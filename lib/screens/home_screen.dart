@@ -209,19 +209,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Text(
               _loadingMessage.isNotEmpty ? _loadingMessage : l10n.t('loading_analyzing'),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E2E),
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
+                border: Border.all(color: theme.colorScheme.outline.withAlpha(60)),
               ),
               child: Row(
                 children: [
@@ -234,9 +234,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   Expanded(
                     child: Text(
                       l10n.t('loading_large_hint'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white60,
+                        color: theme.colorScheme.onSurface.withAlpha(160),
                         height: 1.4,
                       ),
                     ),
@@ -375,20 +375,26 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bg = theme.brightness == Brightness.dark
+        ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
+        : const Color(0xFFEAEBF2);
+    final textColor = theme.colorScheme.onSurface.withAlpha(150);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A3E),
+        color: bg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.white54),
+          Icon(icon, size: 14, color: textColor),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Colors.white54),
+            style: TextStyle(fontSize: 12, color: textColor),
           ),
         ],
       ),

@@ -167,7 +167,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     width: 76,
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A3E),
+                      color: theme.brightness == Brightness.dark
+                          ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
+                          : const Color(0xFFEAEBF2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -317,7 +319,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       child: Material(
         color: isSelected
             ? theme.colorScheme.primary.withAlpha(25)
-            : const Color(0xFF2A2A3E),
+            : (theme.brightness == Brightness.dark
+                ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
+                : const Color(0xFFEAEBF2)),
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           onTap: () => widget.onResolutionChanged(res),
@@ -346,7 +350,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     border: Border.all(
                       color: isSelected
                           ? theme.colorScheme.primary
-                          : Colors.white30,
+                          : theme.colorScheme.onSurface.withAlpha(60),
                       width: 2,
                     ),
                   ),
@@ -364,7 +368,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                          color: isSelected ? theme.colorScheme.primary : Colors.white,
+                          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
                         ),
                       ),
                       Text(
@@ -373,7 +377,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                           fontSize: 11,
                           color: isSelected
                               ? theme.colorScheme.primary.withAlpha(180)
-                              : Colors.white38,
+                              : theme.colorScheme.onSurface.withAlpha(120),
                         ),
                       ),
                     ],

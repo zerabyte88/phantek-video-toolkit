@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../models/app_settings.dart';
 import 'localization_service.dart';
@@ -28,11 +29,21 @@ class SettingsService extends ChangeNotifier {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         _settings = AppSettings.fromJson(data);
       }
+      // Apply wakelock state
+      await _applyWakelock(_settings.keepScreenAwake);
     } catch (e) {
       debugPrint('Error loading settings: $e');
     } finally {
       _isLoaded = true;
       notifyListeners();
+    }
+  }
+
+  Future<void> _applyWakelock(bool enable) async {
+    try {
+      await WakelockPlus.toggle(enable: enable);
+    } catch (e) {
+      debugPrint('Error toggling wakelock: $e');
     }
   }
 
@@ -47,13 +58,26 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> updateSettings(AppSettings newSettings) async {
+    final oldWakelock = _settings.keepScreenAwake;
     _settings = newSettings;
     notifyListeners();
     await _saveSettings();
+
+    if (oldWakelock != newSettings.keepScreenAwake) {
+      await _applyWakelock(newSettings.keepScreenAwake);
+    }
   }
 
   Future<void> setLanguage(String languageCode) async {
     await updateSettings(_settings.copyWith(languageCode: languageCode));
+  }
+
+  Future<void> setThemeMode(String themeMode) async {
+    await updateSettings(_settings.copyWith(themeMode: themeMode));
+  }
+
+  Future<void> setKeepScreenAwake(bool enable) async {
+    await updateSettings(_settings.copyWith(keepScreenAwake: enable));
   }
 
   Future<void> setCpuThreads(int threads) async {
@@ -77,10 +101,10 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> resetToDefaults() async {
-    // Preserve current language when resetting hardware defaults or reset all
     final currentLang = _settings.languageCode;
     _settings = AppSettings(languageCode: currentLang);
     notifyListeners();
     await _saveSettings();
+    await _applyWakelock(_settings.keepScreenAwake);
   }
 }

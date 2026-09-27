@@ -17,7 +17,7 @@ void main() {
     test('Translations resolve correctly for all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
-        expect(l10n.t('app_title'), 'Video Downscaler');
+        expect(l10n.t('app_title'), 'HS Video Converter');
         expect(l10n.t('pick_video').isNotEmpty, isTrue);
         expect(l10n.t('settings_title').isNotEmpty, isTrue);
         expect(l10n.t('loading_analyzing').isNotEmpty, isTrue);
@@ -112,6 +112,8 @@ void main() {
       expect(settings.hardwareAcceleration, isFalse);
       expect(settings.audioBitrateKbps, equals(128));
       expect(settings.languageCode, equals('id'));
+      expect(settings.themeMode, equals('dark'));
+      expect(settings.keepScreenAwake, isFalse);
     });
 
     test('Serialization to and from JSON works', () {
@@ -122,6 +124,8 @@ void main() {
         hardwareAcceleration: true,
         audioBitrateKbps: 192,
         languageCode: 'ja',
+        themeMode: 'oled',
+        keepScreenAwake: true,
       );
 
       final json = original.toJson();
@@ -133,6 +137,21 @@ void main() {
       expect(restored.hardwareAcceleration, isTrue);
       expect(restored.audioBitrateKbps, equals(192));
       expect(restored.languageCode, equals('ja'));
+      expect(restored.themeMode, equals('oled'));
+      expect(restored.keepScreenAwake, isTrue);
+    });
+
+    test('New theme and wakelock translations exist', () {
+      for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('settings_theme').isNotEmpty, isTrue);
+        expect(l10n.t('theme_oled').isNotEmpty, isTrue);
+        expect(l10n.t('theme_light').isNotEmpty, isTrue);
+        expect(l10n.t('settings_wakelock').isNotEmpty, isTrue);
+        expect(l10n.t('settings_wakelock_desc').isNotEmpty, isTrue);
+        expect(l10n.t('proc_elapsed_time').isNotEmpty, isTrue);
+        expect(l10n.t('proc_remaining_time').isNotEmpty, isTrue);
+      }
     });
   });
 }

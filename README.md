@@ -1,4 +1,8 @@
-# 🎬 Video Downscaler
+# 🎬 HS Video Converter
+
+<p align="center">
+  <img src="assets/icon/app_icon.jpg" alt="HS Video Converter Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.47+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
@@ -22,7 +26,9 @@
 
 Modern smartphones record stunning 4K and 2K videos, but these files are often hundreds of megabytes or even gigabytes in size. Sharing them over messaging platforms (like WhatsApp, Discord, or Telegram) or via email frequently fails due to strict file-size limits.
 
-**Video Downscaler** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_full_gpl`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
+Furthermore, many smartphones—especially **mid-range and budget (low-end) devices**—lack the dedicated hardware decoders, CPU/GPU throughput, or memory bandwidth required to decode and smoothly play ultra-high-resolution 2K and 4K media. When attempting to open these heavy files, users often experience severe frame stuttering, audio/video desynchronization, app freezing, or outright "Cannot play video" errors. Solving this playback bottleneck and making videos universally accessible across all devices is one of the primary reasons **HS Video Converter** was created.
+
+**HS Video Converter** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_full_gpl`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
 
 ---
 
@@ -47,13 +53,16 @@ Modern smartphones record stunning 4K and 2K videos, but these files are often h
     - **360p:** 0.5 – 2.0 Mbps
   - Preserves audio quality using AAC stereo encoding at 128 kbps with `+faststart` MP4 container flags for instant streaming playback.
 
-- **📊 Real-time Transcoding Telemetry**
+- **📊 Real-time Transcoding Telemetry & Time Estimator**
   - Live radial progress indicator with percentage readout.
+  - **Live Elapsed Timer**: Shows exact duration since conversion began (`01:24`).
+  - **Dynamic Estimated Remaining Time (ETA)**: Continuously projects completion time (`~02:10`).
+  - **Total Processing Duration**: Displays overall completion time upon finishing (`Finished in 02:15`).
   - Real-time statistics: encoding speed multiplier (e.g. `1.8x` real-time) and accumulated output file size.
   - Safe, responsive cancellation to interrupt long-running transcoding tasks at any moment.
 
 - **💾 File Management & Direct Launch**
-  - Stores output in an organized `VideoDownscaler` application folder.
+  - Stores output in an organized `HS Video Converter` (`HSVideoConverter`) application folder.
   - Calculates and displays exact file size savings (e.g. *"Saved 72%"*).
   - Open output videos directly in your favorite video player with a single tap via `open_file`.
 
@@ -71,14 +80,16 @@ Modern smartphones record stunning 4K and 2K videos, but these files are often h
   - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語 (Japanese)**, **简体中文 (Simplified Chinese - China)**, **繁體中文 (Traditional Chinese - Taiwan)**, and **한국어 (Korean)**.
 
 - **⚙️ Deep Hardware & Performance Tuning**
+  - **Display Themes**: Choose between **Standard Dark Mode**, **Dark OLED Mode** (True `#000000` pitch black for maximum AMOLED battery savings), and **Light Mode**.
+  - **Keep Screen Awake (Wakelock)**: Prevents the display from turning off or sleeping during encoding tasks (includes clear battery consumption warning).
   - **CPU Core / Thread Control**: Specify thread count (`-threads N`) or Auto to balance conversion speed vs. battery & device temperature.
   - **RAM & Memory Buffer Allocation**: Choose from 256 MB (Low Memory), 512 MB (Balanced), 1024 MB (High Performance), or 2048 MB (Maximum) to prevent out-of-memory crashes on resource-constrained devices.
   - **CPU Preset**: Tune encoding speed vs. compression ratio (`ultrafast`, `superfast`, `veryfast`, `fast`, `medium`, `slow`).
   - **Hardware Acceleration**: Optional Android MediaCodec acceleration for energy-efficient GPU transcoding.
   - **Audio Bitrate Control**: Customize audio quality (64 kbps, 128 kbps, 192 kbps, 256 kbps) or strip audio completely (Mute).
 
-- **🎨 Modern Dark UI**
-  - Built with Flutter Material 3 following sleek dark aesthetic guidelines (`#11111B` background, `#1E1E2E` card surfaces, and `#6C63FF` accents).
+- **🎨 Multi-Theme UI (Dark, OLED, Light)**
+  - Built with Flutter Material 3 supporting sleek Dark (`#11111B`), Pure OLED Black (`#000000`), and Clean Light (`#F6F7FB`) modes.
   - Clean typographic hierarchy and animated progress indicators.
 
 ---

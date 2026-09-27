@@ -142,11 +142,12 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       width: 140,
       child: Row(
         children: [
-          Icon(icon, size: 18, color: Colors.white38),
+          Icon(icon, size: 18, color: theme.colorScheme.onSurface.withAlpha(120)),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -154,16 +155,17 @@ class _InfoTile extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white38,
+                    color: theme.colorScheme.onSurface.withAlpha(140),
                   ),
                 ),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

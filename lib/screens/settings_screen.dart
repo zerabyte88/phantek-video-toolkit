@@ -29,11 +29,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           children: [
-            // Language Section
+            // 1. Language Section
             _buildSectionHeader(
               icon: Icons.language_rounded,
               title: l10n.t('settings_language'),
               theme: theme,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.t('settings_language_desc'),
+              style: const TextStyle(fontSize: 12, color: Colors.white54),
             ),
             const SizedBox(height: 10),
             Card(
@@ -84,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         : FontWeight.normal,
                                     color: isSelected
                                         ? theme.colorScheme.primary
-                                        : Colors.white,
+                                        : theme.colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -106,7 +111,157 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Hardware & Performance Section
+            // 2. Display Theme Section (Dark, OLED, Light)
+            _buildSectionHeader(
+              icon: Icons.palette_rounded,
+              title: l10n.t('settings_theme'),
+              theme: theme,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.t('settings_theme_desc'),
+              style: const TextStyle(fontSize: 12, color: Colors.white54),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _buildThemeTile(
+                      icon: Icons.dark_mode_rounded,
+                      title: l10n.t('theme_dark'),
+                      subtitle: 'Navy / Slate Dark (#11111B)',
+                      value: 'dark',
+                      current: settings.themeMode,
+                      theme: theme,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildThemeTile(
+                      icon: Icons.brightness_2_rounded,
+                      title: l10n.t('theme_oled'),
+                      subtitle: 'True Black (#000000) • Hemat baterai AMOLED',
+                      value: 'oled',
+                      current: settings.themeMode,
+                      theme: theme,
+                      badge: 'OLED / AMOLED',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildThemeTile(
+                      icon: Icons.light_mode_rounded,
+                      title: l10n.t('theme_light'),
+                      subtitle: 'Clean & Bright (#F6F7FB)',
+                      value: 'light',
+                      current: settings.themeMode,
+                      theme: theme,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 3. Keep Screen Awake (Wakelock) Section with Warning
+            _buildSectionHeader(
+              icon: Icons.screen_lock_portrait_rounded,
+              title: l10n.t('settings_wakelock'),
+              theme: theme,
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: settings.keepScreenAwake
+                                ? const Color(0xFFFF9F43).withAlpha(30)
+                                : theme.colorScheme.primary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            settings.keepScreenAwake
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded,
+                            color: settings.keepScreenAwake
+                                ? const Color(0xFFFF9F43)
+                                : theme.colorScheme.primary,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text(
+                            l10n.t('settings_wakelock'),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Switch(
+                          value: settings.keepScreenAwake,
+                          onChanged: (val) {
+                            _settingsService.setKeepScreenAwake(val);
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: settings.keepScreenAwake
+                            ? const Color(0xFFFF9F43).withAlpha(15)
+                            : Colors.white.withAlpha(8),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: settings.keepScreenAwake
+                              ? const Color(0xFFFF9F43).withAlpha(60)
+                              : Colors.white12,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.battery_alert_rounded,
+                            size: 18,
+                            color: settings.keepScreenAwake
+                                ? const Color(0xFFFF9F43)
+                                : Colors.white38,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.t('settings_wakelock_desc'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1.4,
+                                color: settings.keepScreenAwake
+                                    ? const Color(0xFFFFD180)
+                                    : Colors.white60,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 4. Hardware & Performance Section
             _buildSectionHeader(
               icon: Icons.memory_rounded,
               title: l10n.t('settings_hardware'),
@@ -613,6 +768,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildThemeTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String value,
+    required String current,
+    required ThemeData theme,
+    String? badge,
+  }) {
+    final isSelected = value == current;
+    return InkWell(
+      onTap: () async {
+        await _settingsService.setThemeMode(value);
+        setState(() {});
+      },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withAlpha(25)
+              : Colors.white.withAlpha(5),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.primary : Colors.white12,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 22,
+              color: isSelected ? theme.colorScheme.primary : Colors.white60,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF7E76FF).withAlpha(35),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            badge,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF7E76FF),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle_rounded,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
     );
   }
 

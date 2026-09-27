@@ -19,6 +19,12 @@ class AppSettings {
   /// Selected language code: 'id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'.
   final String languageCode;
 
+  /// App theme mode: 'dark', 'oled', 'light'.
+  final String themeMode;
+
+  /// Keep screen awake / prevent display sleeping during encoding or app usage.
+  final bool keepScreenAwake;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -26,6 +32,8 @@ class AppSettings {
     this.hardwareAcceleration = false,
     this.audioBitrateKbps = 128,
     this.languageCode = 'id',
+    this.themeMode = 'dark',
+    this.keepScreenAwake = false,
   });
 
   /// Detected hardware core count of the phone.
@@ -38,6 +46,8 @@ class AppSettings {
     bool? hardwareAcceleration,
     int? audioBitrateKbps,
     String? languageCode,
+    String? themeMode,
+    bool? keepScreenAwake,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -46,6 +56,8 @@ class AppSettings {
       hardwareAcceleration: hardwareAcceleration ?? this.hardwareAcceleration,
       audioBitrateKbps: audioBitrateKbps ?? this.audioBitrateKbps,
       languageCode: languageCode ?? this.languageCode,
+      themeMode: themeMode ?? this.themeMode,
+      keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
     );
   }
 
@@ -57,6 +69,8 @@ class AppSettings {
       'hardwareAcceleration': hardwareAcceleration,
       'audioBitrateKbps': audioBitrateKbps,
       'languageCode': languageCode,
+      'themeMode': themeMode,
+      'keepScreenAwake': keepScreenAwake,
     };
   }
 
@@ -68,6 +82,8 @@ class AppSettings {
       hardwareAcceleration: json['hardwareAcceleration'] as bool? ?? false,
       audioBitrateKbps: json['audioBitrateKbps'] as int? ?? 128,
       languageCode: json['languageCode'] as String? ?? 'id',
+      themeMode: json['themeMode'] as String? ?? 'dark',
+      keepScreenAwake: json['keepScreenAwake'] as bool? ?? false,
     );
   }
 }

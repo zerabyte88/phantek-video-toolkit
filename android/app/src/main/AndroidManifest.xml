@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <application
-        android:label="video_downscaler"
+        android:label="HS Video Converter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

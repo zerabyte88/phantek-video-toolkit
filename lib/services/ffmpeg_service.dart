@@ -83,7 +83,7 @@ class FFmpegService {
     required void Function(String log) onLog,
   }) async {
     final dir = await getApplicationDocumentsDirectory();
-    final outputDir = Directory('${dir.path}/VideoDownscaler');
+    final outputDir = Directory('${dir.path}/HSVideoConverter');
     if (!await outputDir.exists()) {
       await outputDir.create(recursive: true);
     }
