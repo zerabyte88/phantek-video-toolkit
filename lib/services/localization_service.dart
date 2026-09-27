@@ -14,7 +14,7 @@ class AppLocalizations {
 
   static const Map<String, Map<String, String>> _localizedValues = {
     'id': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': 'Konversi video 4K/2K ke resolusi\nyang lebih kecil dengan mudah',
       'pick_video': 'Pilih Video',
       'change_video': 'Ganti Video',
@@ -79,7 +79,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': 'Apakah Anda yakin ingin mengembalikan semua preferensi ke pengaturan bawaan?',
       'settings_reset_success': 'Pengaturan berhasil direset ke default',
       'settings_about': 'Tentang Aplikasi',
-      'settings_about_desc': 'HS Video Converter adalah aplikasi open-source untuk kompresi dan konversi video secara aman dan 100% offline tanpa mengunggah ke internet.',
+      'settings_about_desc': 'Video Downscaler adalah aplikasi open-source untuk kompresi dan konversi video secara aman dan 100% offline tanpa mengunggah ke internet.',
       // Bitrate presets
       'bitrate_auto': 'Auto (Dihitung Otomatis)',
       'bitrate_high': 'Kualitas Tinggi',
@@ -108,9 +108,11 @@ class AppLocalizations {
       'proc_remaining_time': 'Estimasi Selesai',
       'proc_calculating': 'Menghitung...',
       'proc_total_time': 'Selesai dalam {time}',
+      'proc_saved_location': 'Folder Penyimpanan',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
     'en': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': 'Downscale & compress 4K/2K videos\nto smaller resolutions effortlessly',
       'pick_video': 'Select Video',
       'change_video': 'Change Video',
@@ -175,7 +177,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': 'Are you sure you want to restore all settings to default values?',
       'settings_reset_success': 'Settings successfully restored to default',
       'settings_about': 'About App',
-      'settings_about_desc': 'HS Video Converter is a 100% offline, privacy-first mobile transcoding tool powered by FFmpeg.',
+      'settings_about_desc': 'Video Downscaler is a 100% offline, privacy-first mobile transcoding tool powered by FFmpeg.',
       // Bitrate presets
       'bitrate_auto': 'Auto (Calculated)',
       'bitrate_high': 'High Quality',
@@ -204,9 +206,11 @@ class AppLocalizations {
       'proc_remaining_time': 'Estimated Remaining',
       'proc_calculating': 'Calculating...',
       'proc_total_time': 'Completed in {time}',
+      'proc_saved_location': 'Storage Folder',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
     'ja': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': '4K/2K動画を高画質のまま\n手軽に縮小・圧縮します',
       'pick_video': '動画を選択',
       'change_video': '別の動画を選択',
@@ -271,7 +275,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': 'すべての設定をデフォルト値に戻してもよろしいですか？',
       'settings_reset_success': '設定をデフォルトに戻しました',
       'settings_about': 'アプリについて',
-      'settings_about_desc': 'HS Video Converterは、完全オフラインで動作する安心の動画縮小・圧縮アプリです。',
+      'settings_about_desc': 'Video Downscalerは、完全オフラインで動作する安心の動画縮小・圧縮アプリです。',
       // Bitrate presets
       'bitrate_auto': '自動 (推奨)',
       'bitrate_high': '高画質',
@@ -300,9 +304,11 @@ class AppLocalizations {
       'proc_remaining_time': '残り予定時間',
       'proc_calculating': '計算中...',
       'proc_total_time': '所要時間: {time}',
+      'proc_saved_location': '保存フォルダー',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
     'zh_CN': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': '轻松将 4K/2K 视频降分辨率\n并高效压缩文件大小',
       'pick_video': '选择视频',
       'change_video': '更换视频',
@@ -367,7 +373,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': '确定要将所有配置项恢复为初始默认值吗？',
       'settings_reset_success': '已成功恢复默认设置',
       'settings_about': '关于应用',
-      'settings_about_desc': 'HS Video Converter 是一款完全离线运行的移动端视频转码压缩工具，保障您的绝对隐私。',
+      'settings_about_desc': 'Video Downscaler 是一款完全离线运行的移动端视频转码压缩工具，保障您的绝对隐私。',
       // Bitrate presets
       'bitrate_auto': '自动 (推荐计算)',
       'bitrate_high': '高画质',
@@ -396,9 +402,11 @@ class AppLocalizations {
       'proc_remaining_time': '预计剩余',
       'proc_calculating': '正在计算...',
       'proc_total_time': '总耗时: {time}',
+      'proc_saved_location': '存储文件夹',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
     'zh_TW': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': '輕鬆將 4K/2K 影片降解析度\n並高效壓縮檔案大小',
       'pick_video': '選取影片',
       'change_video': '更換影片',
@@ -463,7 +471,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': '確定要將所有偏好設定恢復為原廠預設值嗎？',
       'settings_reset_success': '已成功恢復預設設定',
       'settings_about': '關於應用程式',
-      'settings_about_desc': 'HS Video Converter 是一款完全離線執行的行動端影片轉檔壓縮工具，全力保護您的隱私。',
+      'settings_about_desc': 'Video Downscaler 是一款完全離線執行的行動端影片轉檔壓縮工具，全力保護您的隱私。',
       // Bitrate presets
       'bitrate_auto': '自動 (推薦計算)',
       'bitrate_high': '高畫質',
@@ -492,9 +500,11 @@ class AppLocalizations {
       'proc_remaining_time': '預計剩餘',
       'proc_calculating': '正在計算...',
       'proc_total_time': '總耗時: {time}',
+      'proc_saved_location': '儲存資料夾',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
     'ko': {
-      'app_title': 'HS Video Converter',
+      'app_title': 'Video Downscaler',
       'app_tagline': '4K/2K 고해상도 동영상을\n화질 손실 없이 손쉽게 압축하세요',
       'pick_video': '동영상 선택',
       'change_video': '동영상 변경',
@@ -559,7 +569,7 @@ class AppLocalizations {
       'settings_reset_confirm_desc': '모든 사용자 설정을 기본값으로 되돌리시겠습니까?',
       'settings_reset_success': '설정이 기본값으로 재설정되었습니다',
       'settings_about': '앱 정보',
-      'settings_about_desc': 'HS Video Converter는 외부 서버 업로드 없이 기기 내에서 100% 안전하게 동작하는 오프라인 동영상 압축 도구입니다.',
+      'settings_about_desc': 'Video Downscaler는 외부 서버 업로드 없이 기기 내에서 100% 안전하게 동작하는 오프라인 동영상 압축 도구입니다.',
       // Bitrate presets
       'bitrate_auto': '자동 (최적 계산)',
       'bitrate_high': '고화질',
@@ -588,6 +598,8 @@ class AppLocalizations {
       'proc_remaining_time': '예상 남은 시간',
       'proc_calculating': '계산 중...',
       'proc_total_time': '총 소요 시간: {time}',
+      'proc_saved_location': '저장 폴더',
+      'proc_saved_path': 'Movies/Video Downscaler',
     },
   };
 

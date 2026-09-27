@@ -482,6 +482,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   );
                 },
               ),
+              const Divider(height: 20),
+              _buildInfoRow(
+                l10n.t('proc_saved_location'),
+                l10n.t('proc_saved_path'),
+                _outputPath?.split(Platform.pathSeparator).last ?? '',
+              ),
             ],
           ],
         ),

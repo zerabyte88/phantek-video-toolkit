@@ -17,7 +17,7 @@ void main() {
     test('Translations resolve correctly for all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
-        expect(l10n.t('app_title'), 'HS Video Converter');
+        expect(l10n.t('app_title'), 'Video Downscaler');
         expect(l10n.t('pick_video').isNotEmpty, isTrue);
         expect(l10n.t('settings_title').isNotEmpty, isTrue);
         expect(l10n.t('loading_analyzing').isNotEmpty, isTrue);

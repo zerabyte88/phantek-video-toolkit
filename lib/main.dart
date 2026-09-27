@@ -36,7 +36,7 @@ class VideoDownscalerApp extends StatelessWidget {
       builder: (context, child) {
         final themeMode = SettingsService().settings.themeMode;
         return MaterialApp(
-          title: 'HS Video Converter',
+          title: 'Video Downscaler',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.getTheme(themeMode),
           home: const HomeScreen(),

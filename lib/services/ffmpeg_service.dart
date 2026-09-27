@@ -72,6 +72,47 @@ class FFmpegService {
   }
 
   /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
+  /// Get or create the output directory for downscaled videos.
+  /// Strictly targets `/storage/emulated/0/Movies/Video Downscaler` on Android.
+  static Future<Directory> getOutputDirectory() async {
+    if (Platform.isAndroid) {
+      final moviesDir = Directory('/storage/emulated/0/Movies/Video Downscaler');
+      try {
+        if (!await moviesDir.exists()) {
+          await moviesDir.create(recursive: true);
+        }
+        return moviesDir;
+      } catch (e) {
+        // Fallback for devices with different mount points or restricted paths
+        try {
+          final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
+          if (extDirs != null && extDirs.isNotEmpty) {
+            final fallback = Directory('${extDirs.first.path}/Video Downscaler');
+            if (!await fallback.exists()) {
+              await fallback.create(recursive: true);
+            }
+            return fallback;
+          }
+        } catch (_) {}
+
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final fallbackDir = Directory('${appDocDir.path}/Movies/Video Downscaler');
+        if (!await fallbackDir.exists()) {
+          await fallbackDir.create(recursive: true);
+        }
+        return fallbackDir;
+      }
+    } else {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final dir = Directory('${appDocDir.path}/Movies/Video Downscaler');
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+      return dir;
+    }
+  }
+
+  /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
   /// Returns the output file path on success, null on failure.
   static Future<String?> downscaleVideo({
@@ -82,11 +123,7 @@ class FFmpegService {
     required void Function(double progress, String stats) onProgress,
     required void Function(String log) onLog,
   }) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final outputDir = Directory('${dir.path}/HSVideoConverter');
-    if (!await outputDir.exists()) {
-      await outputDir.create(recursive: true);
-    }
+    final outputDir = await getOutputDirectory();
 
     final ext = encodingOptions.container.extension;
     final sanitizedBase = sourceVideo.fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');

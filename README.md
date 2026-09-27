@@ -1,13 +1,13 @@
-# 🎬 HS Video Converter
+# 🎬 Video Downscaler
 
 <p align="center">
-  <img src="assets/icon/app_icon.jpg" alt="HS Video Converter Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+  <img src="assets/icon/app_icon.jpg" alt="Video Downscaler Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.47+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   <img src="https://img.shields.io/badge/Dart-3.13+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
-  <img src="https://img.shields.io/badge/Platform-Android%20(API%2024%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
+  <img src="https://img.shields.io/badge/Platform-Android%20(ARM32%20%7C%20ARM64)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
   <img src="https://img.shields.io/badge/Engine-FFmpeg%20GPL-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
   <img src="https://img.shields.io/github/actions/workflow/status/zerabyte88/video_downscaler/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build%20APK" alt="Build Status" />
 </p>
@@ -26,9 +26,9 @@
 
 Modern smartphones record stunning 4K and 2K videos, but these files are often hundreds of megabytes or even gigabytes in size. Sharing them over messaging platforms (like WhatsApp, Discord, or Telegram) or via email frequently fails due to strict file-size limits.
 
-Furthermore, many smartphones—especially **mid-range and budget (low-end) devices**—lack the dedicated hardware decoders, CPU/GPU throughput, or memory bandwidth required to decode and smoothly play ultra-high-resolution 2K and 4K media. When attempting to open these heavy files, users often experience severe frame stuttering, audio/video desynchronization, app freezing, or outright "Cannot play video" errors. Solving this playback bottleneck and making videos universally accessible across all devices is one of the primary reasons **HS Video Converter** was created.
+Furthermore, many smartphones—especially **mid-range and budget (low-end) devices**—lack the dedicated hardware decoders, CPU/GPU throughput, or memory bandwidth required to decode and smoothly play ultra-high-resolution 2K and 4K media. When attempting to open these heavy files, users often experience severe frame stuttering, audio/video desynchronization, app freezing, or outright "Cannot play video" errors. Solving this playback bottleneck and making videos universally accessible across all devices is one of the primary reasons **Video Downscaler** was created.
 
-**HS Video Converter** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_full_gpl`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
+**Video Downscaler** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_full_gpl`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
 
 ---
 
@@ -62,7 +62,7 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
   - Safe, responsive cancellation to interrupt long-running transcoding tasks at any moment.
 
 - **💾 File Management & Direct Launch**
-  - Stores output in an organized `HS Video Converter` (`HSVideoConverter`) application folder.
+  - Automatically creates and saves output videos to `/storage/emulated/0/Movies/Video Downscaler/` (instantly visible in Gallery, Photos, and Media Players).
   - Calculates and displays exact file size savings (e.g. *"Saved 72%"*).
   - Open output videos directly in your favorite video player with a single tap via `open_file`.
 
@@ -96,22 +96,42 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 
 ## 🛠️ Architecture & How It Works
 
-```mermaid
-flowchart TD
-    A[📁 User Picks Video File] --> B[🔍 FFprobe Media Inspection]
-    B --> C{Extract Video Metadata}
-    C -->|Resolution, Bitrate, FPS, Codec, Duration| D[📋 Video Info Card]
-    D --> E[🎛️ User Selects Downscale Target]
-    E --> F[⚙️ Bitrate & Dimension Calculator]
-    F -->|Aspect Ratio Preserved + Mod 2 Dimensions| G[🚀 FFmpeg Transcoding Pipeline]
-    G -->|libx264 + AAC 128k + faststart| H[📊 Live Progress & Telemetry]
-    H --> I[✅ Conversion Complete]
-    I --> J[📂 Instant Open & File Savings Display]
+```text
+┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
+│   📁 1. Media Input   │ ────> │  🔍 2. FFprobe Probe  │ ────> │  📋 3. Media Metadata │
+│   Native Android      │       │  Extract stream specs │       │  Resolution, Codec,   │
+│   File Picker         │       │  & container details  │       │  FPS, Bitrate, Audio  │
+└───────────────────────┘       └───────────────────────┘       └───────────────────────┘
+                                                                            │
+                                                                            ▼
+┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
+│  🚀 6. Transcoding    │ <──── │  ⚙️ 5. Dimension Calc │ <──── │  🎛️ 4. Configuration  │
+│  FFmpeg Engine        │       │  Aspect ratio clamp   │       │  Target Resolution,   │
+│  Software / Hardware  │       │  & 'mod 2' validation │       │  Codec, and Bitrate   │
+└───────────────────────┘       └───────────────────────┘       └───────────────────────┘
+            │
+            ▼
+┌───────────────────────┐       ┌───────────────────────┐
+│  📊 7. Live Telemetry │ ────> │  ✅ 8. Complete & Save│
+│  Dynamic ETA, Elapsed │       │  Instant open player  │
+│  Timer, % Progress    │       │  & Storage statistics │
+└───────────────────────┘       └───────────────────────┘
 ```
 
-### FFmpeg Transcoding Command Breakdown
+### 🔄 Pipeline Stages Breakdown
 
-The application executes an optimized FFmpeg command configured for mobile efficiency and compatibility:
+| Stage | Component | Technical Role |
+|:---|:---|:---|
+| **1. File Selection & Ingestion** | `file_picker` | Picks local videos via native Android storage access framework without memory overhead. |
+| **2. Media Stream Inspection** | `FFprobe` | Extracts exact container specs, video stream dimensions, framerate, audio tracks, and bitrate. |
+| **3. UI Configuration & Bounds** | `VideoInfoCard` & `ConversionOptionsCard` | Computes eligible downscale targets (e.g. 4K $\rightarrow$ 1080p, 720p), prevents accidental upscaling, and exposes codec/bitrate presets. |
+| **4. Dimension & Bitrate Engine** | `EncodingOptions` | Enforces exact aspect ratio scaling and even `mod 2` width/height constraints required by H.264/HEVC encoders. |
+| **5. Hardware/Software Transcoding** | `FFmpeg` (`ffmpeg_kit_flutter_new`) | Executes the optimized command line pipeline using selected threads, memory buffer limits, and optional Android `MediaCodec` acceleration. |
+| **6. Real-time Telemetry & Launch** | `ProcessingScreen` & `open_file` | Continuously calculates elapsed duration and projected ETA. Finalizes output into `/storage/emulated/0/Movies/Video Downscaler/` and triggers direct playback. |
+
+### ⚡ FFmpeg Transcoding Command Breakdown
+
+The application executes an optimized FFmpeg command configured for mobile efficiency and universal playback compatibility:
 
 ```bash
 ffmpeg -i "<input_path>" \
@@ -125,10 +145,11 @@ ffmpeg -i "<input_path>" \
   -y "<output_path>"
 ```
 
-- `-vf "scale=..."`: Scales video to even dimensions while keeping original aspect ratio.
-- `-c:v libx264 -preset medium`: Balance of fast encoding and strong compression efficiency.
-- `-c:a aac -b:a 128k`: High-fidelity stereo audio compression.
-- `-movflags +faststart`: Moves the `moov` atom to the beginning of the MP4 container for instant playback.
+#### Parameter Highlights:
+- `-vf "scale=<target_width>:<target_height>"`: Scales the video to the target resolution while strictly preserving the original aspect ratio and enforcing even dimensions (`mod 2`) required by mobile hardware decoders.
+- `-c:v libx264 -preset medium`: Balances fast encoding speed with high compression density. Automatically switches to `-c:v h264_mediacodec` or `-c:v hevc_mediacodec` when Hardware Acceleration is enabled.
+- `-c:a aac -b:a 128k`: Delivers clear, high-fidelity stereo audio compression (or strips audio with `-an` if Mute is selected).
+- `-movflags +faststart`: Relocates the `moov` atom to the beginning of the MP4 file for zero-buffering instant streaming and immediate playback.
 
 ---
 
@@ -217,26 +238,28 @@ Ensure your development environment meets the following requirements:
 
 ---
 
-## 📱 Building the APK
+## 📱 Building the APK (ARM 32-bit & 64-bit Exclusive)
+
+> [!TIP]
+> This application is specifically tailored for **real Android devices** utilizing **ARM 32-bit (`armeabi-v7a`)** and **ARM 64-bit (`arm64-v8a`)** architectures. All support for emulator-only `x86` and `x86_64` binaries has been completely stripped out to prevent binary bloat, ensuring both individual APKs and the release `.zip` artifact remain exceptionally compact.
 
 ### Method 1: Local Build
 
 To build release APKs locally on your machine:
 
 ```bash
-# Build universal release APK (contains all ABIs)
-flutter build apk --release
+# Build universal release APK (ARM 32 & 64-bit only):
+flutter build apk --release --target-platform android-arm,android-arm64
 
-# OR build architecture-specific APKs (smaller download size per device):
-flutter build apk --release --split-per-abi
+# OR build architecture-specific APKs:
+flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
 ```
 
 The compiled APKs will be located at:
 `build/app/outputs/flutter-apk/`
-- `app-release.apk` (Universal)
-- `app-arm64-v8a-release.apk` (Modern 64-bit devices, recommended)
-- `app-armeabi-v7a-release.apk` (Older 32-bit devices)
-- `app-x86_64-release.apk` (Emulators)
+- `app-arm64-v8a-release.apk` (Modern 64-bit ARM smartphones — recommended, smallest size)
+- `app-armeabi-v7a-release.apk` (Legacy 32-bit ARM smartphones)
+- `app-release.apk` (Universal ARM dual-architecture binary)
 
 ---
 
