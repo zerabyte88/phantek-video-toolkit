@@ -36,6 +36,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    packaging {
+        jniLibs {
+            pickFirsts.add("**/libc++_shared.so")
+        }
+    }
 }
 
 kotlin {
