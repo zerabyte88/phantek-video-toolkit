@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'screens/home_screen.dart';
+import 'services/settings_service.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SettingsService().init();
+
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -18,6 +22,7 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
+
   runApp(const VideoDownscalerApp());
 }
 
@@ -26,11 +31,16 @@ class VideoDownscalerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Video Downscaler',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+    return ListenableBuilder(
+      listenable: SettingsService(),
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'Video Downscaler',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          home: const HomeScreen(),
+        );
+      },
     );
   }
 }

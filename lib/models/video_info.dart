@@ -80,8 +80,14 @@ class VideoInfo {
   }
 
   List<VideoResolution> get availableDownscaleTargets {
-    return VideoResolution.downscaleTargets
-        .where((r) => r.height < height)
-        .toList();
+    final targets = <VideoResolution>[
+      VideoResolution(
+        label: 'Original ($resolution)',
+        width: width,
+        height: height,
+      ),
+      ...VideoResolution.downscaleTargets.where((r) => r.height < height),
+    ];
+    return targets;
   }
 }

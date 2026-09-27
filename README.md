@@ -57,6 +57,26 @@ Modern smartphones record stunning 4K and 2K videos, but these files are often h
   - Calculates and displays exact file size savings (e.g. *"Saved 72%"*).
   - Open output videos directly in your favorite video player with a single tap via `open_file`.
 
+- **⏳ Instant Loading Feedback & File Analysis**
+  - Instantaneous loading screen activated the moment a video is selected.
+  - Reassures the user during heavy file copying/caching and FFprobe metadata analysis with pulsating animations and status messages.
+
+- **🎛️ Comprehensive Encoding Options (Resolution, Bitrate, Format & Codec)**
+  - **Resolution**: Original resolution preservation or smart downscale targets (1080p, 720p, 480p, 360p).
+  - **Bitrate**: Auto (intelligently computed), High Quality, Balanced, Low Size, or Custom Slider (1–30 Mbps).
+  - **Container Format**: MP4, MKV, MOV, and WebM.
+  - **Video Codec**: H.264 / AVC (`libx264`), H.265 / HEVC (`libx265`), VP9 (`libvpx-vp9`), and MPEG-4 (`mpeg4`).
+
+- **🌐 Multi-Language Support (6 Languages)**
+  - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語 (Japanese)**, **简体中文 (Simplified Chinese - China)**, **繁體中文 (Traditional Chinese - Taiwan)**, and **한국어 (Korean)**.
+
+- **⚙️ Deep Hardware & Performance Tuning**
+  - **CPU Core / Thread Control**: Specify thread count (`-threads N`) or Auto to balance conversion speed vs. battery & device temperature.
+  - **RAM & Memory Buffer Allocation**: Choose from 256 MB (Low Memory), 512 MB (Balanced), 1024 MB (High Performance), or 2048 MB (Maximum) to prevent out-of-memory crashes on resource-constrained devices.
+  - **CPU Preset**: Tune encoding speed vs. compression ratio (`ultrafast`, `superfast`, `veryfast`, `fast`, `medium`, `slow`).
+  - **Hardware Acceleration**: Optional Android MediaCodec acceleration for energy-efficient GPU transcoding.
+  - **Audio Bitrate Control**: Customize audio quality (64 kbps, 128 kbps, 192 kbps, 256 kbps) or strip audio completely (Mute).
+
 - **🎨 Modern Dark UI**
   - Built with Flutter Material 3 following sleek dark aesthetic guidelines (`#11111B` background, `#1E1E2E` card surfaces, and `#6C63FF` accents).
   - Clean typographic hierarchy and animated progress indicators.
@@ -237,6 +257,3 @@ This repository includes a fully configured automated GitHub Actions workflow [`
 ## 📄 License & Attribution
 
 This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with the bundled `ffmpeg_kit_flutter_full_gpl` package and `libx264` codec requirements.
-
-- FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
-- Built with ❤️ using [Flutter](https://flutter.dev).

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/video_info.dart';
+import '../services/localization_service.dart';
+import '../services/settings_service.dart';
 
 class VideoInfoCard extends StatelessWidget {
   final VideoInfo videoInfo;
@@ -10,6 +12,8 @@ class VideoInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = SettingsService().l10n;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -71,46 +75,46 @@ class VideoInfoCard extends StatelessWidget {
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 16),
-            _buildInfoGrid(),
+            _buildInfoGrid(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoGrid() {
+  Widget _buildInfoGrid(AppLocalizations l10n) {
     return Wrap(
       spacing: 16,
       runSpacing: 12,
       children: [
         _InfoTile(
           icon: Icons.aspect_ratio_rounded,
-          label: 'Resolusi',
+          label: l10n.t('resolution'),
           value: '${videoInfo.width}x${videoInfo.height}',
         ),
         _InfoTile(
           icon: Icons.timer_rounded,
-          label: 'Durasi',
+          label: l10n.t('duration'),
           value: videoInfo.formattedDuration,
         ),
         _InfoTile(
           icon: Icons.speed_rounded,
-          label: 'Bitrate',
+          label: l10n.t('bitrate'),
           value: videoInfo.formattedBitrate,
         ),
         _InfoTile(
           icon: Icons.storage_rounded,
-          label: 'Ukuran',
+          label: l10n.t('file_size'),
           value: videoInfo.formattedFileSize,
         ),
         _InfoTile(
           icon: Icons.slow_motion_video_rounded,
-          label: 'FPS',
+          label: l10n.t('fps'),
           value: '${videoInfo.fps.toStringAsFixed(1)} fps',
         ),
         _InfoTile(
           icon: Icons.code_rounded,
-          label: 'Codec',
+          label: l10n.t('codec'),
           value: videoInfo.codec.toUpperCase(),
         ),
       ],

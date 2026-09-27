@@ -3,17 +3,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
+import '../models/app_settings.dart';
+import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/ffmpeg_service.dart';
+import '../services/settings_service.dart';
 
 class ProcessingScreen extends StatefulWidget {
   final VideoInfo videoInfo;
   final VideoResolution targetResolution;
+  final EncodingOptions encodingOptions;
+  final AppSettings appSettings;
 
   const ProcessingScreen({
     super.key,
     required this.videoInfo,
     required this.targetResolution,
+    this.encodingOptions = const EncodingOptions(),
+    this.appSettings = const AppSettings(),
   });
 
   @override
@@ -22,8 +29,9 @@ class ProcessingScreen extends StatefulWidget {
 
 class _ProcessingScreenState extends State<ProcessingScreen>
     with SingleTickerProviderStateMixin {
+  final _settingsService = SettingsService();
   double _progress = 0.0;
-  String _statusText = 'Mempersiapkan...';
+  String _statusText = '';
   String _statsText = '';
   bool _isProcessing = true;
   bool _isSuccess = false;
@@ -35,6 +43,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   @override
   void initState() {
     super.initState();
+    _statusText = _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -52,19 +61,22 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   Future<void> _startProcessing() async {
+    final l10n = _settingsService.l10n;
     setState(() {
-      _statusText = 'Mengkonversi video...';
+      _statusText = l10n.t('proc_converting');
     });
 
     final result = await FFmpegService.downscaleVideo(
       sourceVideo: widget.videoInfo,
       targetResolution: widget.targetResolution,
+      encodingOptions: widget.encodingOptions,
+      appSettings: widget.appSettings,
       onProgress: (progress, stats) {
         if (mounted) {
           setState(() {
             _progress = progress;
             _statsText = stats;
-            _statusText = 'Mengkonversi... ${(progress * 100).toStringAsFixed(1)}%';
+            _statusText = '${l10n.t('proc_converting')} ${(progress * 100).toStringAsFixed(1)}%';
           });
         }
       },
@@ -84,10 +96,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         if (result != null) {
           _isSuccess = true;
           _outputPath = result;
-          _statusText = 'Selesai!';
+          _statusText = l10n.t('proc_completed');
         } else {
           _isSuccess = false;
-          _statusText = 'Gagal mengkonversi video';
+          _statusText = l10n.t('proc_failed');
         }
       });
     }
@@ -96,6 +108,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = _settingsService.l10n;
+
     return PopScope(
       canPop: !_isProcessing,
       onPopInvokedWithResult: (didPop, result) {
@@ -105,7 +119,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Proses Konversi'),
+          title: Text(l10n.t('proc_title')),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () {
@@ -124,11 +138,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               children: [
                 const Spacer(flex: 1),
                 _buildProgressSection(theme),
-                const SizedBox(height: 32),
-                _buildInfoSection(theme),
+                const SizedBox(height: 28),
+                _buildInfoSection(theme, l10n),
                 const Spacer(flex: 2),
-                if (!_isProcessing) _buildActionButtons(theme),
-                if (_isProcessing) _buildCancelButton(theme),
+                if (!_isProcessing) _buildActionButtons(theme, l10n),
+                if (_isProcessing) _buildCancelButton(theme, l10n),
                 const SizedBox(height: 16),
               ],
             ),
@@ -212,6 +226,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         const SizedBox(height: 24),
         Text(
           _statusText,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -231,25 +246,31 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
-  Widget _buildInfoSection(ThemeData theme) {
+  Widget _buildInfoSection(ThemeData theme, l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildInfoRow(
-              'Sumber',
+              l10n.t('proc_source'),
               widget.videoInfo.resolution,
               '${widget.videoInfo.width}x${widget.videoInfo.height}',
             ),
-            const Divider(height: 24),
+            const Divider(height: 20),
             _buildInfoRow(
-              'Target',
+              l10n.t('proc_target'),
               widget.targetResolution.label,
-              '${widget.targetResolution.width}x${widget.targetResolution.height}',
+              '${widget.targetResolution.width}x${widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
+            ),
+            const Divider(height: 20),
+            _buildInfoRow(
+              l10n.t('container_format'),
+              widget.encodingOptions.container.displayName,
+              widget.encodingOptions.codec.displayName,
             ),
             if (_isSuccess && _outputPath != null) ...[
-              const Divider(height: 24),
+              const Divider(height: 20),
               FutureBuilder<int>(
                 future: File(_outputPath!).length(),
                 builder: (context, snapshot) {
@@ -267,9 +288,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                           .toStringAsFixed(0)
                       : '0';
                   return _buildInfoRow(
-                    'Ukuran output',
+                    l10n.t('proc_output_size'),
                     sizeStr,
-                    'Hemat $savings%',
+                    l10n.t('proc_savings', args: {'percent': savings}),
                   );
                 },
               ),
@@ -309,7 +330,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
-  Widget _buildActionButtons(ThemeData theme) {
+  Widget _buildActionButtons(ThemeData theme, l10n) {
     if (_isSuccess) {
       return Column(
         children: [
@@ -318,7 +339,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             child: ElevatedButton.icon(
               onPressed: _openOutputFile,
               icon: const Icon(Icons.folder_open_rounded),
-              label: const Text('Buka File'),
+              label: Text(l10n.t('proc_open_file')),
             ),
           ),
           const SizedBox(height: 12),
@@ -327,7 +348,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             child: OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back_rounded),
-              label: const Text('Kembali'),
+              label: Text(l10n.t('proc_back')),
             ),
           ),
         ],
@@ -342,14 +363,14 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 setState(() {
                   _isProcessing = true;
                   _progress = 0;
-                  _statusText = 'Mempersiapkan...';
+                  _statusText = l10n.t('proc_preparing');
                   _statsText = '';
                   _log = '';
                 });
                 _startProcessing();
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Coba Lagi'),
+              label: Text(l10n.t('proc_retry')),
             ),
           ),
           const SizedBox(height: 12),
@@ -358,7 +379,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             child: OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back_rounded),
-              label: const Text('Kembali'),
+              label: Text(l10n.t('proc_back')),
             ),
           ),
         ],
@@ -366,13 +387,13 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     }
   }
 
-  Widget _buildCancelButton(ThemeData theme) {
+  Widget _buildCancelButton(ThemeData theme, l10n) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: _showCancelDialog,
         icon: const Icon(Icons.cancel_rounded),
-        label: const Text('Batalkan'),
+        label: Text(l10n.t('proc_cancel')),
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFFFF6B6B),
           side: const BorderSide(color: Color(0xFFFF6B6B)),
@@ -382,15 +403,16 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   void _showCancelDialog() {
+    final l10n = _settingsService.l10n;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Batalkan Konversi?'),
-        content: const Text('Proses konversi sedang berjalan. Yakin ingin membatalkan?'),
+        title: Text(l10n.t('proc_cancel_title')),
+        content: Text(l10n.t('proc_cancel_desc')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Tidak'),
+            child: Text(l10n.t('proc_no')),
           ),
           TextButton(
             onPressed: () {
@@ -398,9 +420,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               Navigator.of(context).pop();
               Navigator.of(this.context).pop();
             },
-            child: const Text(
-              'Ya, Batalkan',
-              style: TextStyle(color: Color(0xFFFF6B6B)),
+            child: Text(
+              l10n.t('proc_yes_cancel'),
+              style: const TextStyle(color: Color(0xFFFF6B6B)),
             ),
           ),
         ],

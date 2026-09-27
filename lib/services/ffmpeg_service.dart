@@ -7,6 +7,8 @@ import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/statistics.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../models/app_settings.dart';
+import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 
 class FFmpegService {
@@ -69,12 +71,14 @@ class FFmpegService {
     }
   }
 
-  /// Downscale video to the target resolution.
+  /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
   /// [onProgress] reports progress from 0.0 to 1.0.
   /// Returns the output file path on success, null on failure.
   static Future<String?> downscaleVideo({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
+    EncodingOptions encodingOptions = const EncodingOptions(),
+    AppSettings appSettings = const AppSettings(),
     required void Function(double progress, String stats) onProgress,
     required void Function(String log) onLog,
   }) async {
@@ -84,10 +88,10 @@ class FFmpegService {
       await outputDir.create(recursive: true);
     }
 
-
-    final ext = sourceVideo.fileName.split('.').last;
-    final outputPath =
-        '${outputDir.path}/${sourceVideo.fileName.replaceAll('.$ext', '')}_${targetResolution.label}.$ext';
+    final ext = encodingOptions.container.extension;
+    final sanitizedBase = sourceVideo.fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+    final cleanLabel = targetResolution.label.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+    final outputPath = '${outputDir.path}/${sanitizedBase}_${cleanLabel}_${encodingOptions.codec.displayName.split(' ').first}.$ext';
 
     // Check if output already exists and remove
     final outputFile = File(outputPath);
@@ -99,9 +103,8 @@ class FFmpegService {
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
 
-    // Maintain aspect ratio
-    final sourceAspect = sourceVideo.width / sourceVideo.height;
-    final targetAspect = targetW / targetH;
+    final sourceAspect = sourceVideo.width / (sourceVideo.height > 0 ? sourceVideo.height : 1);
+    final targetAspect = targetW / (targetH > 0 ? targetH : 1);
 
     if (sourceAspect > targetAspect) {
       // Source is wider, limit by width
@@ -111,39 +114,86 @@ class FFmpegService {
       targetW = (targetH * sourceAspect).round();
     }
 
-    // Ensure even dimensions
+    // Ensure even dimensions for encoder requirements
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Calculate target bitrate (proportional to pixel count reduction)
-    final sourcePixels = sourceVideo.width * sourceVideo.height;
-    final targetPixels = targetW * targetH;
-    final ratio = targetPixels / sourcePixels;
-    var targetBitrate = (sourceVideo.bitrate * ratio * 1.2).toInt();
+    // Calculate target bitrate
+    final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+      targetWidth: targetW,
+      targetHeight: targetH,
+      sourceWidth: sourceVideo.width,
+      sourceHeight: sourceVideo.height,
+      sourceBitrateBps: sourceVideo.bitrate,
+    );
+    final bitrateStr = '${targetBitrateKbps}k';
 
-    // Set reasonable min/max bitrates
-    if (targetResolution.height >= 1080) {
-      targetBitrate = targetBitrate.clamp(4000000, 12000000);
-    } else if (targetResolution.height >= 720) {
-      targetBitrate = targetBitrate.clamp(2000000, 6000000);
-    } else if (targetResolution.height >= 480) {
-      targetBitrate = targetBitrate.clamp(1000000, 3000000);
-    } else {
-      targetBitrate = targetBitrate.clamp(500000, 2000000);
+    // Video codec selection
+    String vCodec = encodingOptions.codec.ffmpegCodec;
+    if (appSettings.hardwareAcceleration) {
+      if (encodingOptions.codec == VideoCodec.h264) {
+        vCodec = 'h264_mediacodec';
+      } else if (encodingOptions.codec == VideoCodec.hevc) {
+        vCodec = 'hevc_mediacodec';
+      }
     }
 
-    final bitrateStr = '${(targetBitrate / 1000).round()}k';
+    // Audio options
+    String audioArgs;
+    if (appSettings.audioBitrateKbps <= 0) {
+      audioArgs = '-an';
+    } else {
+      String aCodec = 'aac';
+      if (encodingOptions.container == VideoContainer.webm) {
+        aCodec = 'libopus';
+      }
+      audioArgs = '-c:a $aCodec -b:a ${appSettings.audioBitrateKbps}k';
+    }
 
-    final command = '-i "${sourceVideo.filePath}" '
-        '-vf "scale=$targetW:$targetH" '
-        '-c:v libx264 -preset medium '
-        '-b:v $bitrateStr '
-        '-c:a aac -b:a 128k '
-        '-movflags +faststart '
-        '-y "$outputPath"';
+    // Preset argument for software x264/x265
+    String presetArg = '';
+    if (vCodec == 'libx264' || vCodec == 'libx265') {
+      presetArg = '-preset ${appSettings.cpuPreset}';
+    }
+
+    // Threads argument
+    String threadsArg = '';
+    if (appSettings.cpuThreads > 0) {
+      threadsArg = '-threads ${appSettings.cpuThreads}';
+    }
+
+    // RAM/Buffer argument
+    final bufSizeKb = appSettings.ramBufferMb * 1024;
+    final bufferArg = '-bufsize ${bufSizeKb}k';
+
+    // Container specific flags
+    String containerFlags = '';
+    if (encodingOptions.container == VideoContainer.mp4 ||
+        encodingOptions.container == VideoContainer.mov) {
+      containerFlags = '-movflags +faststart';
+    }
+
+    // Scale filter
+    final scaleFilter = '-vf "scale=$targetW:$targetH"';
+
+    // Construct full command
+    final cmdParts = [
+      '-i "${sourceVideo.filePath}"',
+      threadsArg,
+      scaleFilter,
+      '-c:v $vCodec',
+      presetArg,
+      '-b:v $bitrateStr',
+      bufferArg,
+      audioArgs,
+      containerFlags,
+      '-y "$outputPath"',
+    ]..removeWhere((element) => element.trim().isEmpty);
+
+    final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: ${targetW}x$targetH @ $bitrateStr');
+    onLog('Output: ${targetW}x$targetH @ $bitrateStr using $vCodec');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
 

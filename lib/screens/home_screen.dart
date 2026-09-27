@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/ffmpeg_service.dart';
+import '../services/settings_service.dart';
+import '../widgets/conversion_options_card.dart';
 import '../widgets/video_info_card.dart';
-import '../widgets/resolution_selector.dart';
 import 'processing_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,40 +17,96 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  final _settingsService = SettingsService();
   VideoInfo? _videoInfo;
   VideoResolution? _selectedResolution;
+  EncodingOptions _encodingOptions = const EncodingOptions();
   bool _isLoading = false;
+  String _loadingMessage = '';
+  late AnimationController _loadingAnimController;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadingAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _loadingAnimController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickVideo() async {
-    final files = await FilePicker.pickFiles(
-      type: FileType.video,
-    );
+    final l10n = _settingsService.l10n;
 
-    if (files.isNotEmpty) {
-      final file = files.first;
-      if (file.path == null) return;
+    // Immediately show loading screen BEFORE opening the system file picker,
+    // so when user selects a file and taps OK, the app is already showing the loading screen
+    // while the OS copies/caches the file and FFprobe analyzes it.
+    setState(() {
+      _isLoading = true;
+      _loadingMessage = l10n.t('loading_pick');
+      _videoInfo = null;
+      _selectedResolution = null;
+    });
 
-      setState(() {
-        _isLoading = true;
-        _videoInfo = null;
-        _selectedResolution = null;
-      });
+    try {
+      final files = await FilePicker.pickFiles(
+        type: FileType.video,
+      );
 
-      final info = await FFmpegService.getVideoInfo(file.path!);
+      if (!mounted) return;
 
-      setState(() {
-        _isLoading = false;
-        _videoInfo = info;
-        if (info != null && info.availableDownscaleTargets.isNotEmpty) {
-          _selectedResolution = info.availableDownscaleTargets.first;
+      if (files.isNotEmpty) {
+        final file = files.first;
+        if (file.path == null) {
+          setState(() {
+            _isLoading = false;
+          });
+          return;
         }
-      });
 
-      if (info == null && mounted) {
+        setState(() {
+          _loadingMessage = l10n.t('loading_analyzing');
+        });
+
+        final info = await FFmpegService.getVideoInfo(file.path!);
+
+        if (!mounted) return;
+
+        setState(() {
+          _isLoading = false;
+          _videoInfo = info;
+          if (info != null && info.availableDownscaleTargets.isNotEmpty) {
+            _selectedResolution = info.availableDownscaleTargets.first;
+          }
+        });
+
+        if (info == null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.t('error_read_video')),
+            ),
+          );
+        }
+      } else {
+        // User cancelled picker
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gagal membaca informasi video'),
+          SnackBar(
+            content: Text('${l10n.t('error_read_video')}: $e'),
           ),
         );
       }
@@ -62,6 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => ProcessingScreen(
           videoInfo: _videoInfo!,
           targetResolution: _selectedResolution!,
+          encodingOptions: _encodingOptions,
+          appSettings: _settingsService.settings,
         ),
       ),
     );
@@ -70,11 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = _settingsService.l10n;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Video Downscaler'),
+        title: Text(l10n.t('app_title')),
         actions: [
-          if (_videoInfo != null)
+          if (_videoInfo != null && !_isLoading)
             IconButton(
               onPressed: () {
                 setState(() {
@@ -83,33 +146,111 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
               icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
+              tooltip: l10n.t('reset'),
             ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.settings_rounded),
+            tooltip: l10n.t('settings'),
+          ),
         ],
       ),
       body: SafeArea(
         child: _isLoading
-            ? const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text(
-                      'Membaca info video...',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                  ],
-                ),
-              )
+            ? _buildLoadingState(theme, l10n)
             : _videoInfo == null
-                ? _buildEmptyState(theme)
-                : _buildContent(theme),
+                ? _buildEmptyState(theme, l10n)
+                : _buildContent(theme, l10n),
       ),
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildLoadingState(ThemeData theme, l10n) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    color: theme.colorScheme.primary,
+                    backgroundColor: Colors.white10,
+                  ),
+                ),
+                AnimatedBuilder(
+                  animation: _loadingAnimController,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: 0.6 + (_loadingAnimController.value * 0.4),
+                      child: Icon(
+                        Icons.movie_filter_rounded,
+                        size: 38,
+                        color: theme.colorScheme.primary,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            Text(
+              _loadingMessage.isNotEmpty ? _loadingMessage : l10n.t('loading_analyzing'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E2E),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.t('loading_large_hint'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white60,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme, l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -129,18 +270,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
-              'Video Downscaler',
-              style: TextStyle(
+            Text(
+              l10n.t('app_title'),
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Konversi video 4K/2K ke resolusi\nyang lebih kecil dengan mudah',
+            Text(
+              l10n.t('app_tagline'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
                 color: Colors.white54,
                 height: 1.5,
@@ -152,21 +293,22 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ElevatedButton.icon(
                 onPressed: _pickVideo,
                 icon: const Icon(Icons.video_library_rounded),
-                label: const Text('Pilih Video'),
+                label: Text(l10n.t('pick_video')),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                _FeatureChip(icon: Icons.hd_rounded, label: '4K → 1080p'),
-                SizedBox(width: 8),
-                _FeatureChip(icon: Icons.speed_rounded, label: 'Cepat'),
-                SizedBox(width: 8),
-                _FeatureChip(icon: Icons.high_quality_rounded, label: 'Berkualitas'),
+                _FeatureChip(icon: Icons.hd_rounded, label: l10n.t('feature_downscale')),
+                _FeatureChip(icon: Icons.speed_rounded, label: l10n.t('feature_fast')),
+                _FeatureChip(icon: Icons.high_quality_rounded, label: l10n.t('feature_quality')),
+                _FeatureChip(icon: Icons.offline_bolt_rounded, label: l10n.t('feature_offline')),
               ],
             ),
           ],
@@ -175,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildContent(ThemeData theme) {
+  Widget _buildContent(ThemeData theme, l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -183,70 +325,41 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           VideoInfoCard(videoInfo: _videoInfo!),
           const SizedBox(height: 16),
-          if (_videoInfo!.availableDownscaleTargets.isEmpty)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline_rounded,
-                      size: 48,
-                      color: const Color(0xFF5CD85A).withAlpha(180),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Video sudah beresolusi rendah',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Tidak perlu di-downscale',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                    const SizedBox(height: 20),
-                    OutlinedButton.icon(
-                      onPressed: _pickVideo,
-                      icon: const Icon(Icons.video_library_rounded),
-                      label: const Text('Pilih Video Lain'),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else ...[
-            ResolutionSelector(
-              resolutions: _videoInfo!.availableDownscaleTargets,
-              selected: _selectedResolution,
-              onSelected: (res) {
-                setState(() {
-                  _selectedResolution = res;
-                });
-              },
+          ConversionOptionsCard(
+            sourceVideo: _videoInfo!,
+            resolutions: _videoInfo!.availableDownscaleTargets,
+            selectedResolution: _selectedResolution,
+            encodingOptions: _encodingOptions,
+            onResolutionChanged: (res) {
+              setState(() {
+                _selectedResolution = res;
+              });
+            },
+            onOptionsChanged: (opts) {
+              setState(() {
+                _encodingOptions = opts;
+              });
+            },
+            l10n: l10n,
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: _selectedResolution != null ? _startProcessing : null,
+              icon: const Icon(Icons.play_arrow_rounded, size: 28),
+              label: Text(l10n.t('start_conversion')),
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed:
-                    _selectedResolution != null ? _startProcessing : null,
-                icon: const Icon(Icons.play_arrow_rounded, size: 28),
-                label: const Text('Mulai Konversi'),
-              ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: _pickVideo,
+              icon: const Icon(Icons.swap_horiz_rounded),
+              label: Text(l10n.t('change_video')),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 48,
-              child: OutlinedButton.icon(
-                onPressed: _pickVideo,
-                icon: const Icon(Icons.swap_horiz_rounded),
-                label: const Text('Ganti Video'),
-              ),
-            ),
-          ],
+          ),
           const SizedBox(height: 24),
         ],
       ),
