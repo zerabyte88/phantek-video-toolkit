@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
@@ -172,29 +173,51 @@ class FFmpegService {
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Rate control argument
-    String rateControlArg = '';
-    if (encodingOptions.rateControlMode == RateControlMode.crf) {
-      rateControlArg = '-crf ${encodingOptions.crfValue}';
-    } else {
-      final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
-        targetWidth: targetW,
-        targetHeight: targetH,
-        sourceWidth: sourceVideo.width,
-        sourceHeight: sourceVideo.height,
-        sourceBitrateBps: sourceVideo.bitrate,
-      );
-      rateControlArg = '-b:v ${targetBitrateKbps}k';
-    }
-
     // Video codec selection
     String vCodec = encodingOptions.codec.ffmpegCodec;
+    bool isMediaCodec = false;
+    
     if (appSettings.hardwareAcceleration) {
       if (encodingOptions.codec == VideoCodec.h264) {
         vCodec = 'h264_mediacodec';
+        isMediaCodec = true;
       } else if (encodingOptions.codec == VideoCodec.hevc) {
         vCodec = 'hevc_mediacodec';
+        isMediaCodec = true;
       }
+    }
+
+    // Rate control argument (MediaCodec ignores -crf, must use -b:v)
+    String rateControlArg = '';
+    if (encodingOptions.rateControlMode == RateControlMode.crf && !isMediaCodec) {
+      rateControlArg = '-crf ${encodingOptions.crfValue}';
+    } else {
+      // Calculate a target bitrate. If CRF was chosen but we are on MediaCodec,
+      // we generate a heuristic bitrate based on the CRF value.
+      int targetBitrateKbps;
+      
+      if (encodingOptions.rateControlMode == RateControlMode.crf) {
+        // Fallback for MediaCodec: CRF 20 at 1080p -> ~4000 kbps
+        double baseMbps = 4.0;
+        final maxDim = targetW > targetH ? targetW : targetH;
+        if (maxDim <= 1280) baseMbps = 2.0;
+        if (maxDim <= 854) baseMbps = 1.0;
+        
+        final diff = encodingOptions.crfValue - 20;
+        final factor = diff / 6.0;
+        double estimatedBitrate = baseMbps * pow(0.5, factor);
+        targetBitrateKbps = (estimatedBitrate * 1000).round();
+      } else {
+        targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+          targetWidth: targetW,
+          targetHeight: targetH,
+          sourceWidth: sourceVideo.width,
+          sourceHeight: sourceVideo.height,
+          sourceBitrateBps: sourceVideo.bitrate,
+        );
+      }
+      
+      rateControlArg = '-b:v ${targetBitrateKbps}k';
     }
 
     // Audio options
@@ -220,10 +243,6 @@ class FFmpegService {
     if (appSettings.cpuThreads > 0) {
       threadsArg = '-threads ${appSettings.cpuThreads}';
     }
-
-    // RAM/Buffer argument
-    final bufSizeKb = appSettings.ramBufferMb * 1024;
-    final bufferArg = '-bufsize ${bufSizeKb}k';
 
     // Container specific flags
     String containerFlags = '';
