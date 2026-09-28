@@ -261,7 +261,7 @@ class FFmpegService {
     final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
 
     // Construct full command
-    final cmdParts = [
+    final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
       threadsArg,
       vfArg,
@@ -269,7 +269,6 @@ class FFmpegService {
       presetArg,
       profileLevelArg,
       rateControlArg,
-      bufferArg,
       audioArgs,
       containerFlags,
       '-y "$outputPath"',
