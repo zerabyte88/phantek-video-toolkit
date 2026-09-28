@@ -37,60 +37,42 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 - **🔒 100% Offline & Private Processing**
   - No cloud uploads, no external APIs, and no telemetry. All FFprobe media inspection and FFmpeg transcoding occur locally on the device storage.
 
-- **🎯 Intelligent Downscale Targets**
+- **🎯 Intelligent Downscale Targets & FPS Control**
   - Automatically analyzes input media and exposes only valid downscaling target resolutions (e.g., 4K $\rightarrow$ 1080p, 720p, 480p, or 360p).
-  - Prevents accidental upscaling that would degrade video quality and waste processing cycles.
+  - Target FPS options: Original, 30 FPS, or 24 FPS for cinematic look.
 
-- **📐 Aspect Ratio & Dimension Guard**
-  - Automatically calculates target dimensions while strictly preserving original aspect ratios (16:9, 9:16 portrait, 4:3, 1:1, etc.).
-  - Enforces even-dimension constraints (`mod 2`) required by the H.264 (`libx264`) video encoder.
+- **📐 Aspect Ratio & Lanczos Scaling**
+  - Automatically calculates target dimensions while strictly preserving original aspect ratios.
+  - Enforces even-dimension constraints (`mod 2`) and uses high-quality **Lanczos Resampling** (`scale=W:H:flags=lanczos`).
+  - Colors are forced to standard 8-bit (`yuv420p`) with `high` profile and `4.1` level for maximum Android/iOS compatibility.
 
-- **⚡ Proportional Bitrate Calculation**
-  - Dynamically calculates target bitrate based on pixel reduction ratio, clamped within optimal quality bounds:
-    - **1080p (FHD):** 4.0 – 12.0 Mbps
-    - **720p (HD):** 2.0 – 6.0 Mbps
-    - **480p (SD):** 1.0 – 3.0 Mbps
-    - **360p:** 0.5 – 2.0 Mbps
-  - Preserves audio quality using AAC stereo encoding at 128 kbps with `+faststart` MP4 container flags for instant streaming playback.
+- **⚡ Rate Control: CRF & Bitrate**
+  - **Constant Rate Factor (CRF):** Set target visual quality (CRF 18-28) for intelligent bitrate allocation.
+  - **Custom Bitrate:** Optionally define an exact target bitrate via an interactive slider (1–30 Mbps).
+  - Includes a real-time **Estimated Output Size Calculator** in the UI.
 
-- **📊 Real-time Transcoding Telemetry & Time Estimator**
-  - Live radial progress indicator with percentage readout.
-  - **Live Elapsed Timer**: Shows exact duration since conversion began (`01:24`).
-  - **Dynamic Estimated Remaining Time (ETA)**: Continuously projects completion time (`~02:10`).
-  - **Total Processing Duration**: Displays overall completion time upon finishing (`Finished in 02:15`).
-  - Real-time statistics: encoding speed multiplier (e.g. `1.8x` real-time) and accumulated output file size.
-  - Safe, responsive cancellation to interrupt long-running transcoding tasks at any moment.
+- **📊 Real-time Telemetry & Auto-Detection**
+  - **Hardware Auto-Detection:** Automatically detects device specifications (RAM, SoC, Cores) and sets CPU threads based on hardware tiers.
+  - **Thermal Warning:** Monitors battery temperature every 10 seconds; displays a red warning banner if device hits $\geq$ 45°C.
+  - **Live Progress:** Accurately calculates elapsed duration and projected ETA matching the exact processing percentage.
 
-- **💾 File Management & Direct Launch**
-  - Automatically creates and saves output videos to `/storage/emulated/0/Movies/Video Downscaler/` (instantly visible in Gallery, Photos, and Media Players).
-  - Calculates and displays exact file size savings (e.g. *"Saved 72%"*).
-  - Open output videos directly in your favorite video player with a single tap via `open_file`.
+- **💾 File Management & Smart Cache**
+  - Saves videos to `/storage/emulated/0/Movies/Video Downscaler/`.
+  - **Smart Cache Manager:** Automatically deletes massive temporary files cached by the Android OS (`file_picker`) after conversion is done/cancelled, preventing gigabytes of storage bloat.
+  - **Summary Bottom Sheet:** Displays final saved storage %, Original vs New Size, and options to Play, **Share (via SharePlus)**, and Delete Original Video.
 
-- **⏳ Instant Loading Feedback & File Analysis**
-  - Instantaneous loading screen activated the moment a video is selected.
-  - Reassures the user during heavy file copying/caching and FFprobe metadata analysis with pulsating animations and status messages.
-
-- **🎛️ Comprehensive Encoding Options (Resolution, Bitrate, Format & Codec)**
-  - **Resolution**: Original resolution preservation or smart downscale targets (1080p, 720p, 480p, 360p).
-  - **Bitrate**: Auto (intelligently computed), High Quality, Balanced, Low Size, or Custom Slider (1–30 Mbps).
-  - **Container Format**: MP4, MKV, MOV, and WebM.
-  - **Video Codec**: H.264 / AVC (`libx264`), H.265 / HEVC (`libx265`), VP9 (`libvpx-vp9`), and MPEG-4 (`mpeg4`).
+- **🎛️ Engine Configuration**
+  - Container Format: MP4, MKV, MOV, and WebM.
+  - Video Codec: H.264 / AVC (`libx264`) or H.265 / HEVC (`libx265`).
+  - CPU Preset: Tune encoding speed vs. compression ratio (`ultrafast` to `slow`).
 
 - **🌐 Multi-Language Support (6 Languages)**
-  - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語 (Japanese)**, **简体中文 (Simplified Chinese - China)**, **繁體中文 (Traditional Chinese - Taiwan)**, and **한국어 (Korean)**.
+  - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語**, **简体中文**, **繁體中文**, and **한국어**.
 
-- **⚙️ Deep Hardware & Performance Tuning**
-  - **Display Themes**: Choose between **Standard Dark Mode**, **Dark OLED Mode** (True `#000000` pitch black for maximum AMOLED battery savings), and **Light Mode**.
-  - **Keep Screen Awake (Wakelock)**: Prevents the display from turning off or sleeping during encoding tasks (includes clear battery consumption warning).
-  - **CPU Core / Thread Control**: Specify thread count (`-threads N`) or Auto to balance conversion speed vs. battery & device temperature.
-  - **RAM & Memory Buffer Allocation**: Choose from 256 MB (Low Memory), 512 MB (Balanced), 1024 MB (High Performance), or 2048 MB (Maximum) to prevent out-of-memory crashes on resource-constrained devices.
-  - **CPU Preset**: Tune encoding speed vs. compression ratio (`ultrafast`, `superfast`, `veryfast`, `fast`, `medium`, `slow`).
-  - **Hardware Acceleration**: Optional Android MediaCodec acceleration for energy-efficient GPU transcoding.
-  - **Audio Bitrate Control**: Customize audio quality (64 kbps, 128 kbps, 192 kbps, 256 kbps) or strip audio completely (Mute).
-
-- **🎨 Multi-Theme UI (Dark, OLED, Light)**
-  - Built with Flutter Material 3 supporting sleek Dark (`#11111B`), Pure OLED Black (`#000000`), and Clean Light (`#F6F7FB`) modes.
-  - Clean typographic hierarchy and animated progress indicators.
+- **⚙️ Hardware & Display Features**
+  - **Display Themes**: Standard Dark, OLED Black, and Light Mode.
+  - **Keep Screen Awake (Wakelock)**: Guaranteed OS Wakelock prevents the display from sleeping during heavy FFmpeg tasks.
+  - Dynamic App Version display driven by `package_info_plus`.
 
 ---
 
