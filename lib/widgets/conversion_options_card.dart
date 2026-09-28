@@ -43,9 +43,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
 
-    final targetW = widget.selectedResolution?.width ?? widget.sourceVideo.width;
-    final targetH = widget.selectedResolution?.height ?? widget.sourceVideo.height;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),

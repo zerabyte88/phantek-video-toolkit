@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_downscaler/models/app_settings.dart';
-import 'package:video_downscaler/models/encoding_options.dart';
 import 'package:video_downscaler/services/cache_manager_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 

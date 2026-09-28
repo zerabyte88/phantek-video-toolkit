@@ -805,6 +805,7 @@ class _SuccessBottomSheet extends StatelessWidget {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () {
+                // ignore: deprecated_member_use
                 Share.shareXFiles([XFile(outputPath)]);
               },
               icon: const Icon(Icons.share_rounded),
