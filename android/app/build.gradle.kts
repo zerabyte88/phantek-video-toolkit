@@ -4,6 +4,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.personal.video_downscaler"
     compileSdk = flutter.compileSdkVersion
@@ -14,6 +23,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    val flutterBaseCode = flutter.versionCode ?: 6
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.personal.video_downscaler"
@@ -21,11 +32,9 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
-        // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
-        // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
-        // flag during build.
-        versionCode = flutter.versionCode
+        // Offset versionCode to 10000+ so universal APK and ABI splits are always strictly
+        // greater than any legacy APK (e.g. v1.0.5 arm64 was 2005), preventing downgrade errors.
+        versionCode = if (flutterBaseCode < 10000) 10000 + flutterBaseCode else flutterBaseCode
         versionName = flutter.versionName
 
         ndk {
@@ -42,11 +51,34 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            } else {
+                val releaseJks = file("release.jks")
+                if (releaseJks.exists()) {
+                    keyAlias = "video_downscaler"
+                    keyPassword = "videodownscaler"
+                    storeFile = releaseJks
+                    storePassword = "videodownscaler"
+                } else {
+                    val debugConfig = signingConfigs.getByName("debug")
+                    keyAlias = debugConfig.keyAlias
+                    keyPassword = debugConfig.keyPassword
+                    storeFile = debugConfig.storeFile
+                    storePassword = debugConfig.storePassword
+                }
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

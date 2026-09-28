@@ -2,17 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../models/app_settings.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/cache_manager_service.dart';
-import '../services/ffmpeg_service.dart';
-import '../services/settings_service.dart';
 import '../services/device_spec_helper.dart';
-
-import 'package:share_plus/share_plus.dart';
+import '../services/ffmpeg_service.dart';
+import '../services/foreground_service.dart';
+import '../services/settings_service.dart';
 
 class ProcessingScreen extends StatefulWidget {
   final VideoInfo videoInfo;
@@ -55,6 +56,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   @override
   void initState() {
     super.initState();
+    ForegroundServiceManager().requestPermissions();
     _statusText = _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
@@ -67,6 +69,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   void dispose() {
     _timer?.cancel();
     _pulseController.dispose();
+    ForegroundServiceManager().stopService();
     if (_isProcessing) {
       FFmpegService.cancelAll();
       CacheManagerService().clearAllCache(
@@ -110,6 +113,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     setState(() {
       _statusText = l10n.t('proc_converting');
     });
+
+    await ForegroundServiceManager().startService(
+      title: 'Video Downscaler',
+      text: '${l10n.t('proc_converting')} 0.0%',
+    );
 
     // 1-second timer to update elapsed and remaining time continuously
     _timer?.cancel();
@@ -163,6 +171,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           final now = DateTime.now();
           final elapsed = _startTime != null ? now.difference(_startTime!) : Duration.zero;
           final remaining = _calculateRemainingTime(progress, elapsed);
+          final etaStr = remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+
+          ForegroundServiceManager().updateService(
+            title: 'Video Downscaler',
+            text: '${l10n.t('proc_converting')} ${_formatPercentage(progress)}$etaStr',
+          );
 
           setState(() {
             _progress = progress;
@@ -185,6 +199,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         }
       },
     );
+
+    await ForegroundServiceManager().stopService();
 
     _timer?.cancel();
     if (_startTime != null) {
@@ -241,46 +257,48 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     final theme = Theme.of(context);
     final l10n = _settingsService.l10n;
 
-    return PopScope(
-      canPop: !_isProcessing,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && _isProcessing) {
-          _showCancelDialog();
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.t('proc_title')),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () {
-              if (_isProcessing) {
-                _showCancelDialog();
-              } else {
-                CacheManagerService().clearAllCache(
-                  specificInputPath: widget.videoInfo.filePath,
-                );
-                Navigator.of(context).pop();
-              }
-            },
+    return WithForegroundTask(
+      child: PopScope(
+        canPop: !_isProcessing,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop && _isProcessing) {
+            _showCancelDialog();
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.t('proc_title')),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () {
+                if (_isProcessing) {
+                  _showCancelDialog();
+                } else {
+                  CacheManagerService().clearAllCache(
+                    specificInputPath: widget.videoInfo.filePath,
+                  );
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
           ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                _buildProgressSection(theme, l10n),
-                const SizedBox(height: 24),
-                _buildTimeTelemetryCard(theme, l10n),
-                const SizedBox(height: 16),
-                _buildInfoSection(theme, l10n),
-                const SizedBox(height: 28),
-                if (!_isProcessing) _buildActionButtons(theme, l10n),
-                if (_isProcessing) _buildCancelButton(theme, l10n),
-                const SizedBox(height: 16),
-              ],
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  _buildProgressSection(theme, l10n),
+                  const SizedBox(height: 24),
+                  _buildTimeTelemetryCard(theme, l10n),
+                  const SizedBox(height: 16),
+                  _buildInfoSection(theme, l10n),
+                  const SizedBox(height: 28),
+                  if (!_isProcessing) _buildActionButtons(theme, l10n),
+                  if (_isProcessing) _buildCancelButton(theme, l10n),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),
@@ -694,6 +712,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ),
           TextButton(
             onPressed: () {
+              ForegroundServiceManager().stopService();
               FFmpegService.cancelAll();
               CacheManagerService().clearAllCache(
                 specificInputPath: widget.videoInfo.filePath,
