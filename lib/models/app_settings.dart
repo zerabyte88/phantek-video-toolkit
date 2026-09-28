@@ -81,11 +81,20 @@ class AppSettings {
     };
   }
 
+  /// Sanitize preset to ensure only fast, medium, or slow are used.
+  static String sanitizePreset(String? preset) {
+    if (preset == 'fast' || preset == 'slow') return preset!;
+    if (preset == 'ultrafast' || preset == 'superfast' || preset == 'veryfast' || preset == 'faster') {
+      return 'fast';
+    }
+    return 'medium';
+  }
+
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
       cpuThreads: json['cpuThreads'] as int? ?? 0,
       ramBufferMb: json['ramBufferMb'] as int? ?? 512,
-      cpuPreset: json['cpuPreset'] as String? ?? 'medium',
+      cpuPreset: sanitizePreset(json['cpuPreset'] as String?),
       hardwareAcceleration: json['hardwareAcceleration'] as bool? ?? false,
       audioBitrateKbps: json['audioBitrateKbps'] as int? ?? 128,
       languageCode: json['languageCode'] as String? ?? 'id',

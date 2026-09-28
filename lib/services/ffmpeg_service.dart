@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
@@ -187,37 +186,49 @@ class FFmpegService {
       }
     }
 
-    // Rate control argument (MediaCodec ignores -crf, must use -b:v)
+    final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+      targetWidth: targetW,
+      targetHeight: targetH,
+      sourceWidth: sourceVideo.width,
+      sourceHeight: sourceVideo.height,
+      sourceBitrateBps: sourceVideo.bitrate,
+    );
+
+    // Rate control, preset, and profile arguments
     String rateControlArg = '';
-    if (encodingOptions.rateControlMode == RateControlMode.crf && !isMediaCodec) {
-      rateControlArg = '-crf ${encodingOptions.crfValue}';
-    } else {
-      // Calculate a target bitrate. If CRF was chosen but we are on MediaCodec,
-      // we generate a heuristic bitrate based on the CRF value.
-      int targetBitrateKbps;
-      
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        // Fallback for MediaCodec: CRF 20 at 1080p -> ~4000 kbps
-        double baseMbps = 4.0;
-        final maxDim = targetW > targetH ? targetW : targetH;
-        if (maxDim <= 1280) baseMbps = 2.0;
-        if (maxDim <= 854) baseMbps = 1.0;
-        
-        final diff = encodingOptions.crfValue - 20;
-        final factor = diff / 6.0;
-        double estimatedBitrate = baseMbps * pow(0.5, factor);
-        targetBitrateKbps = (estimatedBitrate * 1000).round();
-      } else {
-        targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
-          targetWidth: targetW,
-          targetHeight: targetH,
-          sourceWidth: sourceVideo.width,
-          sourceHeight: sourceVideo.height,
-          sourceBitrateBps: sourceVideo.bitrate,
-        );
+    String presetArg = '';
+    String profileLevelArg = '';
+
+    if (isMediaCodec) {
+      // MediaCodec hardware encoder on Android strictly requires explicit VBR rate control,
+      // maximum bitrate, buffer size (VBV model), and GOP keyframe interval.
+      // Without these, mobile chipsets (Snapdragon, MediaTek, Exynos) ignore -b:v and
+      // fall back to default low bitrates (~400kbps) causing severe blur and tiny file size.
+      final maxrateKbps = (targetBitrateKbps * 1.5).round();
+      final bufsizeKbps = targetBitrateKbps * 2;
+      final gop = (sourceVideo.fps * 2).round().clamp(24, 120);
+
+      rateControlArg = '-bitrate_mode vbr -b:v ${targetBitrateKbps}k -maxrate ${maxrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
+
+      if (vCodec == 'h264_mediacodec') {
+        profileLevelArg = '-profile:v high';
+      } else if (vCodec == 'hevc_mediacodec') {
+        profileLevelArg = '-profile:v main';
       }
-      
-      rateControlArg = '-b:v ${targetBitrateKbps}k';
+    } else {
+      // Software encoding (libx264 / libx265 / libvpx-vp9)
+      if (encodingOptions.rateControlMode == RateControlMode.crf) {
+        rateControlArg = '-crf ${encodingOptions.crfValue}';
+      } else {
+        rateControlArg = '-b:v ${targetBitrateKbps}k';
+      }
+
+      if (vCodec == 'libx264') {
+        presetArg = '-preset ${appSettings.cpuPreset}';
+        profileLevelArg = '-profile:v high -level:v 4.1';
+      } else if (vCodec == 'libx265') {
+        presetArg = '-preset ${appSettings.cpuPreset}';
+      }
     }
 
     // Audio options
@@ -226,16 +237,6 @@ class FFmpegService {
       audioArgs = '-an';
     } else if (encodingOptions.container == VideoContainer.webm) {
       audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
-    }
-
-    // Preset argument for software x264/x265
-    String presetArg = '';
-    String profileLevelArg = '';
-    if (vCodec == 'libx264') {
-      presetArg = '-preset ${appSettings.cpuPreset}';
-      profileLevelArg = '-profile:v high -level:v 4.1';
-    } else if (vCodec == 'libx265') {
-      presetArg = '-preset ${appSettings.cpuPreset}';
     }
 
     // Threads argument

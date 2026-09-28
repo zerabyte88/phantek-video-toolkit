@@ -543,14 +543,20 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   } else {
                     sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
                   }
-                  final savings = widget.videoInfo.fileSizeBytes > 0
-                      ? ((1 - size / widget.videoInfo.fileSizeBytes) * 100)
+                  final isBigger = size > widget.videoInfo.fileSizeBytes;
+                  final diffPercent = widget.videoInfo.fileSizeBytes > 0
+                      ? ((size - widget.videoInfo.fileSizeBytes).abs() /
+                              widget.videoInfo.fileSizeBytes *
+                              100)
                           .toStringAsFixed(0)
                       : '0';
+                  final savingsBadge = isBigger
+                      ? l10n.t('proc_size_increase', args: {'percent': diffPercent})
+                      : l10n.t('proc_savings', args: {'percent': diffPercent});
                   return _buildInfoRow(
                     l10n.t('proc_output_size'),
                     sizeStr,
-                    l10n.t('proc_savings', args: {'percent': savings}),
+                    savingsBadge,
                   );
                 },
               ),
@@ -740,9 +746,11 @@ class _SuccessBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = SettingsService().l10n;
     final outputSize = File(outputPath).lengthSync();
-    final savings = originalSize > 0
-        ? ((1 - outputSize / originalSize) * 100).toStringAsFixed(1)
+    final isBigger = outputSize > originalSize;
+    final diffRatio = originalSize > 0
+        ? ((outputSize - originalSize).abs() / originalSize * 100).toStringAsFixed(1)
         : '0';
 
     return SafeArea(
@@ -758,7 +766,7 @@ class _SuccessBottomSheet extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Konversi Berhasil',
+                    l10n.t('proc_completed'),
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                   ),
                 ),
@@ -768,26 +776,54 @@ class _SuccessBottomSheet extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatColumn('Asli', _formatSize(originalSize), Icons.folder_rounded, Colors.white54),
+                _buildStatColumn(l10n.t('proc_source'), _formatSize(originalSize), Icons.folder_rounded, Colors.white54),
                 const Icon(Icons.arrow_forward_rounded, color: Colors.white24),
-                _buildStatColumn('Baru', _formatSize(outputSize), Icons.folder_special_rounded, theme.colorScheme.primary),
+                _buildStatColumn(l10n.t('proc_target'), _formatSize(outputSize), Icons.folder_special_rounded, theme.colorScheme.primary),
               ],
             ),
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF5CD85A).withAlpha(20),
+                color: isBigger
+                    ? const Color(0xFFFF9F43).withAlpha(20)
+                    : const Color(0xFF5CD85A).withAlpha(20),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isBigger
+                      ? const Color(0xFFFF9F43).withAlpha(60)
+                      : const Color(0xFF5CD85A).withAlpha(60),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.save_alt_rounded, color: Color(0xFF5CD85A), size: 20),
+                  Icon(
+                    isBigger ? Icons.trending_up_rounded : Icons.save_alt_rounded,
+                    color: isBigger ? const Color(0xFFFF9F43) : const Color(0xFF5CD85A),
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      'Hemat Storage: $savings%',
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF5CD85A)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isBigger
+                              ? l10n.t('proc_size_increase_title', args: {'percent': diffRatio})
+                              : l10n.t('proc_savings_title', args: {'percent': diffRatio}),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isBigger ? const Color(0xFFFF9F43) : const Color(0xFF5CD85A),
+                          ),
+                        ),
+                        if (isBigger) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.t('proc_size_increase_hint'),
+                            style: const TextStyle(fontSize: 11, color: Colors.white70),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],

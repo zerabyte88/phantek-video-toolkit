@@ -575,7 +575,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            settings.cpuPreset.toUpperCase(),
+                            settings.cpuPreset == 'medium' ? 'NORMAL' : settings.cpuPreset.toUpperCase(),
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -598,20 +598,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        'ultrafast',
-                        'superfast',
-                        'veryfast',
-                        'fast',
-                        'medium',
-                        'slow',
-                      ].map((preset) {
-                        final isSelected = settings.cpuPreset == preset;
+                        {
+                          'key': 'fast',
+                          'label': l10n.t('preset_fast'),
+                        },
+                        {
+                          'key': 'medium',
+                          'label': l10n.t('preset_normal'),
+                        },
+                        {
+                          'key': 'slow',
+                          'label': l10n.t('preset_slow'),
+                        },
+                      ].map((item) {
+                        final key = item['key']!;
+                        final label = item['label']!;
+                        final isSelected = settings.cpuPreset == key;
                         return ChoiceChip(
-                          label: Text(preset),
+                          label: Text(label),
                           selected: isSelected,
                           onSelected: (selected) {
                             if (selected) {
-                              _settingsService.setCpuPreset(preset);
+                              _settingsService.setCpuPreset(key);
                               setState(() {});
                             }
                           },

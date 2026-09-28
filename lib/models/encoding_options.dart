@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 enum VideoCodec {
   h264('H.264 / AVC', 'libx264', 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.'),
   hevc('H.265 / HEVC', 'libx265', 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.'),
@@ -72,7 +74,8 @@ class EncodingOptions {
     );
   }
 
-  /// Calculates target video bitrate in kbps based on resolution, source video, and preset.
+  /// Calculates target video bitrate in kbps based on target resolution, CRF/Bitrate mode,
+  /// and source video metadata.
   int calculateTargetBitrateKbps({
     required int targetWidth,
     required int targetHeight,
@@ -84,8 +87,40 @@ class EncodingOptions {
       return customBitrateKbps;
     }
     
-    // For CRF mode, it's variable, but we can return an estimate for UI display if needed.
-    // Or we just return 0 to indicate CRF is in use.
-    return 0;
+    // For CRF mode, calculate baseline bitrate based on target resolution
+    final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
+    double baseMbps = 4.5; // High-quality 1080p baseline (~4.5 Mbps)
+    if (maxDim >= 2560) {
+      baseMbps = 8.5; // 2K/1440p
+    } else if (maxDim >= 1920) {
+      baseMbps = 4.5; // 1080p
+    } else if (maxDim >= 1280) {
+      baseMbps = 2.5; // 720p
+    } else if (maxDim >= 854) {
+      baseMbps = 1.3; // 480p
+    } else {
+      baseMbps = 0.8; // 360p
+    }
+
+    // Every +6 CRF roughly halves the bitrate; every -6 roughly doubles it
+    final diff = crfValue - 20;
+    final factor = diff / 6.0;
+    double estimatedBitrateMbps = baseMbps * math.pow(0.5, factor);
+
+    // If source video bitrate is known and lower than the calculated target,
+    // don't unnecessarily upscale the bitrate beyond the source
+    if (sourceBitrateBps > 0) {
+      final sourceKbps = sourceBitrateBps ~/ 1000;
+      if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {
+        estimatedBitrateMbps = (sourceKbps / 1000.0) * 0.95;
+      }
+    }
+
+    // HEVC has ~30% higher compression efficiency, so target bitrate can be slightly leaner
+    if (codec == VideoCodec.hevc) {
+      estimatedBitrateMbps *= 0.75;
+    }
+
+    return (estimatedBitrateMbps * 1000).round().clamp(300, 50000);
   }
 }

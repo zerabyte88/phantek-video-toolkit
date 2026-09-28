@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../models/encoding_options.dart';
@@ -532,27 +531,25 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
 
   Widget _buildSizeEstimator(ThemeData theme) {
     // Estimating output size
-    // Size = Bitrate * Duration
+    // Size = (Video Bitrate + Audio Bitrate) * Duration
     double sizeMb = 0.0;
     final durationSecs = widget.sourceVideo.durationSeconds;
 
-    if (widget.encodingOptions.rateControlMode == RateControlMode.bitrate) {
-      sizeMb = (_customBitrateMbps * 1000000.0 / 8.0) * durationSecs / (1024 * 1024);
-    } else {
-      // Rough heuristic for CRF
-      final crf = widget.encodingOptions.crfValue;
+    if (durationSecs > 0) {
+      final targetW = widget.selectedResolution?.width ?? widget.sourceVideo.width;
       final targetH = widget.selectedResolution?.height ?? widget.sourceVideo.height;
-      // Assume a base bitrate for CRF 20 at 1080p is ~4Mbps.
-      // Every +6 CRF roughly halves the bitrate.
-      double baseMbps = 4.0;
-      if (targetH <= 720) baseMbps = 2.0;
-      if (targetH <= 480) baseMbps = 1.0;
-      
-      final diff = crf - 20;
-      final factor = diff / 6.0;
-      // formula: 0.5^factor
-      double estimatedBitrate = baseMbps * math.pow(0.5, factor);
-      sizeMb = (estimatedBitrate * 1000000.0 / 8.0) * durationSecs / (1024 * 1024);
+
+      final targetBitrateKbps = widget.encodingOptions.calculateTargetBitrateKbps(
+        targetWidth: targetW,
+        targetHeight: targetH,
+        sourceWidth: widget.sourceVideo.width,
+        sourceHeight: widget.sourceVideo.height,
+        sourceBitrateBps: widget.sourceVideo.bitrate,
+      );
+
+      // Video bitrate + standard AAC audio bitrate (~128 kbps)
+      final totalBitrateKbps = targetBitrateKbps + 128;
+      sizeMb = (totalBitrateKbps * 1000.0 / 8.0) * durationSecs / (1024 * 1024);
     }
 
     return Container(
