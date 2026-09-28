@@ -116,6 +116,28 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.encodingOptions.rateControlMode.description,
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 12),
             if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
               Text(
@@ -245,6 +267,28 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.encodingOptions.container.description,
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 20),
             const Divider(),
@@ -281,6 +325,28 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       : null,
                 );
               }).toList(),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.encodingOptions.codec.description,
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 6),
             Text(

@@ -1,8 +1,7 @@
 enum VideoCodec {
-  h264('H.264 / AVC', 'libx264', 'Universal, kompatibilitas tertinggi'),
-  hevc('H.265 / HEVC', 'libx265', 'Kompresi ~50% lebih efisien'),
-  vp9('VP9', 'libvpx-vp9', 'Standar WebM / YouTube'),
-  mpeg4('MPEG-4', 'mpeg4', 'Kompatibilitas perangkat lawas');
+  h264('H.264 / AVC', 'libx264', 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.'),
+  hevc('H.265 / HEVC', 'libx265', 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.'),
+  vp9('VP9', 'libvpx-vp9', 'YouTube, Google Products. Efisiensi Kompresi Sangat Tinggi.');
 
   final String displayName;
   final String ffmpegCodec;
@@ -12,10 +11,10 @@ enum VideoCodec {
 }
 
 enum VideoContainer {
-  mp4('MP4', 'mp4', 'Paling kompatibel di semua HP dan pemutar'),
-  mkv('MKV', 'mkv', 'Kontainer fleksibel untuk berbagai codec'),
-  mov('MOV', 'mov', 'Format standar Apple QuickTime'),
-  webm('WebM', 'webm', 'Format terbuka, optimal untuk web');
+  mp4('MP4', 'mp4', 'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.'),
+  mkv('MKV', 'mkv', 'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.'),
+  mov('MOV', 'mov', 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).'),
+  webm('WebM', 'webm', 'Mendukung video transparan. Animasi Web, Konten Streaming Online.');
 
   final String displayName;
   final String extension;
@@ -25,8 +24,8 @@ enum VideoContainer {
 }
 
 enum RateControlMode {
-  crf('Constant Rate Factor (CRF)', 'Kualitas konsisten, ukuran bervariasi'),
-  bitrate('Bitrate (CBR/VBR)', 'Ukuran target pasti, kualitas menyesuaikan');
+  crf('Constant Rate Factor (CRF)', 'Mempertahankan kualitas visual yang konsisten tanpa memedulikan ukuran akhir file. Sangat direkomendasikan.'),
+  bitrate('Bitrate (CBR/VBR)', 'Memaksa video untuk mencapai ukuran target MB yang pasti, kualitas visual akan menyesuaikan.');
 
   final String displayName;
   final String description;
