@@ -25,6 +25,9 @@ class AppSettings {
   /// Keep screen awake / prevent display sleeping during encoding or app usage.
   final bool keepScreenAwake;
 
+  /// True if the app is launched for the first time
+  final bool isFirstLaunch;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -34,6 +37,7 @@ class AppSettings {
     this.languageCode = 'id',
     this.themeMode = 'dark',
     this.keepScreenAwake = false,
+    this.isFirstLaunch = true,
   });
 
   /// Detected hardware core count of the phone.
@@ -48,6 +52,7 @@ class AppSettings {
     String? languageCode,
     String? themeMode,
     bool? keepScreenAwake,
+    bool? isFirstLaunch,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -58,6 +63,7 @@ class AppSettings {
       languageCode: languageCode ?? this.languageCode,
       themeMode: themeMode ?? this.themeMode,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
+      isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
     );
   }
 
@@ -71,6 +77,7 @@ class AppSettings {
       'languageCode': languageCode,
       'themeMode': themeMode,
       'keepScreenAwake': keepScreenAwake,
+      'isFirstLaunch': isFirstLaunch,
     };
   }
 
@@ -84,6 +91,7 @@ class AppSettings {
       languageCode: json['languageCode'] as String? ?? 'id',
       themeMode: json['themeMode'] as String? ?? 'dark',
       keepScreenAwake: json['keepScreenAwake'] as bool? ?? false,
+      isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
     );
   }
 }

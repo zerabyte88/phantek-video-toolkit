@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../models/encoding_options.dart';
@@ -34,9 +35,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void initState() {
     super.initState();
-    if (widget.encodingOptions.customBitrateKbps != null) {
-      _customBitrateMbps = (widget.encodingOptions.customBitrateKbps! / 1000).round().clamp(1, 30);
-    }
+    _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000).round().clamp(1, 30);
   }
 
   @override
@@ -44,16 +43,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
 
-    // Calculate estimated bitrate for current selection
     final targetW = widget.selectedResolution?.width ?? widget.sourceVideo.width;
     final targetH = widget.selectedResolution?.height ?? widget.sourceVideo.height;
-    final estimatedBitrateKbps = widget.encodingOptions.calculateTargetBitrateKbps(
-      targetWidth: targetW,
-      targetHeight: targetH,
-      sourceWidth: widget.sourceVideo.width,
-      sourceHeight: widget.sourceVideo.height,
-      sourceBitrateBps: widget.sourceVideo.bitrate,
-    );
 
     return Card(
       child: Padding(
@@ -101,55 +92,87 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             const Divider(),
             const SizedBox(height: 16),
 
-            // 2. Bitrate Selection
+            // 2. Rate Control Selection (CRF vs Bitrate)
             _buildSubHeader(
               icon: Icons.speed_rounded,
-              title: l10n.t('bitrate_setting'),
+              title: 'Opsi Video & Kompresi', // Hardcoded temporarily, or add to l10n
               theme: theme,
-              trailingBadge: '${estimatedBitrateKbps >= 1000 ? (estimatedBitrateKbps / 1000).toStringAsFixed(1) : estimatedBitrateKbps} ${estimatedBitrateKbps >= 1000 ? 'Mbps' : 'Kbps'}',
             ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                _buildBitrateChip(
-                  label: l10n.t('bitrate_auto'),
-                  preset: BitratePreset.auto,
-                  theme: theme,
-                ),
-                _buildBitrateChip(
-                  label: l10n.t('bitrate_high'),
-                  preset: BitratePreset.high,
-                  theme: theme,
-                ),
-                _buildBitrateChip(
-                  label: l10n.t('bitrate_medium'),
-                  preset: BitratePreset.medium,
-                  theme: theme,
-                ),
-                _buildBitrateChip(
-                  label: l10n.t('bitrate_low'),
-                  preset: BitratePreset.low,
-                  theme: theme,
-                ),
-                _buildBitrateChip(
-                  label: l10n.t('bitrate_custom', args: {'value': (_customBitrateMbps * 1000).toString()}),
-                  preset: BitratePreset.custom,
-                  theme: theme,
-                ),
-              ],
+              children: RateControlMode.values.map((mode) {
+                final isSelected = widget.encodingOptions.rateControlMode == mode;
+                return ChoiceChip(
+                  label: Text(mode.displayName),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          rateControlMode: mode,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
             ),
-            if (widget.encodingOptions.bitratePreset == BitratePreset.custom) ...[
-              const SizedBox(height: 12),
+            const SizedBox(height: 12),
+            if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
+              Text(
+                'CRF Value (Lebih kecil = Kualitas lebih baik, Ukuran lebih besar)',
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: widget.encodingOptions.crfValue.toDouble(),
+                      min: 16,
+                      max: 28,
+                      divisions: 12,
+                      label: widget.encodingOptions.crfValue.toString(),
+                      onChanged: (val) {
+                        widget.onOptionsChanged(
+                          widget.encodingOptions.copyWith(
+                            crfValue: val.round(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.dark
+                          ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
+                          : const Color(0xFFEAEBF2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${widget.encodingOptions.crfValue}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              Text(
+                'Target Bitrate (Mbps)',
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
+              ),
               Row(
                 children: [
                   Expanded(
                     child: Slider(
                       value: _customBitrateMbps.toDouble(),
                       min: 1,
-                      max: 30,
-                      divisions: 29,
+                      max: 20,
+                      divisions: 19,
                       label: '$_customBitrateMbps Mbps',
                       onChanged: (val) {
                         setState(() {
@@ -181,6 +204,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 ],
               ),
             ],
+            
+            // Estimated Size display
+            const SizedBox(height: 12),
+            _buildSizeEstimator(theme),
 
             const SizedBox(height: 20),
             const Divider(),
@@ -263,6 +290,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               widget.encodingOptions.codec.description,
               style: const TextStyle(fontSize: 11, color: Colors.white38),
             ),
+            
+            _buildFpsSelector(theme),
           ],
         ),
       ),
@@ -392,25 +421,101 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     );
   }
 
-  Widget _buildBitrateChip({
-    required String label,
-    required BitratePreset preset,
-    required ThemeData theme,
-  }) {
-    final isSelected = widget.encodingOptions.bitratePreset == preset;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          widget.onOptionsChanged(
-            widget.encodingOptions.copyWith(
-              bitratePreset: preset,
-              customBitrateKbps: preset == BitratePreset.custom ? (_customBitrateMbps * 1000) : null,
+  Widget _buildFpsSelector(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        const Divider(),
+        const SizedBox(height: 16),
+        _buildSubHeader(
+          icon: Icons.shutter_speed_rounded,
+          title: 'Target FPS',
+          theme: theme,
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              label: const Text('Original'),
+              selected: widget.encodingOptions.targetFps == 0,
+              onSelected: (val) {
+                if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 0));
+              },
             ),
-          );
-        }
-      },
+            ChoiceChip(
+              label: const Text('30 FPS'),
+              selected: widget.encodingOptions.targetFps == 30,
+              onSelected: (val) {
+                if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 30));
+              },
+            ),
+            ChoiceChip(
+              label: const Text('24 FPS'),
+              selected: widget.encodingOptions.targetFps == 24,
+              onSelected: (val) {
+                if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 24));
+              },
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildSizeEstimator(ThemeData theme) {
+    // Estimating output size
+    // Size = Bitrate * Duration
+    double sizeMb = 0.0;
+    final durationSecs = widget.sourceVideo.durationSeconds;
+
+    if (widget.encodingOptions.rateControlMode == RateControlMode.bitrate) {
+      sizeMb = (_customBitrateMbps * 1000000.0 / 8.0) * durationSecs / (1024 * 1024);
+    } else {
+      // Rough heuristic for CRF
+      final crf = widget.encodingOptions.crfValue;
+      final targetH = widget.selectedResolution?.height ?? widget.sourceVideo.height;
+      // Assume a base bitrate for CRF 20 at 1080p is ~4Mbps.
+      // Every +6 CRF roughly halves the bitrate.
+      double baseMbps = 4.0;
+      if (targetH <= 720) baseMbps = 2.0;
+      if (targetH <= 480) baseMbps = 1.0;
+      
+      final diff = crf - 20;
+      final factor = diff / 6.0;
+      // formula: 0.5^factor
+      double estimatedBitrate = baseMbps * math.pow(0.5, factor);
+      sizeMb = (estimatedBitrate * 1000000.0 / 8.0) * durationSecs / (1024 * 1024);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withAlpha(20),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.sd_storage_rounded, size: 20, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Estimasi Ukuran Output:',
+              style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
+            ),
+          ),
+          Text(
+            '~${sizeMb.toStringAsFixed(1)} MB',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

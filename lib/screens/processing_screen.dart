@@ -10,6 +10,9 @@ import '../models/video_info.dart';
 import '../services/cache_manager_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
+import '../services/device_spec_helper.dart';
+
+import 'package:share_plus/share_plus.dart';
 
 class ProcessingScreen extends StatefulWidget {
   final VideoInfo videoInfo;
@@ -110,7 +113,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     // 1-second timer to update elapsed and remaining time continuously
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (!mounted || !_isProcessing) {
         timer.cancel();
         return;
@@ -118,6 +121,20 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       final now = DateTime.now();
       final elapsed = now.difference(_startTime!);
       final remaining = _calculateRemainingTime(_progress, elapsed);
+      
+      // Check thermal every 10 seconds
+      if (timer.tick % 10 == 0) {
+        final temp = await DeviceSpecHelper.getBatteryTemperature();
+        if (temp >= 45.0 && mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(
+               content: Text('Warning: Device Temperature High (${temp.toStringAsFixed(1)}°C)'),
+               backgroundColor: Colors.red,
+               duration: const Duration(seconds: 3),
+             )
+           );
+        }
+      }
 
       setState(() {
         _elapsedDuration = elapsed;
@@ -193,7 +210,30 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           _statusText = l10n.t('proc_failed');
         }
       });
+
+      if (result != null) {
+        _showSuccessBottomSheet();
+      }
     }
+  }
+
+  void _showSuccessBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return _SuccessBottomSheet(
+          originalPath: widget.videoInfo.filePath,
+          outputPath: _outputPath!,
+          originalSize: widget.videoInfo.fileSizeBytes,
+          totalDuration: _totalDuration ?? Duration.zero,
+          avgSpeed: _speedText,
+        );
+      },
+    );
   }
 
   @override
@@ -669,5 +709,165 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     if (_outputPath != null) {
       OpenFile.open(_outputPath!);
     }
+  }
+}
+
+class _SuccessBottomSheet extends StatelessWidget {
+  final String originalPath;
+  final String outputPath;
+  final int originalSize;
+  final Duration totalDuration;
+  final String avgSpeed;
+
+  const _SuccessBottomSheet({
+    required this.originalPath,
+    required this.outputPath,
+    required this.originalSize,
+    required this.totalDuration,
+    required this.avgSpeed,
+  });
+
+  String _formatSize(int bytes) {
+    if (bytes >= 1073741824) {
+      return '${(bytes / 1073741824).toStringAsFixed(2)} GB';
+    } else if (bytes >= 1048576) {
+      return '${(bytes / 1048576).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final outputSize = File(outputPath).lengthSync();
+    final savings = originalSize > 0
+        ? ((1 - outputSize / originalSize) * 100).toStringAsFixed(1)
+        : '0';
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Color(0xFF5CD85A), size: 32),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Konversi Berhasil',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatColumn('Asli', _formatSize(originalSize), Icons.folder_rounded, Colors.white54),
+                const Icon(Icons.arrow_forward_rounded, color: Colors.white24),
+                _buildStatColumn('Baru', _formatSize(outputSize), Icons.folder_special_rounded, theme.colorScheme.primary),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF5CD85A).withAlpha(20),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.save_alt_rounded, color: Color(0xFF5CD85A), size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Hemat Storage: $savings%',
+                      style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF5CD85A)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                OpenFile.open(outputPath);
+              },
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Buka / Mainkan'),
+              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () {
+                Share.shareXFiles([XFile(outputPath)]);
+              },
+              icon: const Icon(Icons.share_rounded),
+              label: const Text('Bagikan'),
+              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Hapus File Asli?'),
+                    content: const Text('Tindakan ini tidak dapat dibatalkan.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  try {
+                    await File(originalPath).delete();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('File asli dihapus.')));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal menghapus: $e')));
+                    }
+                  }
+                }
+              },
+              icon: const Icon(Icons.delete_forever_rounded),
+              label: const Text('Hapus Video Asli'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFFF6B6B),
+                side: const BorderSide(color: Color(0xFFFF6B6B)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Tutup'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, String value, IconData icon, Color color) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.white54)),
+        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+      ],
+    );
   }
 }

@@ -5,6 +5,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../models/app_settings.dart';
 import 'localization_service.dart';
+import 'device_spec_helper.dart';
 
 class SettingsService extends ChangeNotifier {
   static const _storageKey = 'video_downscaler_app_settings';
@@ -29,6 +30,12 @@ class SettingsService extends ChangeNotifier {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         _settings = AppSettings.fromJson(data);
       }
+      
+      // Hardware Auto-Detection on first launch
+      if (_settings.isFirstLaunch) {
+        await _applyFirstLaunchDefaults();
+      }
+
       // Apply wakelock state
       await _applyWakelock(_settings.keepScreenAwake);
     } catch (e) {
@@ -37,6 +44,26 @@ class SettingsService extends ChangeNotifier {
       _isLoaded = true;
       notifyListeners();
     }
+  }
+
+  Future<void> _applyFirstLaunchDefaults() async {
+    // We can't import here directly without adding the import, but we'll add the import later.
+    final tier = DeviceSpecHelper.getDeviceTier();
+    
+    // Tier 1: 1080p, slow
+    // Tier 2: 1080p, medium
+    // Tier 3: 720p (we'll handle default resolution in main UI probably, or settings), fast
+    String preset = 'medium';
+    if (tier == DeviceTier.highEnd) preset = 'slow';
+    if (tier == DeviceTier.lowEnd) preset = 'fast';
+
+    _settings = _settings.copyWith(
+      isFirstLaunch: false,
+      cpuPreset: preset,
+      cpuThreads: 0, // Auto
+      hardwareAcceleration: false, // User requested libx264 software only
+    );
+    await _saveSettings();
   }
 
   Future<void> _applyWakelock(bool enable) async {

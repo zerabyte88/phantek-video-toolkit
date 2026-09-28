@@ -4,6 +4,9 @@ import '../models/app_settings.dart';
 import '../services/cache_manager_service.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
+import '../services/device_spec_helper.dart';
+
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,11 +20,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _cacheManager = CacheManagerService();
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
+  Map<String, dynamic>? _hardwareInfo;
+  String _appVersion = 'Loading...';
 
   @override
   void initState() {
     super.initState();
     _loadCacheSize();
+    _loadHardwareInfo();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = 'v${packageInfo.version} (${packageInfo.buildNumber})';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _appVersion = 'v1.0.4+4';
+        });
+      }
+    }
+  }
+
+  Future<void> _loadHardwareInfo() async {
+    final info = await DeviceSpecHelper.getHardwareInfo();
+    if (mounted) {
+      setState(() {
+        _hardwareInfo = info;
+      });
+    }
   }
 
   Future<void> _loadCacheSize() async {
@@ -287,6 +320,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
               theme: theme,
             ),
             const SizedBox(height: 10),
+
+            // Real Hardware Info Card
+            if (_hardwareInfo != null)
+              Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded, size: 20, color: theme.colorScheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Spesifikasi Perangkat',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildHardwareInfoRow('Model', '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}'),
+                      const SizedBox(height: 6),
+                      _buildHardwareInfoRow('SoC / Board', _hardwareInfo!['hardware']),
+                      const SizedBox(height: 6),
+                      _buildHardwareInfoRow('CPU Cores', '${_hardwareInfo!['cores']} Core(s)'),
+                      const SizedBox(height: 6),
+                      _buildHardwareInfoRow('Total RAM', '${_hardwareInfo!['ramMb']} MB'),
+                    ],
+                  ),
+                ),
+              ),
 
             // CPU Cores Card
             Card(
@@ -893,6 +962,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         height: 1.4,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    const Divider(height: 1, color: Colors.white12),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'App Version',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white54,
+                          ),
+                        ),
+                        Text(
+                          _appVersion,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -901,6 +994,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHardwareInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 90,
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 13, color: Colors.white54),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 

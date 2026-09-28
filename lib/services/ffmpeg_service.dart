@@ -155,15 +155,20 @@ class FFmpegService {
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Calculate target bitrate
-    final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
-      targetWidth: targetW,
-      targetHeight: targetH,
-      sourceWidth: sourceVideo.width,
-      sourceHeight: sourceVideo.height,
-      sourceBitrateBps: sourceVideo.bitrate,
-    );
-    final bitrateStr = '${targetBitrateKbps}k';
+    // Rate control argument
+    String rateControlArg = '';
+    if (encodingOptions.rateControlMode == RateControlMode.crf) {
+      rateControlArg = '-crf ${encodingOptions.crfValue}';
+    } else {
+      final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+        targetWidth: targetW,
+        targetHeight: targetH,
+        sourceWidth: sourceVideo.width,
+        sourceHeight: sourceVideo.height,
+        sourceBitrateBps: sourceVideo.bitrate,
+      );
+      rateControlArg = '-b:v ${targetBitrateKbps}k';
+    }
 
     // Video codec selection
     String vCodec = encodingOptions.codec.ffmpegCodec;
@@ -176,20 +181,20 @@ class FFmpegService {
     }
 
     // Audio options
-    String audioArgs;
+    String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
     if (appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
-    } else {
-      String aCodec = 'aac';
-      if (encodingOptions.container == VideoContainer.webm) {
-        aCodec = 'libopus';
-      }
-      audioArgs = '-c:a $aCodec -b:a ${appSettings.audioBitrateKbps}k';
+    } else if (encodingOptions.container == VideoContainer.webm) {
+      audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
     }
 
     // Preset argument for software x264/x265
     String presetArg = '';
-    if (vCodec == 'libx264' || vCodec == 'libx265') {
+    String profileLevelArg = '';
+    if (vCodec == 'libx264') {
+      presetArg = '-preset ${appSettings.cpuPreset}';
+      profileLevelArg = '-profile:v high -level:v 4.1';
+    } else if (vCodec == 'libx265') {
       presetArg = '-preset ${appSettings.cpuPreset}';
     }
 
@@ -209,18 +214,25 @@ class FFmpegService {
         encodingOptions.container == VideoContainer.mov) {
       containerFlags = '-movflags +faststart';
     }
+    
+    // FPS filter
+    String fpsFilter = '';
+    if (encodingOptions.targetFps > 0) {
+      fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
+    }
 
-    // Scale filter
-    final scaleFilter = '-vf "scale=$targetW:$targetH"';
+    // Video filters: FPS + Lanczos Scale + format
+    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
 
     // Construct full command
     final cmdParts = [
       '-i "${sourceVideo.filePath}"',
       threadsArg,
-      scaleFilter,
+      vfArg,
       '-c:v $vCodec',
       presetArg,
-      '-b:v $bitrateStr',
+      profileLevelArg,
+      rateControlArg,
       bufferArg,
       audioArgs,
       containerFlags,
@@ -230,7 +242,7 @@ class FFmpegService {
     final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: ${targetW}x$targetH @ $bitrateStr using $vCodec');
+    onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
 
