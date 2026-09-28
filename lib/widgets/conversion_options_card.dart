@@ -493,24 +493,40 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         color: theme.colorScheme.primary.withAlpha(20),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.sd_storage_rounded, size: 20, color: theme.colorScheme.primary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Estimasi Ukuran Output:',
-              style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
-            ),
+          Row(
+            children: [
+              Icon(Icons.sd_storage_rounded, size: 20, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Estimasi Ukuran Output:',
+                  style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
+                ),
+              ),
+              Text(
+                '~${sizeMb.toStringAsFixed(1)} MB',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
           ),
-          Text(
-            '~${sizeMb.toStringAsFixed(1)} MB',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+          if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
+            const SizedBox(height: 4),
+            Text(
+              '* Ukuran asli dapat sangat bervariasi bergantung kerumitan visual video.',
+              style: TextStyle(
+                fontSize: 11,
+                color: theme.colorScheme.onSurface.withAlpha(120),
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

@@ -25,8 +25,19 @@ class FFmpegService {
         orElse: () => streams.first,
       );
 
-      final width = videoStream.getWidth() ?? 0;
-      final height = videoStream.getHeight() ?? 0;
+      int width = videoStream.getWidth() ?? 0;
+      int height = videoStream.getHeight() ?? 0;
+      
+      // Check for rotation in stream tags
+      final tags = videoStream.getAllProperties()?['tags'];
+      if (tags != null && tags is Map) {
+        final rotate = tags['rotate'];
+        if (rotate == '90' || rotate == '270' || rotate == '-90') {
+          final temp = width;
+          width = height;
+          height = temp;
+        }
+      }
 
       // Parse duration
       final durationStr = info.getDuration();
@@ -139,6 +150,12 @@ class FFmpegService {
     // Calculate target dimensions (must be even numbers)
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
+
+    // Handle portrait videos: if source is portrait, swap target dimensions
+    if (sourceVideo.height > sourceVideo.width) {
+      targetW = targetResolution.height;
+      targetH = targetResolution.width;
+    }
 
     final sourceAspect = sourceVideo.width / (sourceVideo.height > 0 ? sourceVideo.height : 1);
     final targetAspect = targetW / (targetH > 0 ? targetH : 1);
