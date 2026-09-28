@@ -92,7 +92,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             // 2. Rate Control Selection (CRF vs Bitrate)
             _buildSubHeader(
               icon: Icons.speed_rounded,
-              title: 'Opsi Video & Kompresi', // Hardcoded temporarily, or add to l10n
+              title: l10n.t('video_options'),
               theme: theme,
             ),
             const SizedBox(height: 10),
@@ -131,7 +131,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.encodingOptions.rateControlMode.description,
+                      widget.encodingOptions.rateControlMode == RateControlMode.crf 
+                          ? l10n.t('desc_crf') 
+                          : l10n.t('desc_bitrate'),
                       style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
                     ),
                   ),
@@ -141,7 +143,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             const SizedBox(height: 12),
             if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
               Text(
-                'CRF Value (Lebih kecil = Kualitas lebih baik, Ukuran lebih besar)',
+                l10n.t('crf_label'),
                 style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
               ),
               Row(
@@ -181,7 +183,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               ),
             ] else ...[
               Text(
-                'Target Bitrate (Mbps)',
+                l10n.t('bitrate_label'),
                 style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
               ),
               Row(
@@ -568,7 +570,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Estimasi Ukuran Output:',
+                  widget.l10n.t('est_size_title'),
                   style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
                 ),
               ),
@@ -585,7 +587,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
             const SizedBox(height: 4),
             Text(
-              '* Ukuran asli dapat sangat bervariasi bergantung kerumitan visual video.',
+              widget.l10n.t('est_size_warning'),
               style: TextStyle(
                 fontSize: 11,
                 color: theme.colorScheme.onSurface.withAlpha(120),

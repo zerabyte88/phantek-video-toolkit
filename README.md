@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Dart-3.13+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
   <img src="https://img.shields.io/badge/Platform-Android%20(ARM32%20%7C%20ARM64)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
   <img src="https://img.shields.io/badge/Engine-FFmpeg%20GPL-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
-  <img src="https://img.shields.io/badge/Version-v1.0.4-ff69b4?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-v1.0.5-ff69b4?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/github/actions/workflow/status/zerabyte88/video_downscaler/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build%20APK" alt="Build Status" />
 </p>
 
@@ -29,7 +29,7 @@ Modern smartphones record stunning 4K and 2K videos, but these files are often h
 
 Furthermore, many smartphones—especially **mid-range and budget (low-end) devices**—lack the dedicated hardware decoders, CPU/GPU throughput, or memory bandwidth required to decode and smoothly play ultra-high-resolution 2K and 4K media. When attempting to open these heavy files, users often experience severe frame stuttering, audio/video desynchronization, app freezing, or outright "Cannot play video" errors. Solving this playback bottleneck and making videos universally accessible across all devices is one of the primary reasons **Video Downscaler** was created.
 
-**Video Downscaler** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_full_gpl`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
+**Video Downscaler** is an open-source Flutter mobile utility powered by the full GPL build of **FFmpeg** (`ffmpeg_kit_flutter_new`). It runs **100% locally on your device**, performing hardware-accelerated and software transcoding without requiring an internet connection. Your videos never leave your phone, guaranteeing absolute privacy and zero mobile data consumption.
 
 ---
 
@@ -43,12 +43,12 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
   - Target FPS options: Original, 30 FPS, or 24 FPS for cinematic look.
 
 - **Aspect Ratio & Lanczos Scaling**
-  - Automatically calculates target dimensions while strictly preserving original aspect ratios.
+  - Automatically calculates target dimensions while strictly preserving original aspect ratios, including auto-detecting and handling Portrait rotation metadata from smartphone cameras.
   - Enforces even-dimension constraints (`mod 2`) and uses high-quality **Lanczos Resampling** (`scale=W:H:flags=lanczos`).
   - Colors are forced to standard 8-bit (`yuv420p`) with `high` profile and `4.1` level for maximum Android/iOS compatibility.
 
 - **Rate Control: CRF & Bitrate**
-  - **Constant Rate Factor (CRF):** Set target visual quality (CRF 18-28) for intelligent bitrate allocation.
+  - **Constant Rate Factor (CRF):** Set target visual quality (CRF 18-28) for intelligent bitrate allocation. Smartly translates to strict bitrate limits when Android Hardware Acceleration (MediaCodec) is engaged to prevent bitrate starvation.
   - **Custom Bitrate:** Optionally define an exact target bitrate via an interactive slider (1–30 Mbps).
   - Includes a real-time **Estimated Output Size Calculator** in the UI.
 
@@ -64,7 +64,7 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 
 - **Engine Configuration**
   - Container Format: MP4, MKV, MOV, and WebM.
-  - Video Codec: H.264 / AVC (`libx264`) or H.265 / HEVC (`libx265`).
+  - Video Codec: H.264 / AVC (`libx264`), H.265 / HEVC (`libx265`), and VP9 (`libvpx-vp9`).
   - CPU Preset: Tune encoding speed vs. compression ratio (`ultrafast` to `slow`).
 
 - **Multi-Language Support (6 Languages)**
@@ -175,7 +175,7 @@ video_downscaler/
 | Package | Version | Purpose |
 |:---|:---|:---|
 | **[Flutter SDK](https://flutter.dev)** | `^3.47.0` | Cross-platform UI toolkit |
-| **[ffmpeg_kit_flutter_full_gpl](https://pub.dev/packages/ffmpeg_kit_flutter_full_gpl)** | `^6.0.3` | Full FFmpeg + FFprobe engine with GPL codecs (libx264) |
+| **[ffmpeg_kit_flutter_new](https://pub.dev/packages/ffmpeg_kit_flutter_new)** | `^4.6.0` | Full FFmpeg + FFprobe engine with GPL codecs (libx264) |
 | **[file_picker](https://pub.dev/packages/file_picker)** | `^13.1.0` | Native file picker for selecting device video files |
 | **[video_player](https://pub.dev/packages/video_player)** | `^2.14.0` | Video playback backend support |
 | **[path_provider](https://pub.dev/packages/path_provider)** | `^2.1.6` | Accessing standard Android document storage paths |
@@ -273,4 +273,4 @@ This repository includes a fully configured automated GitHub Actions workflow [`
 
 ## License & Attribution
 
-This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with the bundled `ffmpeg_kit_flutter_full_gpl` package and `libx264` codec requirements.
+This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with the bundled `ffmpeg_kit_flutter_new` package and `libx264` codec requirements.
