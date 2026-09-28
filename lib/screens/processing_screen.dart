@@ -7,6 +7,7 @@ import 'package:open_file/open_file.dart';
 import '../models/app_settings.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
+import '../services/cache_manager_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
 
@@ -65,8 +66,25 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _pulseController.dispose();
     if (_isProcessing) {
       FFmpegService.cancelAll();
+      CacheManagerService().clearAllCache(
+        specificInputPath: widget.videoInfo.filePath,
+      );
     }
     super.dispose();
+  }
+
+  String _formatPercentage(double progress) {
+    final percent = (progress * 100).clamp(0.0, 100.0);
+    return '${percent.toStringAsFixed(1)}%';
+  }
+
+  Duration? _calculateRemainingTime(double progress, Duration elapsed) {
+    if (progress < 0.005 || progress >= 0.999) return null;
+    final elapsedMs = elapsed.inMilliseconds;
+    if (elapsedMs < 1000) return null;
+    final totalEstimatedMs = elapsedMs / progress;
+    final remainingMs = (totalEstimatedMs - elapsedMs).clamp(0, 86400000);
+    return Duration(milliseconds: remainingMs.round());
   }
 
   String _formatDuration(Duration d) {
@@ -90,7 +108,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       _statusText = l10n.t('proc_converting');
     });
 
-    // Start 1-second elapsed and ETA timer
+    // 1-second timer to update elapsed and remaining time continuously
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted || !_isProcessing) {
@@ -99,17 +117,13 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       }
       final now = DateTime.now();
       final elapsed = now.difference(_startTime!);
-
-      Duration? remaining;
-      if (_progress > 0.02 && _progress < 0.99) {
-        final totalEstimatedMs = elapsed.inMilliseconds / _progress;
-        final remainingMs = (totalEstimatedMs - elapsed.inMilliseconds).clamp(0, 86400000);
-        remaining = Duration(milliseconds: remainingMs.round());
-      }
+      final remaining = _calculateRemainingTime(_progress, elapsed);
 
       setState(() {
         _elapsedDuration = elapsed;
-        _estimatedRemaining = remaining;
+        if (remaining != null) {
+          _estimatedRemaining = remaining;
+        }
       });
     });
 
@@ -129,11 +143,19 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             speed = parts[1].replaceAll('Speed:', '').trim();
           }
 
+          final now = DateTime.now();
+          final elapsed = _startTime != null ? now.difference(_startTime!) : Duration.zero;
+          final remaining = _calculateRemainingTime(progress, elapsed);
+
           setState(() {
             _progress = progress;
+            _elapsedDuration = elapsed;
+            if (remaining != null) {
+              _estimatedRemaining = remaining;
+            }
             _speedText = speed;
             _currentSizeText = size;
-            _statusText = '${l10n.t('proc_converting')} ${(progress * 100).toStringAsFixed(1)}%';
+            _statusText = '${l10n.t('proc_converting')} ${_formatPercentage(progress)}';
           });
         }
       },
@@ -150,6 +172,13 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _timer?.cancel();
     if (_startTime != null) {
       _totalDuration = DateTime.now().difference(_startTime!);
+    }
+
+    // Auto-clean cached input video from file_picker so app storage doesn't bloat to 1GB+
+    if (result != null) {
+      await CacheManagerService().clearAllCache(
+        specificInputPath: widget.videoInfo.filePath,
+      );
     }
 
     if (mounted) {
@@ -188,6 +217,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               if (_isProcessing) {
                 _showCancelDialog();
               } else {
+                CacheManagerService().clearAllCache(
+                  specificInputPath: widget.videoInfo.filePath,
+                );
                 Navigator.of(context).pop();
               }
             },
@@ -270,7 +302,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   const SizedBox(height: 6),
                   Text(
                     _isProcessing
-                        ? '${(_progress * 100).toStringAsFixed(0)}%'
+                        ? _formatPercentage(_progress)
                         : (_isSuccess ? '100%' : 'Error'),
                     style: TextStyle(
                       fontSize: 22,
@@ -572,7 +604,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                CacheManagerService().clearAllCache(
+                  specificInputPath: widget.videoInfo.filePath,
+                );
+                Navigator.of(context).pop();
+              },
               icon: const Icon(Icons.arrow_back_rounded),
               label: Text(l10n.t('proc_back')),
             ),
@@ -612,6 +649,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           TextButton(
             onPressed: () {
               FFmpegService.cancelAll();
+              CacheManagerService().clearAllCache(
+                specificInputPath: widget.videoInfo.filePath,
+              );
               Navigator.of(context).pop();
               Navigator.of(this.context).pop();
             },

@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
+import '../services/cache_manager_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
 import '../widgets/conversion_options_card.dart';
@@ -33,6 +34,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
+
+    // Auto-clean any stale temporary files from previous sessions
+    CacheManagerService().clearAllCache();
   }
 
   @override
@@ -43,6 +47,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Future<void> _pickVideo() async {
     final l10n = _settingsService.l10n;
+
+    // Clean stale cache before picking new video
+    await CacheManagerService().clearAllCache(
+      specificInputPath: _videoInfo?.filePath,
+    );
 
     // Immediately show loading screen BEFORE opening the system file picker,
     // so when user selects a file and taps OK, the app is already showing the loading screen
@@ -140,6 +149,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           if (_videoInfo != null && !_isLoading)
             IconButton(
               onPressed: () {
+                CacheManagerService().clearAllCache(
+                  specificInputPath: _videoInfo?.filePath,
+                );
                 setState(() {
                   _videoInfo = null;
                   _selectedResolution = null;

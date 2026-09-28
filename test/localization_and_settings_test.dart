@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_downscaler/models/app_settings.dart';
 import 'package:video_downscaler/models/encoding_options.dart';
+import 'package:video_downscaler/services/cache_manager_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 
 void main() {
@@ -141,7 +142,7 @@ void main() {
       expect(restored.keepScreenAwake, isTrue);
     });
 
-    test('New theme and wakelock translations exist', () {
+    test('New theme, wakelock, and cache storage translations exist', () {
       for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
         final l10n = AppLocalizations(code);
         expect(l10n.t('settings_theme').isNotEmpty, isTrue);
@@ -151,7 +152,42 @@ void main() {
         expect(l10n.t('settings_wakelock_desc').isNotEmpty, isTrue);
         expect(l10n.t('proc_elapsed_time').isNotEmpty, isTrue);
         expect(l10n.t('proc_remaining_time').isNotEmpty, isTrue);
+        expect(l10n.t('settings_storage').isNotEmpty, isTrue);
+        expect(l10n.t('settings_cache_size').isNotEmpty, isTrue);
+        expect(l10n.t('settings_clear_cache').isNotEmpty, isTrue);
       }
     });
   });
+
+  group('CacheManager and Telemetry Consistency tests', () {
+    test('formatBytes formats properly across units', () {
+      expect(CacheManagerService.formatBytes(0), equals('0 B'));
+      expect(CacheManagerService.formatBytes(500), equals('500 B'));
+      expect(CacheManagerService.formatBytes(1024), equals('1 KB'));
+      expect(CacheManagerService.formatBytes(1048576), equals('1.0 MB'));
+      expect(CacheManagerService.formatBytes(1572864000), equals('1.46 GB'));
+    });
+
+    test('isCachedPath identifies temporary and picker cached paths', () {
+      final cacheManager = CacheManagerService();
+      expect(cacheManager.isCachedPath('/data/user/0/com.app/cache/file_picker/vid.mp4'), isTrue);
+      expect(cacheManager.isCachedPath('/data/user/0/com.app/cache/sample.mp4'), isTrue);
+      expect(cacheManager.isCachedPath('C:\\temp\\cache\\vid.mp4'), isTrue);
+      expect(cacheManager.isCachedPath('/storage/emulated/0/Movies/sample.mp4'), isFalse);
+    });
+
+    test('Percentage formatting retains 1 decimal place consistently without rounding discrepancy', () {
+      String formatPercentage(double progress) {
+        final percent = (progress * 100).clamp(0.0, 100.0);
+        return '${percent.toStringAsFixed(1)}%';
+      }
+
+      // 0.185 (18.5%) should format to 18.5%, not 19%
+      expect(formatPercentage(0.185), equals('18.5%'));
+      expect(formatPercentage(0.0), equals('0.0%'));
+      expect(formatPercentage(0.50), equals('50.0%'));
+      expect(formatPercentage(1.0), equals('100.0%'));
+    });
+  });
 }
+

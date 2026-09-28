@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/app_settings.dart';
+import '../services/cache_manager_service.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
 
@@ -13,6 +14,24 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
+  final _cacheManager = CacheManagerService();
+  int _cacheSizeBytes = 0;
+  bool _isClearingCache = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCacheSize();
+  }
+
+  Future<void> _loadCacheSize() async {
+    final size = await _cacheManager.getCacheSizeBytes();
+    if (mounted) {
+      setState(() {
+        _cacheSizeBytes = size;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -675,6 +694,140 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           );
                         }),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Storage & Cache Management Section
+            _buildSectionHeader(
+              icon: Icons.cleaning_services_rounded,
+              title: l10n.t('settings_storage'),
+              theme: theme,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.t('settings_storage_desc'),
+              style: const TextStyle(fontSize: 12, color: Colors.white54),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF54A0FF).withAlpha(25),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.storage_rounded,
+                            size: 20,
+                            color: Color(0xFF54A0FF),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.t('settings_cache_size'),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                CacheManagerService.formatBytes(_cacheSizeBytes),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _isClearingCache
+                              ? null
+                              : () async {
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  setState(() {
+                                    _isClearingCache = true;
+                                  });
+                                  final freed = await _cacheManager.clearAllCache();
+                                  await _loadCacheSize();
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _isClearingCache = false;
+                                  });
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.t(
+                                          'settings_clear_cache_success',
+                                          args: {
+                                            'size': CacheManagerService.formatBytes(freed),
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                          icon: _isClearingCache
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(Icons.delete_outline_rounded, size: 16),
+                          label: Text(l10n.t('settings_clear_cache')),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF54A0FF),
+                            side: const BorderSide(color: Color(0xFF54A0FF)),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 24),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.auto_delete_rounded,
+                          size: 16,
+                          color: Color(0xFF5CD85A),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.t('settings_cache_info'),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF5CD85A),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.t('settings_cache_info_desc'),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.white38,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
