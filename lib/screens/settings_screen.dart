@@ -42,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.0.4+4';
+          _appVersion = 'v1.0.6 (6)';
         });
       }
     }

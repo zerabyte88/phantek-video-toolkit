@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Dart-3.13+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
   <img src="https://img.shields.io/badge/Platform-Android%20(ARM32%20%7C%20ARM64)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
   <img src="https://img.shields.io/badge/Engine-FFmpeg%20GPL-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
-  <img src="https://img.shields.io/badge/Version-v1.0.5-ff69b4?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-v1.0.6-ff69b4?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/github/actions/workflow/status/zerabyte88/video_downscaler/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build%20APK" alt="Build Status" />
 </p>
 
@@ -65,14 +65,16 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 - **Engine Configuration**
   - Container Format: MP4, MKV, MOV, and WebM.
   - Video Codec: H.264 / AVC (`libx264`), H.265 / HEVC (`libx265`), and VP9 (`libvpx-vp9`).
-  - CPU Preset: Tune encoding speed vs. compression ratio (`ultrafast` to `slow`).
+  - CPU Preset: Streamlined to 3 clear choices: `fast` (quick, light compression), `normal` (balanced speed & size), and `slow` (maximum compression).
 
 - **Multi-Language Support (6 Languages)**
   - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語**, **简体中文**, **繁體中文**, and **한국어**.
 
 - **Hardware & Display Features**
   - **Display Themes**: Standard Dark, OLED Black, and Light Mode.
-  - **Keep Screen Awake (Wakelock)**: Guaranteed OS Wakelock prevents the display from sleeping during heavy FFmpeg tasks.
+  - **Background Execution & Lock Screen Persistence**: Powered by Android Foreground Service (`flutter_foreground_task`) with partial CPU wakelock and ongoing notification progress, allowing encoding to complete uninterrupted even if the screen turns off due to inactivity or is manually locked.
+  - **Seamless In-Place APK Upgrades**: Consistent release signing keystore and monotonic version coding enable instant updates across releases (e.g., from v1.0.5 to v1.0.6) without ever having to uninstall.
+  - **Keep Screen Awake (Wakelock)**: Optional display wakelock keeps the phone display illuminated throughout encoding.
   - Dynamic App Version display driven by `package_info_plus`.
 
 ---
