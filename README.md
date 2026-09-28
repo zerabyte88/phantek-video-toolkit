@@ -1,4 +1,4 @@
-# 🎬 Video Downscaler
+# Video Downscaler
 
 <p align="center">
   <img src="assets/icon/app_icon.jpg" alt="Video Downscaler Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/Dart-3.13+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
   <img src="https://img.shields.io/badge/Platform-Android%20(ARM32%20%7C%20ARM64)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
   <img src="https://img.shields.io/badge/Engine-FFmpeg%20GPL-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg" />
+  <img src="https://img.shields.io/badge/Version-v1.0.4-ff69b4?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/github/actions/workflow/status/zerabyte88/video_downscaler/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build%20APK" alt="Build Status" />
 </p>
 
@@ -22,7 +23,7 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 Modern smartphones record stunning 4K and 2K videos, but these files are often hundreds of megabytes or even gigabytes in size. Sharing them over messaging platforms (like WhatsApp, Discord, or Telegram) or via email frequently fails due to strict file-size limits.
 
@@ -32,75 +33,75 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- **🔒 100% Offline & Private Processing**
+- **100% Offline & Private Processing**
   - No cloud uploads, no external APIs, and no telemetry. All FFprobe media inspection and FFmpeg transcoding occur locally on the device storage.
 
-- **🎯 Intelligent Downscale Targets & FPS Control**
+- **Intelligent Downscale Targets & FPS Control**
   - Automatically analyzes input media and exposes only valid downscaling target resolutions (e.g., 4K $\rightarrow$ 1080p, 720p, 480p, or 360p).
   - Target FPS options: Original, 30 FPS, or 24 FPS for cinematic look.
 
-- **📐 Aspect Ratio & Lanczos Scaling**
+- **Aspect Ratio & Lanczos Scaling**
   - Automatically calculates target dimensions while strictly preserving original aspect ratios.
   - Enforces even-dimension constraints (`mod 2`) and uses high-quality **Lanczos Resampling** (`scale=W:H:flags=lanczos`).
   - Colors are forced to standard 8-bit (`yuv420p`) with `high` profile and `4.1` level for maximum Android/iOS compatibility.
 
-- **⚡ Rate Control: CRF & Bitrate**
+- **Rate Control: CRF & Bitrate**
   - **Constant Rate Factor (CRF):** Set target visual quality (CRF 18-28) for intelligent bitrate allocation.
   - **Custom Bitrate:** Optionally define an exact target bitrate via an interactive slider (1–30 Mbps).
   - Includes a real-time **Estimated Output Size Calculator** in the UI.
 
-- **📊 Real-time Telemetry & Auto-Detection**
+- **Real-time Telemetry & Auto-Detection**
   - **Hardware Auto-Detection:** Automatically detects device specifications (RAM, SoC, Cores) and sets CPU threads based on hardware tiers.
   - **Thermal Warning:** Monitors battery temperature every 10 seconds; displays a red warning banner if device hits $\geq$ 45°C.
   - **Live Progress:** Accurately calculates elapsed duration and projected ETA matching the exact processing percentage.
 
-- **💾 File Management & Smart Cache**
+- **File Management & Smart Cache**
   - Saves videos to `/storage/emulated/0/Movies/Video Downscaler/`.
   - **Smart Cache Manager:** Automatically deletes massive temporary files cached by the Android OS (`file_picker`) after conversion is done/cancelled, preventing gigabytes of storage bloat.
   - **Summary Bottom Sheet:** Displays final saved storage %, Original vs New Size, and options to Play, **Share (via SharePlus)**, and Delete Original Video.
 
-- **🎛️ Engine Configuration**
+- **Engine Configuration**
   - Container Format: MP4, MKV, MOV, and WebM.
   - Video Codec: H.264 / AVC (`libx264`) or H.265 / HEVC (`libx265`).
   - CPU Preset: Tune encoding speed vs. compression ratio (`ultrafast` to `slow`).
 
-- **🌐 Multi-Language Support (6 Languages)**
+- **Multi-Language Support (6 Languages)**
   - Seamless in-app switching between **Bahasa Indonesia**, **English**, **日本語**, **简体中文**, **繁體中文**, and **한국어**.
 
-- **⚙️ Hardware & Display Features**
+- **Hardware & Display Features**
   - **Display Themes**: Standard Dark, OLED Black, and Light Mode.
   - **Keep Screen Awake (Wakelock)**: Guaranteed OS Wakelock prevents the display from sleeping during heavy FFmpeg tasks.
   - Dynamic App Version display driven by `package_info_plus`.
 
 ---
 
-## 🛠️ Architecture & How It Works
+## Architecture & How It Works
 
 ```text
 ┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
-│   📁 1. Media Input   │ ────> │  🔍 2. FFprobe Probe  │ ────> │  📋 3. Media Metadata │
+│    1. Media Input   │ ────> │   2. FFprobe Probe  │ ────> │   3. Media Metadata │
 │   Native Android      │       │  Extract stream specs │       │  Resolution, Codec,   │
 │   File Picker         │       │  & container details  │       │  FPS, Bitrate, Audio  │
 └───────────────────────┘       └───────────────────────┘       └───────────────────────┘
                                                                             │
                                                                             ▼
 ┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
-│  🚀 6. Transcoding    │ <──── │  ⚙️ 5. Dimension Calc │ <──── │  🎛️ 4. Configuration  │
+│   6. Transcoding    │ <──── │   5. Dimension Calc │ <──── │   4. Configuration  │
 │  FFmpeg Engine        │       │  Aspect ratio clamp   │       │  Target Resolution,   │
 │  Software / Hardware  │       │  & 'mod 2' validation │       │  Codec, and Bitrate   │
 └───────────────────────┘       └───────────────────────┘       └───────────────────────┘
             │
             ▼
 ┌───────────────────────┐       ┌───────────────────────┐
-│  📊 7. Live Telemetry │ ────> │  ✅ 8. Complete & Save│
+│   7. Live Telemetry │ ────> │   8. Complete & Save│
 │  Dynamic ETA, Elapsed │       │  Instant open player  │
 │  Timer, % Progress    │       │  & Storage statistics │
 └───────────────────────┘       └───────────────────────┘
 ```
 
-### 🔄 Pipeline Stages Breakdown
+### Pipeline Stages Breakdown
 
 | Stage | Component | Technical Role |
 |:---|:---|:---|
@@ -111,7 +112,7 @@ Furthermore, many smartphones—especially **mid-range and budget (low-end) devi
 | **5. Hardware/Software Transcoding** | `FFmpeg` (`ffmpeg_kit_flutter_new`) | Executes the optimized command line pipeline using selected threads, memory buffer limits, and optional Android `MediaCodec` acceleration. |
 | **6. Real-time Telemetry & Launch** | `ProcessingScreen` & `open_file` | Continuously calculates elapsed duration and projected ETA. Finalizes output into `/storage/emulated/0/Movies/Video Downscaler/` and triggers direct playback. |
 
-### ⚡ FFmpeg Transcoding Command Breakdown
+### FFmpeg Transcoding Command Breakdown
 
 The application executes an optimized FFmpeg command configured for mobile efficiency and universal playback compatibility:
 
@@ -135,7 +136,7 @@ ffmpeg -i "<input_path>" \
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 video_downscaler/
@@ -169,7 +170,7 @@ video_downscaler/
 
 ---
 
-## 📦 Tech Stack & Dependencies
+## Tech Stack & Dependencies
 
 | Package | Version | Purpose |
 |:---|:---|:---|
@@ -183,7 +184,7 @@ video_downscaler/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -220,7 +221,7 @@ Ensure your development environment meets the following requirements:
 
 ---
 
-## 📱 Building the APK (ARM 32-bit & 64-bit Exclusive)
+## Building the APK (ARM 32-bit & 64-bit Exclusive)
 
 > [!TIP]
 > This application is specifically tailored for **real Android devices** utilizing **ARM 32-bit (`armeabi-v7a`)** and **ARM 64-bit (`arm64-v8a`)** architectures. All support for emulator-only `x86` and `x86_64` binaries has been completely stripped out to prevent binary bloat, ensuring both individual APKs and the release `.zip` artifact remain exceptionally compact.
@@ -245,7 +246,7 @@ The compiled APKs will be located at:
 
 ---
 
-### Method 2: Automated CI/CD via GitHub Actions 🤖
+### Method 2: Automated CI/CD via GitHub Actions 
 
 This repository includes a fully configured automated GitHub Actions workflow [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml).
 
@@ -270,6 +271,6 @@ This repository includes a fully configured automated GitHub Actions workflow [`
 
 ---
 
-## 📄 License & Attribution
+## License & Attribution
 
 This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with the bundled `ffmpeg_kit_flutter_full_gpl` package and `libx264` codec requirements.
