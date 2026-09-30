@@ -205,7 +205,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     if (result != null) {
       ForegroundServiceManager().updateService(
         title: 'Video Downscaler',
-        text: 'Konversi Selesai! Video disimpan di Movies',
+        text: l10n.t('proc_notif_completed'),
       );
     }
     Future.delayed(const Duration(seconds: 4), () {
@@ -876,7 +876,7 @@ class _SuccessBottomSheet extends StatelessWidget {
                 OpenFile.open(outputPath);
               },
               icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text('Buka / Mainkan'),
+              label: Text(l10n.t('proc_play_video')),
               style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
             ),
             const SizedBox(height: 12),
@@ -886,13 +886,13 @@ class _SuccessBottomSheet extends StatelessWidget {
                 Share.shareXFiles([XFile(outputPath)]);
               },
               icon: const Icon(Icons.share_rounded),
-              label: const Text('Bagikan'),
+              label: Text(l10n.t('share')),
               style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
             ),
             const SizedBox(height: 20),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Tutup'),
+              child: Text(l10n.t('close')),
             ),
           ],
         ),

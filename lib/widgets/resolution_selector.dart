@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/video_info.dart';
+import '../services/settings_service.dart';
 
 class ResolutionSelector extends StatelessWidget {
   final List<VideoResolution> resolutions;
@@ -17,6 +18,7 @@ class ResolutionSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = SettingsService().l10n;
 
     if (resolutions.isEmpty) {
       return Card(
@@ -31,10 +33,10 @@ class ResolutionSelector extends StatelessWidget {
                   color: Colors.white24,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Video sudah berada di resolusi rendah.\nTidak ada opsi downscale tersedia.',
+                Text(
+                  l10n.t('no_downscale_options'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white54),
+                  style: const TextStyle(color: Colors.white54),
                 ),
               ],
             ),
@@ -57,9 +59,9 @@ class ResolutionSelector extends StatelessWidget {
                   size: 22,
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Target Resolusi',
-                  style: TextStyle(
+                Text(
+                  l10n.t('target_resolution'),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),

@@ -308,7 +308,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.encodingOptions.container.description,
+                      l10n.t('desc_${widget.encodingOptions.container.name}'),
                       style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
                     ),
                   ),
@@ -379,14 +379,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.encodingOptions.codec.description,
+                      l10n.t('desc_${widget.encodingOptions.codec.name}'),
                       style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
                     ),
                   ),
                 ],
               ),
             ),
-            _buildFpsSelector(theme),
+            _buildFpsSelector(theme, l10n),
           ],
         ),
       ),
@@ -518,7 +518,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     );
   }
 
-  Widget _buildFpsSelector(ThemeData theme) {
+  Widget _buildFpsSelector(ThemeData theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -527,7 +527,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         const SizedBox(height: 16),
         _buildSubHeader(
           icon: Icons.shutter_speed_rounded,
-          title: 'Target FPS',
+          title: l10n.t('target_fps'),
           theme: theme,
         ),
         const SizedBox(height: 10),
@@ -540,7 +540,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             children: [
               ChoiceChip(
                 showCheckmark: false,
-                label: const Text('Original'),
+                label: Text(l10n.t('fps_original')),
                 selected: widget.encodingOptions.targetFps == 0,
                 onSelected: (val) {
                   if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 0));

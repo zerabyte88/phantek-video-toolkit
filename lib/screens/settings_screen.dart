@@ -187,7 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildThemeTile(
                       icon: Icons.dark_mode_rounded,
                       title: l10n.t('theme_dark'),
-                      subtitle: 'Navy / Slate Dark (#11111B)',
+                      subtitle: l10n.t('theme_dark_desc'),
                       value: 'dark',
                       current: settings.themeMode,
                       theme: theme,
@@ -196,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildThemeTile(
                       icon: Icons.brightness_2_rounded,
                       title: l10n.t('theme_oled'),
-                      subtitle: 'True Black (#000000) • Hemat baterai AMOLED',
+                      subtitle: l10n.t('theme_oled_desc'),
                       value: 'oled',
                       current: settings.themeMode,
                       theme: theme,
@@ -206,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildThemeTile(
                       icon: Icons.light_mode_rounded,
                       title: l10n.t('theme_light'),
-                      subtitle: 'Clean & Bright (#F6F7FB)',
+                      subtitle: l10n.t('theme_light_desc'),
                       value: 'light',
                       current: settings.themeMode,
                       theme: theme,
@@ -339,7 +339,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Icon(Icons.info_outline_rounded, size: 20, color: theme.colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            'Spesifikasi Perangkat',
+                            l10n.t('device_specs'),
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -349,13 +349,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _buildHardwareInfoRow('Model', '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}'),
+                      _buildHardwareInfoRow(l10n.t('device_model'), '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}'),
                       const SizedBox(height: 6),
-                      _buildHardwareInfoRow('SoC / Board', _hardwareInfo!['hardware']),
+                      _buildHardwareInfoRow(l10n.t('device_soc'), _hardwareInfo!['hardware']),
                       const SizedBox(height: 6),
-                      _buildHardwareInfoRow('CPU Cores', '${_hardwareInfo!['cores']} Core(s)'),
+                      _buildHardwareInfoRow(l10n.t('device_cpu_cores'), '${_hardwareInfo!['cores']} Core(s)'),
                       const SizedBox(height: 6),
-                      _buildHardwareInfoRow('Total RAM', '${_hardwareInfo!['ramMb']} MB'),
+                      _buildHardwareInfoRow(l10n.t('device_total_ram'), '${_hardwareInfo!['ramMb']} MB'),
                     ],
                   ),
                 ),

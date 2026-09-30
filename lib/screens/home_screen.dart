@@ -327,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen>
         Padding(
           padding: const EdgeInsets.only(left: 2, bottom: 12),
           child: Text(
-            'Pilih Mode',
+            l10n.t('select_mode'),
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -341,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: _ModeCard(
                 icon: Icons.compress_rounded,
-                label: 'Downscale',
+                label: l10n.t('mode_downscale'),
                 sublabel: '4K → 1080p',
                 isSelected: _selectedMode == _AppMode.downscale,
                 isEnabled: true,
@@ -353,11 +353,12 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: _ModeCard(
                 icon: Icons.expand_rounded,
-                label: 'Upscale',
+                label: l10n.t('mode_upscale'),
                 sublabel: '1080p → 4K',
                 isSelected: _selectedMode == _AppMode.upscale,
                 isEnabled: false,
                 accentColor: const Color(0xFF5CD85A),
+                badgeText: l10n.t('badge_soon'),
                 onTap: null,
               ),
             ),
@@ -365,11 +366,12 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: _ModeCard(
                 icon: Icons.swap_horiz_rounded,
-                label: 'Convert',
+                label: l10n.t('mode_convert'),
                 sublabel: 'MP4 / MKV / ...',
                 isSelected: _selectedMode == _AppMode.convert,
                 isEnabled: false,
                 accentColor: const Color(0xFFFF9F43),
+                badgeText: l10n.t('badge_soon'),
                 onTap: null,
               ),
             ),
@@ -445,6 +447,7 @@ class _ModeCard extends StatelessWidget {
   final bool isEnabled;
   final Color accentColor;
   final VoidCallback? onTap;
+  final String? badgeText;
 
   const _ModeCard({
     required this.icon,
@@ -454,6 +457,7 @@ class _ModeCard extends StatelessWidget {
     required this.isEnabled,
     required this.accentColor,
     required this.onTap,
+    this.badgeText,
   });
 
   @override
@@ -548,7 +552,7 @@ class _ModeCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Soon',
+                        badgeText ?? 'Soon',
                         style: TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.w700,
