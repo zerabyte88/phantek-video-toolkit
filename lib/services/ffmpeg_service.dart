@@ -160,7 +160,7 @@ class FFmpegService {
   /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
   /// Returns the output file path on success, null on failure.
-  static Future<String?> downscaleVideo({
+  static Future<String?> processVideo({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
     EncodingOptions encodingOptions = const EncodingOptions(),
@@ -284,8 +284,18 @@ class FFmpegService {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    // Always use yuv420p inside the filtergraph for 100% encoder & hardware compatibility
-    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
+    // Detect Mode
+    final isOriginalResolution = targetW == sourceVideo.width && targetH == sourceVideo.height;
+
+    // Build video filter (-vf)
+    String vfArg = '';
+    
+    if (isOriginalResolution) {
+      vfArg = '-vf "${fpsFilter}format=yuv420p"';
+    } else {
+      // Upscale / Downscale
+      vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
+    }
 
     // Construct full command
     final cmdParts = <String>[
