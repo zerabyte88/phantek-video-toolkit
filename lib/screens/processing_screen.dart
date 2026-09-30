@@ -44,8 +44,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   bool _isProcessing = true;
   bool _isSuccess = false;
   String? _outputPath;
-  // ignore: unused_field
-  String _log = '';
   late AnimationController _pulseController;
 
   DateTime? _startTime;
@@ -203,7 +201,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       onLog: (log) {
         if (mounted) {
           setState(() {
-            _log += '$log\n';
             debugPrint(log);
           });
         }
@@ -690,7 +687,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   _statusText = l10n.t('proc_preparing');
                   _speedText = '';
                   _currentSizeText = '';
-                  _log = '';
                 });
                 _startProcessing();
               },
