@@ -1,4 +1,4 @@
-# Phantek Video Downscaler
+# Phantek Video Toolkit
 
 <div align="center">
   <img src="https://img.shields.io/badge/Platform-Android-059669?style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
@@ -9,7 +9,7 @@
 
 <br/>
 
-**Phantek Video Downscaler** is an advanced, privacy-first, on-device video compression and resolution scaling application built with Flutter and powered by FFmpeg. It is designed to intelligently compress massively oversized videos (4K/2K) into lightweight, highly optimized standard formats (1080p, 720p, etc.) entirely on your local smartphone hardware—no internet required.
+**Phantek Video Toolkit** is an advanced, privacy-first, on-device video compression and resolution scaling application built with Flutter and powered by FFmpeg. It is designed to intelligently compress massively oversized videos (4K/2K) into lightweight, highly optimized standard formats (1080p, 720p, etc.) entirely on your local smartphone hardware—no internet required.
 
 ---
 
@@ -62,7 +62,7 @@ flowchart TD
 | **05** | **Dimension Engine** | Automatically flips width &times; height for portrait videos and enforces strict `mod 2` alignment. |
 | **06** | **Transcoding** | Employs `MediaCodec` silicon hardware encoding with automatic fallback to software (`libx264`/`libx265`). |
 | **07** | **Live Telemetry** | Calculates real-time elapsed duration, remaining ETA, processing FPS, and live file size. |
-| **08** | **Finalization** | Saves output to `/Movies/Video Downscaler/`, cleans temporary cache, and provides instant playback. |
+| **08** | **Finalization** | Saves output to device Movies folder, cleans temporary cache, and provides instant playback. |
 
 ### FFmpeg Command Logic
 
@@ -76,7 +76,7 @@ The app strictly optimizes FFmpeg arguments for mobile hardware:
 ## 📦 Building the APK (Automated & Optimized)
 
 > [!TIP]  
-> Phantek Video Downscaler relies heavily on the `ffmpeg_kit_flutter_new` architecture. To keep the app sizes ultra-compact, we exclusively build and release **Split ABI APKs** for **ARM 32-bit (`armeabi-v7a`)** and **ARM 64-bit (`arm64-v8a`)**. We have entirely removed the bulky "Universal Fat APK" from the build pipeline.
+> Phantek Video Toolkit relies heavily on the `ffmpeg_kit_flutter_new` architecture. To keep the app sizes ultra-compact, we exclusively build and release **Split ABI APKs** for **ARM 32-bit (`armeabi-v7a`)** and **ARM 64-bit (`arm64-v8a`)**. We have entirely removed the bulky "Universal Fat APK" from the build pipeline.
 
 ### Method 1: Local Build
 ```bash
@@ -87,8 +87,8 @@ Outputs are routed to `build/app/outputs/flutter-apk/`.
 
 ### Method 2: GitHub Actions CI/CD
 This repository is configured with a robust `.github/workflows/build-apk.yml`.
-- **Automated Version Tagging:** The workflow automatically reads `pubspec.yaml` (e.g. `1.0.7+7`) and renames the output APKs (e.g., `app-arm64-v8a-v1.0.7.apk`), completely eliminating manual renaming.
-- **Triggering Releases:** Simply push a new tag (`git tag v1.0.7 && git push origin v1.0.7`), and GitHub Actions will cleanly compile the split APKs and publish them instantly to your GitHub Releases page!
+- **Automated Version Tagging:** The workflow automatically reads `pubspec.yaml` (e.g. `1.0.7+7`) and renames the output APKs (e.g., `Phantek-Video-Toolkit-arm64-v8a-v1.0.7.apk`), completely eliminating manual renaming.
+- **Triggering Releases:** Simply push a new tag (`git tag v1.0.7 && git push origin v1.0.7`), or run the workflow manually with the "Publish build directly to GitHub Releases" option, and GitHub Actions will cleanly compile the split APKs and publish them instantly to your GitHub Releases page!
 
 ---
 

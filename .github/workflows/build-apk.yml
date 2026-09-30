@@ -72,9 +72,8 @@ jobs:
           VERSION=$(grep '^version: ' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           cd build/app/outputs/flutter-apk/
-          for file in *-release.apk; do
-            mv "$file" "${file/-release/-v$VERSION}"
-          done
+          mv app-arm64-v8a-release.apk "Phantek-Video-Toolkit-arm64-v8a-v${VERSION}.apk"
+          mv app-armeabi-v7a-release.apk "Phantek-Video-Toolkit-armeabi-v7a-v${VERSION}.apk"
 
       - name: 📋 List Generated APKs
         run: |
@@ -84,10 +83,10 @@ jobs:
       - name: 📤 Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: video-downscaler-apk
+          name: phantek-video-toolkit-apk
           path: |
-            build/app/outputs/flutter-apk/app-arm64-v8a-v*.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-v*.apk
+            build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v*.apk
+            build/app/outputs/flutter-apk/Phantek-Video-Toolkit-armeabi-v7a-v*.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -97,8 +96,8 @@ jobs:
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', env.APP_VERSION) }}
           files: |
-            build/app/outputs/flutter-apk/app-arm64-v8a-v*.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-v*.apk
+            build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v*.apk
+            build/app/outputs/flutter-apk/Phantek-Video-Toolkit-armeabi-v7a-v*.apk
           generate_release_notes: true
           draft: false
           prerelease: false
