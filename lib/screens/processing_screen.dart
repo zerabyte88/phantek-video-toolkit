@@ -431,6 +431,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 Container(
                   width: 1,
                   height: 40,
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
                   color: Colors.white12,
                 ),
                 Expanded(

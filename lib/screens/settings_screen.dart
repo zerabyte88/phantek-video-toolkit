@@ -101,18 +101,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     ...AppLocalizations.supportedLanguages.map((lang) {
                       final isSelected = settings.languageCode == lang['code'];
-                      return InkWell(
-                        onTap: () async {
-                          await _settingsService.setLanguage(lang['code']!);
-                          setState(() {});
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          margin: const EdgeInsets.only(bottom: 4),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Ink(
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? theme.colorScheme.primary.withAlpha(30)
@@ -124,7 +115,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   : Colors.transparent,
                             ),
                           ),
-                          child: Row(
+                          child: InkWell(
+                            onTap: () async {
+                              await _settingsService.setLanguage(lang['code']!);
+                              setState(() {});
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                              child: Row(
                             children: [
                               Text(
                                 lang['flag'] ?? '',
@@ -154,6 +156,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
                         ),
+                        ), // close InkWell
+                        ), // close Ink
                       );
                     }),
                   ],
@@ -1069,25 +1073,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String? badge,
   }) {
     final isSelected = value == current;
-    return InkWell(
-      onTap: () async {
-        await _settingsService.setThemeMode(value);
-        setState(() {});
-      },
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withAlpha(25)
-              : Colors.white.withAlpha(5),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.white12,
-            width: isSelected ? 1.5 : 1,
-          ),
+    return Ink(
+      decoration: BoxDecoration(
+        color: isSelected
+            ? theme.colorScheme.primary.withAlpha(25)
+            : Colors.white.withAlpha(5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isSelected ? theme.colorScheme.primary : Colors.white12,
+          width: isSelected ? 1.5 : 1,
         ),
-        child: Row(
+      ),
+      child: InkWell(
+        onTap: () async {
+          await _settingsService.setThemeMode(value);
+          setState(() {});
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
           children: [
             Icon(
               icon,
@@ -1151,8 +1156,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
           ],
         ),
-      ),
-    );
+        ), // close Container
+      ), // close InkWell
+    ); // close Ink
   }
 
   Widget _buildCoreChip({
