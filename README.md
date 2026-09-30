@@ -1,10 +1,10 @@
 # Phantek Video Downscaler
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Platform" />
-  <img src="https://img.shields.io/badge/Flutter-3.47.0-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Version-v1.0.7-ff69b4?style=for-the-badge" alt="Version" />
-  <img src="https://img.shields.io/badge/License-GPLv3-blue?style=for-the-badge" alt="License" />
+  <img src="https://img.shields.io/badge/Platform-Android-059669?style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
+  <img src="https://img.shields.io/badge/Flutter-3.47.0-0284c7?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Version-v1.0.7-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
+  <img src="https://img.shields.io/badge/License-GPLv3-475569?style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
 <br/>
@@ -19,10 +19,10 @@
 - **Resolution Downgrading:** Easily shrink 4K or 2K videos down to 1080p, 720p, 480p, 360p, or 240p. Prevents accidental upscaling of low-res videos.
 - **Smart Portrait Detection:** Automatically detects portrait/vertical videos (via rotation metadata) and adjusts target scaling dynamically (e.g., outputs `1080x1920` instead of `1920x1080`), ensuring aspect ratio and orientation are 100% preserved.
 - **Advanced Video Codecs:** 
-  - **H.264 / AVC:** Universal compatibility.
-  - **H.265 / HEVC:** High compression (up to 50% smaller sizes). Injects the Apple/Android compatibility `-tag:v hvc1` specifically for MP4/MOV formats.
+  - **H.264 / AVC:** Universal compatibility across all players and devices.
+  - **H.265 / HEVC:** High compression (up to 50% smaller sizes). Automatically injects the Apple/Android compatibility `-tag:v hvc1` specifically for MP4/MOV formats.
   - **VP9:** Extreme compression quality strictly locked to WebM and MKV to prevent Android gallery playback errors.
-- **Target Container Formats:** Support for MP4, MKV, MOV, and WebM encoding.
+- **Target Container Formats:** Full support for MP4, MKV, MOV, and WebM encoding.
 
 ### ⚡ Hardware Acceleration & Resilience
 - **MediaCodec Acceleration:** Leverages Android's native silicon encoders (Qualcomm Snapdragon, MediaTek, Exynos) to accelerate H.264 and HEVC exports.
@@ -38,27 +38,31 @@
 
 ## 🛠️ Architecture & FFmpeg Pipeline
 
-```text
-┌──────────────────────┐        ┌──────────────────────┐        ┌──────────────────────┐
-│    1. Media Input    │ ────> │   2. FFprobe Probe   │ ────> │   3. Media Metadata  │
-│   Native Android      │       │  Extract stream specs │       │  Resolution, Codec,   │
-│   File Picker         │       │  & container details  │       │  FPS, Bitrate, Audio  │
-└──────────────────────┘        └──────────────────────┘        └──────────────────────┘
-                                                                            │
-                                                                            ▼
-┌──────────────────────┐        ┌──────────────────────┐        ┌──────────────────────┐
-│   6. Transcoding     │ <──── │   5. Dimension Calc  │ <──── │   4. Configuration   │
-│  FFmpeg Engine        │       │  Smart Portrait &    │       │  Target Resolution,   │
-│  Auto-Fallback HW/SW  │       │  'mod 2' validation  │       │  Codec, and Bitrate   │
-└──────────────────────┘        └──────────────────────┘        └──────────────────────┘
-            │
-            ▼
-┌──────────────────────┐        ┌──────────────────────┐
-│   7. Live Telemetry  │ ────> │   8. Complete & Save │
-│  Dynamic ETA, Elapsed │       │  Instant open player  │
-│  Timer, % Progress    │       │  & Storage statistics │
-└──────────────────────┘        └──────────────────────┘
+```mermaid
+flowchart TD
+    A["1. Media Input (Native File Picker)"] --> B["2. Stream Analysis (FFprobe Extraction)"]
+    B --> C["3. Metadata & Bounds Check"]
+    C --> D["4. Encoding Config (Resolution, Codec, Bitrate)"]
+    D --> E["5. Dimension Engine (Smart Portrait & mod 2)"]
+    E --> F["6. Hardware Transcoding (MediaCodec)"]
+    F -.->|"Auto Fallback on Failure"| F_SW["Software Transcoding (libx264 / libx265)"]
+    F --> G["7. Real-Time Telemetry (ETA, Speed & Progress)"]
+    F_SW --> G
+    G --> H["8. Finalize & Save (Instant Playback & Stats)"]
 ```
+
+### 🔄 Pipeline Stages Breakdown
+
+| Stage | Process | Key Responsibility |
+| :---: | :--- | :--- |
+| **01** | **Media Input** | Streams selected video from device storage via native Android SAF without memory overhead. |
+| **02** | **FFprobe Probe** | Extracts metadata: container format, stream specs, rotation angle, framerate, and audio channels. |
+| **03** | **Validation** | Determines eligible downscale targets (e.g. 4K &rarr; 1080p, 720p) and prevents accidental upscaling. |
+| **04** | **Configuration** | Configures user-selected codec (H.264, H.265, VP9), container, and CRF or target bitrate. |
+| **05** | **Dimension Engine** | Automatically flips width &times; height for portrait videos and enforces strict `mod 2` alignment. |
+| **06** | **Transcoding** | Employs `MediaCodec` silicon hardware encoding with automatic fallback to software (`libx264`/`libx265`). |
+| **07** | **Live Telemetry** | Calculates real-time elapsed duration, remaining ETA, processing FPS, and live file size. |
+| **08** | **Finalization** | Saves output to `/Movies/Video Downscaler/`, cleans temporary cache, and provides instant playback. |
 
 ### FFmpeg Command Logic
 

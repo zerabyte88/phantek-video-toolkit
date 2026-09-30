@@ -66,6 +66,14 @@ jobs:
         run: |
           rm -f build/app/outputs/flutter-apk/*x86*.apk
 
+      - name: 🏷️ Extract Version and Rename APKs
+        run: |
+          VERSION=$(grep '^version: ' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          cd build/app/outputs/flutter-apk/
+          for file in *-release.apk; do
+            mv "$file" "${file/-release/-v$VERSION}"
+          done
+
       - name: 📋 List Generated APKs
         run: |
           echo "Generated APK files in build/app/outputs/flutter-apk/ (ARM only):"
@@ -76,8 +84,8 @@ jobs:
         with:
           name: video-downscaler-apk
           path: |
-            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-v*.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-v*.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -86,8 +94,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-v*.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-v*.apk
           generate_release_notes: true
           draft: false
           prerelease: false
