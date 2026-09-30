@@ -184,6 +184,7 @@ class FFmpegService {
         vCodec = 'hevc_mediacodec';
         isMediaCodec = true;
       }
+      // Note: VP9 has no widely supported MediaCodec encoder, stays software
     }
 
     final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
@@ -194,40 +195,79 @@ class FFmpegService {
       sourceBitrateBps: sourceVideo.bitrate,
     );
 
-    // Rate control, preset, and profile arguments
+    // Rate control, preset, profile, and codec-specific arguments
     String rateControlArg = '';
     String presetArg = '';
     String profileLevelArg = '';
+    String codecExtraArgs = '';
+
+    // GOP (keyframe interval) — used by both HW and SW encoders
+    final gop = (sourceVideo.fps * 2).round().clamp(24, 250);
+
+    // Determine thread count for parallel encoding
+    final int effectiveThreads = appSettings.cpuThreads > 0
+        ? appSettings.cpuThreads
+        : AppSettings.deviceCoreCount;
 
     if (isMediaCodec) {
-      // MediaCodec hardware encoder on Android strictly requires explicit VBR rate control,
-      // maximum bitrate, buffer size (VBV model), and GOP keyframe interval.
-      // Without these, mobile chipsets (Snapdragon, MediaTek, Exynos) ignore -b:v and
-      // fall back to default low bitrates (~400kbps) causing severe blur and tiny file size.
-      final maxrateKbps = (targetBitrateKbps * 1.5).round();
-      final bufsizeKbps = targetBitrateKbps * 2;
-      final gop = (sourceVideo.fps * 2).round().clamp(24, 120);
+      // ===== HARDWARE (MediaCodec) ENCODING =====
+      // Many Android MediaCodec implementations (Snapdragon, MediaTek, Exynos)
+      // poorly support -bitrate_mode and silently ignore bitrate params.
+      // Strategy: use ABR (-b:v) with explicit maxrate/bufsize, no -bitrate_mode.
+      // Enforce a quality floor so the output never drops below a sane bitrate.
+      final int hwBitrateKbps = targetBitrateKbps.clamp(1500, 50000);
+      final int maxrateKbps = (hwBitrateKbps * 1.5).round();
+      final int bufsizeKbps = hwBitrateKbps * 2;
 
-      rateControlArg = '-bitrate_mode vbr -b:v ${targetBitrateKbps}k -maxrate ${maxrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
+      rateControlArg = '-b:v ${hwBitrateKbps}k -maxrate ${maxrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
 
       if (vCodec == 'h264_mediacodec') {
-        profileLevelArg = '-profile:v high';
+        profileLevelArg = '-profile:v high -level:v 4.1';
       } else if (vCodec == 'hevc_mediacodec') {
         profileLevelArg = '-profile:v main';
+        // hvc1 tag is critical for playback on Android/iOS video players
+        codecExtraArgs = '-tag:v hvc1';
       }
     } else {
-      // Software encoding (libx264 / libx265 / libvpx-vp9)
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg = '-crf ${encodingOptions.crfValue}';
-      } else {
-        rateControlArg = '-b:v ${targetBitrateKbps}k';
-      }
-
+      // ===== SOFTWARE ENCODING =====
       if (vCodec == 'libx264') {
+        // H.264 software encoding
+        if (encodingOptions.rateControlMode == RateControlMode.crf) {
+          rateControlArg = '-crf ${encodingOptions.crfValue}';
+        } else {
+          rateControlArg = '-b:v ${targetBitrateKbps}k';
+        }
         presetArg = '-preset ${appSettings.cpuPreset}';
         profileLevelArg = '-profile:v high -level:v 4.1';
+
       } else if (vCodec == 'libx265') {
+        // H.265 / HEVC software encoding
+        if (encodingOptions.rateControlMode == RateControlMode.crf) {
+          rateControlArg = '-crf ${encodingOptions.crfValue}';
+        } else {
+          rateControlArg = '-b:v ${targetBitrateKbps}k';
+        }
         presetArg = '-preset ${appSettings.cpuPreset}';
+        // hvc1 tag required for MP4/MOV playback on Android/iOS
+        codecExtraArgs = '-tag:v hvc1 -x265-params "log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads"';
+
+      } else if (vCodec == 'libvpx-vp9') {
+        // VP9 software encoding — without these flags, libvpx-vp9 runs in
+        // 'best' deadline mode (single-threaded, exhaustive search) which is
+        // 10-50x slower than necessary.
+        if (encodingOptions.rateControlMode == RateControlMode.crf) {
+          // VP9 uses -crf + -b:v 0 for constant quality mode
+          rateControlArg = '-crf ${encodingOptions.crfValue} -b:v 0';
+        } else {
+          rateControlArg = '-b:v ${targetBitrateKbps}k';
+        }
+        // -deadline good : balanced speed/quality (vs 'best' which is glacially slow)
+        // -cpu-used 4    : speed level 0-8, 4 is a good balance
+        // -row-mt 1      : enable row-based multi-threading (massive speedup)
+        // -tile-columns 2: split frame into 4 tile columns for parallelism
+        // -frame-parallel 1: enable frame-level parallelism
+        // -auto-alt-ref 1 & -lag-in-frames 25: better compression with look-ahead
+        codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -frame-parallel 1 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
       }
     }
 
@@ -235,7 +275,9 @@ class FFmpegService {
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
     if (appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
-    } else if (encodingOptions.container == VideoContainer.webm) {
+    } else if (encodingOptions.container == VideoContainer.webm ||
+               encodingOptions.codec == VideoCodec.vp9) {
+      // VP9 typically pairs with Opus audio, and WebM requires Opus/Vorbis
       audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
     }
 
@@ -258,8 +300,13 @@ class FFmpegService {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    // Video filters: FPS + Lanczos Scale + format
-    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
+    // Video filters: FPS + Lanczos Scale + pixel format
+    // Hardware encoders (MediaCodec) should NOT force yuv420p — they accept
+    // the device's native surface format. Forcing yuv420p causes color space
+    // conversion overhead and some chipsets reject it entirely, producing
+    // garbage output. Software encoders need explicit yuv420p for compatibility.
+    final String pixFmtFilter = isMediaCodec ? '' : ',format=yuv420p';
+    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos$pixFmtFilter"';
 
     // Construct full command
     final cmdParts = <String>[
@@ -270,6 +317,7 @@ class FFmpegService {
       presetArg,
       profileLevelArg,
       rateControlArg,
+      codecExtraArgs,
       audioArgs,
       containerFlags,
       '-y "$outputPath"',
@@ -278,7 +326,7 @@ class FFmpegService {
     final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec');
+    onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec${isMediaCodec ? ' (HW)' : ' (SW)'}');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
 

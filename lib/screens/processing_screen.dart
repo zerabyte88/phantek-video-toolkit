@@ -307,27 +307,29 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   Widget _buildProgressSection(ThemeData theme, l10n) {
+    final progressColor = _isProcessing
+        ? theme.colorScheme.primary
+        : (_isSuccess ? const Color(0xFF5CD85A) : const Color(0xFFFF6B6B));
+
     return Column(
       children: [
+        // Main circular progress
         SizedBox(
-          width: 170,
-          height: 170,
+          width: 190,
+          height: 190,
           child: Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 170,
-                height: 170,
+                width: 190,
+                height: 190,
                 child: CircularProgressIndicator(
-                  value: _isProcessing ? (_progress > 0 ? _progress : null) : (_isSuccess ? 1.0 : 0.0),
-                  strokeWidth: 8,
+                  value: _isProcessing
+                      ? (_progress > 0 ? _progress : null)
+                      : (_isSuccess ? 1.0 : 0.0),
+                  strokeWidth: 9,
                   strokeCap: StrokeCap.round,
-                  backgroundColor: Colors.white10,
-                  color: _isProcessing
-                      ? theme.colorScheme.primary
-                      : (_isSuccess
-                          ? const Color(0xFF5CD85A)
-                          : const Color(0xFFFF6B6B)),
+                  color: progressColor,
                 ),
               ),
               Column(
@@ -341,7 +343,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                           opacity: 0.5 + (_pulseController.value * 0.5),
                           child: Icon(
                             Icons.movie_filter_rounded,
-                            size: 44,
+                            size: 36,
                             color: theme.colorScheme.primary,
                           ),
                         );
@@ -352,38 +354,61 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                       _isSuccess
                           ? Icons.check_circle_rounded
                           : Icons.error_rounded,
-                      size: 52,
-                      color: _isSuccess
-                          ? const Color(0xFF5CD85A)
-                          : const Color(0xFFFF6B6B),
+                      size: 48,
+                      color: progressColor,
                     ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     _isProcessing
                         ? _formatPercentage(_progress)
                         : (_isSuccess ? '100%' : 'Error'),
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: _isProcessing
-                          ? theme.colorScheme.onSurface
-                          : (_isSuccess
-                              ? const Color(0xFF5CD85A)
-                              : const Color(0xFFFF6B6B)),
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: progressColor,
+                      letterSpacing: -0.5,
                     ),
                   ),
+                  if (_isProcessing && _speedText.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      _speedText,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurface.withAlpha(130),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 20),
+
+        const SizedBox(height: 6),
+
+        // Linear progress bar for extra clarity
+        if (_isProcessing && _progress > 0)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: _progress,
+                minHeight: 4,
+              ),
+            ),
+          ),
+
+        const SizedBox(height: 16),
         Text(
           _statusText,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ],
