@@ -1,15 +1,19 @@
 # Phantek Video Toolkit
 
+<p align="center">
+  <img src="assets/icon/app_icon.jpg" alt="Phantek Video Toolkit Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+</p>
+
 <div align="center">
   <img src="https://img.shields.io/badge/Platform-Android-059669?style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/badge/Flutter-3.47.0-0284c7?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Version-v1.0.7-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-v1.0.8-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
   <img src="https://img.shields.io/badge/License-GPLv3-475569?style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
 <br/>
 
-**Phantek Video Toolkit** is an advanced, privacy-first, on-device video compression and resolution scaling application built with Flutter and powered by FFmpeg. It is designed to intelligently compress massively oversized videos (4K/2K) into lightweight, highly optimized standard formats (1080p, 720p, etc.) entirely on your local smartphone hardware—no internet required.
+**Phantek Video Toolkit** is an advanced, privacy-first, on-device video compression and resolution scaling application built with Flutter and powered by FFmpeg. It is designed to intelligently compress massively oversized videos (4K/2K) into lightweight, highly optimized standard formats (1080p, 720p, etc.) entirely on your local device—no internet required.
 
 ---
 
@@ -24,9 +28,10 @@
   - **VP9:** Extreme compression quality strictly locked to WebM and MKV to prevent Android gallery playback errors.
 - **Target Container Formats:** Full support for MP4, MKV, MOV, and WebM encoding.
 
-### ⚡ Hardware Acceleration & Resilience
-- **MediaCodec Acceleration:** Leverages Android's native silicon encoders (Qualcomm Snapdragon, MediaTek, Exynos) to accelerate H.264 and HEVC exports.
-- **Auto-Negotiation & Smart Fallback:** Drops rigid surface formats (using `yuv420p` to let Android auto-negotiate hardware surfaces). If an OEM's hardware encoder crashes or fails to initialize, the app **silently and instantly falls back** to ultra-reliable Software Encoding (`libx264` / `libx265`) without throwing errors.
+### ⚡ High-Stability Pure Software Transcoding
+- **Full Multi-Threaded CPU Optimization:** Powered by highly reliable, multi-threaded pure software encoders (`libx264`, `libx265`, `libvpx-vp9`) optimized for ARM architectures with user-configurable thread counts and CPU speed presets.
+- **Flawless Universal Stability:** Completely eliminates vendor-fragmented hardware encoder incompatibilities across diverse Android chips (MediaTek, Qualcomm, Exynos, Unisoc) to ensure 100% crash-free exports with pristine video fidelity.
+- **Auto-Collision File Numbering:** If a video with the same output name already exists in the destination folder, the app automatically appends an incremental number (e.g. `video4k-1080p-2.mp4`), preventing accidental overwrites.
 
 ### 📊 Real-Time Telemetry & UX
 - **Live Processing Dashboard:** Shows precise ETA, real-time FPS speed, estimated final file size, and percent progression.
@@ -44,11 +49,9 @@ flowchart TD
     B --> C["3. Metadata & Bounds Check"]
     C --> D["4. Encoding Config (Resolution, Codec, Bitrate)"]
     D --> E["5. Dimension Engine (Smart Portrait & mod 2)"]
-    E --> F["6. Hardware Transcoding (MediaCodec)"]
-    F -.->|"Auto Fallback on Failure"| F_SW["Software Transcoding (libx264 / libx265)"]
+    E --> F["6. Pure Software Transcoding (libx264 / libx265 / VP9)"]
     F --> G["7. Real-Time Telemetry (ETA, Speed & Progress)"]
-    F_SW --> G
-    G --> H["8. Finalize & Save (Instant Playback & Stats)"]
+    G --> H["8. Finalize & Save (Instant Playback & Unique Naming)"]
 ```
 
 ### 🔄 Pipeline Stages Breakdown
@@ -60,9 +63,9 @@ flowchart TD
 | **03** | **Validation** | Determines eligible downscale targets (e.g. 4K &rarr; 1080p, 720p) and prevents accidental upscaling. |
 | **04** | **Configuration** | Configures user-selected codec (H.264, H.265, VP9), container, and CRF or target bitrate. |
 | **05** | **Dimension Engine** | Automatically flips width &times; height for portrait videos and enforces strict `mod 2` alignment. |
-| **06** | **Transcoding** | Employs `MediaCodec` silicon hardware encoding with automatic fallback to software (`libx264`/`libx265`). |
+| **06** | **Transcoding** | Employs multi-threaded pure software encoding (`libx264`/`libx265`/`VP9`) for rock-solid stability. |
 | **07** | **Live Telemetry** | Calculates real-time elapsed duration, remaining ETA, processing FPS, and live file size. |
-| **08** | **Finalization** | Saves output to device Movies folder, cleans temporary cache, and provides instant playback. |
+| **08** | **Finalization** | Saves output to device Movies folder with automatic collision numbering (e.g. `-2`, `-3`), cleans cache, and provides instant playback. |
 
 ### FFmpeg Command Logic
 
@@ -87,8 +90,8 @@ Outputs are routed to `build/app/outputs/flutter-apk/`.
 
 ### Method 2: GitHub Actions CI/CD
 This repository is configured with a robust `.github/workflows/build-apk.yml`.
-- **Automated Version Tagging:** The workflow automatically reads `pubspec.yaml` (e.g. `1.0.7+7`) and renames the output APKs (e.g., `Phantek-Video-Toolkit-arm64-v8a-v1.0.7.apk`), completely eliminating manual renaming.
-- **Triggering Releases:** Simply push a new tag (`git tag v1.0.7 && git push origin v1.0.7`), or run the workflow manually with the "Publish build directly to GitHub Releases" option, and GitHub Actions will cleanly compile the split APKs and publish them instantly to your GitHub Releases page!
+- **Automated Version Tagging:** The workflow automatically reads `pubspec.yaml` (e.g. `1.0.8+8`) and renames the output APKs (e.g., `Phantek-Video-Toolkit-arm64-v8a-v1.0.8.apk`), completely eliminating manual renaming.
+- **Triggering Releases:** Simply push a new tag (`git tag v1.0.8 && git push origin v1.0.8`), or run the workflow manually with the "Publish build directly to GitHub Releases" option, and GitHub Actions will cleanly compile the split APKs and publish them instantly to your GitHub Releases page!
 
 ---
 

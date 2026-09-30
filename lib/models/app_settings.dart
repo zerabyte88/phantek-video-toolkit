@@ -10,9 +10,6 @@ class AppSettings {
   /// FFmpeg preset for x264/x265 (ultrafast, superfast, veryfast, faster, fast, medium, slow).
   final String cpuPreset;
 
-  /// Whether to attempt hardware-accelerated encoding (MediaCodec on Android).
-  final bool hardwareAcceleration;
-
   /// Audio bitrate in kbps (e.g. 64, 128, 192, 256). 0 means mute / strip audio.
   final int audioBitrateKbps;
 
@@ -32,7 +29,6 @@ class AppSettings {
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
     this.cpuPreset = 'medium',
-    this.hardwareAcceleration = false,
     this.audioBitrateKbps = 128,
     this.languageCode = 'id',
     this.themeMode = 'dark',
@@ -47,7 +43,6 @@ class AppSettings {
     int? cpuThreads,
     int? ramBufferMb,
     String? cpuPreset,
-    bool? hardwareAcceleration,
     int? audioBitrateKbps,
     String? languageCode,
     String? themeMode,
@@ -58,7 +53,6 @@ class AppSettings {
       cpuThreads: cpuThreads ?? this.cpuThreads,
       ramBufferMb: ramBufferMb ?? this.ramBufferMb,
       cpuPreset: cpuPreset ?? this.cpuPreset,
-      hardwareAcceleration: hardwareAcceleration ?? this.hardwareAcceleration,
       audioBitrateKbps: audioBitrateKbps ?? this.audioBitrateKbps,
       languageCode: languageCode ?? this.languageCode,
       themeMode: themeMode ?? this.themeMode,
@@ -72,7 +66,6 @@ class AppSettings {
       'cpuThreads': cpuThreads,
       'ramBufferMb': ramBufferMb,
       'cpuPreset': cpuPreset,
-      'hardwareAcceleration': hardwareAcceleration,
       'audioBitrateKbps': audioBitrateKbps,
       'languageCode': languageCode,
       'themeMode': themeMode,
@@ -95,7 +88,6 @@ class AppSettings {
       cpuThreads: json['cpuThreads'] as int? ?? 0,
       ramBufferMb: json['ramBufferMb'] as int? ?? 512,
       cpuPreset: sanitizePreset(json['cpuPreset'] as String?),
-      hardwareAcceleration: json['hardwareAcceleration'] as bool? ?? false,
       audioBitrateKbps: json['audioBitrateKbps'] as int? ?? 128,
       languageCode: json['languageCode'] as String? ?? 'id',
       themeMode: json['themeMode'] as String? ?? 'dark',
