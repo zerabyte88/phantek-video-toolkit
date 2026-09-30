@@ -243,12 +243,16 @@ class FFmpegService {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
       presetArg = '-preset ${appSettings.cpuPreset}';
+      profileLevelArg = '-profile:v main';
       
       String hvc1Tag = '';
       if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
-      codecExtraArgs = '$hvc1Tag-x265-params "log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads"';
+      // Do NOT wrap x265-params value in quotes — FFmpegKit uses its own
+      // shell-style argument parser and the embedded quotes would be passed
+      // literally to the encoder, corrupting the parameters.
+      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads';
 
     } else if (vCodec == 'libvpx-vp9') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
@@ -256,7 +260,10 @@ class FFmpegService {
       } else {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
-      codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -frame-parallel 1 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
+      profileLevelArg = '-profile:v 0';
+      // Removed deprecated -frame-parallel flag which can cause playback
+      // issues on some devices/players.
+      codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
     }
 
     // Audio options
@@ -287,15 +294,16 @@ class FFmpegService {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    // Always use yuv420p planar format
-    final String pixFmtFilter = ',format=yuv420p';
-    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos$pixFmtFilter"';
+    // Always use yuv420p for maximum playback compatibility
+    final vfArg = '-vf ${fpsFilter}scale=$targetW:$targetH:flags=lanczos';
+    const pixFmtArg = '-pix_fmt yuv420p';
 
     // Construct full command
     final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
       threadsArg,
       vfArg,
+      pixFmtArg,
       '-c:v $vCodec',
       presetArg,
       profileLevelArg,

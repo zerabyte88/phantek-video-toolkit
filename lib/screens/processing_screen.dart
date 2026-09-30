@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../models/app_settings.dart';
 import '../models/encoding_options.dart';
@@ -62,6 +63,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
+    // Force wakelock ON so the screen & CPU stay active during encoding,
+    // regardless of the user's global "Keep Screen Awake" setting.
+    WakelockPlus.enable();
     _startProcessing();
   }
 
@@ -70,6 +74,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _timer?.cancel();
     _pulseController.dispose();
     ForegroundServiceManager().stopService();
+    // Restore wakelock to the user's preference.
+    WakelockPlus.toggle(
+      enable: _settingsService.settings.keepScreenAwake,
+    );
     if (_isProcessing) {
       FFmpegService.cancelAll();
       CacheManagerService().clearAllCache(
@@ -208,6 +216,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         text: l10n.t('proc_notif_completed'),
       );
     }
+    // Restore wakelock to the user's preference now that encoding is done.
+    WakelockPlus.toggle(
+      enable: _settingsService.settings.keepScreenAwake,
+    );
     Future.delayed(const Duration(seconds: 4), () {
       ForegroundServiceManager().stopService();
     });
