@@ -708,14 +708,17 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    _errorMessage!,
-                    maxLines: 8,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                      color: Colors.white70,
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 120),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 10,
+                          color: Colors.white70,
+                        ),
+                      ),
                     ),
                   ),
                 ],
