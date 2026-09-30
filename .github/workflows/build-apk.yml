@@ -2,11 +2,8 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
     tags:
       - 'v*'
-  pull_request:
-    branches: [ "main", "master" ]
   workflow_dispatch:
     inputs:
       build_split_apk:
@@ -14,6 +11,11 @@ on:
         required: false
         type: boolean
         default: true
+      publish_release:
+        description: 'Publish build directly to GitHub Releases'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -57,7 +59,6 @@ jobs:
       - name: 🧪 Run Unit & Widget Tests
         run: flutter test
 
-
       - name: 📱 Build Split-per-ABI Release APKs (ARM 32 & 64-bit only)
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.build_split_apk }}
         run: flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
@@ -69,6 +70,7 @@ jobs:
       - name: 🏷️ Extract Version and Rename APKs
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           cd build/app/outputs/flutter-apk/
           for file in *-release.apk; do
             mv "$file" "${file/-release/-v$VERSION}"
@@ -90,9 +92,10 @@ jobs:
           retention-days: 30
 
       - name: 🏷️ Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', env.APP_VERSION) }}
           files: |
             build/app/outputs/flutter-apk/app-arm64-v8a-v*.apk
             build/app/outputs/flutter-apk/app-armeabi-v7a-v*.apk
