@@ -1,7 +1,7 @@
 # Phantek Video Toolkit
 
 <p align="center">
-  <img src="assets/icon/app_icon.jpg" alt="Phantek Video Toolkit Icon" width="128" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+  <img src="assets/icon/app_icon.jpg" alt="Phantek Video Toolkit Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
 </p>
 
 <div align="center">
@@ -13,88 +13,113 @@
 
 <br/>
 
-**Phantek Video Toolkit** is an on-device video compression and resolution scaling application built with Flutter and FFmpeg. It is designed to compress large high-resolution videos (such as 4K and 2K) into optimized standard formats (1080p, 720p, etc.) locally on the device without requiring internet connectivity.
+**Phantek Video Toolkit** is an offline, on-device mobile video transcoding and resolution downscaling application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
+
+---
+
+## Core Architecture and Design Decisions
+
+### 1. Pure Software Pipeline (Zero Hardware Acceleration)
+To guarantee deterministic encoding output across diverse Android chipsets (Snapdragon, MediaTek, Exynos, Tensor, Unisoc), all hardware-accelerated encoders and decoders (e.g., `mediacodec`) have been excluded from the transcoding pipeline:
+- **Software Decoding:** Input streams are parsed and decoded entirely through standard FFmpeg CPU demuxers and decoders.
+- **Software Encoding:** Encoders are strictly locked to `libx264` (H.264), `libx265` (H.265 / HEVC), and `libvpx-vp9` (VP9).
+- **Stability and Color Accuracy:** Eliminates vendor-specific driver fragmentation, green/red/yellow tint glitches, macroblocking artifacts, and abrupt process termination commonly associated with proprietary Android MediaCodec wrappers.
+
+### 2. Unified Pixel Format and Filtergraph Pipeline
+All scaling, rotation handling, and color normalization operations execute inside an atomic FFmpeg filtergraph:
+- **Filter Syntax:** `-vf "fps=fps=<FPS>,scale=<W>:<H>:flags=lanczos,format=yuv420p"`
+- **Even Dimension Alignment:** Target widths and heights are strictly calculated to even numbers (`mod 2`) to meet macroblock boundary constraints.
+- **Universal Chroma Subsampling:** Enforces 8-bit `yuv420p` within the filter chain, ensuring full compatibility with default Android system players, Google Photos, WhatsApp, and third-party media players.
+
+### 3. Background Persistence and Screen-Off Operation
+Video transcoding requires sustained CPU utilization over extended durations. The application implements background persistence protocols compliant with Android 13 and 14:
+- **Android Foreground Service:** Operates with the `mediaProcessing` foreground service type (`flutter_foreground_task`), displaying live conversion progress in the notification tray.
+- **CPU Wakelock:** Employs `wakelock_plus` to hold partial CPU execution locks during encoding, preventing the Android OS from suspending the process when the screen turns off.
+- **Automated Resource Management:** Services and wakelocks are released immediately upon process completion, cancellation, or failure.
 
 ---
 
 ## Key Features
 
-### Intelligent Downscaling & Codec Support
-- **Resolution Downgrading:** Downscale 4K or 2K videos to 1080p, 720p, 480p, 360p, or 240p. Includes safety checks to prevent upscaling of low-resolution videos.
-- **Smart Portrait Detection:** Detects portrait/vertical videos via rotation metadata and adjusts target scaling dynamically (e.g., outputs `1080x1920` instead of `1920x1080`), ensuring aspect ratio and orientation are preserved accurately.
-- **Advanced Video Codecs:** 
-  - **H.264 / AVC:** Broad compatibility across media players and devices.
-  - **H.265 / HEVC:** High compression efficiency. Automatically injects the `-tag:v hvc1` tag for MP4/MOV formats to improve compatibility.
-  - **VP9:** High compression efficiency. Container format is restricted to WebM and MKV to ensure compatibility with native Android playback.
-- **Target Container Formats:** Support for MP4, MKV, MOV, and WebM encoding.
+### Video Scaling and Codec Management
+- **Resolution Downscaling:** Supports target presets for 1080p, 720p, 480p, 360p, and 240p. Automatic checks prevent accidental upscaling of lower-resolution sources.
+- **Smart Aspect Ratio and Orientation Engine:** Reads stream orientation and rotation metadata (90°, 180°, 270°) to preserve portrait and landscape aspects without stretching or black bar distortion.
+- **Codec Specifications:**
+  - **H.264 / AVC (`libx264`):** Standard profile configuration (`-profile:v high -level:v 4.1`) for maximum device compatibility.
+  - **H.265 / HEVC (`libx265`):** High-efficiency video coding with automatic `-tag:v hvc1` injection for MP4 and MOV containers.
+  - **VP9 (`libvpx-vp9`):** Open-source profile with optimized threading (`-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2`) paired with `libopus` audio in WebM and MKV containers.
+- **Container Support:** MP4 (with `-movflags +faststart`), MKV, MOV, and WebM.
 
-### High-Stability Software Transcoding
-- **Multi-Threaded CPU Optimization:** Utilizes multi-threaded software encoders (`libx264`, `libx265`, `libvpx-vp9`) with configurable thread counts and CPU presets.
-- **Universal Stability:** Ensures consistent export stability and video fidelity across various Android chipsets by relying on software encoding, bypassing potential hardware encoder fragmentation.
-- **Auto-Collision File Numbering:** Automatically appends an incremental number (e.g., `video4k-1080p-2.mp4`) to the output filename if a file with the same name already exists, preventing accidental overwrites.
+### Process Telemetry and Error Transparency
+- **Real-Time Monitoring:** Live progress calculation reporting encoding speed (x factor), frames per second, elapsed time, calculated remaining time (ETA), and estimated output size.
+- **Detailed Error Diagnostics:** Captures stderr logs directly from the FFmpeg session. In the event of a failure, a dedicated diagnostics container presents full FFmpeg error logs for troubleshooting.
+- **Non-Destructive Output Naming:** Automatically detects filename collisions in `/storage/emulated/0/Movies` and appends incremental identifiers (`filename-1080p-2.mp4`) to avoid overwriting existing media.
+- **Automated Cache Purge:** Clears temporary cached input streams originating from the native Android file picker to prevent storage bloat.
 
-### Real-Time Telemetry & UX
-- **Live Processing Dashboard:** Displays estimated time of arrival (ETA), processing speed (FPS), estimated output size, and completion percentage.
-- **Wakelock & Background Persistence:** Utilizes `flutter_foreground_task` to ensure transcoding continues reliably when the application is minimized or the device screen is off.
-- **Multi-Language Support (6 Languages):** Support for Bahasa Indonesia, English, 日本語, 简体中文, 繁體中文, and 한국어.
-- **Adaptive UI:** Includes AMOLED Dark, Standard Dark, and Light themes.
+### Interface and Localization
+- **Theme Modes:** AMOLED Black, Midnight Dark, and Standard Light.
+- **Multi-Language Localization:** Full native string translations for 6 languages:
+  - Bahasa Indonesia
+  - English
+  - 日本語 (Japanese)
+  - 简体中文 (Simplified Chinese)
+  - 繁體中文 (Traditional Chinese)
+  - 한국어 (Korean)
 
 ---
 
-## Architecture & FFmpeg Pipeline
+## Pipeline Execution Flow
 
 ```mermaid
 flowchart TD
-    A["1. Media Input (Native File Picker)"] --> B["2. Stream Analysis (FFprobe Extraction)"]
-    B --> C["3. Metadata & Bounds Check"]
-    C --> D["4. Encoding Config (Resolution, Codec, Bitrate)"]
-    D --> E["5. Dimension Engine (Smart Portrait & mod 2)"]
-    E --> F["6. Software Transcoding (libx264 / libx265 / VP9)"]
-    F --> G["7. Real-Time Telemetry (ETA, Speed & Progress)"]
-    G --> H["8. Finalize & Save (Instant Playback & Unique Naming)"]
+    A["1. File Selection (Native SAF Picker)"] --> B["2. Media Inspection (FFprobe Stream Metadata)"]
+    B --> C["3. Validation & Resolution Bounds Check"]
+    C --> D["4. Dimension Calculation (Smart Orientation & mod 2)"]
+    D --> E["5. Foreground Service & Wakelock Initialization"]
+    E --> F["6. Multi-Threaded Software Transcoding (CPU)"]
+    F --> G["7. Live Telemetry Broadcast (ETA, FPS, Progress)"]
+    G --> H["8. Export to Storage & Cache Cleanup"]
 ```
 
-### Pipeline Stages Breakdown
+### Pipeline Overview
 
-| Stage | Process | Key Responsibility |
+| Step | Component | Technical Operation |
 | :---: | :--- | :--- |
-| **01** | **Media Input** | Streams selected video from device storage via native Android SAF. |
-| **02** | **FFprobe Probe** | Extracts metadata: container format, stream specifications, rotation angle, framerate, and audio channels. |
-| **03** | **Validation** | Determines eligible downscale targets and prevents upscaling. |
-| **04** | **Configuration** | Configures user-selected codec, container, and CRF or target bitrate. |
-| **05** | **Dimension Engine** | Adjusts dimensions for portrait videos and enforces `mod 2` alignment. |
-| **06** | **Transcoding** | Employs multi-threaded software encoding for consistent stability. |
-| **07** | **Live Telemetry** | Calculates elapsed duration, remaining ETA, processing FPS, and live file size. |
-| **08** | **Finalization** | Saves output to device Movies folder with automatic collision numbering, cleans cache, and provides playback. |
-
-### FFmpeg Command Logic
-
-The app optimizes FFmpeg arguments for mobile hardware:
-- **Scaling:** Uses `-vf "scale=<W>:<H>:flags=lanczos,format=yuv420p"` enforcing `mod 2` scaling for hardware decoding compatibility.
-- **VP9 Optimization:** Uses `-deadline good -cpu-used 4 -row-mt 1` to improve VP9 encoding speeds compared to default settings.
-- **Faststart:** Applies `-movflags +faststart` to MP4 and MOV files for optimized web streaming.
+| **01** | Input Handler | Retrieves content URI via Storage Access Framework and resolves absolute path. |
+| **02** | Metadata Probe | Inspects video stream: codec, dimensions, bitrate, rotation tags, audio channels. |
+| **03** | Configuration | Validates downscale constraints and applies CRF or target bitrate parameters. |
+| **04** | Filter Synthesis | Constructs `-vf "scale=W:H:flags=lanczos,format=yuv420p"` with even dimensions. |
+| **05** | Service Lifecycle | Binds Android foreground service with notification channel and holds CPU wakelock. |
+| **06** | FFmpeg Execution | Executes multi-threaded software encoder using configured CPU preset and threads. |
+| **07** | Telemetry Stream | Computes progress, speed multiplier, elapsed duration, and remaining ETA. |
+| **08** | Finalization | Writes output to Movies directory, registers MediaStore entry, and releases wakelocks. |
 
 ---
 
-## Building the APK (Automated & Optimized)
+## Build and Compilation
 
-> [!TIP]  
-> Phantek Video Toolkit utilizes the `ffmpeg_kit_flutter_new` architecture. To maintain compact application sizes, we build and release Split ABI APKs for ARM 32-bit (`armeabi-v7a`) and ARM 64-bit (`arm64-v8a`). The Universal Fat APK is excluded from the build pipeline.
+Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To keep package footprints minimal, the project produces split ABI APK binaries rather than a single universal package.
 
-### Method 1: Local Build
+### Local Build Commands
+
 ```bash
-# Build architecture-specific APKs:
+# Build architecture-specific split APKs for ARM targets
 flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
 ```
-Outputs are routed to `build/app/outputs/flutter-apk/`.
 
-### Method 2: GitHub Actions CI/CD
-This repository includes a `.github/workflows/build-apk.yml` workflow.
-- **Automated Version Tagging:** The workflow reads `pubspec.yaml` (e.g., `1.0.8+8`) and renames the output APKs (e.g., `Phantek-Video-Toolkit-arm64-v8a-v1.0.8.apk`), automating the release naming process.
-- **Triggering Releases:** Push a new version tag (`git tag v1.0.8 && git push origin v1.0.8`) or run the workflow manually to compile and publish split APKs to GitHub Releases.
+Compiled APK files will be located in:
+`build/app/outputs/flutter-apk/`
+- `app-armeabi-v7a-release.apk` (32-bit ARM)
+- `app-arm64-v8a-release.apk` (64-bit ARM)
+
+### Automated CI/CD Workflow
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags:
+- Extracts the version string from `pubspec.yaml`.
+- Builds optimized split-ABI APKs.
+- Packages and publishes binary assets directly to GitHub Releases.
 
 ---
 
 ## License
 
-This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with the bundled `ffmpeg_kit_flutter_new` package and `libx264` codec requirements.
+This software is distributed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with dependencies bundled within `ffmpeg_kit_flutter_new` and the `libx264` GPL licensing requirements.
