@@ -276,7 +276,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         VideoCodec newCodec = widget.encodingOptions.codec;
                         if (format == VideoContainer.webm) {
                           newCodec = VideoCodec.vp9;
-                        } else if (format == VideoContainer.mp4 && newCodec == VideoCodec.vp9) {
+                        } else if (format != VideoContainer.webm && format != VideoContainer.mkv && newCodec == VideoCodec.vp9) {
+                          // VP9 is strictly only for WebM and MKV containers.
+                          // If user selects MP4 or MOV, fallback to H.264
                           newCodec = VideoCodec.h264;
                         }
                         widget.onOptionsChanged(
@@ -332,8 +334,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 spacing: 8,
                 runSpacing: 8,
                 children: VideoCodec.values.map((codec) {
-                  // If WebM, only VP9 is recommended
-                  final isCompatible = widget.encodingOptions.container != VideoContainer.webm || codec == VideoCodec.vp9;
+                  // Validate codec compatibility based on container
+                  bool isCompatible = true;
+                  if (widget.encodingOptions.container == VideoContainer.webm && codec != VideoCodec.vp9) {
+                    isCompatible = false;
+                  }
+                  if ((widget.encodingOptions.container == VideoContainer.mp4 || widget.encodingOptions.container == VideoContainer.mov) && codec == VideoCodec.vp9) {
+                    isCompatible = false;
+                  }
+                  
                   final isSelected = widget.encodingOptions.codec == codec;
                   return ChoiceChip(
                     showCheckmark: false,

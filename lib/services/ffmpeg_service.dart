@@ -198,12 +198,6 @@ class FFmpegService {
       sourceBitrateBps: sourceVideo.bitrate,
     );
 
-    // Rate control, preset, profile, and codec-specific arguments
-    String rateControlArg = '';
-    String presetArg = '';
-    String profileLevelArg = '';
-    String codecExtraArgs = '';
-
     // GOP (keyframe interval) — used by both HW and SW encoders
     final gop = (sourceVideo.fps * 2).round().clamp(24, 250);
 
@@ -212,175 +206,186 @@ class FFmpegService {
         ? appSettings.cpuThreads
         : AppSettings.deviceCoreCount;
 
-    if (isMediaCodec) {
-      // ===== HARDWARE (MediaCodec) ENCODING =====
-      // Android MediaCodec (Qualcomm Snapdragon, MediaTek, Exynos) uses dedicated hardware silicon.
-      // Mobile hardware encoders require generous bitrate allocation to avoid blocky/burik artifacts.
-      int hwBitrateKbps;
-      if (encodingOptions.rateControlMode == RateControlMode.bitrate) {
-        hwBitrateKbps = encodingOptions.customBitrateKbps;
+    int hwRetryCount = 0;
+
+    while (true) {
+      // Rate control, preset, profile, and codec-specific arguments
+      String rateControlArg = '';
+      String presetArg = '';
+      String profileLevelArg = '';
+      String codecExtraArgs = '';
+
+      if (isMediaCodec) {
+        // ===== HARDWARE (MediaCodec) ENCODING =====
+        int hwBitrateKbps;
+        if (encodingOptions.rateControlMode == RateControlMode.bitrate) {
+          hwBitrateKbps = encodingOptions.customBitrateKbps;
+        } else {
+          final maxDim = targetW > targetH ? targetW : targetH;
+          double baseHwMbps;
+          if (maxDim >= 2560) {
+            baseHwMbps = 25.0; // 2K/1440p
+          } else if (maxDim >= 1920) {
+            baseHwMbps = 12.0; // 1080p
+          } else if (maxDim >= 1280) {
+            baseHwMbps = 7.0;  // 720p
+          } else if (maxDim >= 854) {
+            baseHwMbps = 3.5;  // 480p
+          } else {
+            baseHwMbps = 2.0;  // 360p
+          }
+
+          final diff = encodingOptions.crfValue - 20;
+          final factor = diff / 6.0;
+          double estimatedMbps = baseHwMbps * math.pow(0.5, factor);
+
+          if (encodingOptions.codec == VideoCodec.hevc) {
+            estimatedMbps *= 0.8;
+          }
+          hwBitrateKbps = (estimatedMbps * 1000).round().clamp(2500, 50000);
+        }
+
+        final int bufsizeKbps = hwBitrateKbps * 3;
+        rateControlArg = '-b:v ${hwBitrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
+
+        if (vCodec == 'h264_mediacodec') {
+          profileLevelArg = '-profile:v high';
+        } else if (vCodec == 'hevc_mediacodec') {
+          profileLevelArg = '-profile:v main';
+          if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
+            codecExtraArgs = '-tag:v hvc1';
+          }
+        }
       } else {
-        // High-quality baseline bitrate mapping for hardware encoding
-        final maxDim = targetW > targetH ? targetW : targetH;
-        double baseHwMbps;
-        if (maxDim >= 2560) {
-          baseHwMbps = 25.0; // 2K/1440p
-        } else if (maxDim >= 1920) {
-          baseHwMbps = 12.0; // 1080p (crisp, high quality)
-        } else if (maxDim >= 1280) {
-          baseHwMbps = 7.0;  // 720p
-        } else if (maxDim >= 854) {
-          baseHwMbps = 3.5;  // 480p
-        } else {
-          baseHwMbps = 2.0;  // 360p
-        }
+        // ===== SOFTWARE ENCODING =====
+        if (vCodec == 'libx264') {
+          if (encodingOptions.rateControlMode == RateControlMode.crf) {
+            rateControlArg = '-crf ${encodingOptions.crfValue}';
+          } else {
+            rateControlArg = '-b:v ${targetBitrateKbps}k';
+          }
+          presetArg = '-preset ${appSettings.cpuPreset}';
+          profileLevelArg = '-profile:v high -level:v 4.1';
 
-        final diff = encodingOptions.crfValue - 20;
-        final factor = diff / 6.0;
-        double estimatedMbps = baseHwMbps * math.pow(0.5, factor);
+        } else if (vCodec == 'libx265') {
+          if (encodingOptions.rateControlMode == RateControlMode.crf) {
+            rateControlArg = '-crf ${encodingOptions.crfValue}';
+          } else {
+            rateControlArg = '-b:v ${targetBitrateKbps}k';
+          }
+          presetArg = '-preset ${appSettings.cpuPreset}';
+          
+          String hvc1Tag = '';
+          if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
+            hvc1Tag = '-tag:v hvc1 ';
+          }
+          codecExtraArgs = '$hvc1Tag-x265-params "log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads"';
 
-        if (encodingOptions.codec == VideoCodec.hevc) {
-          estimatedMbps *= 0.8;
+        } else if (vCodec == 'libvpx-vp9') {
+          if (encodingOptions.rateControlMode == RateControlMode.crf) {
+            rateControlArg = '-crf ${encodingOptions.crfValue} -b:v 0';
+          } else {
+            rateControlArg = '-b:v ${targetBitrateKbps}k';
+          }
+          codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -frame-parallel 1 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
         }
-        hwBitrateKbps = (estimatedMbps * 1000).round().clamp(2500, 50000);
       }
 
-      // Large buffer headroom prevents hardware encoder from throttling down into pixelation
-      final int bufsizeKbps = hwBitrateKbps * 3;
-      rateControlArg = '-b:v ${hwBitrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
-
-      if (vCodec == 'h264_mediacodec') {
-        profileLevelArg = '-profile:v high';
-      } else if (vCodec == 'hevc_mediacodec') {
-        profileLevelArg = '-profile:v main';
-        codecExtraArgs = '-tag:v hvc1';
+      // Audio options
+      String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
+      if (appSettings.audioBitrateKbps <= 0) {
+        audioArgs = '-an';
+      } else if (encodingOptions.container == VideoContainer.webm ||
+                encodingOptions.codec == VideoCodec.vp9) {
+        audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
       }
-    } else {
-      // ===== SOFTWARE ENCODING =====
-      if (vCodec == 'libx264') {
-        // H.264 software encoding
-        if (encodingOptions.rateControlMode == RateControlMode.crf) {
-          rateControlArg = '-crf ${encodingOptions.crfValue}';
-        } else {
-          rateControlArg = '-b:v ${targetBitrateKbps}k';
-        }
-        presetArg = '-preset ${appSettings.cpuPreset}';
-        profileLevelArg = '-profile:v high -level:v 4.1';
 
-      } else if (vCodec == 'libx265') {
-        // H.265 / HEVC software encoding
-        if (encodingOptions.rateControlMode == RateControlMode.crf) {
-          rateControlArg = '-crf ${encodingOptions.crfValue}';
-        } else {
-          rateControlArg = '-b:v ${targetBitrateKbps}k';
-        }
-        presetArg = '-preset ${appSettings.cpuPreset}';
-        // hvc1 tag required for MP4/MOV playback on Android/iOS
-        codecExtraArgs = '-tag:v hvc1 -x265-params "log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads"';
-
-      } else if (vCodec == 'libvpx-vp9') {
-        // VP9 software encoding — without these flags, libvpx-vp9 runs in
-        // 'best' deadline mode (single-threaded, exhaustive search) which is
-        // 10-50x slower than necessary.
-        if (encodingOptions.rateControlMode == RateControlMode.crf) {
-          // VP9 uses -crf + -b:v 0 for constant quality mode
-          rateControlArg = '-crf ${encodingOptions.crfValue} -b:v 0';
-        } else {
-          rateControlArg = '-b:v ${targetBitrateKbps}k';
-        }
-        // -deadline good : balanced speed/quality (vs 'best' which is glacially slow)
-        // -cpu-used 4    : speed level 0-8, 4 is a good balance
-        // -row-mt 1      : enable row-based multi-threading (massive speedup)
-        // -tile-columns 2: split frame into 4 tile columns for parallelism
-        // -frame-parallel 1: enable frame-level parallelism
-        // -auto-alt-ref 1 & -lag-in-frames 25: better compression with look-ahead
-        codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -frame-parallel 1 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
+      // Threads argument
+      String threadsArg = '';
+      if (appSettings.cpuThreads > 0) {
+        threadsArg = '-threads ${appSettings.cpuThreads}';
       }
-    }
 
-    // Audio options
-    String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
-    if (appSettings.audioBitrateKbps <= 0) {
-      audioArgs = '-an';
-    } else if (encodingOptions.container == VideoContainer.webm ||
-               encodingOptions.codec == VideoCodec.vp9) {
-      // VP9 typically pairs with Opus audio, and WebM requires Opus/Vorbis
-      audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
-    }
-
-    // Threads argument
-    String threadsArg = '';
-    if (appSettings.cpuThreads > 0) {
-      threadsArg = '-threads ${appSettings.cpuThreads}';
-    }
-
-    // Container specific flags
-    String containerFlags = '';
-    if (encodingOptions.container == VideoContainer.mp4 ||
-        encodingOptions.container == VideoContainer.mov) {
-      containerFlags = '-movflags +faststart';
-    }
-    
-    // FPS filter
-    String fpsFilter = '';
-    if (encodingOptions.targetFps > 0) {
-      fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
-    }
-
-    // Hardware encoders (MediaCodec) on Android natively require nv12 semi-planar format.
-    // Software encoders require yuv420p planar format.
-    final String pixFmtFilter = isMediaCodec ? ',format=nv12' : ',format=yuv420p';
-    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos$pixFmtFilter"';
-
-    // Construct full command
-    final cmdParts = <String>[
-      '-i "${sourceVideo.filePath}"',
-      threadsArg,
-      vfArg,
-      '-c:v $vCodec',
-      presetArg,
-      profileLevelArg,
-      rateControlArg,
-      codecExtraArgs,
-      audioArgs,
-      containerFlags,
-      '-y "$outputPath"',
-    ]..removeWhere((element) => element.trim().isEmpty);
-
-    final command = cmdParts.join(' ');
-
-    onLog('Command: ffmpeg $command');
-    onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec${isMediaCodec ? ' (HW)' : ' (SW)'}');
-
-    final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
-
-    // Enable statistics callback
-    FFmpegKitConfig.enableStatisticsCallback((Statistics stats) {
-      final time = stats.getTime().toDouble();
-      if (totalDuration > 0) {
-        final progress = (time / totalDuration).clamp(0.0, 1.0);
-        final speed = stats.getSpeed();
-        final size = stats.getSize();
-        final sizeStr = size > 1048576
-            ? '${(size / 1048576).toStringAsFixed(1)} MB'
-            : '${(size / 1024).toStringAsFixed(0)} KB';
-        onProgress(
-          progress,
-          'Size: $sizeStr | Speed: ${speed.toStringAsFixed(1)}x',
-        );
+      // Container specific flags
+      String containerFlags = '';
+      if (encodingOptions.container == VideoContainer.mp4 ||
+          encodingOptions.container == VideoContainer.mov) {
+        containerFlags = '-movflags +faststart';
       }
-    });
+      
+      // FPS filter
+      String fpsFilter = '';
+      if (encodingOptions.targetFps > 0) {
+        fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
+      }
 
-    final session = await FFmpegKit.execute(command);
-    final returnCode = await session.getReturnCode();
+      // Always use yuv420p planar format. FFmpegKit will auto-negotiate with MediaCodec if needed.
+      final String pixFmtFilter = ',format=yuv420p';
+      final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos$pixFmtFilter"';
 
-    if (ReturnCode.isSuccess(returnCode)) {
-      onLog('\nEncoding completed successfully!');
-      return outputPath;
-    } else {
-      final logs = await session.getAllLogsAsString();
-      onLog('\nEncoding failed: $logs');
-      return null;
+      // Construct full command
+      final cmdParts = <String>[
+        '-i "${sourceVideo.filePath}"',
+        threadsArg,
+        vfArg,
+        '-c:v $vCodec',
+        presetArg,
+        profileLevelArg,
+        rateControlArg,
+        codecExtraArgs,
+        audioArgs,
+        containerFlags,
+        '-y "$outputPath"',
+      ]..removeWhere((element) => element.trim().isEmpty);
+
+      final command = cmdParts.join(' ');
+
+      onLog('Command: ffmpeg $command');
+      onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec${isMediaCodec ? ' (HW)' : ' (SW)'}');
+
+      final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
+
+      // Enable statistics callback
+      FFmpegKitConfig.enableStatisticsCallback((Statistics stats) {
+        final time = stats.getTime().toDouble();
+        if (totalDuration > 0) {
+          final progress = (time / totalDuration).clamp(0.0, 1.0);
+          final speed = stats.getSpeed();
+          final size = stats.getSize();
+          final sizeStr = size > 1048576
+              ? '${(size / 1048576).toStringAsFixed(1)} MB'
+              : '${(size / 1024).toStringAsFixed(0)} KB';
+          onProgress(
+            progress,
+            'Size: $sizeStr | Speed: ${speed.toStringAsFixed(1)}x',
+          );
+        }
+      });
+
+      final session = await FFmpegKit.execute(command);
+      final returnCode = await session.getReturnCode();
+
+      if (ReturnCode.isSuccess(returnCode)) {
+        onLog('\nEncoding completed successfully!');
+        return outputPath;
+      } else if (ReturnCode.isCancel(returnCode)) {
+        onLog('\nEncoding cancelled by user.');
+        return null;
+      } else {
+        final logs = await session.getAllLogsAsString();
+        
+        if (isMediaCodec && hwRetryCount == 0) {
+          onLog('\n[WARNING] Hardware Acceleration failed! Automatically falling back to Software Encoding...\nError log: $logs\n');
+          // Reset flags to fallback
+          isMediaCodec = false;
+          vCodec = encodingOptions.codec.ffmpegCodec;
+          hwRetryCount++;
+          continue;
+        }
+
+        onLog('\nEncoding failed: $logs');
+        return null;
+      }
     }
   }
 
