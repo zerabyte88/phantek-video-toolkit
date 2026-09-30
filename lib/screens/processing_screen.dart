@@ -44,6 +44,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   bool _isProcessing = true;
   bool _isSuccess = false;
   String? _outputPath;
+  String? _errorMessage;
   late AnimationController _pulseController;
 
   DateTime? _startTime;
@@ -115,6 +116,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _elapsedDuration = Duration.zero;
     _estimatedRemaining = null;
     _totalDuration = null;
+    _errorMessage = null;
 
     await ForegroundServiceManager().requestPermissions();
 
@@ -200,9 +202,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       },
       onLog: (log) {
         if (mounted) {
-          setState(() {
-            debugPrint(log);
-          });
+          if (log.contains('Encoding failed:') || log.toLowerCase().contains('error')) {
+            _errorMessage = log.replaceFirst('\nEncoding failed: ', '').trim();
+          }
+          debugPrint(log);
         }
       },
     );
@@ -677,6 +680,48 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     } else {
       return Column(
         children: [
+          if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.35)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Detail Error',
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _errorMessage!,
+                    maxLines: 8,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -687,6 +732,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   _statusText = l10n.t('proc_preparing');
                   _speedText = '';
                   _currentSizeText = '';
+                  _errorMessage = null;
                 });
                 _startProcessing();
               },
@@ -760,9 +806,25 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
+  static String? getMimeType(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'mp4':
+        return 'video/mp4';
+      case 'mkv':
+        return 'video/x-matroska';
+      case 'webm':
+        return 'video/webm';
+      case 'mov':
+        return 'video/quicktime';
+      default:
+        return 'video/*';
+    }
+  }
+
   void _openOutputFile() {
     if (_outputPath != null) {
-      OpenFile.open(_outputPath!);
+      OpenFile.open(_outputPath!, type: getMimeType(_outputPath!));
     }
   }
 }
@@ -881,7 +943,10 @@ class _SuccessBottomSheet extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                OpenFile.open(outputPath);
+                OpenFile.open(
+                  outputPath,
+                  type: _ProcessingScreenState.getMimeType(outputPath),
+                );
               },
               icon: const Icon(Icons.play_arrow_rounded),
               label: Text(l10n.t('proc_play_video')),

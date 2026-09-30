@@ -216,11 +216,6 @@ class FFmpegService {
     // GOP (keyframe interval)
     final gop = (sourceVideo.fps * 2).round().clamp(24, 250);
 
-    // Determine thread count for parallel encoding
-    final int effectiveThreads = appSettings.cpuThreads > 0
-        ? appSettings.cpuThreads
-        : AppSettings.deviceCoreCount;
-
     // Rate control, preset, profile, and codec-specific arguments
     String rateControlArg = '';
     String presetArg = '';
@@ -243,16 +238,13 @@ class FFmpegService {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
       presetArg = '-preset ${appSettings.cpuPreset}';
-      profileLevelArg = '-profile:v main';
+      profileLevelArg = ''; // libx265 does not accept -profile:v main directly as a CLI flag
       
       String hvc1Tag = '';
       if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
-      // Do NOT wrap x265-params value in quotes — FFmpegKit uses its own
-      // shell-style argument parser and the embedded quotes would be passed
-      // literally to the encoder, corrupting the parameters.
-      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads:frame-threads=$effectiveThreads';
+      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
 
     } else if (vCodec == 'libvpx-vp9') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
@@ -260,9 +252,7 @@ class FFmpegService {
       } else {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
-      profileLevelArg = '-profile:v 0';
-      // Removed deprecated -frame-parallel flag which can cause playback
-      // issues on some devices/players.
+      profileLevelArg = ''; // libvpx-vp9 automatically uses Profile 0 for 8-bit yuv420p
       codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
     }
 
@@ -294,16 +284,14 @@ class FFmpegService {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    // Always use yuv420p for maximum playback compatibility
-    final vfArg = '-vf ${fpsFilter}scale=$targetW:$targetH:flags=lanczos';
-    const pixFmtArg = '-pix_fmt yuv420p';
+    // Always use yuv420p inside the filtergraph for 100% encoder & hardware compatibility
+    final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
 
     // Construct full command
     final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
       threadsArg,
       vfArg,
-      pixFmtArg,
       '-c:v $vCodec',
       presetArg,
       profileLevelArg,
