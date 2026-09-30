@@ -61,7 +61,6 @@ class SettingsService extends ChangeNotifier {
       isFirstLaunch: false,
       cpuPreset: preset,
       cpuThreads: 0, // Auto
-      hardwareAcceleration: false, // User requested libx264 software only
     );
     await _saveSettings();
   }
@@ -117,10 +116,6 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setCpuPreset(String preset) async {
     await updateSettings(_settings.copyWith(cpuPreset: preset));
-  }
-
-  Future<void> setHardwareAcceleration(bool enabled) async {
-    await updateSettings(_settings.copyWith(hardwareAcceleration: enabled));
   }
 
   Future<void> setAudioBitrate(int kbps) async {

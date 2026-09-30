@@ -46,7 +46,6 @@ void main() {
       expect(settings.cpuThreads, equals(0)); // Auto
       expect(settings.ramBufferMb, equals(512));
       expect(settings.cpuPreset, equals('medium'));
-      expect(settings.hardwareAcceleration, isFalse);
       expect(settings.audioBitrateKbps, equals(128));
       expect(settings.languageCode, equals('id'));
       expect(settings.themeMode, equals('dark'));
@@ -58,7 +57,6 @@ void main() {
         cpuThreads: 4,
         ramBufferMb: 1024,
         cpuPreset: 'fast',
-        hardwareAcceleration: true,
         audioBitrateKbps: 192,
         languageCode: 'ja',
         themeMode: 'oled',
@@ -71,7 +69,6 @@ void main() {
       expect(restored.cpuThreads, equals(4));
       expect(restored.ramBufferMb, equals(1024));
       expect(restored.cpuPreset, equals('fast'));
-      expect(restored.hardwareAcceleration, isTrue);
       expect(restored.audioBitrateKbps, equals(192));
       expect(restored.languageCode, equals('ja'));
       expect(restored.themeMode, equals('oled'));
