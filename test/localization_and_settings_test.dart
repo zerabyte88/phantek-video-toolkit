@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_downscaler/models/app_settings.dart';
+import 'package:video_downscaler/models/encoding_options.dart';
+import 'package:video_downscaler/models/video_info.dart';
 import 'package:video_downscaler/services/cache_manager_service.dart';
+import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 
 void main() {
@@ -17,7 +22,7 @@ void main() {
     test('Translations resolve correctly for all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
-        expect(l10n.t('app_title'), 'Video Downscaler');
+        expect(l10n.t('app_title'), 'Phantek Video Toolkit');
         expect(l10n.t('pick_video').isNotEmpty, isTrue);
         expect(l10n.t('settings_title').isNotEmpty, isTrue);
         expect(l10n.t('loading_analyzing').isNotEmpty, isTrue);
@@ -118,6 +123,63 @@ void main() {
       expect(formatPercentage(0.0), equals('0.0%'));
       expect(formatPercentage(0.50), equals('50.0%'));
       expect(formatPercentage(1.0), equals('100.0%'));
+    });
+  });
+
+  group('FFmpegService Unique Output Path tests', () {
+    late Directory tempDir;
+
+    setUp(() {
+      tempDir = Directory.systemTemp.createTempSync('unique_path_test_');
+    });
+
+    tearDown(() {
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('generates initial path when file does not exist', () async {
+      final path = await FFmpegService.generateUniqueOutputPath(
+        outputDir: tempDir,
+        fileName: 'video4k.mp4',
+        targetResolution: VideoResolution.downscaleTargets.first,
+        container: VideoContainer.mp4,
+      );
+
+      final sep = Platform.pathSeparator;
+      expect(path, equals('${tempDir.path}${sep}video4k-1080p.mp4'));
+    });
+
+    test('appends incremental suffix -2 when file already exists', () async {
+      final sep = Platform.pathSeparator;
+      // Pre-create video4k-1080p.mp4
+      File('${tempDir.path}${sep}video4k-1080p.mp4').createSync();
+
+      final path = await FFmpegService.generateUniqueOutputPath(
+        outputDir: tempDir,
+        fileName: 'video4k.mp4',
+        targetResolution: VideoResolution.downscaleTargets.first,
+        container: VideoContainer.mp4,
+      );
+
+      expect(path, equals('${tempDir.path}${sep}video4k-1080p-2.mp4'));
+    });
+
+    test('appends incremental suffix -3 when base and -2 already exist', () async {
+      final sep = Platform.pathSeparator;
+      // Pre-create video4k-1080p.mp4 and video4k-1080p-2.mp4
+      File('${tempDir.path}${sep}video4k-1080p.mp4').createSync();
+      File('${tempDir.path}${sep}video4k-1080p-2.mp4').createSync();
+
+      final path = await FFmpegService.generateUniqueOutputPath(
+        outputDir: tempDir,
+        fileName: 'video4k.mp4',
+        targetResolution: VideoResolution.downscaleTargets.first,
+        container: VideoContainer.mp4,
+      );
+
+      expect(path, equals('${tempDir.path}${sep}video4k-1080p-3.mp4'));
     });
   });
 }
