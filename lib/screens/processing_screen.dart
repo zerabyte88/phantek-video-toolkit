@@ -110,6 +110,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _estimatedRemaining = null;
     _totalDuration = null;
 
+    await ForegroundServiceManager().requestPermissions();
+
     setState(() {
       _statusText = l10n.t('proc_converting');
     });
@@ -200,7 +202,15 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       },
     );
 
-    await ForegroundServiceManager().stopService();
+    if (result != null) {
+      ForegroundServiceManager().updateService(
+        title: 'Video Downscaler',
+        text: 'Konversi Selesai! Video disimpan di Movies',
+      );
+    }
+    Future.delayed(const Duration(seconds: 4), () {
+      ForegroundServiceManager().stopService();
+    });
 
     _timer?.cancel();
     if (_startTime != null) {
@@ -387,20 +397,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
 
         const SizedBox(height: 6),
-
-        // Linear progress bar for extra clarity
-        if (_isProcessing && _progress > 0)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: _progress,
-                minHeight: 4,
-              ),
-            ),
-          ),
-
         const SizedBox(height: 16),
         Text(
           _statusText,
@@ -891,44 +887,6 @@ class _SuccessBottomSheet extends StatelessWidget {
               icon: const Icon(Icons.share_rounded),
               label: const Text('Bagikan'),
               style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Hapus File Asli?'),
-                    content: const Text('Tindakan ini tidak dapat dibatalkan.'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirm == true) {
-                  try {
-                    await File(originalPath).delete();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('File asli dihapus.')));
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal menghapus: $e')));
-                    }
-                  }
-                }
-              },
-              icon: const Icon(Icons.delete_forever_rounded),
-              label: const Text('Hapus Video Asli'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6B6B),
-                side: const BorderSide(color: Color(0xFFFF6B6B)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
             ),
             const SizedBox(height: 20),
             TextButton(

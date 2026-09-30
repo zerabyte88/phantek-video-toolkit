@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
@@ -84,10 +85,10 @@ class FFmpegService {
 
   /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
   /// Get or create the output directory for downscaled videos.
-  /// Strictly targets `/storage/emulated/0/Movies/Video Downscaler` on Android.
+  /// Strictly targets `/storage/emulated/0/Movies` directly on Android without subfolders.
   static Future<Directory> getOutputDirectory() async {
     if (Platform.isAndroid) {
-      final moviesDir = Directory('/storage/emulated/0/Movies/Video Downscaler');
+      final moviesDir = Directory('/storage/emulated/0/Movies');
       try {
         if (!await moviesDir.exists()) {
           await moviesDir.create(recursive: true);
@@ -98,7 +99,7 @@ class FFmpegService {
         try {
           final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
           if (extDirs != null && extDirs.isNotEmpty) {
-            final fallback = Directory('${extDirs.first.path}/Video Downscaler');
+            final fallback = extDirs.first;
             if (!await fallback.exists()) {
               await fallback.create(recursive: true);
             }
@@ -107,7 +108,7 @@ class FFmpegService {
         } catch (_) {}
 
         final appDocDir = await getApplicationDocumentsDirectory();
-        final fallbackDir = Directory('${appDocDir.path}/Movies/Video Downscaler');
+        final fallbackDir = Directory('${appDocDir.path}/Movies');
         if (!await fallbackDir.exists()) {
           await fallbackDir.create(recursive: true);
         }
@@ -115,7 +116,7 @@ class FFmpegService {
       }
     } else {
       final appDocDir = await getApplicationDocumentsDirectory();
-      final dir = Directory('${appDocDir.path}/Movies/Video Downscaler');
+      final dir = Directory('${appDocDir.path}/Movies');
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
@@ -138,8 +139,10 @@ class FFmpegService {
 
     final ext = encodingOptions.container.extension;
     final sanitizedBase = sourceVideo.fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-    final cleanLabel = targetResolution.label.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
-    final outputPath = '${outputDir.path}/${sanitizedBase}_${cleanLabel}_${encodingOptions.codec.displayName.split(' ').first}.$ext';
+    final String resSuffix = targetResolution.label.toLowerCase().startsWith('original')
+        ? '${targetResolution.height}p'
+        : targetResolution.label.toLowerCase();
+    final outputPath = '${outputDir.path}/$sanitizedBase-$resSuffix.$ext';
 
     // Check if output already exists and remove
     final outputFile = File(outputPath);
@@ -211,21 +214,45 @@ class FFmpegService {
 
     if (isMediaCodec) {
       // ===== HARDWARE (MediaCodec) ENCODING =====
-      // Many Android MediaCodec implementations (Snapdragon, MediaTek, Exynos)
-      // poorly support -bitrate_mode and silently ignore bitrate params.
-      // Strategy: use ABR (-b:v) with explicit maxrate/bufsize, no -bitrate_mode.
-      // Enforce a quality floor so the output never drops below a sane bitrate.
-      final int hwBitrateKbps = targetBitrateKbps.clamp(1500, 50000);
-      final int maxrateKbps = (hwBitrateKbps * 1.5).round();
-      final int bufsizeKbps = hwBitrateKbps * 2;
+      // Android MediaCodec (Qualcomm Snapdragon, MediaTek, Exynos) uses dedicated hardware silicon.
+      // Mobile hardware encoders require generous bitrate allocation to avoid blocky/burik artifacts.
+      int hwBitrateKbps;
+      if (encodingOptions.rateControlMode == RateControlMode.bitrate) {
+        hwBitrateKbps = encodingOptions.customBitrateKbps;
+      } else {
+        // High-quality baseline bitrate mapping for hardware encoding
+        final maxDim = targetW > targetH ? targetW : targetH;
+        double baseHwMbps;
+        if (maxDim >= 2560) {
+          baseHwMbps = 25.0; // 2K/1440p
+        } else if (maxDim >= 1920) {
+          baseHwMbps = 12.0; // 1080p (crisp, high quality)
+        } else if (maxDim >= 1280) {
+          baseHwMbps = 7.0;  // 720p
+        } else if (maxDim >= 854) {
+          baseHwMbps = 3.5;  // 480p
+        } else {
+          baseHwMbps = 2.0;  // 360p
+        }
 
-      rateControlArg = '-b:v ${hwBitrateKbps}k -maxrate ${maxrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
+        final diff = encodingOptions.crfValue - 20;
+        final factor = diff / 6.0;
+        double estimatedMbps = baseHwMbps * math.pow(0.5, factor);
+
+        if (encodingOptions.codec == VideoCodec.hevc) {
+          estimatedMbps *= 0.8;
+        }
+        hwBitrateKbps = (estimatedMbps * 1000).round().clamp(2500, 50000);
+      }
+
+      // Large buffer headroom prevents hardware encoder from throttling down into pixelation
+      final int bufsizeKbps = hwBitrateKbps * 3;
+      rateControlArg = '-b:v ${hwBitrateKbps}k -bufsize ${bufsizeKbps}k -g $gop';
 
       if (vCodec == 'h264_mediacodec') {
-        profileLevelArg = '-profile:v high -level:v 4.1';
+        profileLevelArg = '-profile:v high';
       } else if (vCodec == 'hevc_mediacodec') {
         profileLevelArg = '-profile:v main';
-        // hvc1 tag is critical for playback on Android/iOS video players
         codecExtraArgs = '-tag:v hvc1';
       }
     } else {
@@ -300,12 +327,9 @@ class FFmpegService {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    // Video filters: FPS + Lanczos Scale + pixel format
-    // Hardware encoders (MediaCodec) should NOT force yuv420p — they accept
-    // the device's native surface format. Forcing yuv420p causes color space
-    // conversion overhead and some chipsets reject it entirely, producing
-    // garbage output. Software encoders need explicit yuv420p for compatibility.
-    final String pixFmtFilter = isMediaCodec ? '' : ',format=yuv420p';
+    // Hardware encoders (MediaCodec) on Android natively require nv12 semi-planar format.
+    // Software encoders require yuv420p planar format.
+    final String pixFmtFilter = isMediaCodec ? ',format=nv12' : ',format=yuv420p';
     final vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos$pixFmtFilter"';
 
     // Construct full command

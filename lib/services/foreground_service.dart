@@ -15,14 +15,20 @@ class ForegroundServiceManager {
       FlutterForegroundTask.initCommunicationPort();
       FlutterForegroundTask.init(
         androidNotificationOptions: AndroidNotificationOptions(
-          channelId: 'video_conversion_channel',
-          channelName: 'Video Downscaler Processing',
-          channelDescription: 'Notifications for active video processing in background',
-          channelImportance: NotificationChannelImportance.LOW,
-          priority: NotificationPriority.LOW,
+          channelId: 'video_conversion_channel_v2',
+          channelName: 'Proses Konversi Video',
+          channelDescription: 'Pemberitahuan proses konversi video di latar belakang',
+          channelImportance: NotificationChannelImportance.HIGH,
+          priority: NotificationPriority.HIGH,
           showWhen: true,
+          visibility: NotificationVisibility.VISIBILITY_PUBLIC,
+          enableVibration: false,
+          playSound: false,
         ),
-        iosNotificationOptions: const IOSNotificationOptions(),
+        iosNotificationOptions: const IOSNotificationOptions(
+          showNotification: true,
+          playSound: false,
+        ),
         foregroundTaskOptions: ForegroundTaskOptions(
           eventAction: ForegroundTaskEventAction.nothing(),
           autoRunOnBoot: false,
@@ -37,14 +43,17 @@ class ForegroundServiceManager {
     }
   }
 
-  Future<void> requestPermissions() async {
+  Future<bool> requestPermissions() async {
     try {
       final perm = await FlutterForegroundTask.checkNotificationPermission();
       if (perm != NotificationPermission.granted) {
-        await FlutterForegroundTask.requestNotificationPermission();
+        final res = await FlutterForegroundTask.requestNotificationPermission();
+        return res == NotificationPermission.granted;
       }
+      return true;
     } catch (e) {
       debugPrint('Error requesting notification permission: $e');
+      return false;
     }
   }
 
