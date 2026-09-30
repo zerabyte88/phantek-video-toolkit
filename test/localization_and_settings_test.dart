@@ -140,43 +140,43 @@ void main() {
       final path = await FFmpegService.generateUniqueOutputPath(
         outputDir: tempDir,
         fileName: 'video4k.mp4',
-        targetResolution: VideoResolution.downscaleTargets.first,
+        targetResolution: VideoResolution.standardResolutions.first,
         container: VideoContainer.mp4,
       );
 
       final sep = Platform.pathSeparator;
-      expect(path, equals('${tempDir.path}${sep}video4k-1080p.mp4'));
+      expect(path, equals('${tempDir.path}${sep}video4k-4k.mp4'));
     });
 
     test('appends incremental suffix -2 when file already exists', () async {
       final sep = Platform.pathSeparator;
-      // Pre-create video4k-1080p.mp4
-      File('${tempDir.path}${sep}video4k-1080p.mp4').createSync();
+      // Pre-create video4k-4k.mp4
+      File('${tempDir.path}${sep}video4k-4k.mp4').createSync();
 
       final path = await FFmpegService.generateUniqueOutputPath(
         outputDir: tempDir,
         fileName: 'video4k.mp4',
-        targetResolution: VideoResolution.downscaleTargets.first,
+        targetResolution: VideoResolution.standardResolutions.first,
         container: VideoContainer.mp4,
       );
 
-      expect(path, equals('${tempDir.path}${sep}video4k-1080p-2.mp4'));
+      expect(path, equals('${tempDir.path}${sep}video4k-4k-2.mp4'));
     });
 
     test('appends incremental suffix -3 when base and -2 already exist', () async {
       final sep = Platform.pathSeparator;
-      // Pre-create video4k-1080p.mp4 and video4k-1080p-2.mp4
-      File('${tempDir.path}${sep}video4k-1080p.mp4').createSync();
-      File('${tempDir.path}${sep}video4k-1080p-2.mp4').createSync();
+      // Pre-create video4k-4k.mp4 and video4k-4k-2.mp4
+      File('${tempDir.path}${sep}video4k-4k.mp4').createSync();
+      File('${tempDir.path}${sep}video4k-4k-2.mp4').createSync();
 
       final path = await FFmpegService.generateUniqueOutputPath(
         outputDir: tempDir,
         fileName: 'video4k.mp4',
-        targetResolution: VideoResolution.downscaleTargets.first,
+        targetResolution: VideoResolution.standardResolutions.first,
         container: VideoContainer.mp4,
       );
 
-      expect(path, equals('${tempDir.path}${sep}video4k-1080p-3.mp4'));
+      expect(path, equals('${tempDir.path}${sep}video4k-4k-3.mp4'));
     });
   });
 }

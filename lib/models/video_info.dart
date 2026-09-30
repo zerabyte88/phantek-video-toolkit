@@ -11,7 +11,9 @@ class VideoResolution {
 
   String get displayName => '$label (${width}x$height)';
 
-  static const List<VideoResolution> downscaleTargets = [
+  static const List<VideoResolution> standardResolutions = [
+    VideoResolution(label: '4K', width: 3840, height: 2160),
+    VideoResolution(label: '2K', width: 2560, height: 1440),
     VideoResolution(label: '1080p', width: 1920, height: 1080),
     VideoResolution(label: '720p', width: 1280, height: 720),
     VideoResolution(label: '480p', width: 854, height: 480),
@@ -86,7 +88,7 @@ class VideoInfo {
         width: width,
         height: height,
       ),
-      ...VideoResolution.downscaleTargets.where((r) => r.height < height),
+      ...VideoResolution.standardResolutions.where((r) => r.height < height),
     ];
     return targets;
   }

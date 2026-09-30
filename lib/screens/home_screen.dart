@@ -121,6 +121,64 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  // ─── Mode Switching ──────────────────────────────────────────────────────
+
+  List<VideoResolution> _getResolutionsForMode(_AppMode mode) {
+    if (_videoInfo == null) return [];
+    
+    final targets = <VideoResolution>[];
+    
+    if (mode == _AppMode.convert) {
+      targets.add(VideoResolution(
+        label: 'Original (${_videoInfo!.resolution})',
+        width: _videoInfo!.width,
+        height: _videoInfo!.height,
+      ));
+      return targets;
+    }
+    
+    final h = _videoInfo!.height;
+    
+    if (mode == _AppMode.upscale) {
+      final upscaleOptions = VideoResolution.standardResolutions.where((r) => r.height > h).toList();
+      if (upscaleOptions.isEmpty) {
+        // Fallback if video is already very high res
+        targets.add(VideoResolution(
+          label: 'Original (${_videoInfo!.resolution})',
+          width: _videoInfo!.width,
+          height: _videoInfo!.height,
+        ));
+      } else {
+        targets.addAll(upscaleOptions.reversed);
+      }
+    } else if (mode == _AppMode.downscale) {
+      final downscaleOptions = VideoResolution.standardResolutions.where((r) => r.height < h).toList();
+      if (downscaleOptions.isEmpty) {
+        // Fallback if video is already very small
+        targets.add(VideoResolution(
+          label: 'Original (${_videoInfo!.resolution})',
+          width: _videoInfo!.width,
+          height: _videoInfo!.height,
+        ));
+      } else {
+        targets.addAll(downscaleOptions);
+      }
+    }
+    
+    return targets;
+  }
+
+  void _onModeChanged(_AppMode mode) {
+    if (_selectedMode == mode) return;
+    setState(() {
+      _selectedMode = mode;
+      final resolutions = _getResolutionsForMode(mode);
+      if (resolutions.isNotEmpty) {
+        _selectedResolution = resolutions.first;
+      }
+    });
+  }
+
   void _startProcessing() {
     if (_videoInfo == null || _selectedResolution == null) return;
     Navigator.of(context).push(
@@ -245,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen>
 
           // ── Pick video CTA ───────────────────────────────────────
           ElevatedButton.icon(
-            onPressed: _selectedMode == _AppMode.downscale ? _pickVideo : null,
+            onPressed: _pickVideo,
             icon: const Icon(Icons.video_library_rounded, size: 22),
             label: Text(l10n.t('pick_video')),
             style: ElevatedButton.styleFrom(
@@ -356,10 +414,9 @@ class _HomeScreenState extends State<HomeScreen>
                 label: l10n.t('mode_upscale'),
                 sublabel: '1080p → 4K',
                 isSelected: _selectedMode == _AppMode.upscale,
-                isEnabled: false,
+                isEnabled: true,
                 accentColor: const Color(0xFF5CD85A),
-                badgeText: l10n.t('badge_soon'),
-                onTap: null,
+                onTap: () => _onModeChanged(_AppMode.upscale),
               ),
             ),
             const SizedBox(width: 10),
@@ -369,10 +426,9 @@ class _HomeScreenState extends State<HomeScreen>
                 label: l10n.t('mode_convert'),
                 sublabel: 'MP4 / MKV / ...',
                 isSelected: _selectedMode == _AppMode.convert,
-                isEnabled: false,
+                isEnabled: true,
                 accentColor: const Color(0xFFFF9F43),
-                badgeText: l10n.t('badge_soon'),
-                onTap: null,
+                onTap: () => _onModeChanged(_AppMode.convert),
               ),
             ),
           ],
@@ -398,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen>
 
           ConversionOptionsCard(
             sourceVideo: _videoInfo!,
-            resolutions: _videoInfo!.availableDownscaleTargets,
+            resolutions: _getResolutionsForMode(_selectedMode),
             selectedResolution: _selectedResolution,
             encodingOptions: _encodingOptions,
             onResolutionChanged: (res) =>
@@ -447,7 +503,6 @@ class _ModeCard extends StatelessWidget {
   final bool isEnabled;
   final Color accentColor;
   final VoidCallback? onTap;
-  final String? badgeText;
 
   const _ModeCard({
     required this.icon,
@@ -457,7 +512,6 @@ class _ModeCard extends StatelessWidget {
     required this.isEnabled,
     required this.accentColor,
     required this.onTap,
-    this.badgeText,
   });
 
   @override
@@ -552,7 +606,7 @@ class _ModeCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        badgeText ?? 'Soon',
+                        'Soon',
                         style: TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.w700,

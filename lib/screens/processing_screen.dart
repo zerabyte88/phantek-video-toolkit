@@ -162,7 +162,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       });
     });
 
-    final result = await FFmpegService.downscaleVideo(
+    final result = await FFmpegService.processVideo(
       sourceVideo: widget.videoInfo,
       targetResolution: widget.targetResolution,
       encodingOptions: widget.encodingOptions,
