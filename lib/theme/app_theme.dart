@@ -89,7 +89,7 @@ class AppTheme {
         side: const BorderSide(color: Colors.white10),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         checkmarkColor: Colors.white,
-        showCheckmark: true,
+        showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: _primaryColor,
@@ -219,7 +219,7 @@ class AppTheme {
         side: const BorderSide(color: Color(0xFF262634)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         checkmarkColor: Colors.white,
-        showCheckmark: true,
+        showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: oledPrimary,
@@ -352,7 +352,7 @@ class AppTheme {
         side: const BorderSide(color: Color(0xFFDCDEEC)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         checkmarkColor: lightPrimary,
-        showCheckmark: true,
+        showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: lightPrimary,

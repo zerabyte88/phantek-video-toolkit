@@ -252,21 +252,6 @@ class _HomeScreenState extends State<HomeScreen>
               padding: const EdgeInsets.symmetric(vertical: 18),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          // ── Feature chips ────────────────────────────────────────
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _FeatureChip(icon: Icons.hd_rounded, label: l10n.t('feature_downscale')),
-              _FeatureChip(icon: Icons.bolt_rounded, label: l10n.t('feature_fast')),
-              _FeatureChip(icon: Icons.high_quality_rounded, label: l10n.t('feature_quality')),
-              _FeatureChip(icon: Icons.wifi_off_rounded, label: l10n.t('feature_offline')),
-            ],
-          ),
         ],
       ),
     );
@@ -517,7 +502,7 @@ class _ModeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: borderColor, width: isSelected ? 1.8 : 1.2),
+          border: Border.all(color: borderColor, width: 1.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -689,50 +674,6 @@ class _InfoBanner extends StatelessWidget {
                 color: theme.colorScheme.onSurface.withAlpha(150),
                 height: 1.5,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Feature Chip ─────────────────────────────────────────────────────────────
-
-class _FeatureChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _FeatureChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final bg = isDark
-        ? (theme.scaffoldBackgroundColor == Colors.black
-            ? const Color(0xFF16161E)
-            : const Color(0xFF252538))
-        : const Color(0xFFEEEFF8);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.dividerColor),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: theme.colorScheme.primary.withAlpha(200)),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.onSurface.withAlpha(140),
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],

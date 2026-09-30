@@ -424,25 +424,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildCoreChip(
-                          label: l10n.t('settings_auto_cores'),
-                          value: 0,
-                          current: settings.cpuThreads,
-                          theme: theme,
-                        ),
-                        ...[1, 2, 4, 6, 8]
-                            .where((c) => c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
-                            .map((c) => _buildCoreChip(
-                                  label: '$c Core',
-                                  value: c,
-                                  current: settings.cpuThreads,
-                                  theme: theme,
-                                )),
-                      ],
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        runAlignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildCoreChip(
+                            label: l10n.t('settings_auto_cores'),
+                            value: 0,
+                            current: settings.cpuThreads,
+                            theme: theme,
+                          ),
+                          ...[1, 2, 4, 6, 8]
+                              .where((c) => c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
+                              .map((c) => _buildCoreChip(
+                                    label: '$c Core',
+                                    value: c,
+                                    current: settings.cpuThreads,
+                                    theme: theme,
+                                  )),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -504,35 +508,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildRamChip(
-                          label: '256 MB',
-                          value: 256,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '512 MB',
-                          value: 512,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '1024 MB',
-                          value: 1024,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '2048 MB',
-                          value: 2048,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                      ],
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        runAlignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildRamChip(
+                            label: '256 MB',
+                            value: 256,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '512 MB',
+                            value: 512,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '1024 MB',
+                            value: 1024,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '2048 MB',
+                            value: 2048,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -594,37 +602,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        {
-                          'key': 'fast',
-                          'label': l10n.t('preset_fast'),
-                        },
-                        {
-                          'key': 'medium',
-                          'label': l10n.t('preset_normal'),
-                        },
-                        {
-                          'key': 'slow',
-                          'label': l10n.t('preset_slow'),
-                        },
-                      ].map((item) {
-                        final key = item['key']!;
-                        final label = item['label']!;
-                        final isSelected = settings.cpuPreset == key;
-                        return ChoiceChip(
-                          label: Text(label),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected) {
-                              _settingsService.setCpuPreset(key);
-                              setState(() {});
-                            }
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        runAlignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          {
+                            'key': 'fast',
+                            'label': l10n.t('preset_fast'),
                           },
-                        );
-                      }).toList(),
+                          {
+                            'key': 'medium',
+                            'label': l10n.t('preset_normal'),
+                          },
+                          {
+                            'key': 'slow',
+                            'label': l10n.t('preset_slow'),
+                          },
+                        ].map((item) {
+                          final key = item['key']!;
+                          final label = item['label']!;
+                          final isSelected = settings.cpuPreset == key;
+                          return ChoiceChip(
+                            showCheckmark: false,
+                            label: Text(label),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              if (selected) {
+                                _settingsService.setCpuPreset(key);
+                                setState(() {});
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
@@ -1150,6 +1163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }) {
     final isSelected = value == current;
     return ChoiceChip(
+      showCheckmark: false,
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
@@ -1169,6 +1183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }) {
     final isSelected = value == current;
     return ChoiceChip(
+      showCheckmark: false,
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
