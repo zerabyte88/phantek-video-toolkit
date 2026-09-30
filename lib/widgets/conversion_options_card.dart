@@ -51,22 +51,30 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             // Header
             Row(
               children: [
-                Icon(
-                  Icons.tune_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 22,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withAlpha(22),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 18,
+                  ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Text(
                   l10n.t('video_options'),
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
 
             // 1. Resolution Selection
             _buildSubHeader(
@@ -143,7 +151,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
               Text(
                 l10n.t('crf_label'),
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(140)),
               ),
               Row(
                 children: [
@@ -165,17 +173,20 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   ),
                   Container(
                     width: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
                     decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
-                          : const Color(0xFFEAEBF2),
-                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.primary.withAlpha(22),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
                     ),
                     child: Text(
                       '${widget.encodingOptions.crfValue}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ],
@@ -183,7 +194,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             ] else ...[
               Text(
                 l10n.t('bitrate_label'),
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(160)),
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(140)),
               ),
               Row(
                 children: [
@@ -207,18 +218,20 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ),
                   Container(
-                    width: 76,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                     decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
-                          : const Color(0xFFEAEBF2),
-                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.primary.withAlpha(22),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
                     ),
                     child: Text(
                       '$_customBitrateMbps Mbps',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ],
@@ -349,12 +362,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              widget.encodingOptions.codec.description,
-              style: const TextStyle(fontSize: 11, color: Colors.white38),
-            ),
-            
             _buildFpsSelector(theme),
           ],
         ),
@@ -370,15 +377,16 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 17, color: theme.colorScheme.primary.withAlpha(200)),
+        Icon(icon, size: 16, color: theme.colorScheme.primary.withAlpha(220)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.white70,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface.withAlpha(180),
+              letterSpacing: 0.2,
             ),
           ),
         ),
@@ -386,14 +394,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withAlpha(30),
+              color: theme.colorScheme.primary.withAlpha(22),
               borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
             ),
             child: Text(
               trailingBadge,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: theme.colorScheme.primary,
               ),
             ),
@@ -553,41 +562,52 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withAlpha(20),
-        borderRadius: BorderRadius.circular(8),
+        color: theme.colorScheme.primary.withAlpha(14),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.primary.withAlpha(40)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.sd_storage_rounded, size: 20, color: theme.colorScheme.primary),
+              Icon(Icons.sd_storage_rounded, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   widget.l10n.t('est_size_title'),
-                  style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: theme.colorScheme.onSurface.withAlpha(180),
+                  ),
                 ),
               ),
-              Text(
-                '~${sizeMb.toStringAsFixed(1)} MB',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withAlpha(22),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '~${sizeMb.toStringAsFixed(1)} MB',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
             ],
           ),
           if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               widget.l10n.t('est_size_warning'),
               style: TextStyle(
                 fontSize: 11,
-                color: theme.colorScheme.onSurface.withAlpha(120),
+                color: theme.colorScheme.onSurface.withAlpha(110),
                 fontStyle: FontStyle.italic,
               ),
             ),

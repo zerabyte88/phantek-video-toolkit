@@ -37,10 +37,26 @@ class VideoDownscalerApp extends StatelessWidget {
       listenable: SettingsService(),
       builder: (context, child) {
         final themeMode = SettingsService().settings.themeMode;
+        final theme = AppTheme.getTheme(themeMode);
+
+        // Sync system nav bar color with active theme
+        final navBarColor = theme.scaffoldBackgroundColor;
+        final isDark = theme.brightness == Brightness.dark;
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
+            systemNavigationBarColor: navBarColor,
+            systemNavigationBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
+          ),
+        );
+
         return MaterialApp(
           title: 'Video Downscaler',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.getTheme(themeMode),
+          theme: theme,
           home: const HomeScreen(),
         );
       },
