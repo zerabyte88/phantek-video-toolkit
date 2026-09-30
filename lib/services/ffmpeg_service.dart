@@ -124,6 +124,40 @@ class FFmpegService {
     }
   }
 
+  /// Generates a unique output file path in [outputDir] to avoid collisions.
+  /// If `base-res.ext` exists, appends an incremental number: `base-res-2.ext`, `base-res-3.ext`, etc.
+  static Future<String> generateUniqueOutputPath({
+    required Directory outputDir,
+    required String fileName,
+    required VideoResolution targetResolution,
+    required VideoContainer container,
+  }) async {
+    final ext = container.extension;
+    final sanitizedBase = fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+    final String resSuffix = targetResolution.label.toLowerCase().startsWith('original')
+        ? '${targetResolution.height}p'
+        : targetResolution.label.toLowerCase();
+
+    final dirPath = outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
+        ? outputDir.path.substring(0, outputDir.path.length - 1)
+        : outputDir.path;
+    final sep = Platform.pathSeparator;
+
+    final basePath = '$dirPath$sep$sanitizedBase-$resSuffix.$ext';
+    if (!await File(basePath).exists()) {
+      return basePath;
+    }
+
+    int counter = 2;
+    while (true) {
+      final candidatePath = '$dirPath$sep$sanitizedBase-$resSuffix-$counter.$ext';
+      if (!await File(candidatePath).exists()) {
+        return candidatePath;
+      }
+      counter++;
+    }
+  }
+
   /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
   /// Returns the output file path on success, null on failure.
@@ -137,18 +171,12 @@ class FFmpegService {
   }) async {
     final outputDir = await getOutputDirectory();
 
-    final ext = encodingOptions.container.extension;
-    final sanitizedBase = sourceVideo.fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-    final String resSuffix = targetResolution.label.toLowerCase().startsWith('original')
-        ? '${targetResolution.height}p'
-        : targetResolution.label.toLowerCase();
-    final outputPath = '${outputDir.path}/$sanitizedBase-$resSuffix.$ext';
-
-    // Check if output already exists and remove
-    final outputFile = File(outputPath);
-    if (await outputFile.exists()) {
-      await outputFile.delete();
-    }
+    final outputPath = await generateUniqueOutputPath(
+      outputDir: outputDir,
+      fileName: sourceVideo.fileName,
+      targetResolution: targetResolution,
+      container: encodingOptions.container,
+    );
 
     // Calculate target dimensions (must be even numbers)
     int targetW = targetResolution.width;
@@ -370,6 +398,12 @@ class FFmpegService {
         return outputPath;
       } else if (ReturnCode.isCancel(returnCode)) {
         onLog('\nEncoding cancelled by user.');
+        final partialFile = File(outputPath);
+        if (await partialFile.exists()) {
+          try {
+            await partialFile.delete();
+          } catch (_) {}
+        }
         return null;
       } else {
         final logs = await session.getAllLogsAsString();
@@ -384,6 +418,12 @@ class FFmpegService {
         }
 
         onLog('\nEncoding failed: $logs');
+        final partialFile = File(outputPath);
+        if (await partialFile.exists()) {
+          try {
+            await partialFile.delete();
+          } catch (_) {}
+        }
         return null;
       }
     }
