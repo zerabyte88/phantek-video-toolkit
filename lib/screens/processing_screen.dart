@@ -117,7 +117,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     });
 
     await ForegroundServiceManager().startService(
-      title: 'Video Downscaler',
+      title: l10n.t('app_title'),
       text: '${l10n.t('proc_converting')} 0.0%',
     );
 
@@ -176,7 +176,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           final etaStr = remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
 
           ForegroundServiceManager().updateService(
-            title: 'Video Downscaler',
+            title: l10n.t('app_title'),
             text: '${l10n.t('proc_converting')} ${_formatPercentage(progress)}$etaStr',
           );
 
@@ -204,7 +204,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     if (result != null) {
       ForegroundServiceManager().updateService(
-        title: 'Video Downscaler',
+        title: l10n.t('app_title'),
         text: l10n.t('proc_notif_completed'),
       );
     }
