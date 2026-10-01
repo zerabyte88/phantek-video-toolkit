@@ -24,6 +24,8 @@ jobs:
   build:
     name: Build & Package APK
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ''
 
     steps:
       - name: 🛎️ Checkout Repository
@@ -68,9 +70,11 @@ jobs:
           rm -f build/app/outputs/flutter-apk/*x86*.apk
 
       - name: 🏷️ Extract Version and Rename APK
+        id: extract_version
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           cd build/app/outputs/flutter-apk/
           if [ -f "app-arm64-v8a-release.apk" ]; then
             mv app-arm64-v8a-release.apk "Phantek-Video-Toolkit-arm64-v8a-v${VERSION}.apk"
@@ -96,7 +100,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', env.APP_VERSION) }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', steps.extract_version.outputs.version || env.APP_VERSION) }}
           files: |
             build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v*.apk
           generate_release_notes: true

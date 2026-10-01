@@ -479,7 +479,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        res.label,
+                        res.label.startsWith('Original')
+                            ? '${widget.l10n.t('res_original')} (${res.label.substring(res.label.indexOf('(') + 1)}'
+                            : res.label,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight:
