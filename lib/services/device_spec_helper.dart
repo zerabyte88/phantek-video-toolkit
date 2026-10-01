@@ -114,34 +114,6 @@ class DeviceSpecHelper {
     required String board,
     required String manufacturer,
   }) {
-    // 1. Try reading /sys/devices/soc0/machine
-    try {
-      final machineFile = File('/sys/devices/soc0/machine');
-      if (machineFile.existsSync()) {
-        final machine = machineFile.readAsStringSync().trim();
-        if (machine.isNotEmpty && !machine.toLowerCase().contains('unknown')) {
-          return machine;
-        }
-      }
-    } catch (_) {}
-
-    // 2. Try reading /proc/cpuinfo Hardware line
-    try {
-      final lines = File('/proc/cpuinfo').readAsLinesSync();
-      for (final line in lines) {
-        final lower = line.toLowerCase();
-        if (lower.startsWith('hardware') || lower.startsWith('model name')) {
-          final parts = line.split(':');
-          if (parts.length > 1) {
-            final hw = parts[1].trim();
-            if (hw.isNotEmpty && !hw.toLowerCase().contains('unknown')) {
-              return hw;
-            }
-          }
-        }
-      }
-    } catch (_) {}
-
     final hwLower = hardware.toLowerCase();
     final boardLower = board.toLowerCase();
 
@@ -166,10 +138,6 @@ class DeviceSpecHelper {
     if (hwLower.contains('sm6115') || boardLower.contains('bengal')) return 'Qualcomm Snapdragon 662';
     if (hwLower.contains('sm4450')) return 'Qualcomm Snapdragon 4 Gen 2';
     if (hwLower.contains('sm4375')) return 'Qualcomm Snapdragon 4 Gen 1';
-    if (hwLower.startsWith('sdm') || hwLower.startsWith('msm') || hwLower.startsWith('sm')) {
-      return 'Qualcomm Snapdragon ${hardware.toUpperCase()}';
-    }
-    if (hwLower.contains('qcom')) return 'Qualcomm Snapdragon';
 
     // MediaTek Dimensity & Helio SoCs
     if (hwLower.contains('mt6991')) return 'MediaTek Dimensity 9400';
@@ -188,7 +156,6 @@ class DeviceSpecHelper {
     if (hwLower.contains('mt6768')) return 'MediaTek Helio P65';
     if (hwLower.contains('mt6765')) return 'MediaTek Helio P35';
     if (hwLower.contains('mt6762')) return 'MediaTek Helio P22';
-    if (hwLower.startsWith('mt')) return 'MediaTek ${hardware.toUpperCase()}';
 
     // Samsung Exynos SoCs
     if (hwLower.contains('s5e9945')) return 'Samsung Exynos 2400';
@@ -199,13 +166,50 @@ class DeviceSpecHelper {
     if (hwLower.contains('universal990')) return 'Samsung Exynos 990';
     if (hwLower.contains('universal9820')) return 'Samsung Exynos 9820';
     if (hwLower.contains('universal9810')) return 'Samsung Exynos 9810';
-    if (hwLower.contains('exynos') || boardLower.contains('exynos')) return 'Samsung Exynos';
 
     // Google Tensor SoCs
     if (boardLower.contains('zumapro')) return 'Google Tensor G4';
     if (boardLower.contains('zuma')) return 'Google Tensor G3';
     if (boardLower.contains('gs201') || boardLower.contains('cloudripper')) return 'Google Tensor G2';
     if (boardLower.contains('gs101') || boardLower.contains('whitechapel')) return 'Google Tensor';
+
+    // Android device sysfs / procfs fallback for unlisted chipsets
+    if (Platform.isAndroid) {
+      // 1. Try reading /sys/devices/soc0/machine
+      try {
+        final machineFile = File('/sys/devices/soc0/machine');
+        if (machineFile.existsSync()) {
+          final machine = machineFile.readAsStringSync().trim();
+          if (machine.isNotEmpty && !machine.toLowerCase().contains('unknown')) {
+            return machine;
+          }
+        }
+      } catch (_) {}
+
+      // 2. Try reading /proc/cpuinfo Hardware line
+      try {
+        final lines = File('/proc/cpuinfo').readAsLinesSync();
+        for (final line in lines) {
+          final lower = line.toLowerCase();
+          if (lower.startsWith('hardware')) {
+            final parts = line.split(':');
+            if (parts.length > 1) {
+              final hw = parts[1].trim();
+              if (hw.isNotEmpty && !hw.toLowerCase().contains('unknown')) {
+                return hw;
+              }
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (hwLower.startsWith('sdm') || hwLower.startsWith('msm') || hwLower.startsWith('sm')) {
+      return 'Qualcomm Snapdragon ${hardware.toUpperCase()}';
+    }
+    if (hwLower.contains('qcom')) return 'Qualcomm Snapdragon';
+    if (hwLower.startsWith('mt')) return 'MediaTek ${hardware.toUpperCase()}';
+    if (hwLower.contains('exynos') || boardLower.contains('exynos')) return 'Samsung Exynos';
 
     if (hardware.isNotEmpty && hardware.toLowerCase() != 'unknown') {
       return hardware.toUpperCase();
@@ -222,21 +226,23 @@ class DeviceSpecHelper {
     required String board,
     required String socName,
   }) {
-    // 1. Try reading Qualcomm kgsl sysfs
-    try {
-      final gpuFile = File('/sys/class/kgsl/kgsl-3d0/gpu_model');
-      if (gpuFile.existsSync()) {
-        var model = gpuFile.readAsStringSync().trim();
-        if (model.isNotEmpty) {
-          model = model
-              .replaceAll('(TM)', '')
-              .replaceAll('(tm)', '')
-              .replaceAll(RegExp(r'\s+'), ' ')
-              .trim();
-          return model;
+    // 1. Try reading Qualcomm kgsl sysfs on Android
+    if (Platform.isAndroid) {
+      try {
+        final gpuFile = File('/sys/class/kgsl/kgsl-3d0/gpu_model');
+        if (gpuFile.existsSync()) {
+          var model = gpuFile.readAsStringSync().trim();
+          if (model.isNotEmpty) {
+            model = model
+                .replaceAll('(TM)', '')
+                .replaceAll('(tm)', '')
+                .replaceAll(RegExp(r'\s+'), ' ')
+                .trim();
+            return model;
+          }
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     // 2. Correlate with detected SoC / chipset
     final s = socName.toLowerCase();
