@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../models/app_settings.dart';
 import '../services/cache_manager_service.dart';
+import '../services/device_spec_helper.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
-import '../services/device_spec_helper.dart';
-
-import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -852,7 +851,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     selectedDir.trim().isNotEmpty) {
                                   await _settingsService
                                       .setOutputDirectory(selectedDir.trim());
-                                  if (mounted) {
+                                  if (context.mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -877,7 +876,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             TextButton.icon(
                               onPressed: () async {
                                 await _settingsService.setOutputDirectory('');
-                                if (mounted) {
+                                if (context.mounted) {
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -986,7 +985,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     selectedDir.trim().isNotEmpty) {
                                   await _settingsService.setAudioOutputDirectory(
                                       selectedDir.trim());
-                                  if (mounted) {
+                                  if (context.mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -1014,7 +1013,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               onPressed: () async {
                                 await _settingsService
                                     .setAudioOutputDirectory('');
-                                if (mounted) {
+                                if (context.mounted) {
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

@@ -37,6 +37,17 @@ class AudioExtractorCard extends StatelessWidget {
     return '${mb.toStringAsFixed(1)} MB';
   }
 
+  String _getAudioFormatDescription(AudioFormat format, AppLocalizations l10n) {
+    switch (format) {
+      case AudioFormat.mp3:
+        return l10n.t('desc_audio_mp3');
+      case AudioFormat.m4a:
+        return l10n.t('desc_audio_m4a');
+      case AudioFormat.wav:
+        return l10n.t('desc_audio_wav');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -142,7 +153,7 @@ class AudioExtractorCard extends StatelessWidget {
             const SizedBox(height: 8),
             Center(
               child: Text(
-                encodingOptions.audioFormat.description,
+                _getAudioFormatDescription(encodingOptions.audioFormat, l10n),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 11.5,
