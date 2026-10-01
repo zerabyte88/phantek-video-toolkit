@@ -335,28 +335,40 @@ class _HomeScreenState extends State<HomeScreen> {
   // ─── Empty / Landing State ───────────────────────────────────────────────
 
   Widget _buildEmptyState(ThemeData theme, l10n) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Mode Segmented Control ───────────────────────────────
-          _buildSegmentedModeBar(theme, l10n),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight > 40 ? constraints.maxHeight - 40 : 0,
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Mode Segmented Control ───────────────────────────────
+                  _buildSegmentedModeBar(theme, l10n),
 
-          const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-          // ── Clean Media Import Box ───────────────────────────────
-          _buildImportCard(theme, l10n),
+                  // ── Clean Media Import Box ───────────────────────────────
+                  _buildImportCard(theme, l10n),
 
-          const SizedBox(height: 28),
+                  const SizedBox(height: 28),
 
-          // ── Feature Checklist (Human & Clean) ────────────────────
-          _buildFeatureHighlights(theme, l10n),
+                  // ── Feature Checklist (Human & Clean) ────────────────────
+                  _buildFeatureHighlights(theme, l10n),
 
-          const SizedBox(height: 24),
-          _buildMadeWithLoveFooter(theme),
-        ],
-      ),
+                  const Spacer(),
+                  const SizedBox(height: 24),
+                  _buildMadeWithLoveFooter(theme),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

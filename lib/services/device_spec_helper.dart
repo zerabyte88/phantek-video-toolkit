@@ -109,13 +109,39 @@ class DeviceSpecHelper {
     };
   }
 
+  static int _getMaxCpuFreqKHz() {
+    try {
+      if (Platform.isAndroid) {
+        for (final cpu in ['cpu7', 'cpu4', 'cpu0']) {
+          final file = File('/sys/devices/system/cpu/$cpu/cpufreq/cpuinfo_max_freq');
+          if (file.existsSync()) {
+            final freq = int.tryParse(file.readAsStringSync().trim()) ?? 0;
+            if (freq > 0) return freq;
+          }
+        }
+      }
+    } catch (_) {}
+    return 0;
+  }
+
   static String detectSocName({
     required String hardware,
     required String board,
     required String manufacturer,
+    String? socModel,
   }) {
     final hwLower = hardware.toLowerCase();
     final boardLower = board.toLowerCase();
+    final socLower = (socModel ?? '').toLowerCase();
+
+    // 1. Explicit Snapdragon 685 (SM6225-AD)
+    if (hwLower.contains('sm6225-ad') ||
+        hwLower.contains('sm6225_ad') ||
+        socLower.contains('sm6225-ad') ||
+        socLower.contains('sm6225_ad') ||
+        socLower.contains('685')) {
+      return 'Qualcomm Snapdragon 685';
+    }
 
     // Qualcomm Snapdragon SoCs
     if (hwLower.contains('sm8650') || boardLower.contains('pineapple')) return 'Qualcomm Snapdragon 8 Gen 3';
@@ -133,9 +159,70 @@ class DeviceSpecHelper {
     }
     if (hwLower.contains('sm7325') || boardLower.contains('yupik')) return 'Qualcomm Snapdragon 778G';
     if (hwLower.contains('sm6375') || boardLower.contains('holi')) return 'Qualcomm Snapdragon 695 5G';
+
+    // Multi-signal Android hardware detection (soc_id, machine, GPU model, clock speed)
+    if (Platform.isAndroid) {
+      // Check kgsl gpu model (Adreno610v2 is exclusive to Snapdragon 685)
+      try {
+        final gpuFile = File('/sys/class/kgsl/kgsl-3d0/gpu_model');
+        if (gpuFile.existsSync()) {
+          final gpuContent = gpuFile.readAsStringSync().toLowerCase();
+          if (gpuContent.contains('610v2') || gpuContent.contains('610_v2')) {
+            return 'Qualcomm Snapdragon 685';
+          }
+        }
+      } catch (_) {}
+
+      // Check soc0 soc_id (574 = 685, 486 = 680, 444 = 662)
+      try {
+        final socIdFile = File('/sys/devices/soc0/soc_id');
+        if (socIdFile.existsSync()) {
+          final id = int.tryParse(socIdFile.readAsStringSync().trim()) ?? 0;
+          if (id == 574 || id == 575 || id == 576) {
+            return 'Qualcomm Snapdragon 685';
+          } else if (id == 486) {
+            return 'Qualcomm Snapdragon 680';
+          } else if (id == 444) {
+            return 'Qualcomm Snapdragon 662';
+          }
+        }
+      } catch (_) {}
+
+      // Check soc0 machine
+      try {
+        final machineFile = File('/sys/devices/soc0/machine');
+        if (machineFile.existsSync()) {
+          final machine = machineFile.readAsStringSync().toLowerCase().trim();
+          if (machine.contains('sm6225-ad') || machine.contains('sm6225_ad') || machine.contains('685')) {
+            return 'Qualcomm Snapdragon 685';
+          } else if (machine.contains('sm6225') || machine.contains('680')) {
+            return 'Qualcomm Snapdragon 680';
+          }
+        }
+      } catch (_) {}
+
+      // Check CPU max frequency on performance cores (685 = 2.8 GHz, 680 = 2.4 GHz, 662 = 2.0 GHz)
+      final maxFreq = _getMaxCpuFreqKHz();
+      if (maxFreq >= 2600000 &&
+          (boardLower.contains('bengal') || boardLower.contains('khaje') || hwLower.contains('qcom'))) {
+        return 'Qualcomm Snapdragon 685';
+      }
+    }
+
     if (hwLower.contains('sm6225') || boardLower.contains('khaje')) return 'Qualcomm Snapdragon 680';
     if (hwLower.contains('sm6125') || boardLower.contains('trinket')) return 'Qualcomm Snapdragon 665';
-    if (hwLower.contains('sm6115') || boardLower.contains('bengal')) return 'Qualcomm Snapdragon 662';
+    if (hwLower.contains('sm6115')) return 'Qualcomm Snapdragon 662';
+
+    // If board is generic 'bengal' (shared platform for 662, 680, 685)
+    if (boardLower.contains('bengal')) {
+      if (Platform.isAndroid) {
+        final maxFreq = _getMaxCpuFreqKHz();
+        if (maxFreq >= 2600000) return 'Qualcomm Snapdragon 685';
+        if (maxFreq >= 2200000) return 'Qualcomm Snapdragon 680';
+      }
+      return 'Qualcomm Snapdragon 662';
+    }
+
     if (hwLower.contains('sm4450')) return 'Qualcomm Snapdragon 4 Gen 2';
     if (hwLower.contains('sm4375')) return 'Qualcomm Snapdragon 4 Gen 1';
 
@@ -238,6 +325,15 @@ class DeviceSpecHelper {
                 .replaceAll('(tm)', '')
                 .replaceAll(RegExp(r'\s+'), ' ')
                 .trim();
+
+            // Format Adreno models: e.g. "Adreno610v2" or "Adreno610" -> "Adreno 610"
+            final adrenoMatch =
+                RegExp(r'^adreno\s*(\d+)(.*)$', caseSensitive: false)
+                    .firstMatch(model);
+            if (adrenoMatch != null) {
+              final num = adrenoMatch.group(1)!;
+              return 'Adreno $num';
+            }
             return model;
           }
         }
@@ -261,7 +357,9 @@ class DeviceSpecHelper {
     if (s.contains('7s gen 2') || h.contains('sm7435') || h.contains('sm6450') || b.contains('crow')) return 'Adreno 710';
     if (s.contains('778g') || h.contains('sm7325')) return 'Adreno 642L';
     if (s.contains('695') || h.contains('sm6375') || h.contains('sm4375')) return 'Adreno 619';
-    if (s.contains('680') || s.contains('665') || h.contains('sm6225') || h.contains('sm6125')) return 'Adreno 610';
+    if (s.contains('685') || s.contains('680') || s.contains('665') || h.contains('sm6225') || h.contains('sm6125')) {
+      return 'Adreno 610';
+    }
     if (s.contains('4 gen 2') || h.contains('sm4450')) return 'Adreno 613';
     if (s.contains('adreno') || h.contains('qcom')) return 'Qualcomm Adreno GPU';
 
@@ -304,6 +402,7 @@ class DeviceSpecHelper {
     String board = 'Unknown';
     String brand = 'Unknown';
     String device = 'Unknown';
+    String? socModel;
 
     if (Platform.isAndroid) {
       final info = await _deviceInfo.androidInfo;
@@ -313,6 +412,17 @@ class DeviceSpecHelper {
       board = info.board;
       brand = info.brand;
       device = info.device;
+      try {
+        socModel = (info.data['socModel'] ?? info.data['soc_model']) as String?;
+      } catch (_) {}
+      if (socModel == null || socModel.isEmpty) {
+        try {
+          final res = await Process.run('getprop', ['ro.soc.model']);
+          if (res.exitCode == 0 && (res.stdout as String).trim().isNotEmpty) {
+            socModel = (res.stdout as String).trim();
+          }
+        } catch (_) {}
+      }
     }
 
     // 1. Device Name (Nama HP)
@@ -349,6 +459,7 @@ class DeviceSpecHelper {
       hardware: hardware,
       board: board,
       manufacturer: manufacturer,
+      socModel: socModel,
     );
 
     // 4. GPU (Graphics)
