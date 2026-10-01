@@ -69,6 +69,34 @@ class AudioExtractorCard extends StatelessWidget {
             ),
             const SizedBox(height: 18),
 
+            if (!sourceVideo.hasAudio) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withAlpha(20),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.red.withAlpha(80)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.volume_off_rounded, color: Colors.red, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.t('no_audio_track'),
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // 1. Audio Format Selection
             Row(
               children: [

@@ -129,6 +129,10 @@ class SettingsService extends ChangeNotifier {
     await updateSettings(_settings.copyWith(outputDirectory: path.trim()));
   }
 
+  Future<void> setAudioOutputDirectory(String path) async {
+    await updateSettings(_settings.copyWith(audioOutputDirectory: path.trim()));
+  }
+
   Future<void> resetToDefaults() async {
     final currentLang = _settings.languageCode;
     _settings = AppSettings(languageCode: currentLang);

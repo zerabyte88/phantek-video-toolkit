@@ -64,6 +64,11 @@ class FFmpegService {
       // Get codec
       final codec = videoStream.getCodec() ?? 'unknown';
 
+      // Parse audio stream info
+      final audioStreams = streams.where((s) => s.getType() == 'audio').toList();
+      final hasAudio = audioStreams.isNotEmpty;
+      final audioCodec = hasAudio ? audioStreams.first.getCodec() : null;
+
       // Get file size
       final file = File(filePath);
       final fileSize = await file.length();
@@ -78,6 +83,8 @@ class FFmpegService {
         fps: fps,
         codec: codec,
         fileSizeBytes: fileSize,
+        hasAudio: hasAudio,
+        audioCodec: audioCodec,
       );
     } catch (e) {
       return null;
@@ -85,10 +92,10 @@ class FFmpegService {
   }
 
   /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
-  /// Get or create the output directory for converted videos.
+  /// Get or create the output directory for converted media.
   /// If [customPath] is provided and valid, uses it.
-  /// Otherwise strictly targets `/storage/emulated/0/Movies` directly on Android without subfolders.
-  static Future<Directory> getOutputDirectory({String? customPath}) async {
+  /// Otherwise targets `/storage/emulated/0/Music` for audio or `/storage/emulated/0/Movies` for video directly on Android.
+  static Future<Directory> getOutputDirectory({String? customPath, bool isAudio = false}) async {
     if (customPath != null && customPath.trim().isNotEmpty) {
       final customDir = Directory(customPath.trim());
       try {
@@ -97,21 +104,24 @@ class FFmpegService {
         }
         return customDir;
       } catch (_) {
-        // Fallback to default Movies directory
+        // Fallback to default directory
       }
     }
 
     if (Platform.isAndroid) {
-      final moviesDir = Directory('/storage/emulated/0/Movies');
+      final defaultPath = isAudio ? '/storage/emulated/0/Music' : '/storage/emulated/0/Movies';
+      final targetDir = Directory(defaultPath);
       try {
-        if (!await moviesDir.exists()) {
-          await moviesDir.create(recursive: true);
+        if (!await targetDir.exists()) {
+          await targetDir.create(recursive: true);
         }
-        return moviesDir;
+        return targetDir;
       } catch (e) {
         // Fallback for devices with different mount points or restricted paths
         try {
-          final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
+          final extDirs = await getExternalStorageDirectories(
+            type: isAudio ? StorageDirectory.music : StorageDirectory.movies,
+          );
           if (extDirs != null && extDirs.isNotEmpty) {
             final fallback = extDirs.first;
             if (!await fallback.exists()) {
@@ -122,7 +132,7 @@ class FFmpegService {
         } catch (_) {}
 
         final appDocDir = await getApplicationDocumentsDirectory();
-        final fallbackDir = Directory('${appDocDir.path}/Movies');
+        final fallbackDir = Directory('${appDocDir.path}/${isAudio ? "Music" : "Movies"}');
         if (!await fallbackDir.exists()) {
           await fallbackDir.create(recursive: true);
         }
@@ -130,7 +140,7 @@ class FFmpegService {
       }
     } else {
       final appDocDir = await getApplicationDocumentsDirectory();
-      final dir = Directory('${appDocDir.path}/Movies');
+      final dir = Directory('${appDocDir.path}/${isAudio ? "Music" : "Movies"}');
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
@@ -419,7 +429,7 @@ class FFmpegService {
   }
 
   /// Extract audio from a video file into MP3, M4A, or WAV format.
-  /// If [audioBitrateKbps] is 0, uses stream copy (-c:a copy) where applicable.
+  /// If [audioBitrateKbps] is 0, uses stream copy where applicable or high-quality encode.
   static Future<String?> extractAudio({
     required VideoInfo sourceVideo,
     required AudioFormat audioFormat,
@@ -428,23 +438,32 @@ class FFmpegService {
     required void Function(double progress, String stats) onProgress,
     required void Function(String log) onLog,
   }) async {
-    final outputDir = await getOutputDirectory(customPath: appSettings.outputDirectory);
+    final outputDir = await getOutputDirectory(
+      customPath: appSettings.audioOutputDirectory,
+      isAudio: true,
+    );
     final outputPath = await generateUniqueAudioOutputPath(
       outputDir: outputDir,
       fileName: sourceVideo.fileName,
       audioFormat: audioFormat,
     );
 
+    final srcCodec = sourceVideo.audioCodec?.toLowerCase() ?? '';
+    final canCopy = (audioFormat == AudioFormat.mp3 && srcCodec == 'mp3') ||
+        (audioFormat == AudioFormat.m4a && (srcCodec == 'aac' || srcCodec == 'mp4a')) ||
+        (audioFormat == AudioFormat.wav && srcCodec.startsWith('pcm'));
+
     String audioCodecArg;
-    if (audioBitrateKbps <= 0) {
+    if (audioBitrateKbps <= 0 && canCopy) {
       audioCodecArg = '-c:a copy';
     } else {
+      final effectiveBitrate = audioBitrateKbps > 0 ? audioBitrateKbps : 192;
       switch (audioFormat) {
         case AudioFormat.mp3:
-          audioCodecArg = '-c:a libmp3lame -b:a ${audioBitrateKbps}k';
+          audioCodecArg = '-c:a libmp3lame -b:a ${effectiveBitrate}k';
           break;
         case AudioFormat.m4a:
-          audioCodecArg = '-c:a aac -b:a ${audioBitrateKbps}k';
+          audioCodecArg = '-c:a aac -b:a ${effectiveBitrate}k';
           break;
         case AudioFormat.wav:
           audioCodecArg = '-c:a pcm_s16le';
@@ -452,10 +471,25 @@ class FFmpegService {
       }
     }
 
-    final command = '-i "${sourceVideo.filePath}" -vn $audioCodecArg -y "$outputPath"';
+    final threadsArg = appSettings.cpuThreads > 0 ? '-threads ${appSettings.cpuThreads}' : '';
+    final m4aFlags = audioFormat == AudioFormat.m4a ? '-movflags +faststart' : '';
+
+    final cmdParts = <String>[
+      '-i "${sourceVideo.filePath}"',
+      threadsArg,
+      '-vn',
+      '-sn',
+      '-dn',
+      '-map 0:a:0?',
+      audioCodecArg,
+      m4aFlags,
+      '-y "$outputPath"',
+    ]..removeWhere((e) => e.trim().isEmpty);
+
+    final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : "Original Copy"}');
+    onLog('Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : (canCopy ? "Original Copy" : "Auto 192 kbps")}');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();
@@ -474,10 +508,13 @@ class FFmpegService {
         final time = stats.getTime().toDouble();
         if (totalDuration > 0) {
           final progress = (time / totalDuration).clamp(0.0, 1.0);
-          final sizeMb = (stats.getSize() / (1024 * 1024)).toStringAsFixed(1);
+          final size = stats.getSize();
+          final sizeStr = size > 1048576
+              ? '${(size / 1048576).toStringAsFixed(1)} MB'
+              : '${(size / 1024).toStringAsFixed(0)} KB';
           final speed = stats.getSpeed();
           final speedStr = speed > 0 ? '${speed.toStringAsFixed(1)}x' : '1.0x';
-          onProgress(progress, 'Size: $sizeMb MB | Speed: $speedStr');
+          onProgress(progress, 'Size: $sizeStr | Speed: $speedStr');
         }
       },
     );

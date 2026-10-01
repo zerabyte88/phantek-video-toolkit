@@ -197,6 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startProcessing() async {
     if (_videoInfo == null) return;
+    if (_selectedMode == _AppMode.extractor && !_videoInfo!.hasAudio) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_settingsService.l10n.t('no_audio_track'))),
+      );
+      return;
+    }
     if (_selectedMode != _AppMode.extractor && _selectedResolution == null) return;
 
     final fallbackRes = _selectedResolution ??
@@ -679,7 +685,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Start conversion CTA
           ElevatedButton.icon(
-            onPressed: (_selectedMode == _AppMode.extractor || _selectedResolution != null)
+            onPressed: ((_selectedMode == _AppMode.extractor && (_videoInfo?.hasAudio ?? true)) ||
+                    (_selectedMode != _AppMode.extractor && _selectedResolution != null))
                 ? _startProcessing
                 : null,
             icon: Icon(
