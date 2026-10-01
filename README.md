@@ -5,10 +5,10 @@
 </p>
 
 <div align="center">
-  <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
-  <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
-  <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
+  <img src="assets/badges/platform.svg" alt="Platform" />
+  <img src="assets/badges/flutter.svg" alt="Flutter" />
+  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="assets/badges/version.svg" alt="Version" /></a>
+  <img src="assets/badges/license.svg" alt="License" />
 </div>
 
 <br/>
