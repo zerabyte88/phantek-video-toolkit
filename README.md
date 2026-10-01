@@ -148,11 +148,6 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 - **UI Label Cleanup:** Streamlined resolution labels to cleaner formatting (`Original (720p)` instead of redundant brackets).
 - **Multi-language Alignment:** Resolved language leaking issues ensuring all screens respect the active locale.
 
-### v1.1.0 (Build 10)
-- **Material 3 Design Overhaul:** Clean, modern UI free of excessive visual noise, supporting AMOLED Black, Dark, and Light themes.
-- **Segmented Control Modes:** Seamless switching between Downscale, Upscale, and Convert.
-- **Pure Software Pipeline:** 100% deterministic CPU encoding with `libx264`, `libx265`, and `libvpx-vp9`.
-
 ---
 
 ## License
