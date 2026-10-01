@@ -353,6 +353,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Modern, clean Segmented Control for Mode selection
   Widget _buildSegmentedModeBar(ThemeData theme, l10n) {
+    final isVideoActive =
+        _selectedMode == _AppMode.convert || _selectedMode == _AppMode.downscale;
+    final isAudioActive = _selectedMode == _AppMode.extractor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -368,41 +372,142 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: theme.colorScheme.outline),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: _SegmentItem(
-                  icon: Icons.swap_horiz_rounded,
-                  label: l10n.t('mode_convert'),
-                  isSelected: _selectedMode == _AppMode.convert,
-                  onTap: () => _onModeChanged(_AppMode.convert),
-                ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Video Group (Convert & Downscale) ───────────────────
+            Expanded(
+              flex: 11,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.videocam_outlined,
+                          size: 13,
+                          color: isVideoActive
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface.withAlpha(150),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.t('category_video'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                            color: isVideoActive
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface.withAlpha(150),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isVideoActive
+                            ? theme.colorScheme.primary.withAlpha(120)
+                            : theme.colorScheme.outline,
+                        width: isVideoActive ? 1.2 : 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _SegmentItem(
+                            icon: Icons.swap_horiz_rounded,
+                            label: l10n.t('mode_convert'),
+                            isSelected: _selectedMode == _AppMode.convert,
+                            onTap: () => _onModeChanged(_AppMode.convert),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: _SegmentItem(
+                            icon: Icons.compress_rounded,
+                            label: l10n.t('mode_downscale'),
+                            isSelected: _selectedMode == _AppMode.downscale,
+                            onTap: () => _onModeChanged(_AppMode.downscale),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _SegmentItem(
-                  icon: Icons.compress_rounded,
-                  label: l10n.t('mode_downscale'),
-                  isSelected: _selectedMode == _AppMode.downscale,
-                  onTap: () => _onModeChanged(_AppMode.downscale),
-                ),
+            ),
+            const SizedBox(width: 10),
+            // ── Audio Group (Audio Extractor) ──────────────────────
+            Expanded(
+              flex: 8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.audiotrack_outlined,
+                          size: 13,
+                          color: isAudioActive
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface.withAlpha(150),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.t('category_audio'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                            color: isAudioActive
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface.withAlpha(150),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isAudioActive
+                            ? theme.colorScheme.primary.withAlpha(120)
+                            : theme.colorScheme.outline,
+                        width: isAudioActive ? 1.2 : 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _SegmentItem(
+                            icon: Icons.audiotrack_rounded,
+                            label: l10n.t('mode_extractor'),
+                            isSelected: _selectedMode == _AppMode.extractor,
+                            onTap: () => _onModeChanged(_AppMode.extractor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _SegmentItem(
-                  icon: Icons.audiotrack_rounded,
-                  label: l10n.t('mode_extractor'),
-                  isSelected: _selectedMode == _AppMode.extractor,
-                  onTap: () => _onModeChanged(_AppMode.extractor),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
