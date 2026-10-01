@@ -626,6 +626,28 @@ void main() {
         socName: exynosCpu,
       );
       expect(exynosGpu, equals('Samsung Xclipse 940'));
+
+      final snapdragon685 = DeviceSpecHelper.detectSocName(
+        hardware: 'sm6225-ad',
+        board: 'bengal',
+        manufacturer: 'vivo',
+      );
+      expect(snapdragon685, equals('Qualcomm Snapdragon 685'));
+
+      final snapdragon685BySocModel = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'bengal',
+        manufacturer: 'vivo',
+        socModel: 'SM6225-AD',
+      );
+      expect(snapdragon685BySocModel, equals('Qualcomm Snapdragon 685'));
+
+      final snapdragon685Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'sm6225-ad',
+        board: 'bengal',
+        socName: snapdragon685,
+      );
+      expect(snapdragon685Gpu, equals('Adreno 610'));
     });
 
     test('DeviceSpecHelper getHardwareInfo returns full specifications dictionary with all expected keys', () async {
