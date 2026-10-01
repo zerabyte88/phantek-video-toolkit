@@ -352,6 +352,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // ── Feature Checklist (Human & Clean) ────────────────────
           _buildFeatureHighlights(theme, l10n),
+
+          const SizedBox(height: 24),
+          _buildMadeWithLoveFooter(theme),
         ],
       ),
     );
@@ -711,6 +714,43 @@ class _HomeScreenState extends State<HomeScreen> {
             label: Text(l10n.t('change_video')),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 13),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildMadeWithLoveFooter(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMadeWithLoveFooter(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Made with ',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface.withAlpha(120),
+              letterSpacing: 0.2,
+            ),
+          ),
+          const Icon(
+            Icons.favorite_rounded,
+            size: 14,
+            color: Color(0xFFEF4444),
+          ),
+          Text(
+            ' love',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface.withAlpha(120),
+              letterSpacing: 0.2,
             ),
           ),
         ],
