@@ -46,8 +46,8 @@ class ForegroundServiceManager {
       FlutterForegroundTask.init(
         androidNotificationOptions: AndroidNotificationOptions(
           channelId: 'video_conversion_channel_v4',
-          channelName: 'Proses Konversi Video',
-          channelDescription: 'Pemberitahuan proses konversi video di latar belakang',
+          channelName: 'Video Processing',
+          channelDescription: 'Background video conversion notification',
           channelImportance: NotificationChannelImportance.HIGH,
           priority: NotificationPriority.HIGH,
           onlyAlertOnce: true,

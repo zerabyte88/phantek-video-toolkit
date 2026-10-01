@@ -95,6 +95,7 @@ class _ResolutionOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = SettingsService().l10n;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
@@ -145,7 +146,9 @@ class _ResolutionOption extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        resolution.label,
+                        resolution.label.startsWith('Original')
+                            ? '${l10n.t('res_original')} (${resolution.label.substring(resolution.label.indexOf('(') + 1)}'
+                            : resolution.label,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight:

@@ -36,6 +36,72 @@ void main() {
       final result = l10n.t('settings_detected_cores', args: {'count': '8'});
       expect(result.contains('8'), isTrue);
     });
+
+    test('Cancel buttons, dialogs, rate control, and feature highlights resolve properly in all languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('proc_cancel_confirm').isNotEmpty, isTrue);
+        expect(l10n.t('proc_continue_btn').isNotEmpty, isTrue);
+        expect(l10n.t('proc_cancel_btn').isNotEmpty, isTrue);
+        expect(l10n.t('rate_control').isNotEmpty, isTrue);
+        expect(l10n.t('feature_offline_fast').isNotEmpty, isTrue);
+        expect(l10n.t('feature_offline_fast_desc').isNotEmpty, isTrue);
+        expect(l10n.t('feature_crf_bitrate').isNotEmpty, isTrue);
+        expect(l10n.t('feature_crf_bitrate_desc').isNotEmpty, isTrue);
+        expect(l10n.t('feature_privacy').isNotEmpty, isTrue);
+        expect(l10n.t('feature_privacy_desc').isNotEmpty, isTrue);
+        expect(l10n.t('error_details').isNotEmpty, isTrue);
+        expect(l10n.t('app_version').isNotEmpty, isTrue);
+        expect(l10n.t('res_original').isNotEmpty, isTrue);
+
+        // Ensure keys do not return the literal key name
+        expect(l10n.t('proc_cancel_confirm'), isNot(equals('proc_cancel_confirm')));
+        expect(l10n.t('proc_continue_btn'), isNot(equals('proc_continue_btn')));
+        expect(l10n.t('proc_cancel_btn'), isNot(equals('proc_cancel_btn')));
+        expect(l10n.t('rate_control'), isNot(equals('rate_control')));
+      }
+    });
+
+    test('100% of all l10n.t keys used across lib are translated in all 6 supported languages', () {
+      final allCalls = <String>{};
+      final libDir = Directory('lib');
+      final dartFiles = libDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'));
+
+      final regex1 = RegExp(r"l10n\.t\('([^']+)'");
+      final regex2 = RegExp(r'l10n\.t\("([^"]+)"');
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        for (final m in regex1.allMatches(content)) {
+          allCalls.add(m.group(1)!);
+        }
+        for (final m in regex2.allMatches(content)) {
+          allCalls.add(m.group(1)!);
+        }
+      }
+
+      // Add dynamic keys
+      allCalls.addAll([
+        'desc_mp4', 'desc_mkv', 'desc_mov', 'desc_webm',
+        'desc_h264', 'desc_hevc', 'desc_vp9',
+      ]);
+      // Remove any interpolated placeholder patterns if present
+      allCalls.removeWhere((k) => k.contains(r'$'));
+
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        for (final key in allCalls) {
+          final translated = l10n.t(key);
+          expect(translated, isNot(equals(key)),
+              reason: 'Key "$key" is missing translation for language "$code"');
+          expect(translated.isNotEmpty, isTrue,
+              reason: 'Key "$key" is empty for language "$code"');
+        }
+      }
+    });
   });
 
   // Encoding tests removed due to refactor
@@ -177,6 +243,75 @@ void main() {
       );
 
       expect(path, equals('${tempDir.path}${sep}video4k-4k-3.mp4'));
+    });
+  });
+
+  group('VideoInfo resolution formatting tests', () {
+    test('resolution returns clean names without (HD), (FHD), (QHD), (SD)', () {
+      const v4k = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 3840,
+        height: 2160,
+        durationSeconds: 10,
+        bitrate: 1000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 1000,
+      );
+      const v2k = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 2560,
+        height: 1440,
+        durationSeconds: 10,
+        bitrate: 1000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 1000,
+      );
+      const v1080 = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 10,
+        bitrate: 1000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 1000,
+      );
+      const v720 = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1280,
+        height: 720,
+        durationSeconds: 10,
+        bitrate: 1000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 1000,
+      );
+      const v480 = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 854,
+        height: 480,
+        durationSeconds: 10,
+        bitrate: 1000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 1000,
+      );
+
+      expect(v4k.resolution, equals('4K'));
+      expect(v2k.resolution, equals('2K'));
+      expect(v1080.resolution, equals('1080p'));
+      expect(v720.resolution, equals('720p'));
+      expect(v480.resolution, equals('480p'));
+
+      // Check available downscale targets label
+      expect(v720.availableDownscaleTargets.first.label, equals('Original (720p)'));
     });
   });
 }

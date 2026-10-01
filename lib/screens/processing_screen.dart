@@ -147,7 +147,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Warning: Device Temperature High (${temp.toStringAsFixed(1)}°C)'),
+                  l10n.t('device_temp_warning', args: {'temp': temp.toStringAsFixed(1)})),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -284,14 +284,16 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       final mimeType = getMimeType(_outputPath!);
       final result = await OpenFile.open(_outputPath!, type: mimeType);
       if (result.type != ResultType.done && mounted) {
+        final l10n = _settingsService.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cannot open file: ${result.message}')),
+          SnackBar(content: Text('${l10n.t('error_open_file')}: ${result.message}')),
         );
       }
     } catch (e) {
       if (mounted) {
+        final l10n = _settingsService.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error opening file: $e')),
+          SnackBar(content: Text('${l10n.t('error_open_file')}: $e')),
         );
       }
     }
@@ -675,7 +677,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             _buildInfoRow(
               theme,
               l10n.t('proc_target'),
-              widget.targetResolution.label,
+              widget.targetResolution.label.startsWith('Original')
+                  ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
+                  : widget.targetResolution.label,
               '${widget.targetResolution.width}×${widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
             ),
             Divider(height: 20, color: theme.colorScheme.outline),
@@ -808,14 +812,14 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.error_outline_rounded,
+                      const Icon(Icons.error_outline_rounded,
                           color: Colors.redAccent, size: 18),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
-                        'Detail Error',
-                        style: TextStyle(
+                        l10n.t('error_details'),
+                        style: const TextStyle(
                           color: Colors.redAccent,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,

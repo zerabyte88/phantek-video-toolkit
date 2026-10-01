@@ -42,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.1.0 (10)';
+          _appVersion = 'v1.1.1 (11)';
         });
       }
     }
@@ -943,7 +943,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'App Version',
+                          l10n.t('app_version'),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,

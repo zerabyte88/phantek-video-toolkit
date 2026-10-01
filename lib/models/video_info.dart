@@ -46,10 +46,10 @@ class VideoInfo {
 
   String get resolution {
     if (height >= 2160) return '4K';
-    if (height >= 1440) return '2K (QHD)';
-    if (height >= 1080) return '1080p (FHD)';
-    if (height >= 720) return '720p (HD)';
-    if (height >= 480) return '480p (SD)';
+    if (height >= 1440) return '2K';
+    if (height >= 1080) return '1080p';
+    if (height >= 720) return '720p';
+    if (height >= 480) return '480p';
     return '${height}p';
   }
 

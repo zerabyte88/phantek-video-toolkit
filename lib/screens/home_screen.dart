@@ -417,9 +417,9 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Clean, professional feature highlights row
   Widget _buildFeatureHighlights(ThemeData theme, l10n) {
     final features = [
-      (Icons.bolt_rounded, 'Offline & Cepat', 'Diproses langsung di CPU/GPU perangkat Anda'),
-      (Icons.tune_rounded, 'Kontrol CRF & Bitrate', 'Presisi kualitas dan kompresi ukuran file'),
-      (Icons.security_rounded, 'Privasi 100%', 'Tanpa upload ke server atau cloud pihak ketiga'),
+      (Icons.bolt_rounded, l10n.t('feature_offline_fast'), l10n.t('feature_offline_fast_desc')),
+      (Icons.tune_rounded, l10n.t('feature_crf_bitrate'), l10n.t('feature_crf_bitrate_desc')),
+      (Icons.security_rounded, l10n.t('feature_privacy'), l10n.t('feature_privacy_desc')),
     ];
 
     return Column(
