@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
@@ -78,12 +80,35 @@ class ForegroundServiceManager {
     try {
       final perm = await FlutterForegroundTask.checkNotificationPermission();
       if (perm != NotificationPermission.granted) {
-        final res = await FlutterForegroundTask.requestNotificationPermission();
-        return res == NotificationPermission.granted;
+        await FlutterForegroundTask.requestNotificationPermission();
+      }
+
+      // Exempt from battery optimization so Doze mode never pauses encoding when screen is off
+      if (Platform.isAndroid) {
+        final isIgnoringBattery = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+        if (!isIgnoringBattery) {
+          await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+        }
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Error requesting foreground permissions: $e');
+      return false;
+    }
+  }
+
+  Future<bool> requestBatteryOptimizationExemption() async {
+    try {
+      if (Platform.isAndroid) {
+        final isIgnoring = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+        if (!isIgnoring) {
+          return await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+        }
       }
       return true;
     } catch (e) {
-      debugPrint('Error requesting notification permission: $e');
+      debugPrint('Error requesting battery optimization exemption: $e');
       return false;
     }
   }
@@ -96,11 +121,21 @@ class ForegroundServiceManager {
       await init();
       final isRunning = await FlutterForegroundTask.isRunningService;
       if (!isRunning) {
-        await FlutterForegroundTask.startService(
+        final result = await FlutterForegroundTask.startService(
           serviceId: 256,
+          serviceTypes: [
+            ForegroundServiceTypes.dataSync,
+            ForegroundServiceTypes.mediaProcessing,
+          ],
           notificationTitle: title,
           notificationText: text,
           callback: _foregroundTaskCallback,
+        );
+        debugPrint('Foreground service started result: $result');
+      } else {
+        await FlutterForegroundTask.updateService(
+          notificationTitle: title,
+          notificationText: text,
         );
       }
     } catch (e) {

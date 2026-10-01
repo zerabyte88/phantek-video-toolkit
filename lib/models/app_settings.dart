@@ -25,6 +25,9 @@ class AppSettings {
   /// True if the app is launched for the first time
   final bool isFirstLaunch;
 
+  /// Custom output directory path chosen by the user. If empty, defaults to Movies folder.
+  final String outputDirectory;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -34,6 +37,7 @@ class AppSettings {
     this.themeMode = 'dark',
     this.keepScreenAwake = false,
     this.isFirstLaunch = true,
+    this.outputDirectory = '',
   });
 
   /// Detected hardware core count of the phone.
@@ -48,6 +52,7 @@ class AppSettings {
     String? themeMode,
     bool? keepScreenAwake,
     bool? isFirstLaunch,
+    String? outputDirectory,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -58,6 +63,7 @@ class AppSettings {
       themeMode: themeMode ?? this.themeMode,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
+      outputDirectory: outputDirectory ?? this.outputDirectory,
     );
   }
 
@@ -71,6 +77,7 @@ class AppSettings {
       'themeMode': themeMode,
       'keepScreenAwake': keepScreenAwake,
       'isFirstLaunch': isFirstLaunch,
+      'outputDirectory': outputDirectory,
     };
   }
 
@@ -93,6 +100,7 @@ class AppSettings {
       themeMode: json['themeMode'] as String? ?? 'dark',
       keepScreenAwake: json['keepScreenAwake'] as bool? ?? false,
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
+      outputDirectory: json['outputDirectory'] as String? ?? '',
     );
   }
 }

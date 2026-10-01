@@ -9,6 +9,7 @@ class ConversionOptionsCard extends StatefulWidget {
   final List<VideoResolution> resolutions;
   final VideoResolution? selectedResolution;
   final EncodingOptions encodingOptions;
+  final bool showCodecSelection;
   final ValueChanged<VideoResolution> onResolutionChanged;
   final ValueChanged<EncodingOptions> onOptionsChanged;
   final AppLocalizations l10n;
@@ -19,6 +20,7 @@ class ConversionOptionsCard extends StatefulWidget {
     required this.resolutions,
     required this.selectedResolution,
     required this.encodingOptions,
+    this.showCodecSelection = true,
     required this.onResolutionChanged,
     required this.onOptionsChanged,
     required this.l10n,
@@ -267,7 +269,11 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: VideoContainer.values.map((format) {
+              children: (widget.showCodecSelection
+                      ? VideoContainer.values
+                      : VideoContainer.values
+                          .where((c) => c != VideoContainer.webm))
+                  .map((format) {
                 final isSelected = widget.encodingOptions.container == format;
                 return ChoiceChip(
                   showCheckmark: false,
@@ -276,7 +282,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   onSelected: (selected) {
                     if (selected) {
                       VideoCodec newCodec = widget.encodingOptions.codec;
-                      if (format == VideoContainer.webm) {
+                      if (!widget.showCodecSelection) {
+                        newCodec = VideoCodec.h264;
+                      } else if (format == VideoContainer.webm) {
                         newCodec = VideoCodec.vp9;
                       } else if (format != VideoContainer.webm &&
                           format != VideoContainer.mkv &&
@@ -324,78 +332,118 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               ),
             ),
 
-            const SizedBox(height: 16),
-            Divider(height: 1, color: theme.dividerColor),
-            const SizedBox(height: 16),
+            if (widget.showCodecSelection) ...[
+              const SizedBox(height: 16),
+              Divider(height: 1, color: theme.dividerColor),
+              const SizedBox(height: 16),
 
-            // 4. Codec Selection
-            _buildSectionLabel(
-              icon: Icons.code_rounded,
-              title: l10n.t('video_codec'),
-              theme: theme,
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: VideoCodec.values.map((codec) {
-                bool isCompatible = true;
-                if (widget.encodingOptions.container == VideoContainer.webm &&
-                    codec != VideoCodec.vp9) {
-                  isCompatible = false;
-                }
-                if ((widget.encodingOptions.container == VideoContainer.mp4 ||
-                        widget.encodingOptions.container == VideoContainer.mov) &&
-                    codec == VideoCodec.vp9) {
-                  isCompatible = false;
-                }
-
-                final isSelected = widget.encodingOptions.codec == codec;
-                return ChoiceChip(
-                  showCheckmark: false,
-                  label: Text(codec.displayName),
-                  selected: isSelected,
-                  onSelected: isCompatible
-                      ? (selected) {
-                          if (selected) {
-                            widget.onOptionsChanged(
-                              widget.encodingOptions.copyWith(codec: codec),
-                            );
-                          }
-                        }
-                      : null,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-                borderRadius: BorderRadius.circular(8),
+              // 4. Codec Selection
+              _buildSectionLabel(
+                icon: Icons.code_rounded,
+                title: l10n.t('video_codec'),
+                theme: theme,
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 15,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.t('desc_${widget.encodingOptions.codec.name}'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withAlpha(160),
-                        height: 1.35,
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: VideoCodec.values.map((codec) {
+                  bool isCompatible = true;
+                  if (widget.encodingOptions.container == VideoContainer.webm &&
+                      codec != VideoCodec.vp9) {
+                    isCompatible = false;
+                  }
+                  if ((widget.encodingOptions.container == VideoContainer.mp4 ||
+                          widget.encodingOptions.container == VideoContainer.mov) &&
+                      codec == VideoCodec.vp9) {
+                    isCompatible = false;
+                  }
+
+                  final isSelected = widget.encodingOptions.codec == codec;
+                  return ChoiceChip(
+                    showCheckmark: false,
+                    label: Text(codec.displayName),
+                    selected: isSelected,
+                    onSelected: isCompatible
+                        ? (selected) {
+                            if (selected) {
+                              widget.onOptionsChanged(
+                                widget.encodingOptions.copyWith(codec: codec),
+                              );
+                            }
+                          }
+                        : null,
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 15,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.t('desc_${widget.encodingOptions.codec.name}'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withAlpha(160),
+                          height: 1.35,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              if (widget.encodingOptions.codec == VideoCodec.hevc ||
+                  widget.encodingOptions.codec == VideoCodec.vp9) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withAlpha(22),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.amber.withAlpha(110),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 16,
+                        color: Colors.amber,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.encodingOptions.codec == VideoCodec.hevc
+                              ? l10n.t('codec_hevc_warning')
+                              : l10n.t('codec_vp9_warning'),
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: theme.colorScheme.onSurface.withAlpha(220),
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
 
             // 5. FPS Selector
             _buildFpsSelector(theme, l10n),

@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/log.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/statistics.dart';
 import 'package:path_provider/path_provider.dart';
@@ -83,9 +85,22 @@ class FFmpegService {
   }
 
   /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
-  /// Get or create the output directory for downscaled videos.
-  /// Strictly targets `/storage/emulated/0/Movies` directly on Android without subfolders.
-  static Future<Directory> getOutputDirectory() async {
+  /// Get or create the output directory for converted videos.
+  /// If [customPath] is provided and valid, uses it.
+  /// Otherwise strictly targets `/storage/emulated/0/Movies` directly on Android without subfolders.
+  static Future<Directory> getOutputDirectory({String? customPath}) async {
+    if (customPath != null && customPath.trim().isNotEmpty) {
+      final customDir = Directory(customPath.trim());
+      try {
+        if (!await customDir.exists()) {
+          await customDir.create(recursive: true);
+        }
+        return customDir;
+      } catch (_) {
+        // Fallback to default Movies directory
+      }
+    }
+
     if (Platform.isAndroid) {
       final moviesDir = Directory('/storage/emulated/0/Movies');
       try {
@@ -168,7 +183,7 @@ class FFmpegService {
     required void Function(double progress, String stats) onProgress,
     required void Function(String log) onLog,
   }) async {
-    final outputDir = await getOutputDirectory();
+    final outputDir = await getOutputDirectory(customPath: appSettings.outputDirectory);
 
     final outputPath = await generateUniqueOutputPath(
       outputDir: outputDir,
@@ -318,25 +333,36 @@ class FFmpegService {
     onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
+    final completer = Completer<FFmpegSession>();
 
-    // Enable statistics callback
-    FFmpegKitConfig.enableStatisticsCallback((Statistics stats) {
-      final time = stats.getTime().toDouble();
-      if (totalDuration > 0) {
-        final progress = (time / totalDuration).clamp(0.0, 1.0);
-        final speed = stats.getSpeed();
-        final size = stats.getSize();
-        final sizeStr = size > 1048576
-            ? '${(size / 1048576).toStringAsFixed(1)} MB'
-            : '${(size / 1024).toStringAsFixed(0)} KB';
-        onProgress(
-          progress,
-          'Size: $sizeStr | Speed: ${speed.toStringAsFixed(1)}x',
-        );
-      }
-    });
+    await FFmpegKit.executeAsync(
+      command,
+      (FFmpegSession session) {
+        if (!completer.isCompleted) {
+          completer.complete(session);
+        }
+      },
+      (Log log) {
+        onLog(log.getMessage());
+      },
+      (Statistics stats) {
+        final time = stats.getTime().toDouble();
+        if (totalDuration > 0) {
+          final progress = (time / totalDuration).clamp(0.0, 1.0);
+          final speed = stats.getSpeed();
+          final size = stats.getSize();
+          final sizeStr = size > 1048576
+              ? '${(size / 1048576).toStringAsFixed(1)} MB'
+              : '${(size / 1024).toStringAsFixed(0)} KB';
+          onProgress(
+            progress,
+            'Size: $sizeStr | Speed: ${speed.toStringAsFixed(1)}x',
+          );
+        }
+      },
+    );
 
-    final session = await FFmpegKit.execute(command);
+    final session = await completer.future;
     final returnCode = await session.getReturnCode();
 
     if (ReturnCode.isSuccess(returnCode)) {

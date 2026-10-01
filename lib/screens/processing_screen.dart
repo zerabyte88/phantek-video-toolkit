@@ -169,28 +169,29 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       encodingOptions: widget.encodingOptions,
       appSettings: widget.appSettings,
       onProgress: (progress, stats) {
+        String speed = '';
+        String size = '';
+        if (stats.contains('|')) {
+          final parts = stats.split('|');
+          size = parts[0].replaceAll('Size:', '').trim();
+          speed = parts[1].replaceAll('Speed:', '').trim();
+        }
+
+        final now = DateTime.now();
+        final elapsed =
+            _startTime != null ? now.difference(_startTime!) : Duration.zero;
+        final remaining = _calculateRemainingTime(progress, elapsed);
+        final etaStr =
+            remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+
+        // Always update foreground notification even if app is minimized
+        ForegroundServiceManager().updateService(
+          title: l10n.t('app_title'),
+          text:
+              '${l10n.t('proc_converting')} ${_formatPercentage(progress)}$etaStr',
+        );
+
         if (mounted) {
-          String speed = '';
-          String size = '';
-          if (stats.contains('|')) {
-            final parts = stats.split('|');
-            size = parts[0].replaceAll('Size:', '').trim();
-            speed = parts[1].replaceAll('Speed:', '').trim();
-          }
-
-          final now = DateTime.now();
-          final elapsed =
-              _startTime != null ? now.difference(_startTime!) : Duration.zero;
-          final remaining = _calculateRemainingTime(progress, elapsed);
-          final etaStr =
-              remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
-
-          ForegroundServiceManager().updateService(
-            title: l10n.t('app_title'),
-            text:
-                '${l10n.t('proc_converting')} ${_formatPercentage(progress)}$etaStr',
-          );
-
           setState(() {
             _progress = progress;
             _elapsedDuration = elapsed;
@@ -265,7 +266,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     final file = File(_outputPath!);
     file.length().then((size) {
       if (!mounted) return;
-      showModalBottomSheet(
+      showModalBottomSheet<bool>(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -273,8 +274,13 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           originalSize: widget.videoInfo.fileSizeBytes,
           outputSize: size,
           outputPath: _outputPath!,
+          codec: widget.encodingOptions.codec,
         ),
-      );
+      ).then((res) {
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
+      });
     });
   }
 
@@ -322,34 +328,38 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     return WithForegroundTask(
       child: PopScope(
-        canPop: !_isProcessing,
+        canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop) return;
-          final shouldPop = await showDialog<bool>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text(l10n.t('proc_cancel_confirm')),
-              content: Text(l10n.t('proc_cancel_desc')),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(l10n.t('proc_continue_btn')),
-                ),
-                TextButton(
-                  onPressed: () {
-                    FFmpegService.cancelAll();
-                    Navigator.of(ctx).pop(true);
-                  },
-                  child: Text(
-                    l10n.t('proc_cancel_btn'),
-                    style: const TextStyle(color: Colors.red),
+          if (_isProcessing) {
+            final shouldPop = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(l10n.t('proc_cancel_confirm')),
+                content: Text(l10n.t('proc_cancel_desc')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: Text(l10n.t('proc_continue_btn')),
                   ),
-                ),
-              ],
-            ),
-          );
-          if (shouldPop == true && mounted) {
-            Navigator.of(context).pop();
+                  TextButton(
+                    onPressed: () {
+                      FFmpegService.cancelAll();
+                      Navigator.of(ctx).pop(true);
+                    },
+                    child: Text(
+                      l10n.t('proc_cancel_btn'),
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            );
+            if (shouldPop == true && mounted) {
+              Navigator.of(context).pop(false);
+            }
+          } else {
+            Navigator.of(context).pop(_isSuccess ? true : null);
           }
         },
         child: Scaffold(
@@ -393,7 +403,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   CacheManagerService().clearAllCache(
                     specificInputPath: widget.videoInfo.filePath,
                   );
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(_isSuccess ? true : null);
                 }
               },
             ),
@@ -924,11 +934,13 @@ class _SuccessBottomSheet extends StatelessWidget {
   final int originalSize;
   final int outputSize;
   final String outputPath;
+  final VideoCodec? codec;
 
   const _SuccessBottomSheet({
     required this.originalSize,
     required this.outputSize,
     required this.outputPath,
+    this.codec,
   });
 
   String _formatSize(int bytes) {
@@ -1089,6 +1101,33 @@ class _SuccessBottomSheet extends StatelessWidget {
                 icon: const Icon(Icons.play_arrow_rounded, size: 20),
                 label: Text(l10n.t('proc_play_video')),
               ),
+              if (codec == VideoCodec.hevc || codec == VideoCodec.vp9) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 14,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          l10n.t('codec_compat_hint'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: theme.colorScheme.onSurface.withAlpha(150),
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () {
@@ -1099,9 +1138,16 @@ class _SuccessBottomSheet extends StatelessWidget {
                 label: Text(l10n.t('share')),
               ),
               const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.t('close')),
+              TextButton.icon(
+                onPressed: () => Navigator.of(context).pop(true),
+                icon: const Icon(Icons.home_rounded, size: 18),
+                label: Text(
+                  l10n.t('back_to_home'),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
             ],
           ),
