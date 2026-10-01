@@ -45,11 +45,12 @@ class ForegroundServiceManager {
       FlutterForegroundTask.initCommunicationPort();
       FlutterForegroundTask.init(
         androidNotificationOptions: AndroidNotificationOptions(
-          channelId: 'video_conversion_channel_v3',
+          channelId: 'video_conversion_channel_v4',
           channelName: 'Proses Konversi Video',
           channelDescription: 'Pemberitahuan proses konversi video di latar belakang',
           channelImportance: NotificationChannelImportance.HIGH,
           priority: NotificationPriority.HIGH,
+          onlyAlertOnce: true,
           showWhen: true,
           visibility: NotificationVisibility.VISIBILITY_PUBLIC,
           enableVibration: false,
@@ -110,10 +111,12 @@ class ForegroundServiceManager {
   Future<void> updateService({
     required String title,
     required String text,
+    bool force = false,
   }) async {
     try {
       final now = DateTime.now();
-      if (_lastNotificationUpdate != null &&
+      if (!force &&
+          _lastNotificationUpdate != null &&
           now.difference(_lastNotificationUpdate!).inMilliseconds < 800) {
         return;
       }
