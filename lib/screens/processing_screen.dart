@@ -214,6 +214,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       ForegroundServiceManager().updateService(
         title: l10n.t('app_title'),
         text: l10n.t('proc_notif_completed'),
+        force: true,
       );
     }
     // Restore wakelock to the user's preference now that encoding is done.

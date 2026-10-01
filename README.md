@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/badge/Platform-Android-059669?style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/badge/Flutter-3.47.0-0284c7?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Version-v1.0.8-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-v1.0.9-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
   <img src="https://img.shields.io/badge/License-GPLv3-475569?style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
@@ -98,24 +98,23 @@ flowchart TD
 
 ## Build and Compilation
 
-Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To keep package footprints minimal, the project produces split ABI APK binaries rather than a single universal package.
+Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To optimize binary size and memory efficiency on modern smartphones, the application is built exclusively for 64-bit ARM (`arm64-v8a`) architectures, completely deprecating legacy 32-bit and emulator packages.
 
 ### Local Build Commands
 
 ```bash
-# Build architecture-specific split APKs for ARM targets
-flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
+# Build lightweight release APK for 64-bit ARM devices
+flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
-Compiled APK files will be located in:
+Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `app-armeabi-v7a-release.apk` (32-bit ARM)
-- `app-arm64-v8a-release.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.0.9.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.0.9`) or manual dispatch:
 - Extracts the version string from `pubspec.yaml`.
-- Builds optimized split-ABI APKs.
+- Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
 
 ---
