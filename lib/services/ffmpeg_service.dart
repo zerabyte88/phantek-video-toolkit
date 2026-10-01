@@ -172,6 +172,34 @@ class FFmpegService {
     }
   }
 
+  /// Generates a unique output file path in [outputDir] for audio extraction.
+  static Future<String> generateUniqueAudioOutputPath({
+    required Directory outputDir,
+    required String fileName,
+    required AudioFormat audioFormat,
+  }) async {
+    final ext = audioFormat.extension;
+    final sanitizedBase = fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+    final dirPath = outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
+        ? outputDir.path.substring(0, outputDir.path.length - 1)
+        : outputDir.path;
+    final sep = Platform.pathSeparator;
+
+    final basePath = '$dirPath$sep$sanitizedBase-audio.$ext';
+    if (!await File(basePath).exists()) {
+      return basePath;
+    }
+
+    int counter = 2;
+    while (true) {
+      final candidatePath = '$dirPath$sep$sanitizedBase-audio-$counter.$ext';
+      if (!await File(candidatePath).exists()) {
+        return candidatePath;
+      }
+      counter++;
+    }
+  }
+
   /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
   /// Returns the output file path on success, null on failure.
@@ -380,6 +408,98 @@ class FFmpegService {
     } else {
       final logs = await session.getAllLogsAsString();
       onLog('\nEncoding failed: $logs');
+      final partialFile = File(outputPath);
+      if (await partialFile.exists()) {
+        try {
+          await partialFile.delete();
+        } catch (_) {}
+      }
+      return null;
+    }
+  }
+
+  /// Extract audio from a video file into MP3, M4A, or WAV format.
+  /// If [audioBitrateKbps] is 0, uses stream copy (-c:a copy) where applicable.
+  static Future<String?> extractAudio({
+    required VideoInfo sourceVideo,
+    required AudioFormat audioFormat,
+    int audioBitrateKbps = 192,
+    AppSettings appSettings = const AppSettings(),
+    required void Function(double progress, String stats) onProgress,
+    required void Function(String log) onLog,
+  }) async {
+    final outputDir = await getOutputDirectory(customPath: appSettings.outputDirectory);
+    final outputPath = await generateUniqueAudioOutputPath(
+      outputDir: outputDir,
+      fileName: sourceVideo.fileName,
+      audioFormat: audioFormat,
+    );
+
+    String audioCodecArg;
+    if (audioBitrateKbps <= 0) {
+      audioCodecArg = '-c:a copy';
+    } else {
+      switch (audioFormat) {
+        case AudioFormat.mp3:
+          audioCodecArg = '-c:a libmp3lame -b:a ${audioBitrateKbps}k';
+          break;
+        case AudioFormat.m4a:
+          audioCodecArg = '-c:a aac -b:a ${audioBitrateKbps}k';
+          break;
+        case AudioFormat.wav:
+          audioCodecArg = '-c:a pcm_s16le';
+          break;
+      }
+    }
+
+    final command = '-i "${sourceVideo.filePath}" -vn $audioCodecArg -y "$outputPath"';
+
+    onLog('Command: ffmpeg $command');
+    onLog('Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : "Original Copy"}');
+
+    final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
+    final completer = Completer<FFmpegSession>();
+
+    await FFmpegKit.executeAsync(
+      command,
+      (FFmpegSession session) {
+        if (!completer.isCompleted) {
+          completer.complete(session);
+        }
+      },
+      (Log log) {
+        onLog(log.getMessage());
+      },
+      (Statistics stats) {
+        final time = stats.getTime().toDouble();
+        if (totalDuration > 0) {
+          final progress = (time / totalDuration).clamp(0.0, 1.0);
+          final sizeMb = (stats.getSize() / (1024 * 1024)).toStringAsFixed(1);
+          final speed = stats.getSpeed();
+          final speedStr = speed > 0 ? '${speed.toStringAsFixed(1)}x' : '1.0x';
+          onProgress(progress, 'Size: $sizeMb MB | Speed: $speedStr');
+        }
+      },
+    );
+
+    final session = await completer.future;
+    final returnCode = await session.getReturnCode();
+
+    if (ReturnCode.isSuccess(returnCode)) {
+      onProgress(1.0, 'Completed');
+      return outputPath;
+    } else if (ReturnCode.isCancel(returnCode)) {
+      onLog('\nExtraction cancelled by user.');
+      final partialFile = File(outputPath);
+      if (await partialFile.exists()) {
+        try {
+          await partialFile.delete();
+        } catch (_) {}
+      }
+      return null;
+    } else {
+      final logs = await session.getAllLogsAsString();
+      onLog('\nExtraction failed: $logs');
       final partialFile = File(outputPath);
       if (await partialFile.exists()) {
         try {

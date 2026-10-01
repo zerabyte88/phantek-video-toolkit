@@ -1,19 +1,19 @@
-# Phantek Video Toolkit
+# Phantek - Video Toolkit
 
 <p align="center">
-  <img src="assets/icon/app_icon.jpg" alt="Phantek Video Toolkit Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
+  <img src="assets/icon/app_icon.jpg" alt="Phantek Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
 </p>
 
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.2&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.3&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
 <br/>
 
-**Phantek Video Toolkit** is an offline, on-device mobile video transcoding, downscaling, and format conversion application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
+**Phantek** (Phantek - Video Toolkit) is an offline, on-device mobile video transcoding, downscaling, and format conversion application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
 
 ---
 
@@ -44,16 +44,17 @@ Video transcoding requires sustained CPU utilization over extended durations. Th
 
 ### Refined Human-Crafted User Interface (Material 3)
 - **Modern Clean Design:** Completely overhauled UI free of generic AI-generated aesthetics (no neon gradients, no clashing rainbow icons, and no oversized glowing cards).
-- **Native Segmented Control:** Intuitive toggle between Downscale, Upscale, and Convert modes via native segmented controls.
+- **Native Segmented Control:** Intuitive toggle across modes (**Convert**, **Downscale**, and **Audio Extractor**) arranged cleanly in ergonomic sequence.
+- **Dedicated Audio Extractor:** Directly strips audio tracks from video into high-quality **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with optional ultra-fast stream copy or customizable bitrate.
 - **Elegant Drop / Import Zone:** Streamlined video selection experience with responsive layout and clear specification tags.
 - **Seamless Return-to-Home Flow:** Success sheet includes a single-tap "Kembali ke Beranda" (Return to Home) button that cleanly resets the session, ready for subsequent tasks.
 - **Theme Modes:** AMOLED Pitch Black, Slate Midnight Dark, and Clean Light mode with full semantic color tokens.
 
 ### Video Scaling and Codec Management
-- **Resolution Downscaling & Upscaling:** Supports target presets for 1080p, 720p, 480p, 360p, and 240p. Automatic checks prevent accidental operations outside bounds.
+- **Resolution Downscaling:** Supports target presets for 1080p, 720p, 480p, 360p, and 240p. Automatic checks prevent accidental operations outside bounds.
 - **Smart Aspect Ratio and Orientation Engine:** Reads stream orientation and rotation metadata (90°, 180°, 270°) to preserve portrait and landscape aspects without stretching or black bar distortion.
 - **Mode-Locked Codec Stability:**
-  - **Downscale & Upscale Modes:** Exclusively locked to standard **H.264 (`libx264`)** with WebM filtered out, ensuring 100% stable outputs playable by all default Android gallery/video players without user configuration errors.
+  - **Downscale Mode:** Exclusively locked to standard **H.264 (`libx264`)** with WebM filtered out, ensuring 100% stable outputs playable by all default Android gallery/video players without user configuration errors.
   - **Convert Mode:** Unlocks advanced codecs (**H.265 / HEVC**, **VP9**, **H.264**) and containers (**MP4**, **MKV**, **MOV**, **WebM**) for power users, accompanied by in-app compatibility warnings advising that HEVC/VP9 may require modern media players (e.g., VLC, MX Player) on devices lacking native hardware decoders.
 - **Codec Specifications:**
   - **H.264 / AVC (`libx264`):** Standard profile configuration (`-profile:v high -level:v 4.1`) for maximum device compatibility.
@@ -112,7 +113,7 @@ flowchart TD
 
 ## Build and Compilation
 
-Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To optimize binary size and memory efficiency on modern smartphones, the application is built exclusively for 64-bit ARM (`arm64-v8a`) architectures, completely deprecating legacy 32-bit packages.
+Phantek utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To optimize binary size and memory efficiency on modern smartphones, the application is built exclusively for 64-bit ARM (`arm64-v8a`) architectures, completely deprecating legacy 32-bit packages.
 
 ### Local Build Commands
 
@@ -123,10 +124,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.1.2.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.1.3.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.2`) or manual workflow dispatch:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.3`) or manual workflow dispatch:
 - Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
@@ -134,6 +135,18 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ---
 
 ## Release History
+
+### v1.1.3 (Build 13)
+- **Audio Extractor Feature:** Added high-speed on-device audio extraction mode to extract tracks directly from video into **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with ultra-fast stream copy or customizable bitrate.
+- **Removed Upscale Feature & Reordered Modes:** Completely replaced Upscale with Audio Extractor. Mode selector is now ordered from left to right: **Convert**, **Downscale**, and **Extractor**.
+- **CPU Preset Streamlining:** Removed the Slow preset in Settings, leaving 2 straightforward, practical options: **Fast** and **Normal** (balanced). Existing saved configurations automatically migrate.
+- **Centered Settings Layout:** All interactive chips and button groups across Settings (CPU Cores, RAM Buffer, CPU Preset, Audio Quality, and Output Directory) are neatly center-aligned for optimal visual balance.
+- **App Rebranding & Title:** Shortened app display name to **Phantek** with formal title **Phantek - Video Toolkit**.
+- **AMOLED Dark Minimalist Logo:** Redesigned app launcher and assets to a modern 2D flat geometric emblem set on pure pitch-black AMOLED dark (`#000000`).
+- **UI Layout & Navigation Polish:** Centered and streamlined option selector buttons (Target FPS, Video Format, Rate Control, Video Codec), added dedicated top-left back navigation, and separated top-right reset to strictly reset option choices without returning home.
+- **Fiery Animated Title Badge:** Added a rotating fiery gradient border around the app title badge.
+- **Author Attribution:** Added footer credits in Settings screen.
+- **Multi-language Alignment:** Resolved text truncation on Japanese, Korean, and Chinese mode buttons using responsive scaling, normalized container label to "Video Format" across all 6 locales, and corrected Traditional Chinese terminology.
 
 ### v1.1.2 (Build 12)
 - **Background Persistence:** Integrated Android Foreground Service (`mediaProcessing` & `dataSync`) with silent progress updates in notification tray, avoiding throttling or pausing when minimized.

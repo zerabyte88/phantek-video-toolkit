@@ -43,7 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.1.2 (12)';
+          _appVersion = 'v1.1.3 (13)';
         });
       }
     }
@@ -434,26 +434,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildCoreChip(
-                          label: l10n.t('settings_auto_cores'),
-                          value: 0,
-                          current: settings.cpuThreads,
-                          theme: theme,
-                        ),
-                        ...[1, 2, 4, 6, 8]
-                            .where((c) =>
-                                c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
-                            .map((c) => _buildCoreChip(
-                                  label: '$c Core',
-                                  value: c,
-                                  current: settings.cpuThreads,
-                                  theme: theme,
-                                )),
-                      ],
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildCoreChip(
+                            label: l10n.t('settings_auto_cores'),
+                            value: 0,
+                            current: settings.cpuThreads,
+                            theme: theme,
+                          ),
+                          ...[1, 2, 4, 6, 8]
+                              .where((c) =>
+                                  c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
+                              .map((c) => _buildCoreChip(
+                                    label: '$c Core',
+                                    value: c,
+                                    current: settings.cpuThreads,
+                                    theme: theme,
+                                  )),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -516,35 +519,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildRamChip(
-                          label: '256 MB',
-                          value: 256,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '512 MB',
-                          value: 512,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '1024 MB',
-                          value: 1024,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                        _buildRamChip(
-                          label: '2048 MB',
-                          value: 2048,
-                          current: settings.ramBufferMb,
-                          theme: theme,
-                        ),
-                      ],
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildRamChip(
+                            label: '256 MB',
+                            value: 256,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '512 MB',
+                            value: 512,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '1024 MB',
+                            value: 1024,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                          _buildRamChip(
+                            label: '2048 MB',
+                            value: 2048,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -609,38 +615,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        {
-                          'key': 'fast',
-                          'label': l10n.t('preset_fast'),
-                        },
-                        {
-                          'key': 'medium',
-                          'label': l10n.t('preset_normal'),
-                        },
-                        {
-                          'key': 'slow',
-                          'label': l10n.t('preset_slow'),
-                        },
-                      ].map((item) {
-                        final key = item['key']!;
-                        final label = item['label']!;
-                        final isSelected = settings.cpuPreset == key;
-                        return ChoiceChip(
-                          showCheckmark: false,
-                          label: Text(label),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected) {
-                              _settingsService.setCpuPreset(key);
-                              setState(() {});
-                            }
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          {
+                            'key': 'fast',
+                            'label': l10n.t('preset_fast'),
                           },
-                        );
-                      }).toList(),
+                          {
+                            'key': 'medium',
+                            'label': l10n.t('preset_normal'),
+                          },
+                        ].map((item) {
+                          final key = item['key']!;
+                          final label = item['label']!;
+                          final isSelected = settings.cpuPreset == key;
+                          return ChoiceChip(
+                            showCheckmark: false,
+                            label: Text(label),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              if (selected) {
+                                _settingsService.setCpuPreset(key);
+                                setState(() {});
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
@@ -705,37 +710,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ChoiceChip(
-                          showCheckmark: false,
-                          label: Text(l10n.t('settings_audio_mute')),
-                          selected: settings.audioBitrateKbps == 0,
-                          onSelected: (selected) {
-                            if (selected) {
-                              _settingsService.setAudioBitrate(0);
-                              setState(() {});
-                            }
-                          },
-                        ),
-                        ...[64, 128, 192, 256].map((kbps) {
-                          final isSelected =
-                              settings.audioBitrateKbps == kbps;
-                          return ChoiceChip(
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
                             showCheckmark: false,
-                            label: Text('$kbps kbps'),
-                            selected: isSelected,
+                            label: Text(l10n.t('settings_audio_mute')),
+                            selected: settings.audioBitrateKbps == 0,
                             onSelected: (selected) {
                               if (selected) {
-                                _settingsService.setAudioBitrate(kbps);
+                                _settingsService.setAudioBitrate(0);
                                 setState(() {});
                               }
                             },
-                          );
-                        }),
-                      ],
+                          ),
+                          ...[64, 128, 192, 256].map((kbps) {
+                            final isSelected =
+                                settings.audioBitrateKbps == kbps;
+                            return ChoiceChip(
+                              showCheckmark: false,
+                              label: Text('$kbps kbps'),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                if (selected) {
+                                  _settingsService.setAudioBitrate(kbps);
+                                  setState(() {});
+                                }
+                              },
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -826,21 +834,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: () async {
-                            try {
-                              final selectedDir =
-                                  await FilePicker.getDirectoryPath(
-                                dialogTitle: l10n.t('settings_output_folder'),
-                              );
-                              if (selectedDir != null &&
-                                  selectedDir.trim().isNotEmpty) {
-                                await _settingsService
-                                    .setOutputDirectory(selectedDir.trim());
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              try {
+                                final selectedDir =
+                                    await FilePicker.getDirectoryPath(
+                                  dialogTitle: l10n.t('settings_output_folder'),
+                                );
+                                if (selectedDir != null &&
+                                    selectedDir.trim().isNotEmpty) {
+                                  await _settingsService
+                                      .setOutputDirectory(selectedDir.trim());
+                                  if (mounted) {
+                                    setState(() {});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            l10n.t('settings_folder_changed')),
+                                      ),
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                debugPrint('Failed to pick directory: $e');
+                              }
+                            },
+                            icon: const Icon(Icons.folder_open_rounded, size: 16),
+                            label: Text(l10n.t('settings_change_folder')),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                          if (settings.outputDirectory.isNotEmpty) ...[
+                            TextButton.icon(
+                              onPressed: () async {
+                                await _settingsService.setOutputDirectory('');
                                 if (mounted) {
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -850,37 +886,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   );
                                 }
-                              }
-                            } catch (e) {
-                              debugPrint('Failed to pick directory: $e');
-                            }
-                          },
-                          icon: const Icon(Icons.folder_open_rounded, size: 16),
-                          label: Text(l10n.t('settings_change_folder')),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                          ),
-                        ),
-                        if (settings.outputDirectory.isNotEmpty) ...[
-                          TextButton.icon(
-                            onPressed: () async {
-                              await _settingsService.setOutputDirectory('');
-                              if (mounted) {
-                                setState(() {});
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        l10n.t('settings_folder_changed')),
-                                  ),
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.restore_rounded, size: 16),
-                            label: Text(l10n.t('settings_reset_folder')),
-                          ),
+                              },
+                              icon: const Icon(Icons.restore_rounded, size: 16),
+                              label: Text(l10n.t('settings_reset_folder')),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -1095,7 +1107,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
+
             const SizedBox(height: 24),
+
+            // Creator Signature / Footer
+            Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Made with ',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: theme.colorScheme.onSurface.withAlpha(150),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.favorite_rounded,
+                        size: 15,
+                        color: Color(0xFFEF4444),
+                      ),
+                      Text(
+                        ' by Zerabyte88',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface.withAlpha(220),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Crafted for high performance & offline privacy',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withAlpha(100),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 28),
           ],
         ),
       ),

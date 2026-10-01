@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Professional, human-designed theme system for Phantek Video Toolkit.
+/// Professional, human-designed theme system for Phantek - Video Toolkit.
 /// Avoids stereotypical "AI-generated" neon purples and glowing borders,
 /// adhering to clean Material 3 and modern native platform aesthetics.
 class AppTheme {

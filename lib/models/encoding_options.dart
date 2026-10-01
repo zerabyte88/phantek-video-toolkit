@@ -35,6 +35,19 @@ enum RateControlMode {
   const RateControlMode(this.displayName, this.description);
 }
 
+enum AudioFormat {
+  mp3('MP3', 'mp3', 'libmp3lame', 'Universal (Kompatibel dengan semua perangkat dan pemutar)'),
+  m4a('M4A / AAC', 'm4a', 'aac', 'Kualitas Tinggi & Efisiensi Terbaik (Apple & Android)'),
+  wav('WAV', 'wav', 'pcm_s16le', 'Lossless Uncompressed (Kualitas Audio Studio Mentah)');
+
+  final String displayName;
+  final String extension;
+  final String ffmpegCodec;
+  final String description;
+
+  const AudioFormat(this.displayName, this.extension, this.ffmpegCodec, this.description);
+}
+
 class EncodingOptions {
   final VideoCodec codec;
   final VideoContainer container;
@@ -47,6 +60,10 @@ class EncodingOptions {
   // Target FPS (0 means original)
   final int targetFps;
 
+  // Audio extraction
+  final AudioFormat audioFormat;
+  final int audioExtractBitrateKbps; // 0 for copy original stream, or 128, 192, 256, 320
+
   const EncodingOptions({
     this.codec = VideoCodec.h264,
     this.container = VideoContainer.mp4,
@@ -54,6 +71,8 @@ class EncodingOptions {
     this.crfValue = 20, // Default for 1080p
     this.customBitrateKbps = 6000,
     this.targetFps = 0,
+    this.audioFormat = AudioFormat.mp3,
+    this.audioExtractBitrateKbps = 192,
   });
 
   EncodingOptions copyWith({
@@ -63,6 +82,8 @@ class EncodingOptions {
     int? crfValue,
     int? customBitrateKbps,
     int? targetFps,
+    AudioFormat? audioFormat,
+    int? audioExtractBitrateKbps,
   }) {
     return EncodingOptions(
       codec: codec ?? this.codec,
@@ -71,6 +92,9 @@ class EncodingOptions {
       crfValue: crfValue ?? this.crfValue,
       customBitrateKbps: customBitrateKbps ?? this.customBitrateKbps,
       targetFps: targetFps ?? this.targetFps,
+      audioFormat: audioFormat ?? this.audioFormat,
+      audioExtractBitrateKbps:
+          audioExtractBitrateKbps ?? this.audioExtractBitrateKbps,
     );
   }
 

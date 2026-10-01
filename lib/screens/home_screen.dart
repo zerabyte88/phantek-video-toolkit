@@ -6,13 +6,15 @@ import '../models/video_info.dart';
 import '../services/cache_manager_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/animated_flame_title.dart';
+import '../widgets/audio_extractor_card.dart';
 import '../widgets/conversion_options_card.dart';
 import '../widgets/video_info_card.dart';
 import 'processing_screen.dart';
 import 'settings_screen.dart';
 
 // ─── Enum mode aplikasi ───────────────────────────────────────────────────────
-enum _AppMode { downscale, upscale, convert }
+enum _AppMode { convert, downscale, extractor }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
 
   // State
-  _AppMode _selectedMode = _AppMode.downscale;
+  _AppMode _selectedMode = _AppMode.convert;
   VideoInfo? _videoInfo;
   VideoResolution? _selectedResolution;
   EncodingOptions _encodingOptions = const EncodingOptions();
@@ -111,6 +113,33 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _resetOptions() {
+    setState(() {
+      _encodingOptions = const EncodingOptions();
+      if (_selectedMode != _AppMode.convert) {
+        _encodingOptions = _encodingOptions.copyWith(
+          codec: VideoCodec.h264,
+          container: VideoContainer.mp4,
+        );
+      }
+      if (_videoInfo != null) {
+        final resolutions = _getResolutionsForMode(_selectedMode, _videoInfo);
+        if (resolutions.isNotEmpty) {
+          _selectedResolution = resolutions.first;
+        }
+      }
+    });
+
+    final l10n = _settingsService.l10n;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.t('options_reset_success')),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   // ─── Mode Switching ──────────────────────────────────────────────────────
 
   List<VideoResolution> _getResolutionsForMode(_AppMode mode, [VideoInfo? source]) {
@@ -119,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final targets = <VideoResolution>[];
 
-    if (mode == _AppMode.convert) {
+    if (mode == _AppMode.convert || mode == _AppMode.extractor) {
       targets.add(VideoResolution(
         label: 'Original (${info.resolution})',
         width: info.width,
@@ -130,19 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final h = info.height;
 
-    if (mode == _AppMode.upscale) {
-      final upscaleOptions =
-          VideoResolution.standardResolutions.where((r) => r.height > h).toList();
-      if (upscaleOptions.isEmpty) {
-        targets.add(VideoResolution(
-          label: 'Original (${info.resolution})',
-          width: info.width,
-          height: info.height,
-        ));
-      } else {
-        targets.addAll(upscaleOptions.reversed);
-      }
-    } else if (mode == _AppMode.downscale) {
+    if (mode == _AppMode.downscale) {
       final downscaleOptions =
           VideoResolution.standardResolutions.where((r) => r.height < h).toList();
       if (downscaleOptions.isEmpty) {
@@ -179,7 +196,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startProcessing() async {
-    if (_videoInfo == null || _selectedResolution == null) return;
+    if (_videoInfo == null) return;
+    if (_selectedMode != _AppMode.extractor && _selectedResolution == null) return;
+
+    final fallbackRes = _selectedResolution ??
+        VideoResolution(
+          label: 'Original (${_videoInfo!.resolution})',
+          width: _videoInfo!.width,
+          height: _videoInfo!.height,
+        );
+
     final options = _selectedMode == _AppMode.convert
         ? _encodingOptions
         : _encodingOptions.copyWith(
@@ -192,9 +218,10 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (context) => ProcessingScreen(
           videoInfo: _videoInfo!,
-          targetResolution: _selectedResolution!,
+          targetResolution: fallbackRes,
           encodingOptions: options,
           appSettings: _settingsService.settings,
+          isAudioExtraction: _selectedMode == _AppMode.extractor,
         ),
       ),
     );
@@ -217,13 +244,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.t('app_title')),
+        leading: (_videoInfo != null && !_isLoading)
+            ? IconButton(
+                onPressed: _resetVideo,
+                icon: const Icon(Icons.arrow_back_rounded),
+                tooltip: l10n.t('back_to_home'),
+              )
+            : null,
+        title: AnimatedFlameTitle(
+          title: l10n.t('app_title'),
+        ),
+        centerTitle: true,
         actions: [
           if (_videoInfo != null && !_isLoading)
             IconButton(
-              onPressed: _resetVideo,
+              onPressed: _resetOptions,
               icon: const Icon(Icons.refresh_rounded),
-              tooltip: l10n.t('reset'),
+              tooltip: l10n.t('reset_options'),
             ),
           IconButton(
             onPressed: () => Navigator.of(context).push(
@@ -342,6 +379,14 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Expanded(
                 child: _SegmentItem(
+                  icon: Icons.swap_horiz_rounded,
+                  label: l10n.t('mode_convert'),
+                  isSelected: _selectedMode == _AppMode.convert,
+                  onTap: () => _onModeChanged(_AppMode.convert),
+                ),
+              ),
+              Expanded(
+                child: _SegmentItem(
                   icon: Icons.compress_rounded,
                   label: l10n.t('mode_downscale'),
                   isSelected: _selectedMode == _AppMode.downscale,
@@ -350,18 +395,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Expanded(
                 child: _SegmentItem(
-                  icon: Icons.expand_rounded,
-                  label: l10n.t('mode_upscale'),
-                  isSelected: _selectedMode == _AppMode.upscale,
-                  onTap: () => _onModeChanged(_AppMode.upscale),
-                ),
-              ),
-              Expanded(
-                child: _SegmentItem(
-                  icon: Icons.swap_horiz_rounded,
-                  label: l10n.t('mode_convert'),
-                  isSelected: _selectedMode == _AppMode.convert,
-                  onTap: () => _onModeChanged(_AppMode.convert),
+                  icon: Icons.audiotrack_rounded,
+                  label: l10n.t('mode_extractor'),
+                  isSelected: _selectedMode == _AppMode.extractor,
+                  onTap: () => _onModeChanged(_AppMode.extractor),
                 ),
               ),
             ],
@@ -510,27 +547,45 @@ class _HomeScreenState extends State<HomeScreen> {
           VideoInfoCard(videoInfo: _videoInfo!),
           const SizedBox(height: 14),
 
-          // Options & resolutions
-          ConversionOptionsCard(
-            sourceVideo: _videoInfo!,
-            resolutions: _getResolutionsForMode(_selectedMode),
-            selectedResolution: _selectedResolution,
-            encodingOptions: _encodingOptions,
-            showCodecSelection: _selectedMode == _AppMode.convert,
-            onResolutionChanged: (res) =>
-                setState(() => _selectedResolution = res),
-            onOptionsChanged: (opts) =>
-                setState(() => _encodingOptions = opts),
-            l10n: l10n,
-          ),
+          // Options & resolutions / Audio Extractor
+          if (_selectedMode == _AppMode.extractor)
+            AudioExtractorCard(
+              sourceVideo: _videoInfo!,
+              encodingOptions: _encodingOptions,
+              onOptionsChanged: (opts) =>
+                  setState(() => _encodingOptions = opts),
+              l10n: l10n,
+            )
+          else
+            ConversionOptionsCard(
+              sourceVideo: _videoInfo!,
+              resolutions: _getResolutionsForMode(_selectedMode),
+              selectedResolution: _selectedResolution,
+              encodingOptions: _encodingOptions,
+              showCodecSelection: _selectedMode == _AppMode.convert,
+              onResolutionChanged: (res) =>
+                  setState(() => _selectedResolution = res),
+              onOptionsChanged: (opts) =>
+                  setState(() => _encodingOptions = opts),
+              l10n: l10n,
+            ),
 
           const SizedBox(height: 20),
 
           // Start conversion CTA
           ElevatedButton.icon(
-            onPressed: _selectedResolution != null ? _startProcessing : null,
-            icon: const Icon(Icons.play_arrow_rounded, size: 22),
-            label: Text(l10n.t('start_conversion')),
+            onPressed: (_selectedMode == _AppMode.extractor || _selectedResolution != null)
+                ? _startProcessing
+                : null,
+            icon: Icon(
+              _selectedMode == _AppMode.extractor
+                  ? Icons.audiotrack_rounded
+                  : Icons.play_arrow_rounded,
+              size: 22,
+            ),
+            label: Text(_selectedMode == _AppMode.extractor
+                ? l10n.t('start_audio_extraction')
+                : l10n.t('start_conversion')),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -576,7 +631,7 @@ class _SegmentItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary
@@ -588,24 +643,26 @@ class _SegmentItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 16,
+              size: 15,
               color: isSelected
                   ? Colors.white
                   : theme.colorScheme.onSurface.withAlpha(180),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Flexible(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected
-                      ? Colors.white
-                      : theme.colorScheme.onSurface.withAlpha(180),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected
+                        ? Colors.white
+                        : theme.colorScheme.onSurface.withAlpha(180),
+                  ),
+                  maxLines: 1,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

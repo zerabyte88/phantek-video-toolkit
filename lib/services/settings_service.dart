@@ -29,6 +29,10 @@ class SettingsService extends ChangeNotifier {
       if (jsonStr != null) {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         _settings = AppSettings.fromJson(data);
+        if (_settings.cpuPreset == 'slow') {
+          _settings = _settings.copyWith(cpuPreset: 'medium');
+          await _saveSettings();
+        }
       }
       
       // Hardware Auto-Detection on first launch
@@ -47,14 +51,13 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> _applyFirstLaunchDefaults() async {
-    // We can't import here directly without adding the import, but we'll add the import later.
     final tier = DeviceSpecHelper.getDeviceTier();
     
-    // Tier 1: 1080p, slow
-    // Tier 2: 1080p, medium
-    // Tier 3: 720p (we'll handle default resolution in main UI probably, or settings), fast
+    // Tier 1: 1080p, medium (normal)
+    // Tier 2: 1080p, medium (normal)
+    // Tier 3: 720p, fast
     String preset = 'medium';
-    if (tier == DeviceTier.highEnd) preset = 'slow';
+    if (tier == DeviceTier.highEnd) preset = 'medium';
     if (tier == DeviceTier.lowEnd) preset = 'fast';
 
     _settings = _settings.copyWith(
