@@ -426,7 +426,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 ],
               ),
             );
-            if (shouldPop == true && mounted) {
+            if (shouldPop == true && context.mounted) {
               Navigator.of(context).pop(false);
             }
           } else {
@@ -438,9 +438,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             title: Text(l10n.t('proc_title')),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () {
+              onPressed: () async {
                 if (_isProcessing) {
-                  showDialog<bool>(
+                  final shouldPop = await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: Text(l10n.t('proc_cancel_confirm')),
@@ -465,11 +465,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                         ),
                       ],
                     ),
-                  ).then((shouldPop) {
-                    if (shouldPop == true && mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  });
+                  );
+                  if (shouldPop == true && context.mounted) {
+                    Navigator.of(context).pop();
+                  }
                 } else {
                   CacheManagerService().clearAllCache(
                     specificInputPath: widget.videoInfo.filePath,
@@ -614,7 +613,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 Container(
                   width: 1,
                   height: 36,
-                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   color: theme.colorScheme.outline,
                 ),
                 Expanded(
@@ -712,18 +711,21 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ),
           child: Icon(icon, size: 18, color: theme.colorScheme.primary),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 11,
                   color: theme.colorScheme.onSurface.withAlpha(130),
+                  height: 1.15,
                 ),
-                maxLines: 1,
+                maxLines: 2,
+                softWrap: true,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),

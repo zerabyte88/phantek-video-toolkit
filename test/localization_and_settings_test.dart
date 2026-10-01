@@ -413,6 +413,12 @@ void main() {
         expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
         expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
         expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_mp3').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_m4a').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_wav').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_mp3'), isNot(equals('desc_audio_mp3')));
+        expect(l10n.t('desc_audio_m4a'), isNot(equals('desc_audio_m4a')));
+        expect(l10n.t('desc_audio_wav'), isNot(equals('desc_audio_wav')));
         expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
       }
     });

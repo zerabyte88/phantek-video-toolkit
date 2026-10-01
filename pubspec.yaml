@@ -31,22 +31,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  device_info_plus: any
   ffmpeg_kit_flutter_new: ^4.6.0
   file_picker: ^13.1.0
-  video_player: ^2.14.0
-  path_provider: ^2.1.6
-  intl: ^0.20.3
+  flutter_foreground_task: any
   open_file: ^4.0.0
+  package_info_plus: any
+  path_provider: ^2.1.6
+  share_plus: ^13.3.0
   shared_preferences: ^2.5.5
   wakelock_plus: ^1.8.0
-  package_info_plus: any
-  device_info_plus: any
-  battery_plus: any
-  flutter_foreground_task: any
-  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:
