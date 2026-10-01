@@ -350,7 +350,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     if (_outputPath == null) return;
     try {
       final mimeType = getMimeType(_outputPath!);
-      final result = await OpenFile.open(_outputPath!, type: mimeType);
+      var result = await OpenFile.open(_outputPath!, type: mimeType);
+      if (result.type != ResultType.done && mimeType != null) {
+        result = await OpenFile.open(_outputPath!);
+      }
       if (result.type != ResultType.done && mounted) {
         final l10n = _settingsService.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -532,7 +535,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 children: [
                   if (_isProcessing)
                     Icon(
-                      Icons.movie_filter_outlined,
+                      widget.isAudioExtraction
+                          ? Icons.audiotrack_rounded
+                          : Icons.movie_filter_outlined,
                       size: 32,
                       color: theme.colorScheme.primary,
                     )
@@ -740,6 +745,76 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   Widget _buildInfoSection(ThemeData theme, l10n) {
+    if (widget.isAudioExtraction) {
+      final audioFmt = widget.encodingOptions.audioFormat.name.toUpperCase();
+      final bitrate = widget.encodingOptions.audioExtractBitrateKbps <= 0
+          ? l10n.t('audio_copy')
+          : '${widget.encodingOptions.audioExtractBitrateKbps} kbps';
+      final srcAudio = widget.videoInfo.audioCodec?.toUpperCase() ?? 'Audio';
+
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildInfoRow(
+                theme,
+                l10n.t('proc_source'),
+                widget.videoInfo.fileName,
+                srcAudio,
+              ),
+              Divider(height: 20, color: theme.colorScheme.outline),
+              _buildInfoRow(
+                theme,
+                l10n.t('proc_target'),
+                '$audioFmt Audio',
+                bitrate,
+              ),
+              Divider(height: 20, color: theme.colorScheme.outline),
+              _buildInfoRow(
+                theme,
+                l10n.t('container_format'),
+                audioFmt,
+                'Audio Track',
+              ),
+              if (_isSuccess && _outputPath != null) ...[
+                Divider(height: 20, color: theme.colorScheme.outline),
+                FutureBuilder<int>(
+                  future: File(_outputPath!).length(),
+                  builder: (context, snapshot) {
+                    final size = snapshot.data ?? 0;
+                    String sizeStr;
+                    if (size >= 1073741824) {
+                      sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
+                    } else if (size >= 1048576) {
+                      sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
+                    } else {
+                      sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
+                    }
+                    return _buildInfoRow(
+                      theme,
+                      l10n.t('proc_output_size'),
+                      sizeStr,
+                      'Audio Extracted',
+                    );
+                  },
+                ),
+                Divider(height: 20, color: theme.colorScheme.outline),
+                _buildInfoRow(
+                  theme,
+                  l10n.t('proc_saved_location'),
+                  widget.appSettings.audioOutputDirectory.isNotEmpty
+                      ? widget.appSettings.audioOutputDirectory
+                      : 'Music (Default)',
+                  _outputPath?.split(Platform.pathSeparator).last ?? '',
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1162,11 +1237,15 @@ class _SuccessBottomSheet extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
-                onPressed: () {
-                  OpenFile.open(
+                onPressed: () async {
+                  final mime = _ProcessingScreenState.getMimeType(outputPath);
+                  var res = await OpenFile.open(
                     outputPath,
-                    type: _ProcessingScreenState.getMimeType(outputPath),
+                    type: mime,
                   );
+                  if (res.type != ResultType.done && mime != null) {
+                    await OpenFile.open(outputPath);
+                  }
                 },
                 icon: Icon(
                   isAudioExtraction

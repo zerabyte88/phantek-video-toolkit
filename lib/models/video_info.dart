@@ -31,6 +31,8 @@ class VideoInfo {
   final double fps;
   final String codec;
   final int fileSizeBytes;
+  final bool hasAudio;
+  final String? audioCodec;
 
   const VideoInfo({
     required this.filePath,
@@ -42,6 +44,8 @@ class VideoInfo {
     required this.fps,
     required this.codec,
     required this.fileSizeBytes,
+    this.hasAudio = true,
+    this.audioCodec,
   });
 
   String get resolution {

@@ -28,6 +28,9 @@ class AppSettings {
   /// Custom output directory path chosen by the user. If empty, defaults to Movies folder.
   final String outputDirectory;
 
+  /// Custom output directory path for extracted audio files. If empty, defaults to Music folder.
+  final String audioOutputDirectory;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -38,6 +41,7 @@ class AppSettings {
     this.keepScreenAwake = false,
     this.isFirstLaunch = true,
     this.outputDirectory = '',
+    this.audioOutputDirectory = '',
   });
 
   /// Detected hardware core count of the phone.
@@ -53,6 +57,7 @@ class AppSettings {
     bool? keepScreenAwake,
     bool? isFirstLaunch,
     String? outputDirectory,
+    String? audioOutputDirectory,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -64,6 +69,7 @@ class AppSettings {
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
       outputDirectory: outputDirectory ?? this.outputDirectory,
+      audioOutputDirectory: audioOutputDirectory ?? this.audioOutputDirectory,
     );
   }
 
@@ -78,6 +84,7 @@ class AppSettings {
       'keepScreenAwake': keepScreenAwake,
       'isFirstLaunch': isFirstLaunch,
       'outputDirectory': outputDirectory,
+      'audioOutputDirectory': audioOutputDirectory,
     };
   }
 
@@ -101,6 +108,7 @@ class AppSettings {
       keepScreenAwake: json['keepScreenAwake'] as bool? ?? false,
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
       outputDirectory: json['outputDirectory'] as String? ?? '',
+      audioOutputDirectory: json['audioOutputDirectory'] as String? ?? '',
     );
   }
 }

@@ -901,6 +901,143 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 12),
 
+            // Audio Output Storage Directory Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.secondary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.audio_file_outlined,
+                            size: 18,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.t('settings_audio_output_folder'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                settings.audioOutputDirectory.isEmpty
+                                    ? l10n.t('settings_audio_folder_default')
+                                    : settings.audioOutputDirectory,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: settings.audioOutputDirectory.isEmpty
+                                      ? FontWeight.normal
+                                      : FontWeight.w600,
+                                  color: settings.audioOutputDirectory.isEmpty
+                                      ? theme.colorScheme.onSurface.withAlpha(140)
+                                      : theme.colorScheme.secondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.t('settings_audio_output_folder_desc'),
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              try {
+                                final selectedDir =
+                                    await FilePicker.getDirectoryPath(
+                                  dialogTitle:
+                                      l10n.t('settings_audio_output_folder'),
+                                );
+                                if (selectedDir != null &&
+                                    selectedDir.trim().isNotEmpty) {
+                                  await _settingsService.setAudioOutputDirectory(
+                                      selectedDir.trim());
+                                  if (mounted) {
+                                    setState(() {});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n.t(
+                                            'settings_audio_folder_changed')),
+                                      ),
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                debugPrint(
+                                    'Failed to pick audio directory: $e');
+                              }
+                            },
+                            icon:
+                                const Icon(Icons.folder_open_rounded, size: 16),
+                            label: Text(l10n.t('settings_change_folder')),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                          if (settings.audioOutputDirectory.isNotEmpty) ...[
+                            TextButton.icon(
+                              onPressed: () async {
+                                await _settingsService
+                                    .setAudioOutputDirectory('');
+                                if (mounted) {
+                                  setState(() {});
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.t(
+                                          'settings_audio_folder_changed')),
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.restore_rounded, size: 16),
+                              label: Text(l10n.t('settings_audio_reset_folder')),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),

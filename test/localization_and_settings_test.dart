@@ -118,6 +118,7 @@ void main() {
       expect(settings.themeMode, equals('dark'));
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
+      expect(settings.audioOutputDirectory, equals(''));
     });
 
     test('Serialization to and from JSON works', () {
@@ -130,6 +131,7 @@ void main() {
         themeMode: 'oled',
         keepScreenAwake: true,
         outputDirectory: '/custom/storage/Movies',
+        audioOutputDirectory: '/custom/storage/Music',
       );
 
       final json = original.toJson();
@@ -143,6 +145,7 @@ void main() {
       expect(restored.themeMode, equals('oled'));
       expect(restored.keepScreenAwake, isTrue);
       expect(restored.outputDirectory, equals('/custom/storage/Movies'));
+      expect(restored.audioOutputDirectory, equals('/custom/storage/Music'));
     });
 
     test('New theme, wakelock, and cache storage translations exist', () {
@@ -170,6 +173,11 @@ void main() {
         expect(l10n.t('settings_reset_folder').isNotEmpty, isTrue);
         expect(l10n.t('settings_folder_changed').isNotEmpty, isTrue);
         expect(l10n.t('settings_folder_default').isNotEmpty, isTrue);
+        expect(l10n.t('settings_audio_output_folder').isNotEmpty, isTrue);
+        expect(l10n.t('settings_audio_output_folder_desc').isNotEmpty, isTrue);
+        expect(l10n.t('settings_audio_reset_folder').isNotEmpty, isTrue);
+        expect(l10n.t('settings_audio_folder_changed').isNotEmpty, isTrue);
+        expect(l10n.t('settings_audio_folder_default').isNotEmpty, isTrue);
       }
     });
 
@@ -177,10 +185,12 @@ void main() {
       const original = AppSettings();
       final updated = original.copyWith(
         outputDirectory: '/custom/path',
+        audioOutputDirectory: '/custom/audio/path',
         keepScreenAwake: true,
       );
 
       expect(updated.outputDirectory, equals('/custom/path'));
+      expect(updated.audioOutputDirectory, equals('/custom/audio/path'));
       expect(updated.keepScreenAwake, isTrue);
       expect(updated.cpuThreads, equals(original.cpuThreads));
       expect(updated.themeMode, equals(original.themeMode));
@@ -449,6 +459,67 @@ void main() {
         audioFormat: AudioFormat.mp3,
       );
       expect(path2, equals('${tempDir.path}${sep}clip-audio-2.mp3'));
+    });
+
+    test('VideoInfo tracks hasAudio and audioCodec accurately', () {
+      const withAudio = VideoInfo(
+        filePath: '/test/video.mp4',
+        fileName: 'video.mp4',
+        fileSizeBytes: 1024,
+        durationSeconds: 10.0,
+        width: 1920,
+        height: 1080,
+        bitrate: 5000000,
+        fps: 30.0,
+        codec: 'h264',
+        audioCodec: 'aac',
+        hasAudio: true,
+      );
+      expect(withAudio.hasAudio, isTrue);
+      expect(withAudio.audioCodec, equals('aac'));
+
+      const withoutAudio = VideoInfo(
+        filePath: '/test/silent.mp4',
+        fileName: 'silent.mp4',
+        fileSizeBytes: 512,
+        durationSeconds: 5.0,
+        width: 1280,
+        height: 720,
+        bitrate: 2000000,
+        fps: 30.0,
+        codec: 'h264',
+        hasAudio: false,
+      );
+      expect(withoutAudio.hasAudio, isFalse);
+      expect(withoutAudio.audioCodec, isNull);
+    });
+
+    test('no_audio_track localization resolves properly across all 6 languages', () {
+      for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
+        final l10n = AppLocalizations(code);
+        final translated = l10n.t('no_audio_track');
+        expect(translated.isNotEmpty, isTrue);
+        expect(translated, isNot(equals('no_audio_track')));
+      }
+    });
+
+    test('FFmpegService getOutputDirectory respects custom path and isAudio flag', () async {
+      final customDir = Directory('${tempDir.path}${Platform.pathSeparator}CustomAudio');
+      customDir.createSync();
+
+      // Custom path provided with isAudio: true
+      final outDirCustomAudio = await FFmpegService.getOutputDirectory(
+        customPath: customDir.path,
+        isAudio: true,
+      );
+      expect(outDirCustomAudio.path, equals(customDir.path));
+
+      // Custom path provided with isAudio: false
+      final outDirCustomVideo = await FFmpegService.getOutputDirectory(
+        customPath: customDir.path,
+        isAudio: false,
+      );
+      expect(outDirCustomVideo.path, equals(customDir.path));
     });
   });
 }
