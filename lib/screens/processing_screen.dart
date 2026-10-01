@@ -729,15 +729,18 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  maxLines: 1,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -769,7 +772,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               _buildInfoRow(
                 theme,
                 l10n.t('proc_target'),
-                '$audioFmt Audio',
+                '$audioFmt ${l10n.t('category_audio')}',
                 bitrate,
               ),
               Divider(height: 20, color: theme.colorScheme.outline),
@@ -777,7 +780,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 theme,
                 l10n.t('container_format'),
                 audioFmt,
-                'Audio Track',
+                l10n.t('audio_track'),
               ),
               if (_isSuccess && _outputPath != null) ...[
                 Divider(height: 20, color: theme.colorScheme.outline),
@@ -797,7 +800,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                       theme,
                       l10n.t('proc_output_size'),
                       sizeStr,
-                      'Audio Extracted',
+                      l10n.t('audio_extracted'),
                     );
                   },
                 ),
@@ -807,7 +810,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   l10n.t('proc_saved_location'),
                   widget.appSettings.audioOutputDirectory.isNotEmpty
                       ? widget.appSettings.audioOutputDirectory
-                      : 'Music (Default)',
+                      : l10n.t('settings_audio_folder_default'),
                   _outputPath?.split(Platform.pathSeparator).last ?? '',
                 ),
               ],
@@ -1322,20 +1325,26 @@ class _SuccessBottomSheet extends StatelessWidget {
       children: [
         Icon(icon, color: color, size: 24),
         const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: theme.colorScheme.onSurface.withAlpha(130),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: theme.colorScheme.onSurface.withAlpha(130),
+            ),
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ),
       ],

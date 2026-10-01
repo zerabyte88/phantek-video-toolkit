@@ -311,7 +311,7 @@ class FFmpegService {
 
     // Audio options
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
-    if (appSettings.audioBitrateKbps <= 0) {
+    if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
     } else if (encodingOptions.container == VideoContainer.webm ||
               encodingOptions.codec == VideoCodec.vp9) {

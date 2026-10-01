@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.3&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.4&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
@@ -124,10 +124,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.1.3.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.1.4.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.3`) or manual workflow dispatch:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.4`) or manual workflow dispatch:
 - Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
@@ -135,6 +135,14 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ---
 
 ## Release History
+
+### v1.1.4 (Build 14)
+- **Orientation-Agnostic Resolution Classification & Filtering:** Fixed downscale resolution logic for portrait/vertical smartphone videos (e.g. 1080x1920) by filtering against the shorter dimension (`shortDimension`). Portrait videos are accurately identified by their standard target category (e.g. 1080p instead of 2K) and downscale mode correctly hides higher targets like 1440p (2K) to eliminate unintended upscaling.
+- **Silent Video Transcoding Safety:** Transcoding videos that do not contain an audio stream now automatically supplies the `-an` flag to FFmpeg, preventing encoder failures when attempting to encode non-existent audio tracks.
+- **UI Overflow & Truncation Elimination:** Wrapped video and processing metadata value badges in responsive down-scaling widgets (`FittedBox`) to completely eliminate text truncation (e.g. `1920 × 10...` or labels getting cut off) on narrow smartphone screens and compact layouts.
+- **Multi-Language Alignment & Zero Leakage:** Resolved untranslated strings in the processing screen audio summary and settings screen hardware specifications. Fully localized CPU thread units (`unit_core`), audio extraction cards (`audio_track`, `audio_extracted`), and default directories across all 6 supported languages (Indonesian, English, Japanese, Simplified Chinese, Traditional Chinese, Korean).
+- **Comprehensive Hardware Specifications in Settings:** Redesigned device specifications card displaying human-readable Device Name (e.g. `Xiaomi 14T`), Model Code (e.g. `2406APNFAG`), Processor / SoC & Cores (e.g. `MediaTek Dimensity 8300 Ultra (8 Core)`), Graphics Processor / GPU (e.g. `Mali G615-MC6`), Marketed RAM (e.g. `12 GB`), and Internal Storage capacity with free space (e.g. `256 GB (142 GB Free)`), fully localized across all 6 supported languages.
+- **Home Footer Attribution Parity:** Synchronized the author attribution footer on the Home screen to match the Settings screen design (`Made with ❤️ by Zerabyte88` & `Crafted for high performance & offline privacy`).
 
 ### v1.1.3 (Build 13)
 - **Audio Extractor Feature:** Added high-speed on-device audio extraction mode to extract tracks directly from video into **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with ultra-fast stream copy or customizable bitrate.

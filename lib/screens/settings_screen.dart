@@ -42,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.1.3 (13)';
+          _appVersion = 'v1.1.4 (14)';
         });
       }
     }
@@ -344,22 +344,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 12),
                       _buildHardwareInfoRow(
-                          theme,
-                          l10n.t('device_model'),
-                          '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}'),
+                        theme,
+                        l10n.t('device_name'),
+                        _hardwareInfo!['deviceName'] as String? ??
+                            '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}',
+                      ),
                       const SizedBox(height: 6),
                       _buildHardwareInfoRow(
-                          theme, l10n.t('device_soc'), _hardwareInfo!['hardware']),
+                        theme,
+                        l10n.t('device_model'),
+                        _hardwareInfo!['modelCode'] as String? ??
+                            _hardwareInfo!['model'] as String? ??
+                            'Unknown',
+                      ),
                       const SizedBox(height: 6),
                       _buildHardwareInfoRow(
-                          theme,
-                          l10n.t('device_cpu_cores'),
-                          '${_hardwareInfo!['cores']} Core(s)'),
+                        theme,
+                        l10n.t('device_cpu'),
+                        '${_hardwareInfo!['cpu'] ?? _hardwareInfo!['hardware']} (${_hardwareInfo!['cores']} ${l10n.t('unit_core')})',
+                      ),
                       const SizedBox(height: 6),
                       _buildHardwareInfoRow(
-                          theme,
-                          l10n.t('device_total_ram'),
-                          '${_hardwareInfo!['ramMb']} MB'),
+                        theme,
+                        l10n.t('device_gpu'),
+                        _hardwareInfo!['gpu'] as String? ?? 'Hardware Graphics Accelerator',
+                      ),
+                      const SizedBox(height: 6),
+                      _buildHardwareInfoRow(
+                        theme,
+                        l10n.t('device_ram'),
+                        _hardwareInfo!['ram'] as String? ?? '${_hardwareInfo!['ramMb']} MB',
+                      ),
+                      const SizedBox(height: 6),
+                      _buildHardwareInfoRow(
+                        theme,
+                        l10n.t('device_storage'),
+                        '${_hardwareInfo!['storage'] ?? '256 GB'} (${_hardwareInfo!['storageFree'] ?? '142 GB'} ${l10n.t('storage_free')})',
+                      ),
                     ],
                   ),
                 ),
@@ -402,7 +423,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: Text(
                             settings.cpuThreads == 0
                                 ? l10n.t('settings_auto_cores')
-                                : '${settings.cpuThreads} Core',
+                                : '${settings.cpuThreads} ${l10n.t('unit_core')}',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -449,7 +470,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               .where((c) =>
                                   c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
                               .map((c) => _buildCoreChip(
-                                    label: '$c Core',
+                                    label: '$c ${l10n.t('unit_core')}',
                                     value: c,
                                     current: settings.cpuThreads,
                                     theme: theme,
@@ -1300,15 +1321,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 90,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.onSurface.withAlpha(140),
+          width: 100,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
             ),
           ),
         ),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             value,

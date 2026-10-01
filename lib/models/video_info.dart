@@ -48,13 +48,17 @@ class VideoInfo {
     this.audioCodec,
   });
 
+  /// Dimension used for resolution classification (shorter edge, consistent across landscape and portrait).
+  int get shortDimension => width < height ? width : height;
+
   String get resolution {
-    if (height >= 2160) return '4K';
-    if (height >= 1440) return '2K';
-    if (height >= 1080) return '1080p';
-    if (height >= 720) return '720p';
-    if (height >= 480) return '480p';
-    return '${height}p';
+    final dim = shortDimension;
+    if (dim >= 2160) return '4K';
+    if (dim >= 1440) return '2K';
+    if (dim >= 1080) return '1080p';
+    if (dim >= 720) return '720p';
+    if (dim >= 480) return '480p';
+    return '${dim}p';
   }
 
   String get formattedDuration {
@@ -86,13 +90,14 @@ class VideoInfo {
   }
 
   List<VideoResolution> get availableDownscaleTargets {
+    final dim = shortDimension;
     final targets = <VideoResolution>[
       VideoResolution(
         label: 'Original ($resolution)',
         width: width,
         height: height,
       ),
-      ...VideoResolution.standardResolutions.where((r) => r.height < height),
+      ...VideoResolution.standardResolutions.where((r) => r.height < dim),
     ];
     return targets;
   }

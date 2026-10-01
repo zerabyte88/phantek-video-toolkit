@@ -157,11 +157,11 @@ class _HomeScreenState extends State<HomeScreen> {
       return targets;
     }
 
-    final h = info.height;
+    final dim = info.shortDimension;
 
     if (mode == _AppMode.downscale) {
       final downscaleOptions =
-          VideoResolution.standardResolutions.where((r) => r.height < h).toList();
+          VideoResolution.standardResolutions.where((r) => r.height < dim).toList();
       if (downscaleOptions.isEmpty) {
         targets.add(VideoResolution(
           label: 'Original (${info.resolution})',
@@ -726,31 +726,41 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMadeWithLoveFooter(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Made with ',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.onSurface.withAlpha(120),
-              letterSpacing: 0.2,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Made with ',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: theme.colorScheme.onSurface.withAlpha(150),
+                ),
+              ),
+              const Icon(
+                Icons.favorite_rounded,
+                size: 15,
+                color: Color(0xFFEF4444),
+              ),
+              Text(
+                ' by Zerabyte88',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface.withAlpha(220),
+                ),
+              ),
+            ],
           ),
-          const Icon(
-            Icons.favorite_rounded,
-            size: 14,
-            color: Color(0xFFEF4444),
-          ),
+          const SizedBox(height: 4),
           Text(
-            ' love',
+            'Crafted for high performance & offline privacy',
             style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.onSurface.withAlpha(120),
-              letterSpacing: 0.2,
+              fontSize: 11,
+              color: theme.colorScheme.onSurface.withAlpha(100),
             ),
           ),
         ],
