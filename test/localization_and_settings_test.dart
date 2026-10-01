@@ -390,6 +390,10 @@ void main() {
       const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
+        expect(l10n.t('category_video').isNotEmpty, isTrue);
+        expect(l10n.t('category_audio').isNotEmpty, isTrue);
+        expect(l10n.t('category_video'), isNot(equals('category_video')));
+        expect(l10n.t('category_audio'), isNot(equals('category_audio')));
         expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
         expect(l10n.t('audio_options').isNotEmpty, isTrue);
         expect(l10n.t('audio_format').isNotEmpty, isTrue);

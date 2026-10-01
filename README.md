@@ -13,7 +13,7 @@
 
 <br/>
 
-**Phantek** (Phantek - Video Toolkit) is an offline, on-device mobile video transcoding, downscaling, and format conversion application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
+**Phantek** (Phantek - Video Toolkit) is an offline, on-device mobile video transcoding, downscaling, format conversion, and audio extraction application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) and extracts audio tracks directly on the device without requiring network access or external server infrastructure.
 
 ---
 
@@ -44,7 +44,7 @@ Video transcoding requires sustained CPU utilization over extended durations. Th
 
 ### Refined Human-Crafted User Interface (Material 3)
 - **Modern Clean Design:** Completely overhauled UI free of generic AI-generated aesthetics (no neon gradients, no clashing rainbow icons, and no oversized glowing cards).
-- **Native Segmented Control:** Intuitive toggle across modes (**Convert**, **Downscale**, and **Audio Extractor**) arranged cleanly in ergonomic sequence.
+- **Categorized Mode Selector:** Intuitive top selector bar grouped into dedicated media categories: **Video** (housing **Convert** and **Downscale**) and **Audio** (housing **Audio Extractor**), with proportional button sizing and dynamic active-category highlighting.
 - **Dedicated Audio Extractor:** Directly strips audio tracks from video into high-quality **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with optional ultra-fast stream copy or customizable bitrate.
 - **Elegant Drop / Import Zone:** Streamlined video selection experience with responsive layout and clear specification tags.
 - **Seamless Return-to-Home Flow:** Success sheet includes a single-tap "Kembali ke Beranda" (Return to Home) button that cleanly resets the session, ready for subsequent tasks.
@@ -138,7 +138,7 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 
 ### v1.1.3 (Build 13)
 - **Audio Extractor Feature:** Added high-speed on-device audio extraction mode to extract tracks directly from video into **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with ultra-fast stream copy or customizable bitrate.
-- **Removed Upscale Feature & Reordered Modes:** Completely replaced Upscale with Audio Extractor. Mode selector is now ordered from left to right: **Convert**, **Downscale**, and **Extractor**.
+- **Categorized Media Mode Bar:** Completely replaced Upscale with Audio Extractor. Reorganized the top mode selector into two dedicated category groups: **Video** (containing **Convert** and **Downscale**) and **Audio** (containing **Audio Extractor**) with adaptive responsive button sizing, dynamic active-group highlighting, and localized headers across all 6 languages.
 - **CPU Preset Streamlining:** Removed the Slow preset in Settings, leaving 2 straightforward, practical options: **Fast** and **Normal** (balanced). Existing saved configurations automatically migrate.
 - **Centered Settings Layout:** All interactive chips and button groups across Settings (CPU Cores, RAM Buffer, CPU Preset, Audio Quality, and Output Directory) are neatly center-aligned for optimal visual balance.
 - **App Rebranding & Title:** Shortened app display name to **Phantek** with formal title **Phantek - Video Toolkit**.
