@@ -21,6 +21,7 @@ class ProcessingScreen extends StatefulWidget {
   final VideoResolution targetResolution;
   final EncodingOptions encodingOptions;
   final AppSettings appSettings;
+  final bool isAudioExtraction;
 
   const ProcessingScreen({
     super.key,
@@ -28,6 +29,7 @@ class ProcessingScreen extends StatefulWidget {
     required this.targetResolution,
     this.encodingOptions = const EncodingOptions(),
     this.appSettings = const AppSettings(),
+    this.isAudioExtraction = false,
   });
 
   @override
@@ -57,7 +59,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   void initState() {
     super.initState();
     ForegroundServiceManager().requestPermissions();
-    _statusText = _settingsService.l10n.t('proc_preparing');
+    _statusText = widget.isAudioExtraction
+        ? _settingsService.l10n.t('proc_extracting')
+        : _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -120,13 +124,17 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     await ForegroundServiceManager().requestPermissions();
 
+    final actionText = widget.isAudioExtraction
+        ? l10n.t('proc_extracting')
+        : l10n.t('proc_converting');
+
     setState(() {
-      _statusText = l10n.t('proc_converting');
+      _statusText = actionText;
     });
 
     await ForegroundServiceManager().startService(
       title: l10n.t('app_title'),
-      text: '${l10n.t('proc_converting')} 0.0%',
+      text: '$actionText 0.0%',
     );
 
     // 1-second timer to update elapsed and remaining time continuously
@@ -163,63 +171,116 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       });
     });
 
-    final result = await FFmpegService.processVideo(
-      sourceVideo: widget.videoInfo,
-      targetResolution: widget.targetResolution,
-      encodingOptions: widget.encodingOptions,
-      appSettings: widget.appSettings,
-      onProgress: (progress, stats) {
-        String speed = '';
-        String size = '';
-        if (stats.contains('|')) {
-          final parts = stats.split('|');
-          size = parts[0].replaceAll('Size:', '').trim();
-          speed = parts[1].replaceAll('Speed:', '').trim();
-        }
+    final result = widget.isAudioExtraction
+        ? await FFmpegService.extractAudio(
+            sourceVideo: widget.videoInfo,
+            audioFormat: widget.encodingOptions.audioFormat,
+            audioBitrateKbps: widget.encodingOptions.audioExtractBitrateKbps,
+            appSettings: widget.appSettings,
+            onProgress: (progress, stats) {
+              String speed = '';
+              String size = '';
+              if (stats.contains('|')) {
+                final parts = stats.split('|');
+                size = parts[0].replaceAll('Size:', '').trim();
+                speed = parts[1].replaceAll('Speed:', '').trim();
+              }
 
-        final now = DateTime.now();
-        final elapsed =
-            _startTime != null ? now.difference(_startTime!) : Duration.zero;
-        final remaining = _calculateRemainingTime(progress, elapsed);
-        final etaStr =
-            remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+              final now = DateTime.now();
+              final elapsed =
+                  _startTime != null ? now.difference(_startTime!) : Duration.zero;
+              final remaining = _calculateRemainingTime(progress, elapsed);
+              final etaStr =
+                  remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
 
-        // Always update foreground notification even if app is minimized
-        ForegroundServiceManager().updateService(
-          title: l10n.t('app_title'),
-          text:
-              '${l10n.t('proc_converting')} ${_formatPercentage(progress)}$etaStr',
-        );
+              ForegroundServiceManager().updateService(
+                title: l10n.t('app_title'),
+                text: '$actionText ${_formatPercentage(progress)}$etaStr',
+              );
 
-        if (mounted) {
-          setState(() {
-            _progress = progress;
-            _elapsedDuration = elapsed;
-            if (remaining != null) {
-              _estimatedRemaining = remaining;
-            }
-            _speedText = speed;
-            _currentSizeText = size;
-            _statusText =
-                '${l10n.t('proc_converting')} ${_formatPercentage(progress)}';
-          });
-        }
-      },
-      onLog: (log) {
-        if (mounted) {
-          if (log.contains('Encoding failed:') ||
-              log.toLowerCase().contains('error')) {
-            _errorMessage = log.replaceFirst('\nEncoding failed: ', '').trim();
-          }
-          debugPrint(log);
-        }
-      },
-    );
+              if (mounted) {
+                setState(() {
+                  _progress = progress;
+                  _elapsedDuration = elapsed;
+                  if (remaining != null) {
+                    _estimatedRemaining = remaining;
+                  }
+                  _speedText = speed;
+                  _currentSizeText = size;
+                  _statusText =
+                      '$actionText ${_formatPercentage(progress)}';
+                });
+              }
+            },
+            onLog: (log) {
+              if (mounted) {
+                if (log.contains('Extraction failed:') ||
+                    log.toLowerCase().contains('error')) {
+                  _errorMessage = log.replaceFirst('\nExtraction failed: ', '').trim();
+                }
+                debugPrint(log);
+              }
+            },
+          )
+        : await FFmpegService.processVideo(
+            sourceVideo: widget.videoInfo,
+            targetResolution: widget.targetResolution,
+            encodingOptions: widget.encodingOptions,
+            appSettings: widget.appSettings,
+            onProgress: (progress, stats) {
+              String speed = '';
+              String size = '';
+              if (stats.contains('|')) {
+                final parts = stats.split('|');
+                size = parts[0].replaceAll('Size:', '').trim();
+                speed = parts[1].replaceAll('Speed:', '').trim();
+              }
+
+              final now = DateTime.now();
+              final elapsed =
+                  _startTime != null ? now.difference(_startTime!) : Duration.zero;
+              final remaining = _calculateRemainingTime(progress, elapsed);
+              final etaStr =
+                  remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+
+              // Always update foreground notification even if app is minimized
+              ForegroundServiceManager().updateService(
+                title: l10n.t('app_title'),
+                text:
+                    '$actionText ${_formatPercentage(progress)}$etaStr',
+              );
+
+              if (mounted) {
+                setState(() {
+                  _progress = progress;
+                  _elapsedDuration = elapsed;
+                  if (remaining != null) {
+                    _estimatedRemaining = remaining;
+                  }
+                  _speedText = speed;
+                  _currentSizeText = size;
+                  _statusText =
+                      '$actionText ${_formatPercentage(progress)}';
+                });
+              }
+            },
+            onLog: (log) {
+              if (mounted) {
+                if (log.contains('Encoding failed:') ||
+                    log.toLowerCase().contains('error')) {
+                  _errorMessage = log.replaceFirst('\nEncoding failed: ', '').trim();
+                }
+                debugPrint(log);
+              }
+            },
+          );
 
     if (result != null) {
       ForegroundServiceManager().updateService(
         title: l10n.t('app_title'),
-        text: l10n.t('proc_notif_completed'),
+        text: widget.isAudioExtraction
+            ? l10n.t('proc_audio_completed')
+            : l10n.t('proc_notif_completed'),
         force: true,
       );
     }
@@ -275,6 +336,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           outputSize: size,
           outputPath: _outputPath!,
           codec: widget.encodingOptions.codec,
+          isAudioExtraction: widget.isAudioExtraction,
         ),
       ).then((res) {
         if (mounted) {
@@ -316,8 +378,14 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         return 'video/quicktime';
       case 'webm':
         return 'video/webm';
+      case 'mp3':
+        return 'audio/mpeg';
+      case 'm4a':
+        return 'audio/mp4';
+      case 'wav':
+        return 'audio/wav';
       default:
-        return 'video/*';
+        return null;
     }
   }
 
@@ -935,12 +1003,14 @@ class _SuccessBottomSheet extends StatelessWidget {
   final int outputSize;
   final String outputPath;
   final VideoCodec? codec;
+  final bool isAudioExtraction;
 
   const _SuccessBottomSheet({
     required this.originalSize,
     required this.outputSize,
     required this.outputPath,
     this.codec,
+    this.isAudioExtraction = false,
   });
 
   String _formatSize(int bytes) {
@@ -1098,10 +1168,19 @@ class _SuccessBottomSheet extends StatelessWidget {
                     type: _ProcessingScreenState.getMimeType(outputPath),
                   );
                 },
-                icon: const Icon(Icons.play_arrow_rounded, size: 20),
-                label: Text(l10n.t('proc_play_video')),
+                icon: Icon(
+                  isAudioExtraction
+                      ? Icons.audiotrack_rounded
+                      : Icons.play_arrow_rounded,
+                  size: 20,
+                ),
+                label: Text(
+                  isAudioExtraction
+                      ? l10n.t('proc_play_audio')
+                      : l10n.t('proc_play_video'),
+                ),
               ),
-              if (codec == VideoCodec.hevc || codec == VideoCodec.vp9) ...[
+              if (!isAudioExtraction && (codec == VideoCodec.hevc || codec == VideoCodec.vp9)) ...[
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),

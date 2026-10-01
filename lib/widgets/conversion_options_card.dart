@@ -100,27 +100,29 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               theme: theme,
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: RateControlMode.values.map((mode) {
-                final isSelected =
-                    widget.encodingOptions.rateControlMode == mode;
-                return ChoiceChip(
-                  showCheckmark: false,
-                  label: Text(mode.displayName),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(
-                          rateControlMode: mode,
-                        ),
-                      );
-                    }
-                  },
-                );
-              }).toList(),
+            Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 6,
+                runSpacing: 6,
+                children: RateControlMode.values.map((mode) {
+                  final isSelected =
+                      widget.encodingOptions.rateControlMode == mode;
+                  return _buildChoiceChip(
+                    label: mode.displayName,
+                    isSelected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        widget.onOptionsChanged(
+                          widget.encodingOptions.copyWith(
+                            rateControlMode: mode,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
             ),
             const SizedBox(height: 10),
             Container(
@@ -261,46 +263,48 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
 
             // 3. Format / Container Selection
             _buildSectionLabel(
-              icon: Icons.folder_zip_outlined,
+              icon: Icons.video_file_outlined,
               title: l10n.t('container_format'),
               theme: theme,
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: (widget.showCodecSelection
-                      ? VideoContainer.values
-                      : VideoContainer.values
-                          .where((c) => c != VideoContainer.webm))
-                  .map((format) {
-                final isSelected = widget.encodingOptions.container == format;
-                return ChoiceChip(
-                  showCheckmark: false,
-                  label: Text('${format.displayName} (.${format.extension})'),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      VideoCodec newCodec = widget.encodingOptions.codec;
-                      if (!widget.showCodecSelection) {
-                        newCodec = VideoCodec.h264;
-                      } else if (format == VideoContainer.webm) {
-                        newCodec = VideoCodec.vp9;
-                      } else if (format != VideoContainer.webm &&
-                          format != VideoContainer.mkv &&
-                          newCodec == VideoCodec.vp9) {
-                        newCodec = VideoCodec.h264;
+            Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 6,
+                runSpacing: 6,
+                children: (widget.showCodecSelection
+                        ? VideoContainer.values
+                        : VideoContainer.values
+                            .where((c) => c != VideoContainer.webm))
+                    .map((format) {
+                  final isSelected = widget.encodingOptions.container == format;
+                  return _buildChoiceChip(
+                    label: '${format.displayName} (.${format.extension})',
+                    isSelected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        VideoCodec newCodec = widget.encodingOptions.codec;
+                        if (!widget.showCodecSelection) {
+                          newCodec = VideoCodec.h264;
+                        } else if (format == VideoContainer.webm) {
+                          newCodec = VideoCodec.vp9;
+                        } else if (format != VideoContainer.webm &&
+                            format != VideoContainer.mkv &&
+                            newCodec == VideoCodec.vp9) {
+                          newCodec = VideoCodec.h264;
+                        }
+                        widget.onOptionsChanged(
+                          widget.encodingOptions.copyWith(
+                            container: format,
+                            codec: newCodec,
+                          ),
+                        );
                       }
-                      widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(
-                          container: format,
-                          codec: newCodec,
-                        ),
-                      );
-                    }
-                  },
-                );
-              }).toList(),
+                    },
+                  );
+                }).toList(),
+              ),
             ),
             const SizedBox(height: 8),
             Container(
@@ -344,37 +348,39 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 theme: theme,
               ),
               const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: VideoCodec.values.map((codec) {
-                  bool isCompatible = true;
-                  if (widget.encodingOptions.container == VideoContainer.webm &&
-                      codec != VideoCodec.vp9) {
-                    isCompatible = false;
-                  }
-                  if ((widget.encodingOptions.container == VideoContainer.mp4 ||
-                          widget.encodingOptions.container == VideoContainer.mov) &&
-                      codec == VideoCodec.vp9) {
-                    isCompatible = false;
-                  }
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: VideoCodec.values.map((codec) {
+                    bool isCompatible = true;
+                    if (widget.encodingOptions.container == VideoContainer.webm &&
+                        codec != VideoCodec.vp9) {
+                      isCompatible = false;
+                    }
+                    if ((widget.encodingOptions.container == VideoContainer.mp4 ||
+                            widget.encodingOptions.container == VideoContainer.mov) &&
+                        codec == VideoCodec.vp9) {
+                      isCompatible = false;
+                    }
 
-                  final isSelected = widget.encodingOptions.codec == codec;
-                  return ChoiceChip(
-                    showCheckmark: false,
-                    label: Text(codec.displayName),
-                    selected: isSelected,
-                    onSelected: isCompatible
-                        ? (selected) {
-                            if (selected) {
-                              widget.onOptionsChanged(
-                                widget.encodingOptions.copyWith(codec: codec),
-                              );
+                    final isSelected = widget.encodingOptions.codec == codec;
+                    return _buildChoiceChip(
+                      label: codec.displayName,
+                      isSelected: isSelected,
+                      onSelected: isCompatible
+                          ? (selected) {
+                              if (selected) {
+                                widget.onOptionsChanged(
+                                  widget.encodingOptions.copyWith(codec: codec),
+                                );
+                              }
                             }
-                          }
-                        : null,
-                  );
-                }).toList(),
+                          : null,
+                    );
+                  }).toList(),
+                ),
               ),
               const SizedBox(height: 8),
               Container(
@@ -471,6 +477,29 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildChoiceChip({
+    required String label,
+    required bool isSelected,
+    required ValueChanged<bool>? onSelected,
+    double fontSize = 12,
+  }) {
+    return ChoiceChip(
+      showCheckmark: false,
+      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+      selected: isSelected,
+      onSelected: onSelected,
     );
   }
 
@@ -571,47 +600,47 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           theme: theme,
         ),
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            ChoiceChip(
-              showCheckmark: false,
-              label: Text(l10n.t('fps_original')),
-              selected: widget.encodingOptions.targetFps == 0,
-              onSelected: (val) {
-                if (val) {
-                  widget.onOptionsChanged(
-                    widget.encodingOptions.copyWith(targetFps: 0),
-                  );
-                }
-              },
-            ),
-            ChoiceChip(
-              showCheckmark: false,
-              label: const Text('30 FPS'),
-              selected: widget.encodingOptions.targetFps == 30,
-              onSelected: (val) {
-                if (val) {
-                  widget.onOptionsChanged(
-                    widget.encodingOptions.copyWith(targetFps: 30),
-                  );
-                }
-              },
-            ),
-            ChoiceChip(
-              showCheckmark: false,
-              label: const Text('24 FPS'),
-              selected: widget.encodingOptions.targetFps == 24,
-              onSelected: (val) {
-                if (val) {
-                  widget.onOptionsChanged(
-                    widget.encodingOptions.copyWith(targetFps: 24),
-                  );
-                }
-              },
-            ),
-          ],
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _buildChoiceChip(
+                label: l10n.t('fps_original'),
+                isSelected: widget.encodingOptions.targetFps == 0,
+                onSelected: (val) {
+                  if (val) {
+                    widget.onOptionsChanged(
+                      widget.encodingOptions.copyWith(targetFps: 0),
+                    );
+                  }
+                },
+              ),
+              _buildChoiceChip(
+                label: '30 FPS',
+                isSelected: widget.encodingOptions.targetFps == 30,
+                onSelected: (val) {
+                  if (val) {
+                    widget.onOptionsChanged(
+                      widget.encodingOptions.copyWith(targetFps: 30),
+                    );
+                  }
+                },
+              ),
+              _buildChoiceChip(
+                label: '24 FPS',
+                isSelected: widget.encodingOptions.targetFps == 24,
+                onSelected: (val) {
+                  if (val) {
+                    widget.onOptionsChanged(
+                      widget.encodingOptions.copyWith(targetFps: 24),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );

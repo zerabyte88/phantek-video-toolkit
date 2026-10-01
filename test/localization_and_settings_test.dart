@@ -22,7 +22,8 @@ void main() {
     test('Translations resolve correctly for all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
-        expect(l10n.t('app_title'), 'Phantek Video Toolkit');
+        expect(l10n.t('app_title'), 'Phantek');
+        expect(l10n.t('app_long_title'), 'Phantek - Video Toolkit');
         expect(l10n.t('pick_video').isNotEmpty, isTrue);
         expect(l10n.t('settings_title').isNotEmpty, isTrue);
         expect(l10n.t('loading_analyzing').isNotEmpty, isTrue);
@@ -370,6 +371,80 @@ void main() {
 
       // Check available downscale targets label
       expect(v720.availableDownscaleTargets.first.label, equals('Original (720p)'));
+    });
+
+    test('Navigation and options reset localization keys resolve correctly in all 6 languages', () {
+      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('back_to_home').isNotEmpty, isTrue);
+        expect(l10n.t('reset_options').isNotEmpty, isTrue);
+        expect(l10n.t('options_reset_success').isNotEmpty, isTrue);
+        expect(l10n.t('back_to_home'), isNot(equals('back_to_home')));
+        expect(l10n.t('reset_options'), isNot(equals('reset_options')));
+        expect(l10n.t('options_reset_success'), isNot(equals('options_reset_success')));
+      }
+    });
+
+    test('Audio Extractor localization keys resolve properly in all 6 languages', () {
+      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
+        expect(l10n.t('audio_options').isNotEmpty, isTrue);
+        expect(l10n.t('audio_format').isNotEmpty, isTrue);
+        expect(l10n.t('audio_bitrate').isNotEmpty, isTrue);
+        expect(l10n.t('audio_copy').isNotEmpty, isTrue);
+        expect(l10n.t('start_audio_extraction').isNotEmpty, isTrue);
+        expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
+        expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
+        expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
+        expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
+      }
+    });
+  });
+
+  group('Audio Extractor and Format tests', () {
+    late Directory tempDir;
+
+    setUp(() {
+      tempDir = Directory.systemTemp.createTempSync('audio_test_');
+    });
+
+    tearDown(() {
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('AudioFormat values have correct codecs and extensions', () {
+      expect(AudioFormat.mp3.extension, equals('mp3'));
+      expect(AudioFormat.mp3.ffmpegCodec, equals('libmp3lame'));
+
+      expect(AudioFormat.m4a.extension, equals('m4a'));
+      expect(AudioFormat.m4a.ffmpegCodec, equals('aac'));
+
+      expect(AudioFormat.wav.extension, equals('wav'));
+      expect(AudioFormat.wav.ffmpegCodec, equals('pcm_s16le'));
+    });
+
+    test('generateUniqueAudioOutputPath generates clean unique audio filenames', () async {
+      final sep = Platform.pathSeparator;
+      final path1 = await FFmpegService.generateUniqueAudioOutputPath(
+        outputDir: tempDir,
+        fileName: 'clip.mp4',
+        audioFormat: AudioFormat.mp3,
+      );
+      expect(path1, equals('${tempDir.path}${sep}clip-audio.mp3'));
+
+      // Create file and check incremental naming
+      File(path1).createSync();
+      final path2 = await FFmpegService.generateUniqueAudioOutputPath(
+        outputDir: tempDir,
+        fileName: 'clip.mp4',
+        audioFormat: AudioFormat.mp3,
+      );
+      expect(path2, equals('${tempDir.path}${sep}clip-audio-2.mp3'));
     });
   });
 }
