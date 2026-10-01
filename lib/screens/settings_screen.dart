@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../models/app_settings.dart';
 import '../services/cache_manager_service.dart';
@@ -42,7 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.1.1 (11)';
+          _appVersion = 'v1.1.2 (12)';
         });
       }
     }
@@ -758,6 +759,136 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 10),
+
+            // Video Output Storage Directory Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.folder_special_outlined,
+                            size: 18,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.t('settings_output_folder'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                settings.outputDirectory.isEmpty
+                                    ? l10n.t('settings_folder_default')
+                                    : settings.outputDirectory,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: settings.outputDirectory.isEmpty
+                                      ? FontWeight.normal
+                                      : FontWeight.w600,
+                                  color: settings.outputDirectory.isEmpty
+                                      ? theme.colorScheme.onSurface.withAlpha(140)
+                                      : theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.t('settings_output_folder_desc'),
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            try {
+                              final selectedDir =
+                                  await FilePicker.getDirectoryPath(
+                                dialogTitle: l10n.t('settings_output_folder'),
+                              );
+                              if (selectedDir != null &&
+                                  selectedDir.trim().isNotEmpty) {
+                                await _settingsService
+                                    .setOutputDirectory(selectedDir.trim());
+                                if (mounted) {
+                                  setState(() {});
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          l10n.t('settings_folder_changed')),
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              debugPrint('Failed to pick directory: $e');
+                            }
+                          },
+                          icon: const Icon(Icons.folder_open_rounded, size: 16),
+                          label: Text(l10n.t('settings_change_folder')),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                          ),
+                        ),
+                        if (settings.outputDirectory.isNotEmpty) ...[
+                          TextButton.icon(
+                            onPressed: () async {
+                              await _settingsService.setOutputDirectory('');
+                              if (mounted) {
+                                setState(() {});
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        l10n.t('settings_folder_changed')),
+                                  ),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.restore_rounded, size: 16),
+                            label: Text(l10n.t('settings_reset_folder')),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),

@@ -116,6 +116,7 @@ void main() {
       expect(settings.languageCode, equals('id'));
       expect(settings.themeMode, equals('dark'));
       expect(settings.keepScreenAwake, isFalse);
+      expect(settings.outputDirectory, equals(''));
     });
 
     test('Serialization to and from JSON works', () {
@@ -127,6 +128,7 @@ void main() {
         languageCode: 'ja',
         themeMode: 'oled',
         keepScreenAwake: true,
+        outputDirectory: '/custom/storage/Movies',
       );
 
       final json = original.toJson();
@@ -139,6 +141,7 @@ void main() {
       expect(restored.languageCode, equals('ja'));
       expect(restored.themeMode, equals('oled'));
       expect(restored.keepScreenAwake, isTrue);
+      expect(restored.outputDirectory, equals('/custom/storage/Movies'));
     });
 
     test('New theme, wakelock, and cache storage translations exist', () {
@@ -154,7 +157,62 @@ void main() {
         expect(l10n.t('settings_storage').isNotEmpty, isTrue);
         expect(l10n.t('settings_cache_size').isNotEmpty, isTrue);
         expect(l10n.t('settings_clear_cache').isNotEmpty, isTrue);
+
+        // v1.1.2 new keys
+        expect(l10n.t('codec_hevc_warning').isNotEmpty, isTrue);
+        expect(l10n.t('codec_vp9_warning').isNotEmpty, isTrue);
+        expect(l10n.t('codec_compat_hint').isNotEmpty, isTrue);
+        expect(l10n.t('back_to_home').isNotEmpty, isTrue);
+        expect(l10n.t('settings_output_folder').isNotEmpty, isTrue);
+        expect(l10n.t('settings_output_folder_desc').isNotEmpty, isTrue);
+        expect(l10n.t('settings_change_folder').isNotEmpty, isTrue);
+        expect(l10n.t('settings_reset_folder').isNotEmpty, isTrue);
+        expect(l10n.t('settings_folder_changed').isNotEmpty, isTrue);
+        expect(l10n.t('settings_folder_default').isNotEmpty, isTrue);
       }
+    });
+
+    test('AppSettings copyWith properly updates outputDirectory and other fields', () {
+      const original = AppSettings();
+      final updated = original.copyWith(
+        outputDirectory: '/custom/path',
+        keepScreenAwake: true,
+      );
+
+      expect(updated.outputDirectory, equals('/custom/path'));
+      expect(updated.keepScreenAwake, isTrue);
+      expect(updated.cpuThreads, equals(original.cpuThreads));
+      expect(updated.themeMode, equals(original.themeMode));
+    });
+
+    test('FFmpegService getOutputDirectory uses customPath when provided and valid', () async {
+      final customTemp = Directory('${Directory.systemTemp.path}/test_custom_output_${DateTime.now().millisecondsSinceEpoch}');
+      try {
+        final result = await FFmpegService.getOutputDirectory(customPath: customTemp.path);
+        expect(result.path, equals(customTemp.path));
+        expect(await result.exists(), isTrue);
+      } finally {
+        if (await customTemp.exists()) {
+          await customTemp.delete(recursive: true);
+        }
+      }
+    });
+  });
+
+  group('EncodingOptions and Mode Restrictions tests', () {
+    test('Default encoding options uses H264 and MP4 for best stability', () {
+      const opts = EncodingOptions();
+      expect(opts.codec, equals(VideoCodec.h264));
+      expect(opts.container, equals(VideoContainer.mp4));
+    });
+
+    test('Non-convert containers exclude webm for H264 stability', () {
+      final safeContainers =
+          VideoContainer.values.where((c) => c != VideoContainer.webm).toList();
+      expect(safeContainers.contains(VideoContainer.mp4), isTrue);
+      expect(safeContainers.contains(VideoContainer.mkv), isTrue);
+      expect(safeContainers.contains(VideoContainer.mov), isTrue);
+      expect(safeContainers.contains(VideoContainer.webm), isFalse);
     });
   });
 

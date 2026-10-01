@@ -167,21 +167,45 @@ class _HomeScreenState extends State<HomeScreen> {
       if (resolutions.isNotEmpty) {
         _selectedResolution = resolutions.first;
       }
+      if (mode != _AppMode.convert) {
+        _encodingOptions = _encodingOptions.copyWith(
+          codec: VideoCodec.h264,
+          container: _encodingOptions.container == VideoContainer.webm
+              ? VideoContainer.mp4
+              : _encodingOptions.container,
+        );
+      }
     });
   }
 
-  void _startProcessing() {
+  void _startProcessing() async {
     if (_videoInfo == null || _selectedResolution == null) return;
-    Navigator.of(context).push(
+    final options = _selectedMode == _AppMode.convert
+        ? _encodingOptions
+        : _encodingOptions.copyWith(
+            codec: VideoCodec.h264,
+            container: _encodingOptions.container == VideoContainer.webm
+                ? VideoContainer.mp4
+                : _encodingOptions.container,
+          );
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => ProcessingScreen(
           videoInfo: _videoInfo!,
           targetResolution: _selectedResolution!,
-          encodingOptions: _encodingOptions,
+          encodingOptions: options,
           appSettings: _settingsService.settings,
         ),
       ),
     );
+
+    if (result == true && mounted) {
+      setState(() {
+        _videoInfo = null;
+        _selectedResolution = null;
+      });
+      CacheManagerService().clearAllCache();
+    }
   }
 
   // ─── Build ───────────────────────────────────────────────────────────────
@@ -492,6 +516,7 @@ class _HomeScreenState extends State<HomeScreen> {
             resolutions: _getResolutionsForMode(_selectedMode),
             selectedResolution: _selectedResolution,
             encodingOptions: _encodingOptions,
+            showCodecSelection: _selectedMode == _AppMode.convert,
             onResolutionChanged: (res) =>
                 setState(() => _selectedResolution = res),
             onOptionsChanged: (opts) =>
