@@ -205,6 +205,34 @@ void main() {
       expect(targetHeights, equals([720, 480, 360]));
     });
 
+    test('Portrait 1080x1920 video correctly classifies as 1080p and excludes 2K from downscale targets', () {
+      const portrait1080 = VideoInfo(
+        filePath: '/portrait1080.mp4',
+        fileName: 'portrait1080.mp4',
+        width: 1080,
+        height: 1920,
+        durationSeconds: 15,
+        bitrate: 4000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 7500000,
+      );
+
+      expect(portrait1080.shortDimension, equals(1080));
+      expect(portrait1080.resolution, equals('1080p'));
+
+      final targets = portrait1080.availableDownscaleTargets;
+      expect(targets.first.label, equals('Original (1080p)'));
+
+      final targetLabels = targets.map((t) => t.label).toList();
+      expect(targetLabels.contains('2K'), isFalse,
+          reason: 'Portrait 1080p must not offer 2K (1440p) downscale target');
+      expect(targetLabels.contains('4K'), isFalse);
+
+      final downscaledHeights = targets.skip(1).map((t) => t.height).toList();
+      expect(downscaledHeights, equals([720, 480, 360]));
+    });
+
     test('Portrait video aspect ratio dimension calculation swaps width and height correctly', () {
       const portraitSource = VideoInfo(
         filePath: '/portrait.mp4',
@@ -352,6 +380,30 @@ void main() {
 
       expect(silentVideo.hasAudio, isFalse);
       expect(silentVideo.audioCodec, isNull);
+    });
+
+    test('Silent video transcoding logic uses -an instead of audio codec arguments', () {
+      const silentVideo = VideoInfo(
+        filePath: '/silent.mp4',
+        fileName: 'silent.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 10,
+        bitrate: 3000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 3750000,
+        hasAudio: false,
+      );
+
+      const settings = AppSettings(audioBitrateKbps: 128);
+
+      String audioArgs = '-c:a aac -b:a ${settings.audioBitrateKbps}k';
+      if (!silentVideo.hasAudio || settings.audioBitrateKbps <= 0) {
+        audioArgs = '-an';
+      }
+
+      expect(audioArgs, equals('-an'));
     });
   });
 

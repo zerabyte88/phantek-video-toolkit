@@ -557,7 +557,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     children: [
                       Text(
                         res.label.startsWith('Original')
-                            ? '${widget.l10n.t('res_original')} (${res.label.substring(res.label.indexOf('(') + 1)}'
+                            ? (res.label.contains('(')
+                                ? '${widget.l10n.t('res_original')} (${res.label.substring(res.label.indexOf('(') + 1)}'
+                                : widget.l10n.t('res_original'))
                             : res.label,
                         style: TextStyle(
                           fontSize: 14,
@@ -708,14 +710,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   }
 
   Widget _buildQualityBadge(VideoResolution res, ThemeData theme) {
+    final dim = res.width < res.height ? res.width : res.height;
     String label;
-    if (res.height >= 2160) {
+    if (dim >= 2160) {
       label = '4K';
-    } else if (res.height >= 1440) {
+    } else if (dim >= 1440) {
       label = '2K';
-    } else if (res.height >= 1080) {
+    } else if (dim >= 1080) {
       label = 'FHD';
-    } else if (res.height >= 720) {
+    } else if (dim >= 720) {
       label = 'HD';
     } else {
       label = 'SD';

@@ -5,6 +5,7 @@ import 'package:video_downscaler/models/app_settings.dart';
 import 'package:video_downscaler/models/encoding_options.dart';
 import 'package:video_downscaler/models/video_info.dart';
 import 'package:video_downscaler/services/cache_manager_service.dart';
+import 'package:video_downscaler/services/device_spec_helper.dart';
 import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 
@@ -61,6 +62,48 @@ void main() {
         expect(l10n.t('proc_cancel_btn'), isNot(equals('proc_cancel_btn')));
         expect(l10n.t('rate_control'), isNot(equals('rate_control')));
       }
+    });
+
+    test('Device specifications keys resolve properly and accurately in all 6 languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('device_name').isNotEmpty, isTrue);
+        expect(l10n.t('device_model').isNotEmpty, isTrue);
+        expect(l10n.t('device_cpu').isNotEmpty, isTrue);
+        expect(l10n.t('device_gpu').isNotEmpty, isTrue);
+        expect(l10n.t('device_ram').isNotEmpty, isTrue);
+        expect(l10n.t('device_storage').isNotEmpty, isTrue);
+        expect(l10n.t('storage_free').isNotEmpty, isTrue);
+
+        expect(l10n.t('device_name'), isNot(equals('device_name')));
+        expect(l10n.t('device_model'), isNot(equals('device_model')));
+        expect(l10n.t('device_cpu'), isNot(equals('device_cpu')));
+        expect(l10n.t('device_gpu'), isNot(equals('device_gpu')));
+        expect(l10n.t('device_ram'), isNot(equals('device_ram')));
+        expect(l10n.t('device_storage'), isNot(equals('device_storage')));
+        expect(l10n.t('storage_free'), isNot(equals('storage_free')));
+      }
+
+      // Verify language accuracy: Indonesian has 'Nama HP' and 'Penyimpanan'
+      final l10nId = const AppLocalizations('id');
+      expect(l10nId.t('device_name'), equals('Nama HP'));
+      expect(l10nId.t('device_model'), equals('Model HP'));
+      expect(l10nId.t('device_storage'), equals('Penyimpanan'));
+
+      // English has 'Device Name' and 'Storage'
+      final l10nEn = const AppLocalizations('en');
+      expect(l10nEn.t('device_name'), equals('Device Name'));
+      expect(l10nEn.t('device_storage'), equals('Storage'));
+
+      // Korean has '기기 이름' and '저장 공간'
+      final l10nKo = const AppLocalizations('ko');
+      expect(l10nKo.t('device_name'), equals('기기 이름'));
+      expect(l10nKo.t('device_storage'), equals('저장 공간'));
+
+      // Japanese has 'デバイス名' and 'ストレージ'
+      final l10nJa = const AppLocalizations('ja');
+      expect(l10nJa.t('device_name'), equals('デバイス名'));
+      expect(l10nJa.t('device_storage'), equals('ストレージ'));
     });
 
     test('100% of all l10n.t keys used across lib are translated in all 6 supported languages', () {
@@ -526,6 +569,82 @@ void main() {
         isAudio: false,
       );
       expect(outDirCustomVideo.path, equals(customDir.path));
+    });
+
+    test('DeviceSpecHelper getMarketedRamGb calculates accurate marketing RAM capacities', () {
+      expect(DeviceSpecHelper.getMarketedRamGb(7840), equals(8));
+      expect(DeviceSpecHelper.getMarketedRamGb(5800), equals(6));
+      expect(DeviceSpecHelper.getMarketedRamGb(3800), equals(4));
+      expect(DeviceSpecHelper.getMarketedRamGb(11800), equals(12));
+      expect(DeviceSpecHelper.getMarketedRamGb(15800), equals(16));
+      expect(DeviceSpecHelper.getMarketedRamGb(23800), equals(24));
+    });
+
+    test('DeviceSpecHelper SoC and GPU detection correctly maps Snapdragon, Dimensity, and Exynos', () {
+      final snapdragonCpu = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'kalama',
+        manufacturer: 'Qualcomm',
+      );
+      expect(snapdragonCpu, contains('Snapdragon 8 Gen 2'));
+      final snapdragonGpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'qcom',
+        board: 'kalama',
+        socName: snapdragonCpu,
+      );
+      expect(snapdragonGpu, equals('Adreno 740'));
+
+      final dimensityCpu = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6897',
+        board: 'mt6897',
+        manufacturer: 'MediaTek',
+      );
+      expect(dimensityCpu, contains('Dimensity 8300'));
+      final dimensityGpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'mt6897',
+        board: 'mt6897',
+        socName: dimensityCpu,
+      );
+      expect(dimensityGpu, equals('Mali-G615 MC6'));
+
+      final adreno710 = DeviceSpecHelper.detectGpuName(
+        hardware: 'sm6450',
+        board: 'crow',
+        socName: 'Qualcomm Snapdragon 7s Gen 2',
+      );
+      expect(adreno710, equals('Adreno 710'));
+
+      final exynosCpu = DeviceSpecHelper.detectSocName(
+        hardware: 's5e9945',
+        board: 's5e9945',
+        manufacturer: 'Samsung',
+      );
+      expect(exynosCpu, contains('Exynos 2400'));
+      final exynosGpu = DeviceSpecHelper.detectGpuName(
+        hardware: 's5e9945',
+        board: 's5e9945',
+        socName: exynosCpu,
+      );
+      expect(exynosGpu, equals('Samsung Xclipse 940'));
+    });
+
+    test('DeviceSpecHelper getHardwareInfo returns full specifications dictionary with all expected keys', () async {
+      final info = await DeviceSpecHelper.getHardwareInfo();
+      expect(info.containsKey('deviceName'), isTrue);
+      expect(info.containsKey('modelCode'), isTrue);
+      expect(info.containsKey('cpu'), isTrue);
+      expect(info.containsKey('gpu'), isTrue);
+      expect(info.containsKey('ram'), isTrue);
+      expect(info.containsKey('storage'), isTrue);
+      expect(info.containsKey('storageFree'), isTrue);
+      expect(info.containsKey('cores'), isTrue);
+
+      expect((info['deviceName'] as String).isNotEmpty, isTrue);
+      expect((info['modelCode'] as String).isNotEmpty, isTrue);
+      expect((info['cpu'] as String).isNotEmpty, isTrue);
+      expect((info['gpu'] as String).isNotEmpty, isTrue);
+      expect((info['ram'] as String).isNotEmpty, isTrue);
+      expect((info['storage'] as String).isNotEmpty, isTrue);
     });
   });
 }
