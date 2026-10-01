@@ -36,10 +36,6 @@ android {
         // greater than any legacy APK (e.g. v1.0.5 arm64 was 2005), preventing downgrade errors.
         versionCode = if (flutterBaseCode < 10000) 10000 + flutterBaseCode else flutterBaseCode
         versionName = flutter.versionName
-
-        ndk {
-            abiFilters.addAll(listOf("arm64-v8a"))
-        }
     }
 
     splits {

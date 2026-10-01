@@ -7,13 +7,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/Platform-Android-059669?style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/badge/Flutter-3.47.0-0284c7?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Version-v1.0.9-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-v1.1.0-4f46e5?style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" />
   <img src="https://img.shields.io/badge/License-GPLv3-475569?style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
 <br/>
 
-**Phantek Video Toolkit** is an offline, on-device mobile video transcoding and resolution downscaling application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
+**Phantek Video Toolkit** is an offline, on-device mobile video transcoding, downscaling, and format conversion application built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). The application compresses high-bitrate and high-resolution videos (such as 4K and 2K) to standardized formats (1080p, 720p, 480p, 360p, 240p) directly on the device without requiring network access or external server infrastructure.
 
 ---
 
@@ -32,14 +32,21 @@ All scaling, rotation handling, and color normalization operations execute insid
 - **Universal Chroma Subsampling:** Enforces 8-bit `yuv420p` within the filter chain, ensuring full compatibility with default Android system players, Google Photos, WhatsApp, and third-party media players.
 
 ### 3. Background Persistence and Screen-Off Operation
-Video transcoding requires sustained CPU utilization over extended durations. The application implements background persistence protocols compliant with Android 13 and 14:
+Video transcoding requires sustained CPU utilization over extended durations. The application implements background persistence protocols compliant with Android 13, 14, and 15:
 - **Android Foreground Service:** Operates with the `mediaProcessing` foreground service type (`flutter_foreground_task`), displaying live conversion progress in the notification tray.
+- **Alert Once Notification Protocol:** Foreground notification pop-up (*heads-up banner*) triggers strictly once at task start and upon completion. Progress telemetry updates silently in the status bar tray without interrupting the user.
 - **CPU Wakelock:** Employs `wakelock_plus` to hold partial CPU execution locks during encoding, preventing the Android OS from suspending the process when the screen turns off.
 - **Automated Resource Management:** Services and wakelocks are released immediately upon process completion, cancellation, or failure.
 
 ---
 
 ## Key Features
+
+### Refined Human-Crafted User Interface (Material 3)
+- **Modern Clean Design:** Completely overhauled UI free of generic AI-generated aesthetics (no neon gradients, no clashing rainbow icons, and no oversized glowing cards).
+- **Native Segmented Control:** Intuitive toggle between Downscale, Upscale, and Convert modes via native segmented controls.
+- **Elegant Drop / Import Zone:** Streamlined video selection experience with responsive layout and clear specification tags.
+- **Theme Modes:** AMOLED Pitch Black, Slate Midnight Dark, and Clean Light mode with full semantic color tokens.
 
 ### Video Scaling and Codec Management
 - **Resolution Downscaling:** Supports target presets for 1080p, 720p, 480p, 360p, and 240p. Automatic checks prevent accidental upscaling of lower-resolution sources.
@@ -51,20 +58,19 @@ Video transcoding requires sustained CPU utilization over extended durations. Th
 - **Container Support:** MP4 (with `-movflags +faststart`), MKV, MOV, and WebM.
 
 ### Process Telemetry and Error Transparency
-- **Real-Time Monitoring:** Live progress calculation reporting encoding speed (x factor), frames per second, elapsed time, calculated remaining time (ETA), and estimated output size.
-- **Detailed Error Diagnostics:** Captures stderr logs directly from the FFmpeg session. In the event of a failure, a dedicated diagnostics container presents full FFmpeg error logs for troubleshooting.
-- **Non-Destructive Output Naming:** Automatically detects filename collisions in `/storage/emulated/0/Movies` and appends incremental identifiers (`filename-1080p-2.mp4`) to avoid overwriting existing media.
+- **Real-Time Monitoring:** Live progress calculation reporting encoding speed (fps), elapsed time, calculated remaining time (ETA), and estimated output size.
+- **Detailed Error Diagnostics:** Captures stderr logs directly from the FFmpeg session with interactive inspection modals.
+- **Non-Destructive Output Naming:** Automatically detects filename collisions in `/storage/emulated/0/Movies` and appends incremental identifiers (`video-1080p-2.mp4`) to avoid overwriting existing media.
 - **Automated Cache Purge:** Clears temporary cached input streams originating from the native Android file picker to prevent storage bloat.
 
-### Interface and Localization
-- **Theme Modes:** AMOLED Black, Midnight Dark, and Standard Light.
-- **Multi-Language Localization:** Full native string translations for 6 languages:
-  - Bahasa Indonesia
-  - English
-  - 日本語 (Japanese)
-  - 简体中文 (Simplified Chinese)
-  - 繁體中文 (Traditional Chinese)
-  - 한국어 (Korean)
+### Multi-Language Localization
+Full native string translations for 6 languages:
+- Bahasa Indonesia
+- English
+- 日本語 (Japanese)
+- 简体中文 (Simplified Chinese)
+- 繁體中文 (Traditional Chinese)
+- 한국어 (Korean)
 
 ---
 
@@ -98,7 +104,7 @@ flowchart TD
 
 ## Build and Compilation
 
-Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To optimize binary size and memory efficiency on modern smartphones, the application is built exclusively for 64-bit ARM (`arm64-v8a`) architectures, completely deprecating legacy 32-bit and emulator packages.
+Phantek Video Toolkit utilizes native C/C++ shared libraries bundled through `ffmpeg_kit_flutter_new`. To optimize binary size and memory efficiency on modern smartphones, the application is built exclusively for 64-bit ARM (`arm64-v8a`) architectures, completely deprecating legacy 32-bit packages.
 
 ### Local Build Commands
 
@@ -109,11 +115,11 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.0.9.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.1.0.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.0.9`) or manual dispatch:
-- Extracts the version string from `pubspec.yaml`.
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.0`) or manual workflow dispatch:
+- Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
 

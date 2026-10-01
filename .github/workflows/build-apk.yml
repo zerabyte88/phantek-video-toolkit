@@ -72,7 +72,11 @@ jobs:
           VERSION=$(grep '^version: ' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           cd build/app/outputs/flutter-apk/
-          mv app-arm64-v8a-release.apk "Phantek-Video-Toolkit-arm64-v8a-v${VERSION}.apk"
+          if [ -f "app-arm64-v8a-release.apk" ]; then
+            mv app-arm64-v8a-release.apk "Phantek-Video-Toolkit-arm64-v8a-v${VERSION}.apk"
+          elif [ -f "app-release.apk" ]; then
+            mv app-release.apk "Phantek-Video-Toolkit-arm64-v8a-v${VERSION}.apk"
+          fi
 
       - name: 📋 List Generated APKs
         run: |

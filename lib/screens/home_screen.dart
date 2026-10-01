@@ -11,7 +11,7 @@ import '../widgets/video_info_card.dart';
 import 'processing_screen.dart';
 import 'settings_screen.dart';
 
-// ─── Enum untuk mode yang tersedia ─────────────────────────────────────────
+// ─── Enum mode aplikasi ───────────────────────────────────────────────────────
 enum _AppMode { downscale, upscale, convert }
 
 class HomeScreen extends StatefulWidget {
@@ -21,8 +21,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
 
   // State
@@ -33,22 +32,10 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isLoading = false;
   String _loadingMessage = '';
 
-  late AnimationController _loadingAnimController;
-
   @override
   void initState() {
     super.initState();
-    _loadingAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
     CacheManagerService().clearAllCache();
-  }
-
-  @override
-  void dispose() {
-    _loadingAnimController.dispose();
-    super.dispose();
   }
 
   // ─── Video Picking ───────────────────────────────────────────────────────
@@ -88,8 +75,11 @@ class _HomeScreenState extends State<HomeScreen>
         setState(() {
           _isLoading = false;
           _videoInfo = info;
-          if (info != null && info.availableDownscaleTargets.isNotEmpty) {
-            _selectedResolution = info.availableDownscaleTargets.first;
+          if (info != null) {
+            final resolutions = _getResolutionsForMode(_selectedMode, info);
+            if (resolutions.isNotEmpty) {
+              _selectedResolution = resolutions.first;
+            }
           }
         });
 
@@ -123,48 +113,49 @@ class _HomeScreenState extends State<HomeScreen>
 
   // ─── Mode Switching ──────────────────────────────────────────────────────
 
-  List<VideoResolution> _getResolutionsForMode(_AppMode mode) {
-    if (_videoInfo == null) return [];
-    
+  List<VideoResolution> _getResolutionsForMode(_AppMode mode, [VideoInfo? source]) {
+    final info = source ?? _videoInfo;
+    if (info == null) return [];
+
     final targets = <VideoResolution>[];
-    
+
     if (mode == _AppMode.convert) {
       targets.add(VideoResolution(
-        label: 'Original (${_videoInfo!.resolution})',
-        width: _videoInfo!.width,
-        height: _videoInfo!.height,
+        label: 'Original (${info.resolution})',
+        width: info.width,
+        height: info.height,
       ));
       return targets;
     }
-    
-    final h = _videoInfo!.height;
-    
+
+    final h = info.height;
+
     if (mode == _AppMode.upscale) {
-      final upscaleOptions = VideoResolution.standardResolutions.where((r) => r.height > h).toList();
+      final upscaleOptions =
+          VideoResolution.standardResolutions.where((r) => r.height > h).toList();
       if (upscaleOptions.isEmpty) {
-        // Fallback if video is already very high res
         targets.add(VideoResolution(
-          label: 'Original (${_videoInfo!.resolution})',
-          width: _videoInfo!.width,
-          height: _videoInfo!.height,
+          label: 'Original (${info.resolution})',
+          width: info.width,
+          height: info.height,
         ));
       } else {
         targets.addAll(upscaleOptions.reversed);
       }
     } else if (mode == _AppMode.downscale) {
-      final downscaleOptions = VideoResolution.standardResolutions.where((r) => r.height < h).toList();
+      final downscaleOptions =
+          VideoResolution.standardResolutions.where((r) => r.height < h).toList();
       if (downscaleOptions.isEmpty) {
-        // Fallback if video is already very small
         targets.add(VideoResolution(
-          label: 'Original (${_videoInfo!.resolution})',
-          width: _videoInfo!.width,
-          height: _videoInfo!.height,
+          label: 'Original (${info.resolution})',
+          width: info.width,
+          height: info.height,
         ));
       } else {
         targets.addAll(downscaleOptions);
       }
     }
-    
+
     return targets;
   }
 
@@ -214,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen>
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
             ),
-            icon: const Icon(Icons.settings_rounded),
+            icon: const Icon(Icons.settings_outlined),
             tooltip: l10n.t('settings'),
           ),
         ],
@@ -229,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // ─── Loading ─────────────────────────────────────────────────────────────
+  // ─── Loading State ───────────────────────────────────────────────────────
 
   Widget _buildLoadingState(ThemeData theme, l10n) {
     return Center(
@@ -238,44 +229,35 @@ class _HomeScreenState extends State<HomeScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 96,
-                  height: 96,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3.5,
-                    strokeCap: StrokeCap.round,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                AnimatedBuilder(
-                  animation: _loadingAnimController,
-                  builder: (context, _) => Opacity(
-                    opacity: 0.5 + (_loadingAnimController.value * 0.5),
-                    child: Icon(
-                      Icons.movie_filter_rounded,
-                      size: 40,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ],
+            SizedBox(
+              width: 54,
+              height: 54,
+              child: CircularProgressIndicator(
+                strokeWidth: 3.5,
+                color: theme.colorScheme.primary,
+              ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
             Text(
               _loadingMessage.isNotEmpty
                   ? _loadingMessage
                   : l10n.t('loading_analyzing'),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
-            const SizedBox(height: 16),
-            _InfoBanner(
-              icon: Icons.info_outline_rounded,
-              message: l10n.t('loading_large_hint'),
-              color: theme.colorScheme.primary,
+            const SizedBox(height: 10),
+            Text(
+              l10n.t('loading_large_hint'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+                height: 1.4,
+              ),
             ),
           ],
         ),
@@ -287,157 +269,208 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildEmptyState(ThemeData theme, l10n) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Hero icon + headline ─────────────────────────────────
-          _buildHero(theme, l10n),
+          // ── Mode Segmented Control ───────────────────────────────
+          _buildSegmentedModeBar(theme, l10n),
+
+          const SizedBox(height: 20),
+
+          // ── Clean Media Import Box ───────────────────────────────
+          _buildImportCard(theme, l10n),
 
           const SizedBox(height: 28),
 
-          // ── Mode selector ────────────────────────────────────────
-          _buildModeSelector(theme, l10n),
-
-          const SizedBox(height: 24),
-
-          // ── Pick video CTA ───────────────────────────────────────
-          ElevatedButton.icon(
-            onPressed: _pickVideo,
-            icon: const Icon(Icons.video_library_rounded, size: 22),
-            label: Text(l10n.t('pick_video')),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 18),
-            ),
-          ),
+          // ── Feature Checklist (Human & Clean) ────────────────────
+          _buildFeatureHighlights(theme, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildHero(ThemeData theme, l10n) {
-    return Column(
-      children: [
-        // Icon glow
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 130,
-              height: 130,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    theme.colorScheme.primary.withAlpha(35),
-                    theme.colorScheme.primary.withAlpha(0),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withAlpha(22),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.colorScheme.primary.withAlpha(55),
-                  width: 1.5,
-                ),
-              ),
-              child: Icon(
-                Icons.video_settings_rounded,
-                size: 52,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Text(
-          l10n.t('app_title'),
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.3,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          l10n.t('app_tagline'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13,
-            color: theme.colorScheme.onSurface.withAlpha(140),
-            height: 1.6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ─── Mode Selector ───────────────────────────────────────────────────────
-
-  Widget _buildModeSelector(ThemeData theme, l10n) {
+  /// Modern, clean Segmented Control for Mode selection
+  Widget _buildSegmentedModeBar(ThemeData theme, l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 12),
+          padding: const EdgeInsets.only(left: 2, bottom: 8),
           child: Text(
             l10n.t('select_mode'),
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface.withAlpha(170),
-              letterSpacing: 0.3,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface.withAlpha(150),
+              letterSpacing: 0.2,
             ),
           ),
         ),
-        Row(
-          children: [
-            Expanded(
-              child: _ModeCard(
-                icon: Icons.compress_rounded,
-                label: l10n.t('mode_downscale'),
-                sublabel: '4K → 1080p',
-                isSelected: _selectedMode == _AppMode.downscale,
-                isEnabled: true,
-                accentColor: theme.colorScheme.primary,
-                onTap: () => setState(() => _selectedMode = _AppMode.downscale),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.colorScheme.outline),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.compress_rounded,
+                  label: l10n.t('mode_downscale'),
+                  isSelected: _selectedMode == _AppMode.downscale,
+                  onTap: () => _onModeChanged(_AppMode.downscale),
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _ModeCard(
-                icon: Icons.expand_rounded,
-                label: l10n.t('mode_upscale'),
-                sublabel: '1080p → 4K',
-                isSelected: _selectedMode == _AppMode.upscale,
-                isEnabled: true,
-                accentColor: const Color(0xFF5CD85A),
-                onTap: () => _onModeChanged(_AppMode.upscale),
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.expand_rounded,
+                  label: l10n.t('mode_upscale'),
+                  isSelected: _selectedMode == _AppMode.upscale,
+                  onTap: () => _onModeChanged(_AppMode.upscale),
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _ModeCard(
-                icon: Icons.swap_horiz_rounded,
-                label: l10n.t('mode_convert'),
-                sublabel: 'MP4 / MKV / ...',
-                isSelected: _selectedMode == _AppMode.convert,
-                isEnabled: true,
-                accentColor: const Color(0xFFFF9F43),
-                onTap: () => _onModeChanged(_AppMode.convert),
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.swap_horiz_rounded,
+                  label: l10n.t('mode_convert'),
+                  isSelected: _selectedMode == _AppMode.convert,
+                  onTap: () => _onModeChanged(_AppMode.convert),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
-  // ─── Content (video dipilih) ──────────────────────────────────────────────
+  /// Clean, modern Import / Select Video Card
+  Widget _buildImportCard(ThemeData theme, l10n) {
+    return InkWell(
+      onTap: _pickVideo,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outline,
+            width: 1.2,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withAlpha(20),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.file_upload_outlined,
+                size: 32,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.t('pick_video'),
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+                letterSpacing: -0.2,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'MP4, MKV, MOV, WebM (up to 4K / 60 FPS)',
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _pickVideo,
+              icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+              label: Text(l10n.t('pick_video')),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Clean, professional feature highlights row
+  Widget _buildFeatureHighlights(ThemeData theme, l10n) {
+    final features = [
+      (Icons.bolt_rounded, 'Offline & Cepat', 'Diproses langsung di CPU/GPU perangkat Anda'),
+      (Icons.tune_rounded, 'Kontrol CRF & Bitrate', 'Presisi kualitas dan kompresi ukuran file'),
+      (Icons.security_rounded, 'Privasi 100%', 'Tanpa upload ke server atau cloud pihak ketiga'),
+    ];
+
+    return Column(
+      children: features.map((f) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: theme.colorScheme.outline),
+                ),
+                child: Icon(f.$1, size: 16, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      f.$2,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      f.$3,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurface.withAlpha(130),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // ─── Content State (Video Loaded) ─────────────────────────────────────────
 
   Widget _buildContent(ThemeData theme, l10n) {
     return SingleChildScrollView(
@@ -445,13 +478,15 @@ class _HomeScreenState extends State<HomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Mode indicator pill di atas
-          _ActiveModePill(mode: _selectedMode, theme: theme),
-          const SizedBox(height: 12),
+          // Mode switch bar at top
+          _buildSegmentedModeBar(theme, l10n),
+          const SizedBox(height: 14),
 
+          // Video spec info card
           VideoInfoCard(videoInfo: _videoInfo!),
           const SizedBox(height: 14),
 
+          // Options & resolutions
           ConversionOptionsCard(
             sourceVideo: _videoInfo!,
             resolutions: _getResolutionsForMode(_selectedMode),
@@ -466,14 +501,13 @@ class _HomeScreenState extends State<HomeScreen>
 
           const SizedBox(height: 20),
 
-          // Start conversion
+          // Start conversion CTA
           ElevatedButton.icon(
-            onPressed:
-                _selectedResolution != null ? _startProcessing : null,
-            icon: const Icon(Icons.play_arrow_rounded, size: 26),
+            onPressed: _selectedResolution != null ? _startProcessing : null,
+            icon: const Icon(Icons.play_arrow_rounded, size: 22),
             label: Text(l10n.t('start_conversion')),
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: const EdgeInsets.symmetric(vertical: 16),
             ),
           ),
           const SizedBox(height: 10),
@@ -481,10 +515,10 @@ class _HomeScreenState extends State<HomeScreen>
           // Change video
           OutlinedButton.icon(
             onPressed: _pickVideo,
-            icon: const Icon(Icons.swap_horiz_rounded, size: 20),
+            icon: const Icon(Icons.sync_rounded, size: 18),
             label: Text(l10n.t('change_video')),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 13),
             ),
           ),
         ],
@@ -493,248 +527,64 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-// ─── Mode Card Widget ─────────────────────────────────────────────────────────
+// ─── Segment Item Component ──────────────────────────────────────────────────
 
-class _ModeCard extends StatelessWidget {
+class _SegmentItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String sublabel;
   final bool isSelected;
-  final bool isEnabled;
-  final Color accentColor;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
-  const _ModeCard({
+  const _SegmentItem({
     required this.icon,
     required this.label,
-    required this.sublabel,
     required this.isSelected,
-    required this.isEnabled,
-    required this.accentColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    // Warna berdasarkan state
-    final Color bgColor;
-    final Color borderColor;
-    final Color iconBg;
-    final Color labelColor;
-    final Color sublabelColor;
-
-    if (!isEnabled) {
-      // Disabled — abu-abu lembut
-      bgColor = isDark ? Colors.white.withAlpha(5) : Colors.black.withAlpha(4);
-      borderColor =
-          isDark ? Colors.white.withAlpha(14) : Colors.black.withAlpha(10);
-      iconBg = isDark ? Colors.white.withAlpha(8) : Colors.black.withAlpha(6);
-      labelColor = theme.colorScheme.onSurface.withAlpha(60);
-      sublabelColor = theme.colorScheme.onSurface.withAlpha(40);
-    } else if (isSelected) {
-      // Selected + enabled
-      bgColor = accentColor.withAlpha(20);
-      borderColor = accentColor.withAlpha(120);
-      iconBg = accentColor.withAlpha(30);
-      labelColor = accentColor;
-      sublabelColor = accentColor.withAlpha(160);
-    } else {
-      // Not selected, enabled
-      bgColor = isDark ? Colors.white.withAlpha(7) : Colors.black.withAlpha(4);
-      borderColor =
-          isDark ? Colors.white.withAlpha(20) : Colors.black.withAlpha(14);
-      iconBg = isDark ? Colors.white.withAlpha(10) : Colors.black.withAlpha(6);
-      labelColor = theme.colorScheme.onSurface.withAlpha(180);
-      sublabelColor = theme.colorScheme.onSurface.withAlpha(100);
-    }
-
-    return GestureDetector(
-      onTap: isEnabled ? onTap : null,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: borderColor, width: 1.5),
+          color: isSelected
+              ? theme.colorScheme.primary
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icon container
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 24,
-                    color: isEnabled
-                        ? (isSelected
-                            ? accentColor
-                            : theme.colorScheme.onSurface.withAlpha(100))
-                        : theme.colorScheme.onSurface.withAlpha(40),
-                  ),
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected
+                  ? Colors.white
+                  : theme.colorScheme.onSurface.withAlpha(180),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? Colors.white
+                      : theme.colorScheme.onSurface.withAlpha(180),
                 ),
-                // "Segera" badge untuk fitur belum tersedia
-                if (!isEnabled)
-                  Positioned(
-                    top: -6,
-                    right: -6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF3A3A4A)
-                            : const Color(0xFFE0E2EE),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: isDark
-                              ? Colors.white12
-                              : Colors.black.withAlpha(15),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Text(
-                        'Soon',
-                        style: TextStyle(
-                          fontSize: 8,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface.withAlpha(80),
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: labelColor,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              sublabel,
-              style: TextStyle(
-                fontSize: 10,
-                color: sublabelColor,
-                fontWeight: FontWeight.w500,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ─── Active Mode Pill (di content screen) ────────────────────────────────────
-
-class _ActiveModePill extends StatelessWidget {
-  final _AppMode mode;
-  final ThemeData theme;
-
-  const _ActiveModePill({required this.mode, required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    final (icon, label, color) = switch (mode) {
-      _AppMode.downscale => (
-          Icons.compress_rounded,
-          'Mode: Downscale',
-          theme.colorScheme.primary
-        ),
-      _AppMode.upscale => (
-          Icons.expand_rounded,
-          'Mode: Upscale',
-          const Color(0xFF5CD85A)
-        ),
-      _AppMode.convert => (
-          Icons.swap_horiz_rounded,
-          'Mode: Convert',
-          const Color(0xFFFF9F43)
-        ),
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-      decoration: BoxDecoration(
-        color: color.withAlpha(18),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withAlpha(55)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Info Banner ──────────────────────────────────────────────────────────────
-
-class _InfoBanner extends StatelessWidget {
-  final IconData icon;
-  final String message;
-  final Color color;
-
-  const _InfoBanner({
-    required this.icon,
-    required this.message,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: color.withAlpha(12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withAlpha(40)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.onSurface.withAlpha(150),
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

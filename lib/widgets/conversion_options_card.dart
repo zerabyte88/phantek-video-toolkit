@@ -34,7 +34,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void initState() {
     super.initState();
-    _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000).round().clamp(1, 30);
+    _customBitrateMbps =
+        (widget.encodingOptions.customBitrateKbps / 1000).round().clamp(1, 30);
   }
 
   @override
@@ -44,40 +45,34 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(22),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.tune_rounded,
-                    color: theme.colorScheme.primary,
-                    size: 18,
-                  ),
+                Icon(
+                  Icons.tune_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 20,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Text(
                   l10n.t('video_options'),
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.1,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             // 1. Resolution Selection
-            _buildSubHeader(
+            _buildSectionLabel(
               icon: Icons.aspect_ratio_rounded,
               title: l10n.t('target_resolution'),
               theme: theme,
@@ -92,71 +87,80 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               );
             }),
 
-            const SizedBox(height: 20),
-            const Divider(),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: theme.dividerColor),
             const SizedBox(height: 16),
 
             // 2. Rate Control Selection (CRF vs Bitrate)
-            _buildSubHeader(
+            _buildSectionLabel(
               icon: Icons.speed_rounded,
-              title: l10n.t('video_options'),
+              title: l10n.t('rate_control'),
               theme: theme,
             ),
             const SizedBox(height: 10),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: RateControlMode.values.map((mode) {
-                  final isSelected = widget.encodingOptions.rateControlMode == mode;
-                  return ChoiceChip(
-                    showCheckmark: false,
-                    label: Text(mode.displayName),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      if (selected) {
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            rateControlMode: mode,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                }).toList(),
-              ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: RateControlMode.values.map((mode) {
+                final isSelected =
+                    widget.encodingOptions.rateControlMode == mode;
+                return ChoiceChip(
+                  showCheckmark: false,
+                  label: Text(mode.displayName),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          rateControlMode: mode,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 15,
+                    color: theme.colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.encodingOptions.rateControlMode == RateControlMode.crf 
-                          ? l10n.t('desc_crf') 
+                      widget.encodingOptions.rateControlMode ==
+                              RateControlMode.crf
+                          ? l10n.t('desc_crf')
                           : l10n.t('desc_bitrate'),
-                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withAlpha(160),
+                        height: 1.35,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
+            if (widget.encodingOptions.rateControlMode ==
+                RateControlMode.crf) ...[
               Text(
                 l10n.t('crf_label'),
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(140)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface.withAlpha(140),
+                ),
               ),
               Row(
                 children: [
@@ -177,19 +181,18 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ),
                   Container(
-                    width: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+                    width: 44,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(22),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
+                      color: theme.colorScheme.primary.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${widget.encodingOptions.crfValue}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
                         color: theme.colorScheme.primary,
                       ),
                     ),
@@ -199,7 +202,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             ] else ...[
               Text(
                 l10n.t('bitrate_label'),
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(140)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface.withAlpha(140),
+                ),
               ),
               Row(
                 children: [
@@ -223,18 +229,18 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(22),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
+                      color: theme.colorScheme.primary.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '$_customBitrateMbps Mbps',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                         color: theme.colorScheme.primary,
                       ),
                     ),
@@ -242,150 +248,156 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 ],
               ),
             ],
-            
+
             // Estimated Size display
             const SizedBox(height: 12),
             _buildSizeEstimator(theme),
 
-            const SizedBox(height: 20),
-            const Divider(),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: theme.dividerColor),
             const SizedBox(height: 16),
 
             // 3. Format / Container Selection
-            _buildSubHeader(
-              icon: Icons.folder_zip_rounded,
+            _buildSectionLabel(
+              icon: Icons.folder_zip_outlined,
               title: l10n.t('container_format'),
               theme: theme,
             ),
             const SizedBox(height: 10),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: VideoContainer.values.map((format) {
-                  final isSelected = widget.encodingOptions.container == format;
-                  return ChoiceChip(
-                    showCheckmark: false,
-                    label: Text('${format.displayName} (.${format.extension})'),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      if (selected) {
-                        // Smart codec adaptation
-                        VideoCodec newCodec = widget.encodingOptions.codec;
-                        if (format == VideoContainer.webm) {
-                          newCodec = VideoCodec.vp9;
-                        } else if (format != VideoContainer.webm && format != VideoContainer.mkv && newCodec == VideoCodec.vp9) {
-                          // VP9 is strictly only for WebM and MKV containers.
-                          // If user selects MP4 or MOV, fallback to H.264
-                          newCodec = VideoCodec.h264;
-                        }
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            container: format,
-                            codec: newCodec,
-                          ),
-                        );
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: VideoContainer.values.map((format) {
+                final isSelected = widget.encodingOptions.container == format;
+                return ChoiceChip(
+                  showCheckmark: false,
+                  label: Text('${format.displayName} (.${format.extension})'),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      VideoCodec newCodec = widget.encodingOptions.codec;
+                      if (format == VideoContainer.webm) {
+                        newCodec = VideoCodec.vp9;
+                      } else if (format != VideoContainer.webm &&
+                          format != VideoContainer.mkv &&
+                          newCodec == VideoCodec.vp9) {
+                        newCodec = VideoCodec.h264;
                       }
-                    },
-                  );
-                }).toList(),
-              ),
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          container: format,
+                          codec: newCodec,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 15,
+                    color: theme.colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       l10n.t('desc_${widget.encodingOptions.container.name}'),
-                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withAlpha(160),
+                        height: 1.35,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
-            const Divider(),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: theme.dividerColor),
             const SizedBox(height: 16),
 
             // 4. Codec Selection
-            _buildSubHeader(
+            _buildSectionLabel(
               icon: Icons.code_rounded,
               title: l10n.t('video_codec'),
               theme: theme,
             ),
             const SizedBox(height: 10),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: VideoCodec.values.map((codec) {
-                  // Validate codec compatibility based on container
-                  bool isCompatible = true;
-                  if (widget.encodingOptions.container == VideoContainer.webm && codec != VideoCodec.vp9) {
-                    isCompatible = false;
-                  }
-                  if ((widget.encodingOptions.container == VideoContainer.mp4 || widget.encodingOptions.container == VideoContainer.mov) && codec == VideoCodec.vp9) {
-                    isCompatible = false;
-                  }
-                  
-                  final isSelected = widget.encodingOptions.codec == codec;
-                  return ChoiceChip(
-                    showCheckmark: false,
-                    label: Text(codec.displayName),
-                    selected: isSelected,
-                    avatar: codec == VideoCodec.hevc
-                        ? const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFF9F43))
-                        : null,
-                    onSelected: isCompatible
-                        ? (selected) {
-                            if (selected) {
-                              widget.onOptionsChanged(
-                                widget.encodingOptions.copyWith(codec: codec),
-                              );
-                            }
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: VideoCodec.values.map((codec) {
+                bool isCompatible = true;
+                if (widget.encodingOptions.container == VideoContainer.webm &&
+                    codec != VideoCodec.vp9) {
+                  isCompatible = false;
+                }
+                if ((widget.encodingOptions.container == VideoContainer.mp4 ||
+                        widget.encodingOptions.container == VideoContainer.mov) &&
+                    codec == VideoCodec.vp9) {
+                  isCompatible = false;
+                }
+
+                final isSelected = widget.encodingOptions.codec == codec;
+                return ChoiceChip(
+                  showCheckmark: false,
+                  label: Text(codec.displayName),
+                  selected: isSelected,
+                  onSelected: isCompatible
+                      ? (selected) {
+                          if (selected) {
+                            widget.onOptionsChanged(
+                              widget.encodingOptions.copyWith(codec: codec),
+                            );
                           }
-                        : null,
-                  );
-                }).toList(),
-              ),
+                        }
+                      : null,
+                );
+              }).toList(),
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(50),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: theme.dividerColor.withAlpha(50)),
+                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.primary),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 15,
+                    color: theme.colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       l10n.t('desc_${widget.encodingOptions.codec.name}'),
-                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withAlpha(200)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withAlpha(160),
+                        height: 1.35,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+
+            // 5. FPS Selector
             _buildFpsSelector(theme, l10n),
           ],
         ),
@@ -393,44 +405,23 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     );
   }
 
-  Widget _buildSubHeader({
+  Widget _buildSectionLabel({
     required IconData icon,
     required String title,
     required ThemeData theme,
-    String? trailingBadge,
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: theme.colorScheme.primary.withAlpha(220)),
+        Icon(icon, size: 16, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface.withAlpha(180),
-              letterSpacing: 0.2,
-            ),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface.withAlpha(200),
           ),
         ),
-        if (trailingBadge != null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withAlpha(22),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: theme.colorScheme.primary.withAlpha(50)),
-            ),
-            child: Text(
-              trailingBadge,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -444,10 +435,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: isSelected
-            ? theme.colorScheme.primary.withAlpha(25)
-            : (theme.brightness == Brightness.dark
-                ? (theme.scaffoldBackgroundColor == Colors.black ? const Color(0xFF14141C) : const Color(0xFF2A2A3E))
-                : const Color(0xFFEAEBF2)),
+            ? theme.colorScheme.primary.withAlpha(20)
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           onTap: () => widget.onResolutionChanged(res),
@@ -459,15 +448,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               border: Border.all(
                 color: isSelected
                     ? theme.colorScheme.primary
-                    : Colors.transparent,
-                width: 1.5,
+                    : theme.colorScheme.outline,
+                width: isSelected ? 1.5 : 1.0,
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 20,
-                  height: 20,
+                  width: 18,
+                  height: 18,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
@@ -476,12 +465,12 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     border: Border.all(
                       color: isSelected
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface.withAlpha(60),
-                      width: 2,
+                          : theme.colorScheme.onSurface.withAlpha(80),
+                      width: 1.8,
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, size: 13, color: Colors.white)
+                      ? const Icon(Icons.check, size: 12, color: Colors.white)
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -493,23 +482,24 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         res.label,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface,
                         ),
                       ),
                       Text(
-                        '${res.width} x ${res.height}',
+                        '${res.width} × ${res.height}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isSelected
-                              ? theme.colorScheme.primary.withAlpha(180)
-                              : theme.colorScheme.onSurface.withAlpha(120),
+                          color: theme.colorScheme.onSurface.withAlpha(120),
                         ),
                       ),
                     ],
                   ),
                 ),
-                _buildQualityBadge(res),
+                _buildQualityBadge(res, theme),
               ],
             ),
           ),
@@ -523,63 +513,72 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        const Divider(),
+        Divider(height: 1, color: theme.dividerColor),
         const SizedBox(height: 16),
-        _buildSubHeader(
-          icon: Icons.shutter_speed_rounded,
+        _buildSectionLabel(
+          icon: Icons.speed_outlined,
           title: l10n.t('target_fps'),
           theme: theme,
         ),
         const SizedBox(height: 10),
-        Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            runAlignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              ChoiceChip(
-                showCheckmark: false,
-                label: Text(l10n.t('fps_original')),
-                selected: widget.encodingOptions.targetFps == 0,
-                onSelected: (val) {
-                  if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 0));
-                },
-              ),
-              ChoiceChip(
-                showCheckmark: false,
-                label: const Text('30 FPS'),
-                selected: widget.encodingOptions.targetFps == 30,
-                onSelected: (val) {
-                  if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 30));
-                },
-              ),
-              ChoiceChip(
-                showCheckmark: false,
-                label: const Text('24 FPS'),
-                selected: widget.encodingOptions.targetFps == 24,
-                onSelected: (val) {
-                  if (val) widget.onOptionsChanged(widget.encodingOptions.copyWith(targetFps: 24));
-                },
-              ),
-            ],
-          ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              showCheckmark: false,
+              label: Text(l10n.t('fps_original')),
+              selected: widget.encodingOptions.targetFps == 0,
+              onSelected: (val) {
+                if (val) {
+                  widget.onOptionsChanged(
+                    widget.encodingOptions.copyWith(targetFps: 0),
+                  );
+                }
+              },
+            ),
+            ChoiceChip(
+              showCheckmark: false,
+              label: const Text('30 FPS'),
+              selected: widget.encodingOptions.targetFps == 30,
+              onSelected: (val) {
+                if (val) {
+                  widget.onOptionsChanged(
+                    widget.encodingOptions.copyWith(targetFps: 30),
+                  );
+                }
+              },
+            ),
+            ChoiceChip(
+              showCheckmark: false,
+              label: const Text('24 FPS'),
+              selected: widget.encodingOptions.targetFps == 24,
+              onSelected: (val) {
+                if (val) {
+                  widget.onOptionsChanged(
+                    widget.encodingOptions.copyWith(targetFps: 24),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ],
     );
   }
 
   Widget _buildSizeEstimator(ThemeData theme) {
-    // Estimating output size
-    // Size = (Video Bitrate + Audio Bitrate) * Duration
     double sizeMb = 0.0;
     final durationSecs = widget.sourceVideo.durationSeconds;
 
     if (durationSecs > 0) {
-      final targetW = widget.selectedResolution?.width ?? widget.sourceVideo.width;
-      final targetH = widget.selectedResolution?.height ?? widget.sourceVideo.height;
+      final targetW =
+          widget.selectedResolution?.width ?? widget.sourceVideo.width;
+      final targetH =
+          widget.selectedResolution?.height ?? widget.sourceVideo.height;
 
-      final targetBitrateKbps = widget.encodingOptions.calculateTargetBitrateKbps(
+      final targetBitrateKbps =
+          widget.encodingOptions.calculateTargetBitrateKbps(
         targetWidth: targetW,
         targetHeight: targetH,
         sourceWidth: widget.sourceVideo.width,
@@ -587,99 +586,74 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         sourceBitrateBps: widget.sourceVideo.bitrate,
       );
 
-      // Video bitrate + standard AAC audio bitrate (~128 kbps)
       final totalBitrateKbps = targetBitrateKbps + 128;
-      sizeMb = (totalBitrateKbps * 1000.0 / 8.0) * durationSecs / (1024 * 1024);
+      sizeMb =
+          (totalBitrateKbps * 1000.0 / 8.0) * durationSecs / (1024 * 1024);
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withAlpha(14),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.primary.withAlpha(40)),
+        color: theme.colorScheme.primary.withAlpha(16),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.colorScheme.primary.withAlpha(35)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.sd_storage_rounded, size: 18, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  widget.l10n.t('est_size_title'),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface.withAlpha(180),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withAlpha(22),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '~${sizeMb.toStringAsFixed(1)} MB',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
+          Icon(
+            Icons.data_usage_rounded,
+            size: 17,
+            color: theme.colorScheme.primary,
           ),
-          if (widget.encodingOptions.rateControlMode == RateControlMode.crf) ...[
-            const SizedBox(height: 6),
-            Text(
-              widget.l10n.t('est_size_warning'),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              widget.l10n.t('est_size_title'),
               style: TextStyle(
-                fontSize: 11,
-                color: theme.colorScheme.onSurface.withAlpha(110),
-                fontStyle: FontStyle.italic,
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(180),
               ),
             ),
-          ],
+          ),
+          Text(
+            '~${sizeMb.toStringAsFixed(1)} MB',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.primary,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildQualityBadge(VideoResolution res) {
+  Widget _buildQualityBadge(VideoResolution res, ThemeData theme) {
     String label;
-    Color color;
     if (res.height >= 2160) {
       label = '4K';
-      color = const Color(0xFFFF6B6B);
     } else if (res.height >= 1440) {
       label = '2K';
-      color = const Color(0xFFFF9F43);
     } else if (res.height >= 1080) {
       label = 'FHD';
-      color = const Color(0xFF54A0FF);
     } else if (res.height >= 720) {
       label = 'HD';
-      color = const Color(0xFF5CD85A);
     } else {
       label = 'SD';
-      color = Colors.white54;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(6),
+        color: theme.colorScheme.onSurface.withAlpha(20),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: color,
+          fontWeight: FontWeight.w600,
+          color: theme.colorScheme.onSurface.withAlpha(180),
         ),
       ),
     );
