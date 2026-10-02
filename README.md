@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.4&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/video_downscaler/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.5&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
@@ -124,10 +124,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.1.4.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.1.5.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.4`) or manual workflow dispatch:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.5`) or manual workflow dispatch:
 - Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
@@ -135,6 +135,14 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ---
 
 ## Release History
+
+### v1.1.5 (Build 15)
+- **Live Hardware & System Telemetry Dashboard:** Integrated real-time conversion monitoring cards directly into the processing screen:
+  - **Memory Usage:** Displays live process resident memory (RAM RSS in MB) compared against the user's configured RAM buffer limit with a 4-level segmented progress visualizer.
+  - **Storage I/O Throughput:** Real-time disk write throughput measurement (in MB/s) with a live 4-segment write pulse activity monitor, allowing users to verify active file synthesis and storage speed.
+  - **CPU Multi-Core Equalizer:** Live processing load percentage calculated from active encoding threads and hardware processors, complete with an animated 8-bar multi-thread activity equalizer.
+- **Copyright-Safe Material 3 Telemetry Design:** Fully original visual design adhering to Phantek's Material 3 slate/cobalt aesthetics with soft-glow status indicators, auto-scaling value typography (`FittedBox`), and seamless contrast adaptation across AMOLED Black, Slate Dark, and Clean Light themes.
+- **Full Localization Parity:** All telemetry labels and metrics are fully localized across all 6 supported languages (Indonesian, English, Japanese, Simplified Chinese, Traditional Chinese, Korean).
 
 ### v1.1.4 (Build 14)
 - **Orientation-Agnostic Resolution Classification & Filtering:** Fixed downscale resolution logic for portrait/vertical smartphone videos (e.g. 1080x1920) by filtering against the shorter dimension (`shortDimension`). Portrait videos are accurately identified by their standard target category (e.g. 1080p instead of 2K) and downscale mode correctly hides higher targets like 1440p (2K) to eliminate unintended upscaling.
