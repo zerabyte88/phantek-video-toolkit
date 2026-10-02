@@ -58,8 +58,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   int _memoryUsageMb = 0;
   double _storageIoRateMb = 0.0;
   int _cpuUsagePercent = 0;
-  final List<double> _storageIoHistory = [0.2, 0.4, 0.2, 0.6];
-  List<double> _cpuCoreLoads = [0.25, 0.35, 0.2, 0.7, 0.3, 0.5, 0.2, 0.15];
+  static const int _historySampleCount = 18;
+  final List<double> _cpuHistory = List.filled(_historySampleCount, 0.05);
+  final List<double> _memoryHistory = List.filled(_historySampleCount, 0.08);
+  final List<double> _storageHistory = List.filled(_historySampleCount, 0.02);
   int _prevSizeBytes = 0;
 
   @override
@@ -133,6 +135,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _storageIoRateMb = 0.0;
     _memoryUsageMb = 0;
     _cpuUsagePercent = 0;
+    _cpuHistory.fillRange(0, _historySampleCount, 0.05);
+    _memoryHistory.fillRange(0, _historySampleCount, 0.08);
+    _storageHistory.fillRange(0, _historySampleCount, 0.02);
 
     await ForegroundServiceManager().requestPermissions();
 
@@ -209,23 +214,30 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ioMb = 2.4 + ((elapsed.inSeconds * 3) % 5) * 0.8;
       }
 
-      // 3. CPU Usage & 8-thread core workload distribution
+      // 3. CPU Usage
       final totalCores = Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
       final threads = widget.appSettings.cpuThreads > 0 ? widget.appSettings.cpuThreads : totalCores;
       final basePercent = ((threads / totalCores) * 62.0).clamp(32.0, 86.0);
       final jitter = ((elapsed.inSeconds * 7 + 2) % 9) - 4;
       final cpuPercent = _isProcessing ? (basePercent + jitter).round() : 0;
 
-      final newLoads = List.generate(8, (i) {
-        if (!_isProcessing) return 0.08;
-        final factor = (i == 3 || i == 2) ? 1.35 : ((i % 2 == 0) ? 0.95 : 0.65);
-        final wave = ((elapsed.inSeconds + i * 2) % 6) / 10.0;
-        return ((cpuPercent / 100.0) * factor * 0.75 + wave * 0.2).clamp(0.12, 0.95);
-      });
+      final cpuNorm = _isProcessing ? (cpuPercent / 100.0).clamp(0.04, 1.0) : 0.04;
+      _cpuHistory.add(cpuNorm);
+      if (_cpuHistory.length > _historySampleCount) {
+        _cpuHistory.removeAt(0);
+      }
 
-      _storageIoHistory.add((ioMb / 10.0).clamp(0.15, 1.0));
-      if (_storageIoHistory.length > 4) {
-        _storageIoHistory.removeAt(0);
+      final maxRam = widget.appSettings.ramBufferMb > 0 ? widget.appSettings.ramBufferMb : 512;
+      final memNorm = _isProcessing ? (memMb / maxRam).clamp(0.05, 1.0) : 0.05;
+      _memoryHistory.add(memNorm);
+      if (_memoryHistory.length > _historySampleCount) {
+        _memoryHistory.removeAt(0);
+      }
+
+      final ioNorm = _isProcessing ? (ioMb / 12.0).clamp(0.02, 1.0) : 0.02;
+      _storageHistory.add(ioNorm);
+      if (_storageHistory.length > _historySampleCount) {
+        _storageHistory.removeAt(0);
       }
 
       setState(() {
@@ -236,7 +248,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         _memoryUsageMb = memMb;
         _storageIoRateMb = ioMb;
         _cpuUsagePercent = cpuPercent;
-        _cpuCoreLoads = newLoads;
       });
     });
 
@@ -377,7 +388,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         _isProcessing = false;
         _cpuUsagePercent = 0;
         _storageIoRateMb = 0.0;
-        _cpuCoreLoads = List.generate(8, (_) => 0.08);
+        _cpuHistory.fillRange(0, _historySampleCount, 0.04);
+        _storageHistory.fillRange(0, _historySampleCount, 0.02);
         if (result != null) {
           _isSuccess = true;
           _outputPath = result;
@@ -665,24 +677,48 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
-  /// Live System Telemetry Cards: Memory Usage, Storage I/O, and CPU Usage
+  /// Live System Telemetry Cards: Processor Load (Left), RAM Allocation (Middle), and Disk Write (Right)
   Widget _buildLiveSystemTelemetry(ThemeData theme, l10n) {
+    final totalCores = Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
+    final threads = widget.appSettings.cpuThreads > 0 ? widget.appSettings.cpuThreads : totalCores;
+
     return Row(
       children: [
-        // 1. Memory Usage Card
+        // 1. CPU (Left) - Beban Prosesor
         Expanded(
           child: _buildTelemetryTile(
             theme: theme,
-            iconColor: const Color(0xFF38BDF8),
-            label: l10n.t('telemetry_memory'),
-            value: '${_memoryUsageMb > 0 ? _memoryUsageMb : 60} MB',
-            subValue: ' / ${widget.appSettings.ramBufferMb}',
-            visualizer: _buildMemoryVisualizer(theme),
+            iconColor: const Color(0xFF0284C7),
+            label: l10n.t('telemetry_cpu_usage'),
+            value: '$_cpuUsagePercent%',
+            subValue: ' • ${threads}T',
+            visualizer: _WindowsTaskGraph(
+              history: _cpuHistory,
+              color: const Color(0xFF0284C7),
+              isProcessing: _isProcessing,
+            ),
           ),
         ),
         const SizedBox(width: 8),
 
-        // 2. Storage I/O Card
+        // 2. RAM (Middle) - Alokasi RAM
+        Expanded(
+          child: _buildTelemetryTile(
+            theme: theme,
+            iconColor: const Color(0xFF818CF8),
+            label: l10n.t('telemetry_memory'),
+            value: '${_memoryUsageMb > 0 ? _memoryUsageMb : 60} MB',
+            subValue: ' / ${widget.appSettings.ramBufferMb} MB',
+            visualizer: _WindowsTaskGraph(
+              history: _memoryHistory,
+              color: const Color(0xFF818CF8),
+              isProcessing: _isProcessing,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        // 3. Storage / Disk (Right) - Laju Tulis Disk
         Expanded(
           child: _buildTelemetryTile(
             theme: theme,
@@ -692,20 +728,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 ? '${_storageIoRateMb.toStringAsFixed(1)} MB/s'
                 : (_isProcessing ? '0.8 MB/s' : '0.0 MB/s'),
             subValue: null,
-            visualizer: _buildStorageIoVisualizer(theme),
-          ),
-        ),
-        const SizedBox(width: 8),
-
-        // 3. CPU Usage Card
-        Expanded(
-          child: _buildTelemetryTile(
-            theme: theme,
-            iconColor: const Color(0xFF22D3EE),
-            label: l10n.t('telemetry_cpu_usage'),
-            value: '$_cpuUsagePercent%',
-            subValue: null,
-            visualizer: _buildCpuEqualizerVisualizer(theme),
+            visualizer: _WindowsTaskGraph(
+              history: _storageHistory,
+              color: const Color(0xFF06B6D4),
+              isProcessing: _isProcessing,
+            ),
           ),
         ),
       ],
@@ -796,105 +823,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             ),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: 18,
-            child: visualizer,
-          ),
+          visualizer,
         ],
       ),
     );
   }
 
-  Widget _buildMemoryVisualizer(ThemeData theme) {
-    final activeColor = const Color(0xFF38BDF8);
-    final ratio = widget.appSettings.ramBufferMb > 0
-        ? (_memoryUsageMb / widget.appSettings.ramBufferMb).clamp(0.05, 1.0)
-        : 0.15;
-
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(4, (index) {
-          final activeThreshold = (index + 1) * 0.25;
-          final isActive = ratio >= activeThreshold || (index == 0 && _isProcessing);
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1.5),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 3.5,
-              height: isActive ? (6.0 + index * 3.5) : 3.0,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? activeColor
-                    : theme.colorScheme.outline.withAlpha(40),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildStorageIoVisualizer(ThemeData theme) {
-    final activeColor = const Color(0xFF06B6D4);
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(4, (index) {
-          final val = index < _storageIoHistory.length ? _storageIoHistory[index] : 0.2;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1.5),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 3.5,
-              height: (18.0 * val).clamp(3.0, 18.0),
-              decoration: BoxDecoration(
-                color: _isProcessing
-                    ? activeColor
-                    : theme.colorScheme.outline.withAlpha(40),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildCpuEqualizerVisualizer(ThemeData theme) {
-    const activeColor = Color(0xFF06B6D4);
-    final inactiveColor = theme.colorScheme.outline.withAlpha(35);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: List.generate(8, (index) {
-        final load = index < _cpuCoreLoads.length ? _cpuCoreLoads[index] : 0.2;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1.0),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              height: (18.0 * load).clamp(3.0, 18.0),
-              decoration: BoxDecoration(
-                color: _isProcessing
-                    ? (load > 0.65 ? activeColor : activeColor.withAlpha(180))
-                    : inactiveColor,
-                borderRadius: BorderRadius.circular(2.5),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  /// Real-time live Elapsed & Remaining Time Telemetry Card
   Widget _buildTimeTelemetryCard(ThemeData theme, l10n) {
     return Card(
       child: Padding(
@@ -1652,5 +1586,156 @@ class _SuccessBottomSheet extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _WindowsTaskGraph extends StatelessWidget {
+  final List<double> history;
+  final Color color;
+  final bool isProcessing;
+
+  const _WindowsTaskGraph({
+    required this.history,
+    required this.color,
+    required this.isProcessing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      height: 32,
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.black.withAlpha(95)
+            : theme.colorScheme.surfaceContainerHighest.withAlpha(95),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withAlpha(22)
+              : theme.colorScheme.outline.withAlpha(40),
+          width: 0.8,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: CustomPaint(
+          painter: _WindowsGraphPainter(
+            history: history,
+            lineColor: color,
+            gridColor: isDark
+                ? Colors.white.withAlpha(18)
+                : theme.colorScheme.outline.withAlpha(28),
+            isProcessing: isProcessing,
+          ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+  }
+}
+
+class _WindowsGraphPainter extends CustomPainter {
+  final List<double> history;
+  final Color lineColor;
+  final Color gridColor;
+  final bool isProcessing;
+
+  _WindowsGraphPainter({
+    required this.history,
+    required this.lineColor,
+    required this.gridColor,
+    required this.isProcessing,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    final gridPaint = Paint()
+      ..color = gridColor
+      ..strokeWidth = 0.5
+      ..style = PaintingStyle.stroke;
+
+    // 3 horizontal grid lines (at 25%, 50%, 75% height)
+    for (int i = 1; i <= 3; i++) {
+      final y = size.height * (i / 4.0);
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+    // 4 vertical grid lines (at 20%, 40%, 60%, 80% width)
+    for (int i = 1; i <= 4; i++) {
+      final x = size.width * (i / 5.0);
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
+    }
+
+    if (history.isEmpty) return;
+
+    final count = history.length;
+    final stepX = count > 1 ? size.width / (count - 1) : size.width;
+    final points = <Offset>[];
+
+    for (int i = 0; i < count; i++) {
+      final x = i * stepX;
+      final val = history[i].clamp(0.0, 1.0);
+      final usableHeight = size.height - 4;
+      final y = (size.height - 2) - (val * usableHeight);
+      points.add(Offset(x, y));
+    }
+
+    // 1. Area fill below curve
+    final fillPath = Path();
+    fillPath.moveTo(points.first.dx, size.height);
+    for (final pt in points) {
+      fillPath.lineTo(pt.dx, pt.dy);
+    }
+    fillPath.lineTo(points.last.dx, size.height);
+    fillPath.close();
+
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          lineColor.withAlpha(isProcessing ? 65 : 25),
+          lineColor.withAlpha(isProcessing ? 10 : 2),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(fillPath, fillPaint);
+
+    // 2. Stroke line
+    final linePath = Path();
+    linePath.moveTo(points.first.dx, points.first.dy);
+    for (int i = 1; i < points.length; i++) {
+      linePath.lineTo(points[i].dx, points[i].dy);
+    }
+
+    final linePaint = Paint()
+      ..color = isProcessing ? lineColor : lineColor.withAlpha(120)
+      ..strokeWidth = 1.3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    canvas.drawPath(linePath, linePaint);
+
+    // 3. Leading Head Dot
+    if (points.isNotEmpty && isProcessing) {
+      final head = points.last;
+      final headPaint = Paint()
+        ..color = lineColor
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(head, 2.0, headPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _WindowsGraphPainter oldDelegate) {
+    return oldDelegate.history != history ||
+        oldDelegate.lineColor != lineColor ||
+        oldDelegate.isProcessing != isProcessing;
   }
 }
