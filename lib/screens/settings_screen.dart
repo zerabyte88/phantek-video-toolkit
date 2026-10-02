@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_settings.dart';
 import '../services/cache_manager_service.dart';
@@ -21,7 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'Loading...';
+  String _appVersion = 'v1.1.5';
+  String _buildNumber = '15';
 
   @override
   void initState() {
@@ -36,15 +38,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final packageInfo = await PackageInfo.fromPlatform();
       if (mounted) {
         setState(() {
-          _appVersion = 'v${packageInfo.version} (${packageInfo.buildNumber})';
+          _appVersion = 'v${packageInfo.version}';
+          _buildNumber = packageInfo.buildNumber.isNotEmpty
+              ? packageInfo.buildNumber
+              : '15';
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.1.5 (15)';
+          _appVersion = 'v1.1.5';
+          _buildNumber = '15';
         });
       }
+    }
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final uri = Uri.parse(urlString);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Could not launch $urlString: $e');
     }
   }
 
@@ -1204,113 +1221,244 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 16),
 
-            // About Card
+            // About Card (Redesigned to match Image 1 with offline avatar)
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: 16,
-                          color: theme.colorScheme.onSurface.withAlpha(140),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.t('settings_about'),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l10n.t('settings_about_desc'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withAlpha(140),
-                        height: 1.4,
-                      ),
-                    ),
-                    Divider(height: 20, color: theme.colorScheme.outline),
+                    // Header: (i) About Phantek + green version pill badge
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          l10n.t('app_version'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.onSurface.withAlpha(140),
-                          ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline_rounded,
+                              size: 18,
+                              color: Color(0xFF06B6D4),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.t('settings_about'),
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onSurface,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          _appVersion,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 3.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withAlpha(25),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFF10B981).withAlpha(140),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            _appVersion,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF34D399),
+                              letterSpacing: 0.2,
+                            ),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      l10n.t('about_phantek_subtitle'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Key-Value Specifications
+                    _buildAboutDetailRow(
+                      theme,
+                      l10n.t('app_version'),
+                      _appVersion,
+                    ),
+                    _buildAboutDetailRow(
+                      theme,
+                      l10n.t('build_label'),
+                      '$_buildNumber (Release APK)',
+                    ),
+                    _buildAboutDetailRow(
+                      theme,
+                      l10n.t('architecture_label'),
+                      'ARM64-v8a (FFmpeg 6.0)',
+                    ),
+                    _buildAboutDetailRow(
+                      theme,
+                      l10n.t('license_label'),
+                      'GPLv3',
+                    ),
+
+                    const SizedBox(height: 12),
+                    Divider(
+                      height: 20,
+                      color: theme.colorScheme.outline.withAlpha(35),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Developer Tile (Offline avatar)
+                    InkWell(
+                      onTap: () => _launchUrl('https://github.com/zerabyte88'),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF06B6D4),
+                                  width: 2.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF06B6D4).withAlpha(70),
+                                    blurRadius: 6,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/icon/developer_avatar.png',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
+                                    Icons.person_rounded,
+                                    color: Color(0xFF06B6D4),
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Developer: zerabyte88',
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.t('developer_role'),
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.onSurface.withAlpha(130),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.open_in_new_rounded,
+                              size: 18,
+                              color: Color(0xFF06B6D4),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // View Repository on GitHub Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _launchUrl(
+                          'https://github.com/zerabyte88/video_downscaler',
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: theme.colorScheme.outline.withAlpha(70),
+                            width: 1.0,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 16,
+                          color: Color(0xFF06B6D4),
+                        ),
+                        label: Text(
+                          l10n.t('view_github_repo'),
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF06B6D4),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
-
-            // Creator Signature / Footer
-            Center(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Made with ',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          color: theme.colorScheme.onSurface.withAlpha(150),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.favorite_rounded,
-                        size: 15,
-                        color: Color(0xFFEF4444),
-                      ),
-                      Text(
-                        ' by Zerabyte88',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface.withAlpha(220),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Crafted for high performance & offline privacy',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurface.withAlpha(100),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 28),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAboutDetailRow(ThemeData theme, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface.withAlpha(140),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }
