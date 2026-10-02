@@ -209,6 +209,9 @@ class AppLocalizations {
       'audio_track': 'Trek Audio',
       'audio_extracted': 'Audio Diekstrak',
       'unit_core': 'Core',
+      'telemetry_memory': 'Penggunaan RAM',
+      'telemetry_storage_io': 'Storage I/O',
+      'telemetry_cpu_usage': 'Penggunaan CPU',
     },
     'en': {
       'desc_crf': 'Maintains consistent visual quality regardless of final file size. Lower value means better quality but larger size. Highly recommended.',
@@ -406,6 +409,9 @@ class AppLocalizations {
       'audio_track': 'Audio Track',
       'audio_extracted': 'Audio Extracted',
       'unit_core': 'Core',
+      'telemetry_memory': 'Memory usage',
+      'telemetry_storage_io': 'Storage I/O',
+      'telemetry_cpu_usage': 'CPU usage',
     },
     'ja': {
       'desc_crf': '最終ファイルサイズに関係なく一定の画質を維持します。数値が小さいほど高画質になりますが、サイズが大きくなります。強く推奨されます。',
@@ -603,6 +609,9 @@ class AppLocalizations {
       'audio_track': '音声トラック',
       'audio_extracted': '抽出された音声',
       'unit_core': 'コア',
+      'telemetry_memory': 'メモリ使用量',
+      'telemetry_storage_io': 'ストレージ I/O',
+      'telemetry_cpu_usage': 'CPU使用率',
     },
     'zh_CN': {
       'desc_crf': '不考虑最终文件大小，保持恒定的视觉画质。数值越小画质越好，但文件越大。强烈推荐。',
@@ -800,6 +809,9 @@ class AppLocalizations {
       'audio_track': '音频轨道',
       'audio_extracted': '已提取音频',
       'unit_core': '核',
+      'telemetry_memory': '内存占用',
+      'telemetry_storage_io': '存储 I/O',
+      'telemetry_cpu_usage': 'CPU占用率',
     },
     'zh_TW': {
       'desc_crf': '不論最終檔案大小，保持穩定的畫質表現。數值越小畫質越好，但檔案越大。強烈推薦。',
@@ -997,6 +1009,9 @@ class AppLocalizations {
       'audio_track': '音訊軌道',
       'audio_extracted': '已提取音訊',
       'unit_core': '核心',
+      'telemetry_memory': '記憶體佔用',
+      'telemetry_storage_io': '儲存 I/O',
+      'telemetry_cpu_usage': 'CPU佔用率',
     },
     'ko': {
       'desc_crf': '최종 파일 크기에 구애받지 않고 일관된 화질을 유지합니다. 값이 낮을수록 고화질이지만 용량이 커집니다. 가장 추천하는 방식입니다.',
@@ -1194,6 +1209,9 @@ class AppLocalizations {
       'audio_track': '오디오 트랙',
       'audio_extracted': '추출된 오디오',
       'unit_core': '코어',
+      'telemetry_memory': '메모리 사용량',
+      'telemetry_storage_io': '스토리지 I/O',
+      'telemetry_cpu_usage': 'CPU 사용량',
     },
   };
 
