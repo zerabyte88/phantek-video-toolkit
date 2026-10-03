@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.1.5&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
 </div>
 
@@ -124,10 +124,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.1.5.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.2.0.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.1.5`) or manual workflow dispatch:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.2.0`) or manual workflow dispatch:
 - Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
@@ -135,6 +135,11 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ---
 
 ## Release History
+
+### v1.2.0 (Build 16)
+- **Application ID & Namespace Modernization:** Standardized package identifier and Android namespace to `com.phantek.cygnus.albireo` across Gradle, Kotlin manifests, and directory trees for production deployment.
+- **Refined CPU Encoding Preset UX:** Rewrote CPU preset descriptions in Settings to be clear, natural, and easy to understand without distracting punctuation.
+- **Repository & Brand Alignment:** Fully updated project documentation, releases badges, and source links to point to the dedicated `phantek-video-toolkit` GitHub repository.
 
 ### v1.1.5 (Build 15)
 - **Unified & Illuminated Selection Styling:** Completely revamped all selectable chips, buttons, and tiles (Rate Control, Video Format, Video Codec, Target FPS, Audio Bitrates, CPU Presets, Core Allocations, RAM Buffers, Display Themes, and Language Selectors) with solid, high-contrast vibrant primary blue (`#2563EB`) fills, crisp pure-white typography (`#FFFFFF`), and unified accent borders. Replaced dark translucent tints and inconsistent badge colors for effortless visibility and unified visual harmony across AMOLED Black, Slate Dark, and Light themes.
