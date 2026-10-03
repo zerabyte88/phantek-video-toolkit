@@ -49,25 +49,24 @@ android {
 
     signingConfigs {
         create("release") {
-            if (keystorePropertiesFile.exists()) {
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
+            val keyAliasVal = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+            val keyPasswordVal = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
+            val storePasswordVal = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
+            val storeFileVal = keystoreProperties.getProperty("storeFile") ?: System.getenv("STORE_FILE") ?: "release.jks"
+
+            val resolvedStoreFile = if (storeFileVal != null) file(storeFileVal) else null
+
+            if (resolvedStoreFile != null && resolvedStoreFile.exists() && keyAliasVal != null && storePasswordVal != null) {
+                keyAlias = keyAliasVal
+                keyPassword = keyPasswordVal ?: storePasswordVal
+                storeFile = resolvedStoreFile
+                storePassword = storePasswordVal
             } else {
-                val releaseJks = file("release.jks")
-                if (releaseJks.exists()) {
-                    keyAlias = "video_downscaler"
-                    keyPassword = "videodownscaler"
-                    storeFile = releaseJks
-                    storePassword = "videodownscaler"
-                } else {
-                    val debugConfig = signingConfigs.getByName("debug")
-                    keyAlias = debugConfig.keyAlias
-                    keyPassword = debugConfig.keyPassword
-                    storeFile = debugConfig.storeFile
-                    storePassword = debugConfig.storePassword
-                }
+                val debugConfig = signingConfigs.getByName("debug")
+                keyAlias = debugConfig.keyAlias
+                keyPassword = debugConfig.keyPassword
+                storeFile = debugConfig.storeFile
+                storePassword = debugConfig.storePassword
             }
         }
     }
