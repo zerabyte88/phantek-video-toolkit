@@ -1,4 +1,4 @@
-package com.personal.video_downscaler
+package com.phantek.cygnus.albireo
 
 import io.flutter.embedding.android.FlutterActivity
 
