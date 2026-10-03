@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
   <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
-  <img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" />
+  <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
 <br/>
@@ -190,7 +190,9 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 
 ## License
 
-This software is distributed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with dependencies bundled within `ffmpeg_kit_flutter_new` and the `libx264` GPL licensing requirements.
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See the [LICENSE](LICENSE) file for the full license text.
+
+This software complies with the copyleft licensing requirements for dependencies bundled within `ffmpeg_kit_flutter_new` and GPL-licensed components (`libx264`, `libx265`, `libmp3lame`).
 
 ---
 
