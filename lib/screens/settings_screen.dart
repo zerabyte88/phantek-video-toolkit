@@ -57,11 +57,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _launchUrl(String urlString) async {
     final uri = Uri.parse(urlString);
     try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
       }
     } catch (e) {
       debugPrint('Could not launch $urlString: $e');
+      try {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } catch (_) {}
     }
   }
 
@@ -89,6 +96,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = _settingsService.settings;
     final l10n = _settingsService.l10n;
     final deviceCores = AppSettings.deviceCoreCount;
+    final totalRamMb = DeviceSpecHelper.getTotalRamMb();
+    final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(totalRamMb);
+    final is4GbDisabled = marketedRamGb <= 4 || totalRamMb <= 4096;
 
     return Scaffold(
       appBar: AppBar(
@@ -586,9 +596,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             current: settings.ramBufferMb,
                             theme: theme,
                           ),
+                          _buildRamChip(
+                            label: '4096 MB',
+                            value: 4096,
+                            current: settings.ramBufferMb,
+                            theme: theme,
+                            enabled: !is4GbDisabled,
+                          ),
                         ],
                       ),
                     ),
+                    if (is4GbDisabled) ...[
+                      const SizedBox(height: 8),
+                      Center(
+                        child: Text(
+                          l10n.t('settings_ram_4gb_disabled_hint'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: theme.colorScheme.onSurface.withAlpha(120),
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -1650,18 +1681,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required int value,
     required int current,
     required ThemeData theme,
+    bool enabled = true,
   }) {
     final isSelected = value == current;
     return ChoiceChip(
       showCheckmark: false,
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          _settingsService.setRamBuffer(value);
-          setState(() {});
-        }
-      },
+      label: Text(
+        label,
+        style: TextStyle(
+          color: !enabled
+              ? theme.colorScheme.onSurface.withAlpha(80)
+              : (isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface),
+        ),
+      ),
+      selected: isSelected && enabled,
+      onSelected: enabled
+          ? (selected) {
+              if (selected) {
+                _settingsService.setRamBuffer(value);
+                setState(() {});
+              }
+            }
+          : null,
     );
   }
 

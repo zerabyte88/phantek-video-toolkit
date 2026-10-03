@@ -218,7 +218,7 @@ class FFmpegService {
     required VideoResolution targetResolution,
     EncodingOptions encodingOptions = const EncodingOptions(),
     AppSettings appSettings = const AppSettings(),
-    required void Function(double progress, String stats) onProgress,
+    required void Function(double progress, String stats, [int? sizeBytes]) onProgress,
     required void Function(String log) onLog,
   }) async {
     final outputDir = await getOutputDirectory(customPath: appSettings.outputDirectory);
@@ -395,6 +395,7 @@ class FFmpegService {
           onProgress(
             progress,
             'Size: $sizeStr | Speed: ${speed.toStringAsFixed(1)}x',
+            size,
           );
         }
       },
@@ -435,7 +436,7 @@ class FFmpegService {
     required AudioFormat audioFormat,
     int audioBitrateKbps = 192,
     AppSettings appSettings = const AppSettings(),
-    required void Function(double progress, String stats) onProgress,
+    required void Function(double progress, String stats, [int? sizeBytes]) onProgress,
     required void Function(String log) onLog,
   }) async {
     final outputDir = await getOutputDirectory(
@@ -514,7 +515,7 @@ class FFmpegService {
               : '${(size / 1024).toStringAsFixed(0)} KB';
           final speed = stats.getSpeed();
           final speedStr = speed > 0 ? '${speed.toStringAsFixed(1)}x' : '1.0x';
-          onProgress(progress, 'Size: $sizeStr | Speed: $speedStr');
+          onProgress(progress, 'Size: $sizeStr | Speed: $speedStr', size);
         }
       },
     );

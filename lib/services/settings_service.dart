@@ -33,6 +33,14 @@ class SettingsService extends ChangeNotifier {
           _settings = _settings.copyWith(cpuPreset: 'medium');
           await _saveSettings();
         }
+        if (_settings.ramBufferMb > 2048) {
+          final totalRamMb = DeviceSpecHelper.getTotalRamMb();
+          final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(totalRamMb);
+          if (marketedRamGb <= 4 || totalRamMb <= 4096) {
+            _settings = _settings.copyWith(ramBufferMb: 2048);
+            await _saveSettings();
+          }
+        }
       }
       
       // Hardware Auto-Detection on first launch
