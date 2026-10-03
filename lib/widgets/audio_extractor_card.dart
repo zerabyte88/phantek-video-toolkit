@@ -137,7 +137,24 @@ class AudioExtractorCard extends StatelessWidget {
                   final isSelected = encodingOptions.audioFormat == fmt;
                   return ChoiceChip(
                     showCheckmark: false,
-                    label: Text(fmt.displayName),
+                    selectedColor: theme.colorScheme.primary,
+                    backgroundColor: theme.colorScheme.surface,
+                    side: BorderSide(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.outline,
+                      width: isSelected ? 1.2 : 1.0,
+                    ),
+                    label: Text(
+                      fmt.displayName,
+                      style: TextStyle(
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
                     selected: isSelected,
                     onSelected: (selected) {
                       if (selected) {
@@ -195,7 +212,28 @@ class AudioExtractorCard extends StatelessWidget {
                   children: [
                     ChoiceChip(
                       showCheckmark: false,
-                      label: Text(l10n.t('audio_copy')),
+                      selectedColor: theme.colorScheme.primary,
+                      backgroundColor: theme.colorScheme.surface,
+                      side: BorderSide(
+                        color: encodingOptions.audioExtractBitrateKbps == 0
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.outline,
+                        width: encodingOptions.audioExtractBitrateKbps == 0
+                            ? 1.2
+                            : 1.0,
+                      ),
+                      label: Text(
+                        l10n.t('audio_copy'),
+                        style: TextStyle(
+                          fontWeight:
+                              encodingOptions.audioExtractBitrateKbps == 0
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                          color: encodingOptions.audioExtractBitrateKbps == 0
+                              ? Colors.white
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
                       selected: encodingOptions.audioExtractBitrateKbps == 0,
                       onSelected: (selected) {
                         if (selected) {
@@ -205,12 +243,30 @@ class AudioExtractorCard extends StatelessWidget {
                         }
                       },
                     ),
-                    ...[128, 192, 256, 320].map((kbps) {
+                    ...[64, 128, 192, 256, 320].map((kbps) {
                       final isSelected =
                           encodingOptions.audioExtractBitrateKbps == kbps;
                       return ChoiceChip(
                         showCheckmark: false,
-                        label: Text('$kbps kbps'),
+                        selectedColor: theme.colorScheme.primary,
+                        backgroundColor: theme.colorScheme.surface,
+                        side: BorderSide(
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.outline,
+                          width: isSelected ? 1.2 : 1.0,
+                        ),
+                        label: Text(
+                          '$kbps kbps',
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
                         selected: isSelected,
                         onSelected: (selected) {
                           if (selected) {

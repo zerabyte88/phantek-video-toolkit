@@ -486,16 +486,24 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     required ValueChanged<bool>? onSelected,
     double fontSize = 12,
   }) {
+    final theme = Theme.of(context);
     return ChoiceChip(
       showCheckmark: false,
       visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surface,
+      side: BorderSide(
+        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+        width: isSelected ? 1.2 : 1.0,
+      ),
       label: Text(
         label,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          color: isSelected ? Colors.white : theme.colorScheme.onSurface,
         ),
       ),
       selected: isSelected,
@@ -508,11 +516,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     required bool isSelected,
     required ThemeData theme,
   }) {
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: isSelected
-            ? theme.colorScheme.primary.withAlpha(20)
+            ? (isDark
+                ? theme.colorScheme.primary.withAlpha(45)
+                : theme.colorScheme.primary.withAlpha(25))
             : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
@@ -566,7 +577,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w500,
                           color: isSelected
-                              ? theme.colorScheme.primary
+                              ? (isDark
+                                  ? Colors.white
+                                  : theme.colorScheme.primary)
                               : theme.colorScheme.onSurface,
                         ),
                       ),
@@ -574,7 +587,11 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         '${res.width} × ${res.height}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: theme.colorScheme.onSurface.withAlpha(120),
+                          color: isSelected
+                              ? (isDark
+                                  ? Colors.white.withAlpha(190)
+                                  : theme.colorScheme.primary.withAlpha(200))
+                              : theme.colorScheme.onSurface.withAlpha(120),
                         ),
                       ),
                     ],

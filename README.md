@@ -137,6 +137,8 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ## Release History
 
 ### v1.1.5 (Build 15)
+- **Unified & Illuminated Selection Styling:** Completely revamped all selectable chips, buttons, and tiles (Rate Control, Video Format, Video Codec, Target FPS, Audio Bitrates, CPU Presets, Core Allocations, RAM Buffers, Display Themes, and Language Selectors) with solid, high-contrast vibrant primary blue (`#2563EB`) fills, crisp pure-white typography (`#FFFFFF`), and unified accent borders. Replaced dark translucent tints and inconsistent badge colors for effortless visibility and unified visual harmony across AMOLED Black, Slate Dark, and Light themes.
+- **320 kbps Studio Audio Quality:** Added a 320 kbps ultra-high bitrate audio encoding option across both the Audio Extractor module and global Settings Audio Quality configurations for maximum acoustic clarity.
 - **Windows Task Manager-Style Live Telemetry Dashboard:** Integrated real-time conversion monitoring cards directly into the processing screen with live history line charts:
   - **Beban Prosesor (CPU Usage):** Live multi-threaded encoding workload percentage with active thread count and dynamic history wave.
   - **Alokasi RAM (Memory RSS):** High-precision physical process resident memory read directly from Linux `/proc/self/status` (VmRSS) vs user-configured buffer limit with continuous line graph.

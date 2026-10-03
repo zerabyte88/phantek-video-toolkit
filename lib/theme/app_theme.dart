@@ -93,14 +93,15 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFF1E293B),
-        selectedColor: _primaryColor.withAlpha(50),
+        selectedColor: _primaryColor,
         labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        checkmarkColor: textPrimary,
+        checkmarkColor: Colors.white,
         showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(
@@ -223,14 +224,15 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surfaceBg,
-        selectedColor: _primaryColor.withAlpha(50),
+        selectedColor: _primaryColor,
         labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        checkmarkColor: textPrimary,
+        checkmarkColor: Colors.white,
         showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(
@@ -353,14 +355,15 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFFF1F5F9),
-        selectedColor: _primaryColor.withAlpha(30),
+        selectedColor: _primaryColor,
         labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        checkmarkColor: _primaryColor,
+        checkmarkColor: Colors.white,
         showCheckmark: false,
       ),
       sliderTheme: SliderThemeData(

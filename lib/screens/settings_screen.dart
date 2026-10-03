@@ -129,11 +129,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: AppLocalizations.supportedLanguages.map((lang) {
                     final isSelected = settings.languageCode == lang['code'];
+                    final isDark = theme.brightness == Brightness.dark;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Material(
                         color: isSelected
-                            ? theme.colorScheme.primary.withAlpha(20)
+                            ? (isDark
+                                ? theme.colorScheme.primary.withAlpha(45)
+                                : theme.colorScheme.primary.withAlpha(25))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                         child: InkWell(
@@ -153,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 color: isSelected
                                     ? theme.colorScheme.primary
                                     : Colors.transparent,
-                                width: 1.2,
+                                width: 1.5,
                               ),
                             ),
                             child: Row(
@@ -172,7 +175,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ? FontWeight.w600
                                           : FontWeight.normal,
                                       color: isSelected
-                                          ? theme.colorScheme.primary
+                                          ? (isDark
+                                              ? Colors.white
+                                              : theme.colorScheme.primary)
                                           : theme.colorScheme.onSurface,
                                     ),
                                   ),
@@ -180,7 +185,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 if (isSelected)
                                   Icon(
                                     Icons.check_circle_rounded,
-                                    color: theme.colorScheme.primary,
+                                    color: isDark
+                                        ? Colors.white
+                                        : theme.colorScheme.primary,
                                     size: 18,
                                   ),
                               ],
@@ -524,7 +531,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Icon(
                           Icons.storage_outlined,
                           size: 18,
-                          color: theme.colorScheme.secondary,
+                          color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -543,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondary.withAlpha(20),
+                            color: theme.colorScheme.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -551,7 +558,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.secondary,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ),
@@ -703,7 +710,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           final isSelected = settings.cpuPreset == key;
                           return ChoiceChip(
                             showCheckmark: false,
-                            label: Text(label),
+                            selectedColor: theme.colorScheme.primary,
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.outline,
+                              width: isSelected ? 1.2 : 1.0,
+                            ),
+                            label: Text(
+                              label,
+                              style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : theme.colorScheme.onSurface,
+                              ),
+                            ),
                             selected: isSelected,
                             onSelected: (selected) {
                               if (selected) {
@@ -734,7 +759,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Icon(
                           Icons.audiotrack_outlined,
                           size: 18,
-                          color: theme.colorScheme.secondary,
+                          color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -753,7 +778,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondary.withAlpha(20),
+                            color: theme.colorScheme.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -763,7 +788,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.secondary,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ),
@@ -786,7 +811,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           ChoiceChip(
                             showCheckmark: false,
-                            label: Text(l10n.t('settings_audio_mute')),
+                            selectedColor: theme.colorScheme.primary,
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(
+                              color: settings.audioBitrateKbps == 0
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.outline,
+                              width: settings.audioBitrateKbps == 0 ? 1.2 : 1.0,
+                            ),
+                            label: Text(
+                              l10n.t('settings_audio_mute'),
+                              style: TextStyle(
+                                fontWeight: settings.audioBitrateKbps == 0
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: settings.audioBitrateKbps == 0
+                                    ? Colors.white
+                                    : theme.colorScheme.onSurface,
+                              ),
+                            ),
                             selected: settings.audioBitrateKbps == 0,
                             onSelected: (selected) {
                               if (selected) {
@@ -795,12 +838,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               }
                             },
                           ),
-                          ...[64, 128, 192, 256].map((kbps) {
+                          ...[64, 128, 192, 256, 320].map((kbps) {
                             final isSelected =
                                 settings.audioBitrateKbps == kbps;
                             return ChoiceChip(
                               showCheckmark: false,
-                              label: Text('$kbps kbps'),
+                              selectedColor: theme.colorScheme.primary,
+                              backgroundColor: theme.colorScheme.surface,
+                              side: BorderSide(
+                                color: isSelected
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.outline,
+                                width: isSelected ? 1.2 : 1.0,
+                              ),
+                              label: Text(
+                                '$kbps kbps',
+                                style: TextStyle(
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurface,
+                                ),
+                              ),
                               selected: isSelected,
                               onSelected: (selected) {
                                 if (selected) {
@@ -981,13 +1042,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondary.withAlpha(20),
+                            color: theme.colorScheme.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             Icons.audio_file_outlined,
                             size: 18,
-                            color: theme.colorScheme.secondary,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -1017,7 +1078,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       : FontWeight.w600,
                                   color: settings.audioOutputDirectory.isEmpty
                                       ? theme.colorScheme.onSurface.withAlpha(140)
-                                      : theme.colorScheme.secondary,
+                                      : theme.colorScheme.primary,
                                 ),
                               ),
                             ],
@@ -1560,9 +1621,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String? badge,
   }) {
     final isSelected = value == current;
+    final isDark = theme.brightness == Brightness.dark;
     return Material(
       color: isSelected
-          ? theme.colorScheme.primary.withAlpha(20)
+          ? (isDark
+              ? theme.colorScheme.primary.withAlpha(45)
+              : theme.colorScheme.primary.withAlpha(25))
           : Colors.transparent,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
@@ -1579,7 +1643,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: isSelected
                   ? theme.colorScheme.primary
                   : Colors.transparent,
-              width: 1.2,
+              width: 1.5,
             ),
           ),
           child: Row(
@@ -1588,7 +1652,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon,
                 size: 20,
                 color: isSelected
-                    ? theme.colorScheme.primary
+                    ? (isDark ? Colors.white : theme.colorScheme.primary)
                     : theme.colorScheme.onSurface.withAlpha(160),
               ),
               const SizedBox(width: 12),
@@ -1605,7 +1669,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             fontWeight:
                                 isSelected ? FontWeight.w600 : FontWeight.w500,
                             color: isSelected
-                                ? theme.colorScheme.primary
+                                ? (isDark
+                                    ? Colors.white
+                                    : theme.colorScheme.primary)
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
@@ -1617,7 +1683,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withAlpha(20),
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.primary.withAlpha(20),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -1625,7 +1693,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.primary,
+                                color: isSelected
+                                    ? Colors.white
+                                    : theme.colorScheme.primary,
                               ),
                             ),
                           ),
@@ -1637,7 +1707,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 11,
-                        color: theme.colorScheme.onSurface.withAlpha(120),
+                        color: isSelected
+                            ? (isDark
+                                ? Colors.white.withAlpha(190)
+                                : theme.colorScheme.onSurface.withAlpha(180))
+                            : theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
                   ],
@@ -1646,7 +1720,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (isSelected)
                 Icon(
                   Icons.check_circle_rounded,
-                  color: theme.colorScheme.primary,
+                  color: isDark ? Colors.white : theme.colorScheme.primary,
                   size: 18,
                 ),
             ],
@@ -1665,7 +1739,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isSelected = value == current;
     return ChoiceChip(
       showCheckmark: false,
-      label: Text(label),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surface,
+      side: BorderSide(
+        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+        width: isSelected ? 1.2 : 1.0,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+        ),
+      ),
       selected: isSelected,
       onSelected: (selected) {
         if (selected) {
@@ -1686,12 +1772,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isSelected = value == current;
     return ChoiceChip(
       showCheckmark: false,
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surface,
+      side: BorderSide(
+        color: !enabled
+            ? theme.colorScheme.outline.withAlpha(50)
+            : (isSelected ? theme.colorScheme.primary : theme.colorScheme.outline),
+        width: isSelected ? 1.2 : 1.0,
+      ),
       label: Text(
         label,
         style: TextStyle(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: !enabled
               ? theme.colorScheme.onSurface.withAlpha(80)
-              : (isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface),
+              : (isSelected ? Colors.white : theme.colorScheme.onSurface),
         ),
       ),
       selected: isSelected && enabled,
