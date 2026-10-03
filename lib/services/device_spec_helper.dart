@@ -32,6 +32,30 @@ class DeviceSpecHelper {
     return 4096; // Fallback to 4GB
   }
 
+  /// Read real physical process memory usage (VmRSS) from Linux /proc filesystem on Android,
+  /// falling back to ProcessInfo.currentRss.
+  static int getProcessRssMb() {
+    try {
+      if (Platform.isAndroid) {
+        final lines = File('/proc/self/status').readAsLinesSync();
+        for (final line in lines) {
+          if (line.startsWith('VmRSS:')) {
+            final parts = line.split(RegExp(r'\s+'));
+            if (parts.length > 1) {
+              final kb = int.tryParse(parts[1]) ?? 0;
+              if (kb > 0) return kb ~/ 1024;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+    try {
+      final rss = ProcessInfo.currentRss;
+      if (rss > 0) return rss ~/ (1024 * 1024);
+    } catch (_) {}
+    return 0;
+  }
+
   static int getMarketedRamGb(int ramMb) {
     if (ramMb <= 0) return 4;
     final gb = ramMb / 1024.0;

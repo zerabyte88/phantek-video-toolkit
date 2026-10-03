@@ -137,12 +137,15 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ## Release History
 
 ### v1.1.5 (Build 15)
-- **Live Hardware & System Telemetry Dashboard:** Integrated real-time conversion monitoring cards directly into the processing screen:
-  - **Memory Usage:** Displays live process resident memory (RAM RSS in MB) compared against the user's configured RAM buffer limit with a 4-level segmented progress visualizer.
-  - **Storage I/O Throughput:** Real-time disk write throughput measurement (in MB/s) with a live 4-segment write pulse activity monitor, allowing users to verify active file synthesis and storage speed.
-  - **CPU Multi-Core Equalizer:** Live processing load percentage calculated from active encoding threads and hardware processors, complete with an animated 8-bar multi-thread activity equalizer.
+- **Windows Task Manager-Style Live Telemetry Dashboard:** Integrated real-time conversion monitoring cards directly into the processing screen with live history line charts:
+  - **Beban Prosesor (CPU Usage):** Live multi-threaded encoding workload percentage with active thread count and dynamic history wave.
+  - **Alokasi RAM (Memory RSS):** High-precision physical process resident memory read directly from Linux `/proc/self/status` (VmRSS) vs user-configured buffer limit with continuous line graph.
+  - **Laju Tulis Disk (Storage I/O):** Real-time disk write throughput measurement (in MB/s) tracking actual encoder output bytes with dynamic write velocity curves.
+  - **Telemetry Stream Bug Fix:** Resolved a critical list initialization issue (`UnsupportedError: Cannot add to a fixed-length list`) and `CustomPaint.shouldRepaint` synchronization that caused telemetry metrics and graph visualizers to freeze during transcoding.
+- **4096 MB (4GB) RAM Buffer with Hardware OOM Protection:** Added a 4096 MB buffer option in Settings for heavy workloads. To safeguard devices against OS Out-Of-Memory (OOM) kills, devices with $\le 4$ GB physical RAM automatically disable and grey out the 4GB chip with a descriptive hint.
+- **Offline Developer Profile & Browser Intent Launch Fix:** Bundled an offline developer avatar asset in Settings and declared Android 11+ (API 30+) package visibility `<queries>` for HTTPS/HTTP schemes, ensuring developer profile and repository links open reliably in external browser apps.
 - **Copyright-Safe Material 3 Telemetry Design:** Fully original visual design adhering to Phantek's Material 3 slate/cobalt aesthetics with soft-glow status indicators, auto-scaling value typography (`FittedBox`), and seamless contrast adaptation across AMOLED Black, Slate Dark, and Clean Light themes.
-- **Full Localization Parity:** All telemetry labels and metrics are fully localized across all 6 supported languages (Indonesian, English, Japanese, Simplified Chinese, Traditional Chinese, Korean).
+- **Full Localization Parity:** All telemetry labels, metrics, and new buffer hints are fully localized across all 6 supported languages (Indonesian, English, Japanese, Simplified Chinese, Traditional Chinese, Korean).
 
 ### v1.1.4 (Build 14)
 - **Orientation-Agnostic Resolution Classification & Filtering:** Fixed downscale resolution logic for portrait/vertical smartphone videos (e.g. 1080x1920) by filtering against the shorter dimension (`shortDimension`). Portrait videos are accurately identified by their standard target category (e.g. 1080p instead of 2K) and downscale mode correctly hides higher targets like 1440p (2K) to eliminate unintended upscaling.

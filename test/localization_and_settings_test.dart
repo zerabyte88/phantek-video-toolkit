@@ -221,7 +221,26 @@ void main() {
         expect(l10n.t('settings_audio_reset_folder').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_changed').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_default').isNotEmpty, isTrue);
+        expect(l10n.t('settings_ram_ultra').isNotEmpty, isTrue);
+        expect(l10n.t('settings_ram_4gb_disabled_hint').isNotEmpty, isTrue);
       }
+    });
+
+    test('AppSettings supports 4096 MB RAM buffer serialization and copyWith', () {
+      const original = AppSettings(ramBufferMb: 4096);
+      expect(original.ramBufferMb, equals(4096));
+      final json = original.toJson();
+      expect(json['ramBufferMb'], equals(4096));
+      final fromJson = AppSettings.fromJson(json);
+      expect(fromJson.ramBufferMb, equals(4096));
+
+      final updated = original.copyWith(ramBufferMb: 2048);
+      expect(updated.ramBufferMb, equals(2048));
+    });
+
+    test('DeviceSpecHelper getProcessRssMb returns non-negative memory integer', () {
+      final rssMb = DeviceSpecHelper.getProcessRssMb();
+      expect(rssMb, greaterThanOrEqualTo(0));
     });
 
     test('AppSettings copyWith properly updates outputDirectory and other fields', () {
