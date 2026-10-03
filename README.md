@@ -47,7 +47,7 @@ Video transcoding requires sustained CPU utilization over extended durations. Th
 - **Categorized Mode Selector:** Intuitive top selector bar grouped into dedicated media categories: **Video** (housing **Convert** and **Downscale**) and **Audio** (housing **Audio Extractor**), with proportional button sizing and dynamic active-category highlighting.
 - **Dedicated Audio Extractor:** Directly strips audio tracks from video into high-quality **MP3** (`libmp3lame`), **M4A / AAC** (`aac`), or uncompressed studio lossless **WAV** (`pcm_s16le`) with optional ultra-fast stream copy or customizable bitrate.
 - **Elegant Drop / Import Zone:** Streamlined video selection experience with responsive layout and clear specification tags.
-- **Seamless Return-to-Home Flow:** Success sheet includes a single-tap "Kembali ke Beranda" (Return to Home) button that cleanly resets the session, ready for subsequent tasks.
+- **Seamless Return-to-Home Flow:** Success sheet includes a single-tap "Return to Home" button that cleanly resets the session, ready for subsequent tasks.
 - **Theme Modes:** AMOLED Pitch Black, Slate Midnight Dark, and Clean Light mode with full semantic color tokens.
 
 ### Video Scaling and Codec Management
@@ -140,9 +140,9 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 - **Unified & Illuminated Selection Styling:** Completely revamped all selectable chips, buttons, and tiles (Rate Control, Video Format, Video Codec, Target FPS, Audio Bitrates, CPU Presets, Core Allocations, RAM Buffers, Display Themes, and Language Selectors) with solid, high-contrast vibrant primary blue (`#2563EB`) fills, crisp pure-white typography (`#FFFFFF`), and unified accent borders. Replaced dark translucent tints and inconsistent badge colors for effortless visibility and unified visual harmony across AMOLED Black, Slate Dark, and Light themes.
 - **320 kbps Studio Audio Quality:** Added a 320 kbps ultra-high bitrate audio encoding option across both the Audio Extractor module and global Settings Audio Quality configurations for maximum acoustic clarity.
 - **Windows Task Manager-Style Live Telemetry Dashboard:** Integrated real-time conversion monitoring cards directly into the processing screen with live history line charts:
-  - **Beban Prosesor (CPU Usage):** Live multi-threaded encoding workload percentage with active thread count and dynamic history wave.
-  - **Alokasi RAM (Memory RSS):** High-precision physical process resident memory read directly from Linux `/proc/self/status` (VmRSS) vs user-configured buffer limit with continuous line graph.
-  - **Laju Tulis Disk (Storage I/O):** Real-time disk write throughput measurement (in MB/s) tracking actual encoder output bytes with dynamic write velocity curves.
+  - **Processor Workload (CPU Usage):** Live multi-threaded encoding workload percentage with active thread count and dynamic history wave.
+  - **Memory Allocation (RAM RSS):** High-precision physical process resident memory read directly from Linux `/proc/self/status` (VmRSS) vs user-configured buffer limit with continuous line graph.
+  - **Disk Write Throughput (Storage I/O):** Real-time disk write throughput measurement (in MB/s) tracking actual encoder output bytes with dynamic write velocity curves.
   - **Telemetry Stream Bug Fix:** Resolved a critical list initialization issue (`UnsupportedError: Cannot add to a fixed-length list`) and `CustomPaint.shouldRepaint` synchronization that caused telemetry metrics and graph visualizers to freeze during transcoding.
 - **4096 MB (4GB) RAM Buffer with Hardware OOM Protection:** Added a 4096 MB buffer option in Settings for heavy workloads. To safeguard devices against OS Out-Of-Memory (OOM) kills, devices with $\le 4$ GB physical RAM automatically disable and grey out the 4GB chip with a descriptive hint.
 - **Offline Developer Profile & Browser Intent Launch Fix:** Bundled an offline developer avatar asset in Settings and declared Android 11+ (API 30+) package visibility `<queries>` for HTTPS/HTTP schemes, ensuring developer profile and repository links open reliably in external browser apps.
