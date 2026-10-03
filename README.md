@@ -181,3 +181,14 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ## License
 
 This software is distributed under the terms of the GNU General Public License v3.0 (GPLv3) to comply with dependencies bundled within `ffmpeg_kit_flutter_new` and the `libx264` GPL licensing requirements.
+
+---
+
+<div align="center">
+  <br/>
+  <a href="https://github.com/zerabyte88">
+    <img src="https://github.com/zerabyte88.png" width="48" height="48" style="border-radius: 50%;" alt="zerabyte88" />
+  </a>
+  <br/>
+  <sub>Developed with ❤️ by <a href="https://github.com/zerabyte88">zerabyte88</a> (Creator & Maintainer)</sub>
+</div>
