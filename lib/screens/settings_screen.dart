@@ -1489,7 +1489,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () => _launchUrl(
-                          'https://github.com/zerabyte88/video_downscaler',
+                          'https://github.com/zerabyte88/phantek-video-toolkit',
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
