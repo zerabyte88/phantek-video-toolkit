@@ -85,7 +85,9 @@ class CacheManagerService {
           final len = await f.length();
           await f.delete();
           bytesFreed += len;
-          debugPrint('Deleted specific cached input file: $specificInputPath ($len bytes)');
+          debugPrint(
+            'Deleted specific cached input file: $specificInputPath ($len bytes)',
+          );
         }
       } catch (e) {
         debugPrint('Error deleting specific input file: $e');

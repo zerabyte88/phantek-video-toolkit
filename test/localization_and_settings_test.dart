@@ -14,9 +14,15 @@ void main() {
     const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
 
     test('All 6 requested languages are available in supportedLanguages', () {
-      final codes = AppLocalizations.supportedLanguages.map((l) => l['code']).toList();
+      final codes = AppLocalizations.supportedLanguages
+          .map((l) => l['code'])
+          .toList();
       for (final code in supportedCodes) {
-        expect(codes.contains(code), isTrue, reason: 'Language $code must be supported');
+        expect(
+          codes.contains(code),
+          isTrue,
+          reason: 'Language $code must be supported',
+        );
       }
     });
 
@@ -57,7 +63,10 @@ void main() {
         expect(l10n.t('res_original').isNotEmpty, isTrue);
 
         // Ensure keys do not return the literal key name
-        expect(l10n.t('proc_cancel_confirm'), isNot(equals('proc_cancel_confirm')));
+        expect(
+          l10n.t('proc_cancel_confirm'),
+          isNot(equals('proc_cancel_confirm')),
+        );
         expect(l10n.t('proc_continue_btn'), isNot(equals('proc_continue_btn')));
         expect(l10n.t('proc_cancel_btn'), isNot(equals('proc_cancel_btn')));
         expect(l10n.t('rate_control'), isNot(equals('rate_control')));
@@ -129,8 +138,11 @@ void main() {
 
       // Add dynamic keys
       allCalls.addAll([
-        'desc_mp4', 'desc_mkv', 'desc_mov',
-        'desc_h264', 'desc_hevc',
+        'desc_mp4',
+        'desc_mkv',
+        'desc_mov',
+        'desc_h264',
+        'desc_hevc',
       ]);
       // Remove any interpolated placeholder patterns if present
       allCalls.removeWhere((k) => k.contains(r'$'));
@@ -139,10 +151,16 @@ void main() {
         final l10n = AppLocalizations(code);
         for (final key in allCalls) {
           final translated = l10n.t(key);
-          expect(translated, isNot(equals(key)),
-              reason: 'Key "$key" is missing translation for language "$code"');
-          expect(translated.isNotEmpty, isTrue,
-              reason: 'Key "$key" is empty for language "$code"');
+          expect(
+            translated,
+            isNot(equals(key)),
+            reason: 'Key "$key" is missing translation for language "$code"',
+          );
+          expect(
+            translated.isNotEmpty,
+            isTrue,
+            reason: 'Key "$key" is empty for language "$code"',
+          );
         }
       }
     });
@@ -225,22 +243,28 @@ void main() {
       }
     });
 
-    test('AppSettings supports 4096 MB RAM buffer serialization and copyWith', () {
-      const original = AppSettings(ramBufferMb: 4096);
-      expect(original.ramBufferMb, equals(4096));
-      final json = original.toJson();
-      expect(json['ramBufferMb'], equals(4096));
-      final fromJson = AppSettings.fromJson(json);
-      expect(fromJson.ramBufferMb, equals(4096));
+    test(
+      'AppSettings supports 4096 MB RAM buffer serialization and copyWith',
+      () {
+        const original = AppSettings(ramBufferMb: 4096);
+        expect(original.ramBufferMb, equals(4096));
+        final json = original.toJson();
+        expect(json['ramBufferMb'], equals(4096));
+        final fromJson = AppSettings.fromJson(json);
+        expect(fromJson.ramBufferMb, equals(4096));
 
-      final updated = original.copyWith(ramBufferMb: 2048);
-      expect(updated.ramBufferMb, equals(2048));
-    });
+        final updated = original.copyWith(ramBufferMb: 2048);
+        expect(updated.ramBufferMb, equals(2048));
+      },
+    );
 
-    test('DeviceSpecHelper getProcessRssMb returns non-negative memory integer', () {
-      final rssMb = DeviceSpecHelper.getProcessRssMb();
-      expect(rssMb, greaterThanOrEqualTo(0));
-    });
+    test(
+      'DeviceSpecHelper getProcessRssMb returns non-negative memory integer',
+      () {
+        final rssMb = DeviceSpecHelper.getProcessRssMb();
+        expect(rssMb, greaterThanOrEqualTo(0));
+      },
+    );
 
     test('DeviceSpecHelper getProcessCpuUsagePercent returns valid percentage within 0-100', () {
       final cpuUsage = DeviceSpecHelper.getProcessCpuUsagePercent();
@@ -248,25 +272,32 @@ void main() {
       expect(cpuUsage, lessThanOrEqualTo(100.0));
     });
 
-    test('AppSettings copyWith properly updates outputDirectory and other fields', () {
-      const original = AppSettings();
-      final updated = original.copyWith(
-        outputDirectory: '/custom/path',
-        audioOutputDirectory: '/custom/audio/path',
-        keepScreenAwake: true,
-      );
+    test(
+      'AppSettings copyWith properly updates outputDirectory and other fields',
+      () {
+        const original = AppSettings();
+        final updated = original.copyWith(
+          outputDirectory: '/custom/path',
+          audioOutputDirectory: '/custom/audio/path',
+          keepScreenAwake: true,
+        );
 
-      expect(updated.outputDirectory, equals('/custom/path'));
-      expect(updated.audioOutputDirectory, equals('/custom/audio/path'));
-      expect(updated.keepScreenAwake, isTrue);
-      expect(updated.cpuThreads, equals(original.cpuThreads));
-      expect(updated.themeMode, equals(original.themeMode));
-    });
+        expect(updated.outputDirectory, equals('/custom/path'));
+        expect(updated.audioOutputDirectory, equals('/custom/audio/path'));
+        expect(updated.keepScreenAwake, isTrue);
+        expect(updated.cpuThreads, equals(original.cpuThreads));
+        expect(updated.themeMode, equals(original.themeMode));
+      },
+    );
 
     test('FFmpegService getOutputDirectory uses customPath when provided and valid', () async {
-      final customTemp = Directory('${Directory.systemTemp.path}/test_custom_output_${DateTime.now().millisecondsSinceEpoch}');
+      final customTemp = Directory(
+        '${Directory.systemTemp.path}/test_custom_output_${DateTime.now().millisecondsSinceEpoch}',
+      );
       try {
-        final result = await FFmpegService.getOutputDirectory(customPath: customTemp.path);
+        final result = await FFmpegService.getOutputDirectory(
+          customPath: customTemp.path,
+        );
         expect(result.path, equals(customTemp.path));
         expect(await result.exists(), isTrue);
       } finally {
@@ -304,10 +335,21 @@ void main() {
 
     test('isCachedPath identifies temporary and picker cached paths', () {
       final cacheManager = CacheManagerService();
-      expect(cacheManager.isCachedPath('/data/user/0/com.app/cache/file_picker/vid.mp4'), isTrue);
-      expect(cacheManager.isCachedPath('/data/user/0/com.app/cache/sample.mp4'), isTrue);
+      expect(
+        cacheManager.isCachedPath(
+          '/data/user/0/com.app/cache/file_picker/vid.mp4',
+        ),
+        isTrue,
+      );
+      expect(
+        cacheManager.isCachedPath('/data/user/0/com.app/cache/sample.mp4'),
+        isTrue,
+      );
       expect(cacheManager.isCachedPath('C:\\temp\\cache\\vid.mp4'), isTrue);
-      expect(cacheManager.isCachedPath('/storage/emulated/0/Movies/sample.mp4'), isFalse);
+      expect(
+        cacheManager.isCachedPath('/storage/emulated/0/Movies/sample.mp4'),
+        isFalse,
+      );
     });
 
     test('Percentage formatting retains 1 decimal place consistently without rounding discrepancy', () {
@@ -364,21 +406,24 @@ void main() {
       expect(path, equals('${tempDir.path}${sep}video4k-4k-2.mp4'));
     });
 
-    test('appends incremental suffix -3 when base and -2 already exist', () async {
-      final sep = Platform.pathSeparator;
-      // Pre-create video4k-4k.mp4 and video4k-4k-2.mp4
-      File('${tempDir.path}${sep}video4k-4k.mp4').createSync();
-      File('${tempDir.path}${sep}video4k-4k-2.mp4').createSync();
+    test(
+      'appends incremental suffix -3 when base and -2 already exist',
+      () async {
+        final sep = Platform.pathSeparator;
+        // Pre-create video4k-4k.mp4 and video4k-4k-2.mp4
+        File('${tempDir.path}${sep}video4k-4k.mp4').createSync();
+        File('${tempDir.path}${sep}video4k-4k-2.mp4').createSync();
 
-      final path = await FFmpegService.generateUniqueOutputPath(
-        outputDir: tempDir,
-        fileName: 'video4k.mp4',
-        targetResolution: VideoResolution.standardResolutions.first,
-        container: VideoContainer.mp4,
-      );
+        final path = await FFmpegService.generateUniqueOutputPath(
+          outputDir: tempDir,
+          fileName: 'video4k.mp4',
+          targetResolution: VideoResolution.standardResolutions.first,
+          container: VideoContainer.mp4,
+        );
 
-      expect(path, equals('${tempDir.path}${sep}video4k-4k-3.mp4'));
-    });
+        expect(path, equals('${tempDir.path}${sep}video4k-4k-3.mp4'));
+      },
+    );
   });
 
   group('VideoInfo resolution formatting tests', () {
@@ -446,7 +491,10 @@ void main() {
       expect(v480.resolution, equals('480p'));
 
       // Check available downscale targets label
-      expect(v720.availableDownscaleTargets.first.label, equals('Original (720p)'));
+      expect(
+        v720.availableDownscaleTargets.first.label,
+        equals('Original (720p)'),
+      );
     });
 
     test('Navigation and options reset localization keys resolve correctly in all 6 languages', () {
@@ -458,36 +506,42 @@ void main() {
         expect(l10n.t('options_reset_success').isNotEmpty, isTrue);
         expect(l10n.t('back_to_home'), isNot(equals('back_to_home')));
         expect(l10n.t('reset_options'), isNot(equals('reset_options')));
-        expect(l10n.t('options_reset_success'), isNot(equals('options_reset_success')));
+        expect(
+          l10n.t('options_reset_success'),
+          isNot(equals('options_reset_success')),
+        );
       }
     });
 
-    test('Audio Extractor localization keys resolve properly in all 6 languages', () {
-      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
-      for (final code in supportedCodes) {
-        final l10n = AppLocalizations(code);
-        expect(l10n.t('category_video').isNotEmpty, isTrue);
-        expect(l10n.t('category_audio').isNotEmpty, isTrue);
-        expect(l10n.t('category_video'), isNot(equals('category_video')));
-        expect(l10n.t('category_audio'), isNot(equals('category_audio')));
-        expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
-        expect(l10n.t('audio_options').isNotEmpty, isTrue);
-        expect(l10n.t('audio_format').isNotEmpty, isTrue);
-        expect(l10n.t('audio_bitrate').isNotEmpty, isTrue);
-        expect(l10n.t('audio_copy').isNotEmpty, isTrue);
-        expect(l10n.t('start_audio_extraction').isNotEmpty, isTrue);
-        expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
-        expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
-        expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
-        expect(l10n.t('desc_audio_mp3').isNotEmpty, isTrue);
-        expect(l10n.t('desc_audio_m4a').isNotEmpty, isTrue);
-        expect(l10n.t('desc_audio_wav').isNotEmpty, isTrue);
-        expect(l10n.t('desc_audio_mp3'), isNot(equals('desc_audio_mp3')));
-        expect(l10n.t('desc_audio_m4a'), isNot(equals('desc_audio_m4a')));
-        expect(l10n.t('desc_audio_wav'), isNot(equals('desc_audio_wav')));
-        expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
-      }
-    });
+    test(
+      'Audio Extractor localization keys resolve properly in all 6 languages',
+      () {
+        const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
+        for (final code in supportedCodes) {
+          final l10n = AppLocalizations(code);
+          expect(l10n.t('category_video').isNotEmpty, isTrue);
+          expect(l10n.t('category_audio').isNotEmpty, isTrue);
+          expect(l10n.t('category_video'), isNot(equals('category_video')));
+          expect(l10n.t('category_audio'), isNot(equals('category_audio')));
+          expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
+          expect(l10n.t('audio_options').isNotEmpty, isTrue);
+          expect(l10n.t('audio_format').isNotEmpty, isTrue);
+          expect(l10n.t('audio_bitrate').isNotEmpty, isTrue);
+          expect(l10n.t('audio_copy').isNotEmpty, isTrue);
+          expect(l10n.t('start_audio_extraction').isNotEmpty, isTrue);
+          expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
+          expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
+          expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
+          expect(l10n.t('desc_audio_mp3').isNotEmpty, isTrue);
+          expect(l10n.t('desc_audio_m4a').isNotEmpty, isTrue);
+          expect(l10n.t('desc_audio_wav').isNotEmpty, isTrue);
+          expect(l10n.t('desc_audio_mp3'), isNot(equals('desc_audio_mp3')));
+          expect(l10n.t('desc_audio_m4a'), isNot(equals('desc_audio_m4a')));
+          expect(l10n.t('desc_audio_wav'), isNot(equals('desc_audio_wav')));
+          expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
+        }
+      },
+    );
   });
 
   group('Audio Extractor and Format tests', () {
@@ -514,24 +568,27 @@ void main() {
       expect(AudioFormat.wav.ffmpegCodec, equals('pcm_s16le'));
     });
 
-    test('generateUniqueAudioOutputPath generates clean unique audio filenames', () async {
-      final sep = Platform.pathSeparator;
-      final path1 = await FFmpegService.generateUniqueAudioOutputPath(
-        outputDir: tempDir,
-        fileName: 'clip.mp4',
-        audioFormat: AudioFormat.mp3,
-      );
-      expect(path1, equals('${tempDir.path}${sep}clip-audio.mp3'));
+    test(
+      'generateUniqueAudioOutputPath generates clean unique audio filenames',
+      () async {
+        final sep = Platform.pathSeparator;
+        final path1 = await FFmpegService.generateUniqueAudioOutputPath(
+          outputDir: tempDir,
+          fileName: 'clip.mp4',
+          audioFormat: AudioFormat.mp3,
+        );
+        expect(path1, equals('${tempDir.path}${sep}clip-audio.mp3'));
 
-      // Create file and check incremental naming
-      File(path1).createSync();
-      final path2 = await FFmpegService.generateUniqueAudioOutputPath(
-        outputDir: tempDir,
-        fileName: 'clip.mp4',
-        audioFormat: AudioFormat.mp3,
-      );
-      expect(path2, equals('${tempDir.path}${sep}clip-audio-2.mp3'));
-    });
+        // Create file and check incremental naming
+        File(path1).createSync();
+        final path2 = await FFmpegService.generateUniqueAudioOutputPath(
+          outputDir: tempDir,
+          fileName: 'clip.mp4',
+          audioFormat: AudioFormat.mp3,
+        );
+        expect(path2, equals('${tempDir.path}${sep}clip-audio-2.mp3'));
+      },
+    );
 
     test('VideoInfo tracks hasAudio and audioCodec accurately', () {
       const withAudio = VideoInfo(
@@ -566,33 +623,41 @@ void main() {
       expect(withoutAudio.audioCodec, isNull);
     });
 
-    test('no_audio_track localization resolves properly across all 6 languages', () {
-      for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
-        final l10n = AppLocalizations(code);
-        final translated = l10n.t('no_audio_track');
-        expect(translated.isNotEmpty, isTrue);
-        expect(translated, isNot(equals('no_audio_track')));
-      }
-    });
+    test(
+      'no_audio_track localization resolves properly across all 6 languages',
+      () {
+        for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
+          final l10n = AppLocalizations(code);
+          final translated = l10n.t('no_audio_track');
+          expect(translated.isNotEmpty, isTrue);
+          expect(translated, isNot(equals('no_audio_track')));
+        }
+      },
+    );
 
-    test('FFmpegService getOutputDirectory respects custom path and isAudio flag', () async {
-      final customDir = Directory('${tempDir.path}${Platform.pathSeparator}CustomAudio');
-      customDir.createSync();
+    test(
+      'FFmpegService getOutputDirectory respects custom path and isAudio flag',
+      () async {
+        final customDir = Directory(
+          '${tempDir.path}${Platform.pathSeparator}CustomAudio',
+        );
+        customDir.createSync();
 
-      // Custom path provided with isAudio: true
-      final outDirCustomAudio = await FFmpegService.getOutputDirectory(
-        customPath: customDir.path,
-        isAudio: true,
-      );
-      expect(outDirCustomAudio.path, equals(customDir.path));
+        // Custom path provided with isAudio: true
+        final outDirCustomAudio = await FFmpegService.getOutputDirectory(
+          customPath: customDir.path,
+          isAudio: true,
+        );
+        expect(outDirCustomAudio.path, equals(customDir.path));
 
-      // Custom path provided with isAudio: false
-      final outDirCustomVideo = await FFmpegService.getOutputDirectory(
-        customPath: customDir.path,
-        isAudio: false,
-      );
-      expect(outDirCustomVideo.path, equals(customDir.path));
-    });
+        // Custom path provided with isAudio: false
+        final outDirCustomVideo = await FFmpegService.getOutputDirectory(
+          customPath: customDir.path,
+          isAudio: false,
+        );
+        expect(outDirCustomVideo.path, equals(customDir.path));
+      },
+    );
 
     test('DeviceSpecHelper getMarketedRamGb calculates accurate marketing RAM capacities', () {
       expect(DeviceSpecHelper.getMarketedRamGb(7840), equals(8));
@@ -759,9 +824,16 @@ void main() {
         manufacturer: 'Qualcomm',
         socModel: 'SM8850',
       );
-      expect(snapdragon8EliteGen5Cpu, equals('Qualcomm Snapdragon 8 Elite Gen 5'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'sm8850', board: 'sun', socName: snapdragon8EliteGen5Cpu),
+        snapdragon8EliteGen5Cpu,
+        equals('Qualcomm Snapdragon 8 Elite Gen 5'),
+      );
+      expect(
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'sm8850',
+          board: 'sun',
+          socName: snapdragon8EliteGen5Cpu,
+        ),
         equals('Adreno 830'),
       );
 
@@ -772,7 +844,11 @@ void main() {
       );
       expect(dimensity7050Cpu, equals('MediaTek Dimensity 7050'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'mt6877v', board: 'mt6877', socName: dimensity7050Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'mt6877v',
+          board: 'mt6877',
+          socName: dimensity7050Cpu,
+        ),
         equals('Mali-G68 MC4'),
       );
 
@@ -783,7 +859,11 @@ void main() {
       );
       expect(dimensity9500Cpu, equals('MediaTek Dimensity 9500'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'mt6993', board: 'mt6993', socName: dimensity9500Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'mt6993',
+          board: 'mt6993',
+          socName: dimensity9500Cpu,
+        ),
         equals('Immortalis-G925 MC12'),
       );
 
@@ -794,7 +874,11 @@ void main() {
       );
       expect(dimensity9600Cpu, equals('MediaTek Dimensity 9600'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'mt6995', board: 'mt6995', socName: dimensity9600Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'mt6995',
+          board: 'mt6995',
+          socName: dimensity9600Cpu,
+        ),
         equals('Immortalis-G925 MC12'),
       );
 
@@ -805,7 +889,11 @@ void main() {
       );
       expect(snapdragon778GCpu, equals('Qualcomm Snapdragon 778G'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'sm7325', board: 'yupik', socName: snapdragon778GCpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'sm7325',
+          board: 'yupik',
+          socName: snapdragon778GCpu,
+        ),
         equals('Adreno 642L'),
       );
 
@@ -816,7 +904,11 @@ void main() {
       );
       expect(snapdragon660Cpu, equals('Qualcomm Snapdragon 660'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'sdm660', board: 'sdm660', socName: snapdragon660Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'sdm660',
+          board: 'sdm660',
+          socName: snapdragon660Cpu,
+        ),
         equals('Adreno 512'),
       );
 
@@ -827,7 +919,11 @@ void main() {
       );
       expect(unisocT770Cpu, equals('Unisoc T770'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'ums512t', board: 't770', socName: unisocT770Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'ums512t',
+          board: 't770',
+          socName: unisocT770Cpu,
+        ),
         equals('Mali-G57 MP4'),
       );
 
@@ -839,7 +935,11 @@ void main() {
       );
       expect(unisocT618Cpu, equals('Unisoc T618'));
       expect(
-        DeviceSpecHelper.detectGpuName(hardware: 'ums512', board: 't618', socName: unisocT618Cpu),
+        DeviceSpecHelper.detectGpuName(
+          hardware: 'ums512',
+          board: 't618',
+          socName: unisocT618Cpu,
+        ),
         equals('Mali-G57 MP1'),
       );
     });
@@ -864,4 +964,3 @@ void main() {
     });
   });
 }
-

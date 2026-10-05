@@ -90,7 +90,11 @@ class AudioExtractorCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.volume_off_rounded, color: Colors.red, size: 20),
+                    const Icon(
+                      Icons.volume_off_rounded,
+                      color: Colors.red,
+                      size: 20,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -148,8 +152,9 @@ class AudioExtractorCard extends StatelessWidget {
                     label: Text(
                       fmt.displayName,
                       style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: isSelected
                             ? Colors.white
                             : theme.colorScheme.onSurface,
@@ -227,8 +232,8 @@ class AudioExtractorCard extends StatelessWidget {
                         style: TextStyle(
                           fontWeight:
                               encodingOptions.audioExtractBitrateKbps == 0
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: encodingOptions.audioExtractBitrateKbps == 0
                               ? Colors.white
                               : theme.colorScheme.onSurface,
@@ -238,7 +243,9 @@ class AudioExtractorCard extends StatelessWidget {
                       onSelected: (selected) {
                         if (selected) {
                           onOptionsChanged(
-                            encodingOptions.copyWith(audioExtractBitrateKbps: 0),
+                            encodingOptions.copyWith(
+                              audioExtractBitrateKbps: 0,
+                            ),
                           );
                         }
                       },
@@ -272,7 +279,8 @@ class AudioExtractorCard extends StatelessWidget {
                           if (selected) {
                             onOptionsChanged(
                               encodingOptions.copyWith(
-                                  audioExtractBitrateKbps: kbps),
+                                audioExtractBitrateKbps: kbps,
+                              ),
                             );
                           }
                         },

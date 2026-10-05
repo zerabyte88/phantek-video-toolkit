@@ -34,7 +34,8 @@ class _VideoProcessingTaskHandler extends TaskHandler {
 }
 
 class ForegroundServiceManager {
-  static final ForegroundServiceManager _instance = ForegroundServiceManager._internal();
+  static final ForegroundServiceManager _instance =
+      ForegroundServiceManager._internal();
   factory ForegroundServiceManager() => _instance;
   ForegroundServiceManager._internal();
 
@@ -85,7 +86,8 @@ class ForegroundServiceManager {
 
       // Exempt from battery optimization so Doze mode never pauses encoding when screen is off
       if (Platform.isAndroid) {
-        final isIgnoringBattery = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+        final isIgnoringBattery =
+            await FlutterForegroundTask.isIgnoringBatteryOptimizations;
         if (!isIgnoringBattery) {
           await FlutterForegroundTask.requestIgnoreBatteryOptimization();
         }
@@ -94,21 +96,6 @@ class ForegroundServiceManager {
       return true;
     } catch (e) {
       debugPrint('Error requesting foreground permissions: $e');
-      return false;
-    }
-  }
-
-  Future<bool> requestBatteryOptimizationExemption() async {
-    try {
-      if (Platform.isAndroid) {
-        final isIgnoring = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
-        if (!isIgnoring) {
-          return await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-        }
-      }
-      return true;
-    } catch (e) {
-      debugPrint('Error requesting battery optimization exemption: $e');
       return false;
     }
   }

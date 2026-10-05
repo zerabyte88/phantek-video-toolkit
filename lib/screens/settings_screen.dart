@@ -101,9 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final is4GbDisabled = marketedRamGb <= 4 || totalRamMb <= 4096;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.t('settings_title')),
-      ),
+      appBar: AppBar(title: Text(l10n.t('settings_title'))),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -135,8 +133,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Material(
                         color: isSelected
                             ? (isDark
-                                ? theme.colorScheme.primary.withAlpha(45)
-                                : theme.colorScheme.primary.withAlpha(25))
+                                  ? theme.colorScheme.primary.withAlpha(45)
+                                  : theme.colorScheme.primary.withAlpha(25))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                         child: InkWell(
@@ -176,8 +174,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           : FontWeight.normal,
                                       color: isSelected
                                           ? (isDark
-                                              ? Colors.white
-                                              : theme.colorScheme.primary)
+                                                ? Colors.white
+                                                : theme.colorScheme.primary)
                                           : theme.colorScheme.onSurface,
                                     ),
                                   ),
@@ -309,7 +307,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest
                             .withAlpha(80),
@@ -330,8 +330,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 height: 1.35,
-                                color:
-                                    theme.colorScheme.onSurface.withAlpha(150),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  150,
+                                ),
                               ),
                             ),
                           ),
@@ -363,8 +364,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.info_outline_rounded,
-                              size: 18, color: theme.colorScheme.primary),
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: 18,
+                            color: theme.colorScheme.primary,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             l10n.t('device_specs'),
@@ -401,13 +405,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildHardwareInfoRow(
                         theme,
                         l10n.t('device_gpu'),
-                        _hardwareInfo!['gpu'] as String? ?? 'Hardware Graphics Accelerator',
+                        _hardwareInfo!['gpu'] as String? ??
+                            'Hardware Graphics Accelerator',
                       ),
                       const SizedBox(height: 6),
                       _buildHardwareInfoRow(
                         theme,
                         l10n.t('device_ram'),
-                        _hardwareInfo!['ram'] as String? ?? '${_hardwareInfo!['ramMb']} MB',
+                        _hardwareInfo!['ram'] as String? ??
+                            '${_hardwareInfo!['ramMb']} MB',
                       ),
                       const SizedBox(height: 6),
                       _buildHardwareInfoRow(
@@ -501,14 +507,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             theme: theme,
                           ),
                           ...[1, 2, 4, 6, 8]
-                              .where((c) =>
-                                  c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
-                              .map((c) => _buildCoreChip(
-                                    label: '$c ${l10n.t('unit_core')}',
-                                    value: c,
-                                    current: settings.cpuThreads,
-                                    theme: theme,
-                                  )),
+                              .where(
+                                (c) =>
+                                    c <=
+                                    (deviceCores > 0 ? (deviceCores + 2) : 8),
+                              )
+                              .map(
+                                (c) => _buildCoreChip(
+                                  label: '$c ${l10n.t('unit_core')}',
+                                  value: c,
+                                  current: settings.cpuThreads,
+                                  theme: theme,
+                                ),
+                              ),
                         ],
                       ),
                     ),
@@ -695,49 +706,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         alignment: WrapAlignment.center,
                         spacing: 8,
                         runSpacing: 8,
-                        children: [
-                          {
-                            'key': 'fast',
-                            'label': l10n.t('preset_fast'),
-                          },
-                          {
-                            'key': 'medium',
-                            'label': l10n.t('preset_normal'),
-                          },
-                        ].map((item) {
-                          final key = item['key']!;
-                          final label = item['label']!;
-                          final isSelected = settings.cpuPreset == key;
-                          return ChoiceChip(
-                            showCheckmark: false,
-                            selectedColor: theme.colorScheme.primary,
-                            backgroundColor: theme.colorScheme.surface,
-                            side: BorderSide(
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.outline,
-                              width: isSelected ? 1.2 : 1.0,
-                            ),
-                            label: Text(
-                              label,
-                              style: TextStyle(
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              if (selected) {
-                                _settingsService.setCpuPreset(key);
-                                setState(() {});
-                              }
-                            },
-                          );
-                        }).toList(),
+                        children:
+                            [
+                              {'key': 'fast', 'label': l10n.t('preset_fast')},
+                              {
+                                'key': 'medium',
+                                'label': l10n.t('preset_normal'),
+                              },
+                            ].map((item) {
+                              final key = item['key']!;
+                              final label = item['label']!;
+                              final isSelected = settings.cpuPreset == key;
+                              return ChoiceChip(
+                                showCheckmark: false,
+                                selectedColor: theme.colorScheme.primary,
+                                backgroundColor: theme.colorScheme.surface,
+                                side: BorderSide(
+                                  color: isSelected
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outline,
+                                  width: isSelected ? 1.2 : 1.0,
+                                ),
+                                label: Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected) {
+                                    _settingsService.setCpuPreset(key);
+                                    setState(() {});
+                                  }
+                                },
+                              );
+                            }).toList(),
                       ),
                     ),
                   ],
@@ -944,7 +953,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ? FontWeight.normal
                                       : FontWeight.w600,
                                   color: settings.outputDirectory.isEmpty
-                                      ? theme.colorScheme.onSurface.withAlpha(140)
+                                      ? theme.colorScheme.onSurface.withAlpha(
+                                          140,
+                                        )
                                       : theme.colorScheme.primary,
                                 ),
                               ),
@@ -975,18 +986,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               try {
                                 final selectedDir =
                                     await FilePicker.getDirectoryPath(
-                                  dialogTitle: l10n.t('settings_output_folder'),
-                                );
+                                      dialogTitle: l10n.t(
+                                        'settings_output_folder',
+                                      ),
+                                    );
                                 if (selectedDir != null &&
                                     selectedDir.trim().isNotEmpty) {
-                                  await _settingsService
-                                      .setOutputDirectory(selectedDir.trim());
+                                  await _settingsService.setOutputDirectory(
+                                    selectedDir.trim(),
+                                  );
                                   if (context.mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                            l10n.t('settings_folder_changed')),
+                                          l10n.t('settings_folder_changed'),
+                                        ),
                                       ),
                                     );
                                   }
@@ -995,11 +1010,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 debugPrint('Failed to pick directory: $e');
                               }
                             },
-                            icon: const Icon(Icons.folder_open_rounded, size: 16),
+                            icon: const Icon(
+                              Icons.folder_open_rounded,
+                              size: 16,
+                            ),
                             label: Text(l10n.t('settings_change_folder')),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                             ),
                           ),
                           if (settings.outputDirectory.isNotEmpty) ...[
@@ -1011,7 +1031,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                          l10n.t('settings_folder_changed')),
+                                        l10n.t('settings_folder_changed'),
+                                      ),
                                     ),
                                   );
                                 }
@@ -1073,11 +1094,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: settings.audioOutputDirectory.isEmpty
+                                  fontWeight:
+                                      settings.audioOutputDirectory.isEmpty
                                       ? FontWeight.normal
                                       : FontWeight.w600,
                                   color: settings.audioOutputDirectory.isEmpty
-                                      ? theme.colorScheme.onSurface.withAlpha(140)
+                                      ? theme.colorScheme.onSurface.withAlpha(
+                                          140,
+                                        )
                                       : theme.colorScheme.primary,
                                 ),
                               ),
@@ -1108,53 +1132,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               try {
                                 final selectedDir =
                                     await FilePicker.getDirectoryPath(
-                                  dialogTitle:
-                                      l10n.t('settings_audio_output_folder'),
-                                );
+                                      dialogTitle: l10n.t(
+                                        'settings_audio_output_folder',
+                                      ),
+                                    );
                                 if (selectedDir != null &&
                                     selectedDir.trim().isNotEmpty) {
-                                  await _settingsService.setAudioOutputDirectory(
-                                      selectedDir.trim());
+                                  await _settingsService
+                                      .setAudioOutputDirectory(
+                                        selectedDir.trim(),
+                                      );
                                   if (context.mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(l10n.t(
-                                            'settings_audio_folder_changed')),
+                                        content: Text(
+                                          l10n.t(
+                                            'settings_audio_folder_changed',
+                                          ),
+                                        ),
                                       ),
                                     );
                                   }
                                 }
                               } catch (e) {
                                 debugPrint(
-                                    'Failed to pick audio directory: $e');
+                                  'Failed to pick audio directory: $e',
+                                );
                               }
                             },
-                            icon:
-                                const Icon(Icons.folder_open_rounded, size: 16),
+                            icon: const Icon(
+                              Icons.folder_open_rounded,
+                              size: 16,
+                            ),
                             label: Text(l10n.t('settings_change_folder')),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                             ),
                           ),
                           if (settings.audioOutputDirectory.isNotEmpty) ...[
                             TextButton.icon(
                               onPressed: () async {
-                                await _settingsService
-                                    .setAudioOutputDirectory('');
+                                await _settingsService.setAudioOutputDirectory(
+                                  '',
+                                );
                                 if (context.mounted) {
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(l10n.t(
-                                          'settings_audio_folder_changed')),
+                                      content: Text(
+                                        l10n.t('settings_audio_folder_changed'),
+                                      ),
                                     ),
                                   );
                                 }
                               },
                               icon: const Icon(Icons.restore_rounded, size: 16),
-                              label: Text(l10n.t('settings_audio_reset_folder')),
+                              label: Text(
+                                l10n.t('settings_audio_reset_folder'),
+                              ),
                             ),
                           ],
                         ],
@@ -1196,14 +1235,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 l10n.t('settings_cache_size'),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: theme.colorScheme.onSurface
-                                      .withAlpha(140),
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    140,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 CacheManagerService.formatBytes(
-                                    _cacheSizeBytes),
+                                  _cacheSizeBytes,
+                                ),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -1217,13 +1258,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onPressed: _isClearingCache
                               ? null
                               : () async {
-                                  final messenger =
-                                      ScaffoldMessenger.of(context);
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
                                   setState(() {
                                     _isClearingCache = true;
                                   });
-                                  final freed =
-                                      await _cacheManager.clearAllCache();
+                                  final freed = await _cacheManager
+                                      .clearAllCache();
                                   await _loadCacheSize();
                                   if (!mounted) return;
                                   setState(() {
@@ -1237,7 +1279,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           args: {
                                             'size':
                                                 CacheManagerService.formatBytes(
-                                                    freed),
+                                                  freed,
+                                                ),
                                           },
                                         ),
                                       ),
@@ -1248,15 +1291,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? const SizedBox(
                                   width: 12,
                                   height: 12,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
-                              : const Icon(Icons.delete_outline_rounded,
-                                  size: 16),
+                              : const Icon(
+                                  Icons.delete_outline_rounded,
+                                  size: 16,
+                                ),
                           label: Text(l10n.t('settings_clear_cache')),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
                         ),
                       ],
@@ -1428,7 +1476,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF06B6D4).withAlpha(70),
+                                    color: const Color(0xFF06B6D4)
+                                        .withAlpha(70),
                                     blurRadius: 6,
                                     spreadRadius: 1,
                                   ),
@@ -1440,10 +1489,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       const Icon(
-                                    Icons.person_rounded,
-                                    color: Color(0xFF06B6D4),
-                                    size: 24,
-                                  ),
+                                        Icons.person_rounded,
+                                        color: Color(0xFF06B6D4),
+                                        size: 24,
+                                      ),
                                 ),
                               ),
                             ),
@@ -1466,7 +1515,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w500,
-                                      color: theme.colorScheme.onSurface.withAlpha(130),
+                                      color: theme.colorScheme.onSurface
+                                          .withAlpha(130),
                                     ),
                                   ),
                                 ],
@@ -1555,8 +1605,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildHardwareInfoRow(
-      ThemeData theme, String label, String value) {
+  Widget _buildHardwareInfoRow(ThemeData theme, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1625,8 +1674,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Material(
       color: isSelected
           ? (isDark
-              ? theme.colorScheme.primary.withAlpha(45)
-              : theme.colorScheme.primary.withAlpha(25))
+                ? theme.colorScheme.primary.withAlpha(45)
+                : theme.colorScheme.primary.withAlpha(25))
           : Colors.transparent,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
@@ -1666,12 +1715,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           title,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                             color: isSelected
                                 ? (isDark
-                                    ? Colors.white
-                                    : theme.colorScheme.primary)
+                                      ? Colors.white
+                                      : theme.colorScheme.primary)
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
@@ -1709,8 +1759,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         fontSize: 11,
                         color: isSelected
                             ? (isDark
-                                ? Colors.white.withAlpha(190)
-                                : theme.colorScheme.onSurface.withAlpha(180))
+                                  ? Colors.white.withAlpha(190)
+                                  : theme.colorScheme.onSurface.withAlpha(180))
                             : theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
@@ -1742,7 +1792,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       selectedColor: theme.colorScheme.primary,
       backgroundColor: theme.colorScheme.surface,
       side: BorderSide(
-        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+        color: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.outline,
         width: isSelected ? 1.2 : 1.0,
       ),
       label: Text(
@@ -1777,7 +1829,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       side: BorderSide(
         color: !enabled
             ? theme.colorScheme.outline.withAlpha(50)
-            : (isSelected ? theme.colorScheme.primary : theme.colorScheme.outline),
+            : (isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline),
         width: isSelected ? 1.2 : 1.0,
       ),
       label: Text(
@@ -1822,9 +1876,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 nav.pop();
                 setState(() {});
                 messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.t('settings_reset_success')),
-                  ),
+                  SnackBar(content: Text(l10n.t('settings_reset_success'))),
                 );
               }
             },

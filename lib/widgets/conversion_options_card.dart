@@ -36,8 +36,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void initState() {
     super.initState();
-    _customBitrateMbps =
-        (widget.encodingOptions.customBitrateKbps / 1000).round().clamp(1, 30);
+    _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
+        .round()
+        .clamp(1, 30);
   }
 
   @override
@@ -233,8 +234,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withAlpha(25),
                       borderRadius: BorderRadius.circular(8),
@@ -361,9 +364,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(
+                    80,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -391,7 +399,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               if (widget.encodingOptions.codec == VideoCodec.hevc) ...[
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.withAlpha(22),
                     borderRadius: BorderRadius.circular(8),
@@ -469,7 +480,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       selectedColor: theme.colorScheme.primary,
       backgroundColor: theme.colorScheme.surface,
       side: BorderSide(
-        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+        color: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.outline,
         width: isSelected ? 1.2 : 1.0,
       ),
       label: Text(
@@ -496,8 +509,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       child: Material(
         color: isSelected
             ? (isDark
-                ? theme.colorScheme.primary.withAlpha(45)
-                : theme.colorScheme.primary.withAlpha(25))
+                  ? theme.colorScheme.primary.withAlpha(45)
+                  : theme.colorScheme.primary.withAlpha(25))
             : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
@@ -543,17 +556,18 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       Text(
                         res.label.startsWith('Original')
                             ? (res.label.contains('(')
-                                ? '${widget.l10n.t('res_original')} (${res.label.substring(res.label.indexOf('(') + 1)}'
-                                : widget.l10n.t('res_original'))
+                                  ? '${widget.l10n.t('res_original')} (${res.label.substring(res.label.indexOf('(') + 1)}'
+                                  : widget.l10n.t('res_original'))
                             : res.label,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: isSelected
                               ? (isDark
-                                  ? Colors.white
-                                  : theme.colorScheme.primary)
+                                    ? Colors.white
+                                    : theme.colorScheme.primary)
                               : theme.colorScheme.onSurface,
                         ),
                       ),
@@ -563,8 +577,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                           fontSize: 11,
                           color: isSelected
                               ? (isDark
-                                  ? Colors.white.withAlpha(190)
-                                  : theme.colorScheme.primary.withAlpha(200))
+                                    ? Colors.white.withAlpha(190)
+                                    : theme.colorScheme.primary.withAlpha(200))
                               : theme.colorScheme.onSurface.withAlpha(120),
                         ),
                       ),
@@ -649,18 +663,17 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       final targetH =
           widget.selectedResolution?.height ?? widget.sourceVideo.height;
 
-      final targetBitrateKbps =
-          widget.encodingOptions.calculateTargetBitrateKbps(
-        targetWidth: targetW,
-        targetHeight: targetH,
-        sourceWidth: widget.sourceVideo.width,
-        sourceHeight: widget.sourceVideo.height,
-        sourceBitrateBps: widget.sourceVideo.bitrate,
-      );
+      final targetBitrateKbps = widget.encodingOptions
+          .calculateTargetBitrateKbps(
+            targetWidth: targetW,
+            targetHeight: targetH,
+            sourceWidth: widget.sourceVideo.width,
+            sourceHeight: widget.sourceVideo.height,
+            sourceBitrateBps: widget.sourceVideo.bitrate,
+          );
 
       final totalBitrateKbps = targetBitrateKbps + 128;
-      sizeMb =
-          (totalBitrateKbps * 1000.0 / 8.0) * durationSecs / (1024 * 1024);
+      sizeMb = (totalBitrateKbps * 1000.0 / 8.0) * durationSecs / (1024 * 1024);
     }
 
     return Container(

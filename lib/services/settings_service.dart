@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -42,7 +43,7 @@ class SettingsService extends ChangeNotifier {
           }
         }
       }
-      
+
       // Hardware Auto-Detection on first launch
       if (_settings.isFirstLaunch) {
         await _applyFirstLaunchDefaults();
@@ -60,7 +61,7 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> _applyFirstLaunchDefaults() async {
     final tier = DeviceSpecHelper.getDeviceTier();
-    
+
     // Tier 1: 1080p, medium (normal)
     // Tier 2: 1080p, medium (normal)
     // Tier 3: 720p, fast

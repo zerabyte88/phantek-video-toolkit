@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:video_downscaler/models/app_settings.dart';
@@ -22,13 +23,16 @@ void main() {
       audioCodec: 'aac',
     );
 
-    test('VideoCodec enum definitions are correct with valid ffmpeg codec strings', () {
-      expect(VideoCodec.h264.ffmpegCodec, equals('libx264'));
-      expect(VideoCodec.hevc.ffmpegCodec, equals('libx265'));
+    test(
+      'VideoCodec enum definitions are correct with valid ffmpeg codec strings',
+      () {
+        expect(VideoCodec.h264.ffmpegCodec, equals('libx264'));
+        expect(VideoCodec.hevc.ffmpegCodec, equals('libx265'));
 
-      expect(VideoCodec.h264.displayName, contains('H.264'));
-      expect(VideoCodec.hevc.displayName, contains('H.265'));
-    });
+        expect(VideoCodec.h264.displayName, contains('H.264'));
+        expect(VideoCodec.hevc.displayName, contains('H.265'));
+      },
+    );
 
     test('VideoContainer extensions and display names match specification', () {
       expect(VideoContainer.mp4.extension, equals('mp4'));
@@ -156,51 +160,60 @@ void main() {
   });
 
   group('2. Downscale Feature & Resolution Scaling Tests', () {
-    test('4K video produces standard downscale targets from 2K down to 360p', () {
-      const v4k = VideoInfo(
-        filePath: '/4k.mp4',
-        fileName: '4k.mp4',
-        width: 3840,
-        height: 2160,
-        durationSeconds: 60,
-        bitrate: 20000000,
-        fps: 30,
-        codec: 'h264',
-        fileSizeBytes: 150000000,
-      );
+    test(
+      '4K video produces standard downscale targets from 2K down to 360p',
+      () {
+        const v4k = VideoInfo(
+          filePath: '/4k.mp4',
+          fileName: '4k.mp4',
+          width: 3840,
+          height: 2160,
+          durationSeconds: 60,
+          bitrate: 20000000,
+          fps: 30,
+          codec: 'h264',
+          fileSizeBytes: 150000000,
+        );
 
-      final targets = v4k.availableDownscaleTargets;
-      expect(targets.first.label, equals('Original (4K)'));
-      expect(targets.first.width, equals(3840));
-      expect(targets.first.height, equals(2160));
+        final targets = v4k.availableDownscaleTargets;
+        expect(targets.first.label, equals('Original (4K)'));
+        expect(targets.first.width, equals(3840));
+        expect(targets.first.height, equals(2160));
 
-      final targetLabels = targets.map((t) => t.label).toList();
-      expect(targetLabels, containsAll(['Original (4K)', '2K', '1080p', '720p', '480p', '360p']));
-      expect(targetLabels.contains('4K'), isFalse);
-    });
+        final targetLabels = targets.map((t) => t.label).toList();
+        expect(
+          targetLabels,
+          containsAll(['Original (4K)', '2K', '1080p', '720p', '480p', '360p']),
+        );
+        expect(targetLabels.contains('4K'), isFalse);
+      },
+    );
 
-    test('1080p video only allows downscaling to strictly smaller resolutions', () {
-      const v1080 = VideoInfo(
-        filePath: '/1080p.mp4',
-        fileName: '1080p.mp4',
-        width: 1920,
-        height: 1080,
-        durationSeconds: 60,
-        bitrate: 5000000,
-        fps: 30,
-        codec: 'h264',
-        fileSizeBytes: 37500000,
-      );
+    test(
+      '1080p video only allows downscaling to strictly smaller resolutions',
+      () {
+        const v1080 = VideoInfo(
+          filePath: '/1080p.mp4',
+          fileName: '1080p.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 60,
+          bitrate: 5000000,
+          fps: 30,
+          codec: 'h264',
+          fileSizeBytes: 37500000,
+        );
 
-      final targets = v1080.availableDownscaleTargets;
-      expect(targets.first.label, equals('Original (1080p)'));
+        final targets = v1080.availableDownscaleTargets;
+        expect(targets.first.label, equals('Original (1080p)'));
 
-      final targetHeights = targets.skip(1).map((t) => t.height).toList();
-      for (final h in targetHeights) {
-        expect(h, lessThan(1080));
-      }
-      expect(targetHeights, equals([720, 480, 360]));
-    });
+        final targetHeights = targets.skip(1).map((t) => t.height).toList();
+        for (final h in targetHeights) {
+          expect(h, lessThan(1080));
+        }
+        expect(targetHeights, equals([720, 480, 360]));
+      },
+    );
 
     test('Portrait 1080x1920 video correctly classifies as 1080p and excludes 2K from downscale targets', () {
       const portrait1080 = VideoInfo(
@@ -222,8 +235,11 @@ void main() {
       expect(targets.first.label, equals('Original (1080p)'));
 
       final targetLabels = targets.map((t) => t.label).toList();
-      expect(targetLabels.contains('2K'), isFalse,
-          reason: 'Portrait 1080p must not offer 2K (1440p) downscale target');
+      expect(
+        targetLabels.contains('2K'),
+        isFalse,
+        reason: 'Portrait 1080p must not offer 2K (1440p) downscale target',
+      );
       expect(targetLabels.contains('4K'), isFalse);
 
       final downscaledHeights = targets.skip(1).map((t) => t.height).toList();
@@ -243,7 +259,11 @@ void main() {
         fileSizeBytes: 7500000,
       );
 
-      const targetRes720 = VideoResolution(label: '720p', width: 1280, height: 720);
+      const targetRes720 = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
 
       int targetW = targetRes720.width;
       int targetH = targetRes720.height;
@@ -284,7 +304,11 @@ void main() {
         fileSizeBytes: 30000000,
       );
 
-      const target720p = VideoResolution(label: '720p', width: 1280, height: 720);
+      const target720p = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
 
       int targetW = target720p.width;
       int targetH = target720p.height;
@@ -309,56 +333,68 @@ void main() {
   });
 
   group('3. Audio Extractor Feature & Format Tests', () {
-    test('AudioFormat values have correct codecs, extensions, and descriptions', () {
-      expect(AudioFormat.mp3.extension, equals('mp3'));
-      expect(AudioFormat.mp3.ffmpegCodec, equals('libmp3lame'));
+    test(
+      'AudioFormat values have correct codecs, extensions, and descriptions',
+      () {
+        expect(AudioFormat.mp3.extension, equals('mp3'));
+        expect(AudioFormat.mp3.ffmpegCodec, equals('libmp3lame'));
 
-      expect(AudioFormat.m4a.extension, equals('m4a'));
-      expect(AudioFormat.m4a.ffmpegCodec, equals('aac'));
+        expect(AudioFormat.m4a.extension, equals('m4a'));
+        expect(AudioFormat.m4a.ffmpegCodec, equals('aac'));
 
-      expect(AudioFormat.wav.extension, equals('wav'));
-      expect(AudioFormat.wav.ffmpegCodec, equals('pcm_s16le'));
-    });
+        expect(AudioFormat.wav.extension, equals('wav'));
+        expect(AudioFormat.wav.ffmpegCodec, equals('pcm_s16le'));
+      },
+    );
 
     test('canCopy stream logic detects when codec can be directly copied vs re-encoded', () {
       final canCopyMp3 = (AudioFormat.mp3 == AudioFormat.mp3 && 'mp3' == 'mp3');
       expect(canCopyMp3, isTrue);
 
-      final canCopyAac = (AudioFormat.m4a == AudioFormat.m4a && ('aac' == 'aac' || 'aac' == 'mp4a'));
+      final canCopyAac =
+          (AudioFormat.m4a == AudioFormat.m4a &&
+          ('aac' == 'aac' || 'aac' == 'mp4a'));
       expect(canCopyAac, isTrue);
 
-      final canCopyWav = (AudioFormat.wav == AudioFormat.wav && 'pcm_s16le'.startsWith('pcm'));
+      final canCopyWav =
+          (AudioFormat.wav == AudioFormat.wav && 'pcm_s16le'.startsWith('pcm'));
       expect(canCopyWav, isTrue);
 
-      final canCopyAacToMp3 = (AudioFormat.mp3 == AudioFormat.mp3 && 'aac' == 'mp3');
+      final canCopyAacToMp3 =
+          (AudioFormat.mp3 == AudioFormat.mp3 && 'aac' == 'mp3');
       expect(canCopyAacToMp3, isFalse);
     });
 
-    test('generateUniqueAudioOutputPath avoids overwriting existing audio files', () async {
-      final tempDir = Directory.systemTemp.createTempSync('audio_unique_test_');
-      try {
-        final path1 = await FFmpegService.generateUniqueAudioOutputPath(
-          outputDir: tempDir,
-          fileName: 'podcast.mp4',
-          audioFormat: AudioFormat.mp3,
+    test(
+      'generateUniqueAudioOutputPath avoids overwriting existing audio files',
+      () async {
+        final tempDir = Directory.systemTemp.createTempSync(
+          'audio_unique_test_',
         );
-        final sep = Platform.pathSeparator;
-        expect(path1, equals('${tempDir.path}${sep}podcast-audio.mp3'));
+        try {
+          final path1 = await FFmpegService.generateUniqueAudioOutputPath(
+            outputDir: tempDir,
+            fileName: 'podcast.mp4',
+            audioFormat: AudioFormat.mp3,
+          );
+          final sep = Platform.pathSeparator;
+          expect(path1, equals('${tempDir.path}${sep}podcast-audio.mp3'));
 
-        File(path1).createSync();
+          File(path1).createSync();
 
-        final path2 = await FFmpegService.generateUniqueAudioOutputPath(
-          outputDir: tempDir,
-          fileName: 'podcast.mp4',
-          audioFormat: AudioFormat.mp3,
-        );
-        expect(path2, equals('${tempDir.path}${sep}podcast-audio-2.mp3'));
-      } finally {
-        if (tempDir.existsSync()) {
-          tempDir.deleteSync(recursive: true);
+          final path2 = await FFmpegService.generateUniqueAudioOutputPath(
+            outputDir: tempDir,
+            fileName: 'podcast.mp4',
+            audioFormat: AudioFormat.mp3,
+          );
+          expect(path2, equals('${tempDir.path}${sep}podcast-audio-2.mp3'));
+        } finally {
+          if (tempDir.existsSync()) {
+            tempDir.deleteSync(recursive: true);
+          }
         }
-      }
-    });
+      },
+    );
 
     test('Video with hasAudio = false correctly identifies silent videos', () {
       const silentVideo = VideoInfo(

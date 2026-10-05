@@ -29,7 +29,7 @@ class FFmpegService {
 
       int width = videoStream.getWidth() ?? 0;
       int height = videoStream.getHeight() ?? 0;
-      
+
       // Check for rotation in stream tags
       final tags = videoStream.getAllProperties()?['tags'];
       if (tags != null && tags is Map) {
@@ -65,7 +65,9 @@ class FFmpegService {
       final codec = videoStream.getCodec() ?? 'unknown';
 
       // Parse audio stream info
-      final audioStreams = streams.where((s) => s.getType() == 'audio').toList();
+      final audioStreams = streams
+          .where((s) => s.getType() == 'audio')
+          .toList();
       final hasAudio = audioStreams.isNotEmpty;
       final audioCodec = hasAudio ? audioStreams.first.getCodec() : null;
 
@@ -91,11 +93,13 @@ class FFmpegService {
     }
   }
 
-  /// Downscale and transcode video to the target resolution, codec, container, and bitrate.
   /// Get or create the output directory for converted media.
   /// If [customPath] is provided and valid, uses it.
   /// Otherwise targets `/storage/emulated/0/Music` for audio or `/storage/emulated/0/Movies` for video directly on Android.
-  static Future<Directory> getOutputDirectory({String? customPath, bool isAudio = false}) async {
+  static Future<Directory> getOutputDirectory({
+    String? customPath,
+    bool isAudio = false,
+  }) async {
     if (customPath != null && customPath.trim().isNotEmpty) {
       final customDir = Directory(customPath.trim());
       try {
@@ -109,7 +113,9 @@ class FFmpegService {
     }
 
     if (Platform.isAndroid) {
-      final defaultPath = isAudio ? '/storage/emulated/0/Music' : '/storage/emulated/0/Movies';
+      final defaultPath = isAudio
+          ? '/storage/emulated/0/Music'
+          : '/storage/emulated/0/Movies';
       final targetDir = Directory(defaultPath);
       try {
         if (!await targetDir.exists()) {
@@ -132,7 +138,9 @@ class FFmpegService {
         } catch (_) {}
 
         final appDocDir = await getApplicationDocumentsDirectory();
-        final fallbackDir = Directory('${appDocDir.path}/${isAudio ? "Music" : "Movies"}');
+        final fallbackDir = Directory(
+          '${appDocDir.path}/${isAudio ? "Music" : "Movies"}',
+        );
         if (!await fallbackDir.exists()) {
           await fallbackDir.create(recursive: true);
         }
@@ -140,7 +148,9 @@ class FFmpegService {
       }
     } else {
       final appDocDir = await getApplicationDocumentsDirectory();
-      final dir = Directory('${appDocDir.path}/${isAudio ? "Music" : "Movies"}');
+      final dir = Directory(
+        '${appDocDir.path}/${isAudio ? "Music" : "Movies"}',
+      );
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
@@ -158,11 +168,13 @@ class FFmpegService {
   }) async {
     final ext = container.extension;
     final sanitizedBase = fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-    final String resSuffix = targetResolution.label.toLowerCase().startsWith('original')
+    final String resSuffix =
+        targetResolution.label.toLowerCase().startsWith('original')
         ? '${targetResolution.height}p'
         : targetResolution.label.toLowerCase();
 
-    final dirPath = outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
+    final dirPath =
+        outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
         ? outputDir.path.substring(0, outputDir.path.length - 1)
         : outputDir.path;
     final sep = Platform.pathSeparator;
@@ -174,7 +186,8 @@ class FFmpegService {
 
     int counter = 2;
     while (true) {
-      final candidatePath = '$dirPath$sep$sanitizedBase-$resSuffix-$counter.$ext';
+      final candidatePath =
+          '$dirPath$sep$sanitizedBase-$resSuffix-$counter.$ext';
       if (!await File(candidatePath).exists()) {
         return candidatePath;
       }
@@ -190,7 +203,8 @@ class FFmpegService {
   }) async {
     final ext = audioFormat.extension;
     final sanitizedBase = fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-    final dirPath = outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
+    final dirPath =
+        outputDir.path.endsWith('/') || outputDir.path.endsWith('\\')
         ? outputDir.path.substring(0, outputDir.path.length - 1)
         : outputDir.path;
     final sep = Platform.pathSeparator;
@@ -218,10 +232,13 @@ class FFmpegService {
     required VideoResolution targetResolution,
     EncodingOptions encodingOptions = const EncodingOptions(),
     AppSettings appSettings = const AppSettings(),
-    required void Function(double progress, String stats, [int? sizeBytes]) onProgress,
+    required void Function(double progress, String stats, [int? sizeBytes])
+    onProgress,
     required void Function(String log) onLog,
   }) async {
-    final outputDir = await getOutputDirectory(customPath: appSettings.outputDirectory);
+    final outputDir = await getOutputDirectory(
+      customPath: appSettings.outputDirectory,
+    );
 
     final outputPath = await generateUniqueOutputPath(
       outputDir: outputDir,
@@ -240,7 +257,8 @@ class FFmpegService {
       targetH = targetResolution.width;
     }
 
-    final sourceAspect = sourceVideo.width / (sourceVideo.height > 0 ? sourceVideo.height : 1);
+    final sourceAspect =
+        sourceVideo.width / (sourceVideo.height > 0 ? sourceVideo.height : 1);
     final targetAspect = targetW / (targetH > 0 ? targetH : 1);
 
     if (sourceAspect > targetAspect) {
@@ -276,11 +294,14 @@ class FFmpegService {
     String codecExtraArgs = '';
 
     // Threads argument (explicit allocation for multi-core processors)
-    final totalCores =
-        Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
-    final effectiveThreads =
-        appSettings.cpuThreads > 0 ? appSettings.cpuThreads : totalCores;
-    final threadsArg = '-threads $effectiveThreads -filter_threads $effectiveThreads';
+    final totalCores = Platform.numberOfProcessors > 0
+        ? Platform.numberOfProcessors
+        : 8;
+    final effectiveThreads = appSettings.cpuThreads > 0
+        ? appSettings.cpuThreads
+        : totalCores;
+    final threadsArg =
+        '-threads $effectiveThreads -filter_threads $effectiveThreads';
 
     if (vCodec == 'libx264') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
@@ -290,7 +311,6 @@ class FFmpegService {
       }
       presetArg = '-preset ${appSettings.cpuPreset}';
       profileLevelArg = '-profile:v high -level:v 4.1';
-
     } else if (vCodec == 'libx265') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
         rateControlArg = '-crf ${encodingOptions.crfValue}';
@@ -298,14 +318,16 @@ class FFmpegService {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
       presetArg = '-preset ${appSettings.cpuPreset}';
-      profileLevelArg = ''; // libx265 does not accept -profile:v main directly as a CLI flag
-      
+      profileLevelArg =
+          ''; // libx265 does not accept -profile:v main directly as a CLI flag
+
       String hvc1Tag = '';
-      if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
+      if (encodingOptions.container == VideoContainer.mp4 ||
+          encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
-      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads';
-
+      codecExtraArgs =
+          '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads';
     }
 
     // Audio options
@@ -320,7 +342,7 @@ class FFmpegService {
         encodingOptions.container == VideoContainer.mov) {
       containerFlags = '-movflags +faststart';
     }
-    
+
     // FPS filter
     String fpsFilter = '';
     if (encodingOptions.targetFps > 0) {
@@ -328,16 +350,18 @@ class FFmpegService {
     }
 
     // Detect Mode
-    final isOriginalResolution = targetW == sourceVideo.width && targetH == sourceVideo.height;
+    final isOriginalResolution =
+        targetW == sourceVideo.width && targetH == sourceVideo.height;
 
     // Build video filter (-vf)
     String vfArg = '';
-    
+
     if (isOriginalResolution) {
       vfArg = '-vf "${fpsFilter}format=yuv420p"';
     } else {
       // Upscale / Downscale
-      vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=bicubic,format=yuv420p"';
+      vfArg =
+          '-vf "${fpsFilter}scale=$targetW:$targetH:flags=bicubic,format=yuv420p"';
     }
 
     // Construct full command
@@ -426,7 +450,8 @@ class FFmpegService {
     required AudioFormat audioFormat,
     int audioBitrateKbps = 192,
     AppSettings appSettings = const AppSettings(),
-    required void Function(double progress, String stats, [int? sizeBytes]) onProgress,
+    required void Function(double progress, String stats, [int? sizeBytes])
+    onProgress,
     required void Function(String log) onLog,
   }) async {
     final outputDir = await getOutputDirectory(
@@ -440,8 +465,10 @@ class FFmpegService {
     );
 
     final srcCodec = sourceVideo.audioCodec?.toLowerCase() ?? '';
-    final canCopy = (audioFormat == AudioFormat.mp3 && srcCodec == 'mp3') ||
-        (audioFormat == AudioFormat.m4a && (srcCodec == 'aac' || srcCodec == 'mp4a')) ||
+    final canCopy =
+        (audioFormat == AudioFormat.mp3 && srcCodec == 'mp3') ||
+        (audioFormat == AudioFormat.m4a &&
+            (srcCodec == 'aac' || srcCodec == 'mp4a')) ||
         (audioFormat == AudioFormat.wav && srcCodec.startsWith('pcm'));
 
     String audioCodecArg;
@@ -462,8 +489,12 @@ class FFmpegService {
       }
     }
 
-    final threadsArg = appSettings.cpuThreads > 0 ? '-threads ${appSettings.cpuThreads}' : '';
-    final m4aFlags = audioFormat == AudioFormat.m4a ? '-movflags +faststart' : '';
+    final threadsArg = appSettings.cpuThreads > 0
+        ? '-threads ${appSettings.cpuThreads}'
+        : '';
+    final m4aFlags = audioFormat == AudioFormat.m4a
+        ? '-movflags +faststart'
+        : '';
 
     final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
@@ -480,7 +511,9 @@ class FFmpegService {
     final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : (canCopy ? "Original Copy" : "Auto 192 kbps")}');
+    onLog(
+      'Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : (canCopy ? "Original Copy" : "Auto 192 kbps")}',
+    );
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();
