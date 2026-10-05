@@ -299,23 +299,12 @@ class FFmpegService {
       }
       codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
 
-    } else if (vCodec == 'libvpx-vp9') {
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg = '-crf ${encodingOptions.crfValue} -b:v 0';
-      } else {
-        rateControlArg = '-b:v ${targetBitrateKbps}k';
-      }
-      profileLevelArg = ''; // libvpx-vp9 automatically uses Profile 0 for 8-bit yuv420p
-      codecExtraArgs = '-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2 -auto-alt-ref 1 -lag-in-frames 25 -g $gop';
     }
 
     // Audio options
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
     if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
-    } else if (encodingOptions.container == VideoContainer.webm ||
-              encodingOptions.codec == VideoCodec.vp9) {
-      audioArgs = '-c:a libopus -b:a ${appSettings.audioBitrateKbps}k';
     }
 
     // Threads argument

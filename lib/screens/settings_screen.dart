@@ -22,8 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v1.2.0';
-  String _buildNumber = '16';
+  String _appVersion = 'v1.2.1';
+  String _buildNumber = '17';
 
   @override
   void initState() {
@@ -41,14 +41,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '16';
+              : '17';
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.2.0';
-          _buildNumber = '16';
+          _appVersion = 'v1.2.1';
+          _buildNumber = '17';
         });
       }
     }

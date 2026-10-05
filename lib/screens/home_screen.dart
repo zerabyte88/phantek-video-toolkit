@@ -187,9 +187,6 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mode != _AppMode.convert) {
         _encodingOptions = _encodingOptions.copyWith(
           codec: VideoCodec.h264,
-          container: _encodingOptions.container == VideoContainer.webm
-              ? VideoContainer.mp4
-              : _encodingOptions.container,
         );
       }
     });
@@ -216,9 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ? _encodingOptions
         : _encodingOptions.copyWith(
             codec: VideoCodec.h264,
-            container: _encodingOptions.container == VideoContainer.webm
-                ? VideoContainer.mp4
-                : _encodingOptions.container,
           );
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
@@ -576,7 +570,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'MP4, MKV, MOV, WebM (up to 4K / 60 FPS)',
+              'MP4, MKV, MOV (up to 4K / 60 FPS)',
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurface.withAlpha(140),

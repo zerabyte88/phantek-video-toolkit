@@ -273,11 +273,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 alignment: WrapAlignment.center,
                 spacing: 6,
                 runSpacing: 6,
-                children: (widget.showCodecSelection
-                        ? VideoContainer.values
-                        : VideoContainer.values
-                            .where((c) => c != VideoContainer.webm))
-                    .map((format) {
+                children: VideoContainer.values.map((format) {
                   final isSelected = widget.encodingOptions.container == format;
                   return _buildChoiceChip(
                     label: '${format.displayName} (.${format.extension})',
@@ -286,12 +282,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       if (selected) {
                         VideoCodec newCodec = widget.encodingOptions.codec;
                         if (!widget.showCodecSelection) {
-                          newCodec = VideoCodec.h264;
-                        } else if (format == VideoContainer.webm) {
-                          newCodec = VideoCodec.vp9;
-                        } else if (format != VideoContainer.webm &&
-                            format != VideoContainer.mkv &&
-                            newCodec == VideoCodec.vp9) {
                           newCodec = VideoCodec.h264;
                         }
                         widget.onOptionsChanged(
@@ -354,30 +344,17 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   spacing: 6,
                   runSpacing: 6,
                   children: VideoCodec.values.map((codec) {
-                    bool isCompatible = true;
-                    if (widget.encodingOptions.container == VideoContainer.webm &&
-                        codec != VideoCodec.vp9) {
-                      isCompatible = false;
-                    }
-                    if ((widget.encodingOptions.container == VideoContainer.mp4 ||
-                            widget.encodingOptions.container == VideoContainer.mov) &&
-                        codec == VideoCodec.vp9) {
-                      isCompatible = false;
-                    }
-
                     final isSelected = widget.encodingOptions.codec == codec;
                     return _buildChoiceChip(
                       label: codec.displayName,
                       isSelected: isSelected,
-                      onSelected: isCompatible
-                          ? (selected) {
-                              if (selected) {
-                                widget.onOptionsChanged(
-                                  widget.encodingOptions.copyWith(codec: codec),
-                                );
-                              }
-                            }
-                          : null,
+                      onSelected: (selected) {
+                        if (selected) {
+                          widget.onOptionsChanged(
+                            widget.encodingOptions.copyWith(codec: codec),
+                          );
+                        }
+                      },
                     );
                   }).toList(),
                 ),
@@ -411,8 +388,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   ],
                 ),
               ),
-              if (widget.encodingOptions.codec == VideoCodec.hevc ||
-                  widget.encodingOptions.codec == VideoCodec.vp9) ...[
+              if (widget.encodingOptions.codec == VideoCodec.hevc) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -435,9 +411,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          widget.encodingOptions.codec == VideoCodec.hevc
-                              ? l10n.t('codec_hevc_warning')
-                              : l10n.t('codec_vp9_warning'),
+                          l10n.t('codec_hevc_warning'),
                           style: TextStyle(
                             fontSize: 11.5,
                             color: theme.colorScheme.onSurface.withAlpha(220),

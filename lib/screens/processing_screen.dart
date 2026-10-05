@@ -512,8 +512,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         return 'video/x-matroska';
       case 'mov':
         return 'video/quicktime';
-      case 'webm':
-        return 'video/webm';
       case 'mp3':
         return 'audio/mpeg';
       case 'm4a':
@@ -1550,7 +1548,7 @@ class _SuccessBottomSheet extends StatelessWidget {
                       : l10n.t('proc_play_video'),
                 ),
               ),
-              if (!isAudioExtraction && (codec == VideoCodec.hevc || codec == VideoCodec.vp9)) ...[
+              if (!isAudioExtraction && codec == VideoCodec.hevc) ...[
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
