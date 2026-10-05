@@ -2,8 +2,7 @@ import 'dart:math' as math;
 
 enum VideoCodec {
   h264('H.264 / AVC', 'libx264', 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.'),
-  hevc('H.265 / HEVC', 'libx265', 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.'),
-  vp9('VP9', 'libvpx-vp9', 'YouTube, Google Products. Efisiensi Kompresi Sangat Tinggi.');
+  hevc('H.265 / HEVC', 'libx265', 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.');
 
   final String displayName;
   final String ffmpegCodec;
@@ -15,8 +14,7 @@ enum VideoCodec {
 enum VideoContainer {
   mp4('MP4', 'mp4', 'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.'),
   mkv('MKV', 'mkv', 'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.'),
-  mov('MOV', 'mov', 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).'),
-  webm('WebM', 'webm', 'Mendukung video transparan. Animasi Web, Konten Streaming Online.');
+  mov('MOV', 'mov', 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).');
 
   final String displayName;
   final String extension;

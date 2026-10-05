@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Flutter&message=3.47.0&color=0284c7&style=for-the-badge&logo=flutter&logoColor=white&labelColor=0f172a" alt="Flutter" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.2.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -22,7 +22,7 @@
 ### 1. Pure Software Pipeline (Zero Hardware Acceleration)
 To guarantee deterministic encoding output across diverse Android chipsets (Snapdragon, MediaTek, Exynos, Tensor, Unisoc), all hardware-accelerated encoders and decoders (e.g., `mediacodec`) have been excluded from the transcoding pipeline:
 - **Software Decoding:** Input streams are parsed and decoded entirely through standard FFmpeg CPU demuxers and decoders.
-- **Software Encoding:** Encoders are strictly locked to `libx264` (H.264), `libx265` (H.265 / HEVC), and `libvpx-vp9` (VP9).
+- **Software Encoding:** Encoders are strictly locked to `libx264` (H.264) and `libx265` (H.265 / HEVC).
 - **Stability and Color Accuracy:** Eliminates vendor-specific driver fragmentation, green/red/yellow tint glitches, macroblocking artifacts, and abrupt process termination commonly associated with proprietary Android MediaCodec wrappers.
 
 ### 2. Unified Pixel Format and Filtergraph Pipeline
@@ -54,13 +54,12 @@ Video transcoding requires sustained CPU utilization over extended durations. Th
 - **Resolution Downscaling:** Supports target presets for 1080p, 720p, 480p, 360p, and 240p. Automatic checks prevent accidental operations outside bounds.
 - **Smart Aspect Ratio and Orientation Engine:** Reads stream orientation and rotation metadata (90°, 180°, 270°) to preserve portrait and landscape aspects without stretching or black bar distortion.
 - **Mode-Locked Codec Stability:**
-  - **Downscale Mode:** Exclusively locked to standard **H.264 (`libx264`)** with WebM filtered out, ensuring 100% stable outputs playable by all default Android gallery/video players without user configuration errors.
-  - **Convert Mode:** Unlocks advanced codecs (**H.265 / HEVC**, **VP9**, **H.264**) and containers (**MP4**, **MKV**, **MOV**, **WebM**) for power users, accompanied by in-app compatibility warnings advising that HEVC/VP9 may require modern media players (e.g., VLC, MX Player) on devices lacking native hardware decoders.
+  - **Downscale Mode:** Exclusively locked to standard **H.264 (`libx264`)**, ensuring 100% stable outputs playable by all default Android gallery/video players without user configuration errors.
+  - **Convert Mode:** Unlocks **H.265 / HEVC** and **H.264** across **MP4**, **MKV**, and **MOV** containers for power users, accompanied by in-app compatibility warnings advising that HEVC may require modern media players (e.g., VLC, MX Player) on devices lacking native hardware decoders.
 - **Codec Specifications:**
   - **H.264 / AVC (`libx264`):** Standard profile configuration (`-profile:v high -level:v 4.1`) for maximum device compatibility.
   - **H.265 / HEVC (`libx265`):** High-efficiency video coding with automatic `-tag:v hvc1` injection for MP4 and MOV containers.
-  - **VP9 (`libvpx-vp9`):** Open-source profile with optimized threading (`-deadline good -cpu-used 4 -row-mt 1 -tile-columns 2`) paired with `libopus` audio in WebM and MKV containers.
-- **Container Support:** MP4 (with `-movflags +faststart`), MKV, MOV, and WebM.
+- **Container Support:** MP4 (with `-movflags +faststart`), MKV, and MOV.
 
 ### Storage and Output Management
 - **Custom Output Folder Selection:** Select any local storage directory via Settings (`FilePicker.getDirectoryPath`), with an instant "Reset to Movies" option.
@@ -124,10 +123,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 
 Compiled APK will be located in:
 `build/app/outputs/flutter-apk/`
-- `Phantek-Video-Toolkit-arm64-v8a-v1.2.0.apk` (64-bit ARM)
+- `Phantek-Video-Toolkit-arm64-v8a-v1.2.1.apk` (64-bit ARM)
 
 ### Automated CI/CD Workflow
-The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.2.0`) or manual workflow dispatch:
+The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that triggers on release tags (e.g. `v1.2.1`) or manual workflow dispatch:
 - Configured without conflicting `ndk.abiFilters` and `splits.abi` for seamless AGP builds.
 - Builds optimized 64-bit ARM APK.
 - Packages and publishes binary assets directly to GitHub Releases.
@@ -135,6 +134,10 @@ The repository contains a GitHub Actions workflow (`.github/workflows/build-apk.
 ---
 
 ## Release History
+
+### v1.2.1 (Build 17)
+- **VP9 & WebM Deprecation for Stability:** Completely removed the VP9 (`libvpx-vp9`) video codec and `.webm` container format across all application modules, encoding pipelines, and localizations due to frequent bugs and low adoption.
+- **Enhanced Codec & Container Streamlining:** Standardized video encoding to pure, robust **H.264 (`libx264`)** and **H.265 / HEVC (`libx265`)** across **MP4**, **MKV**, and **MOV** containers with unified AAC audio encoding.
 
 ### v1.2.0 (Build 16)
 - **Application ID & Namespace Modernization:** Standardized package identifier and Android namespace to `com.phantek.cygnus.albireo` across Gradle, Kotlin manifests, and directory trees for production deployment.

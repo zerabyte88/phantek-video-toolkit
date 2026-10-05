@@ -129,8 +129,8 @@ void main() {
 
       // Add dynamic keys
       allCalls.addAll([
-        'desc_mp4', 'desc_mkv', 'desc_mov', 'desc_webm',
-        'desc_h264', 'desc_hevc', 'desc_vp9',
+        'desc_mp4', 'desc_mkv', 'desc_mov',
+        'desc_h264', 'desc_hevc',
       ]);
       // Remove any interpolated placeholder patterns if present
       allCalls.removeWhere((k) => k.contains(r'$'));
@@ -207,7 +207,6 @@ void main() {
 
         // v1.1.2 new keys
         expect(l10n.t('codec_hevc_warning').isNotEmpty, isTrue);
-        expect(l10n.t('codec_vp9_warning').isNotEmpty, isTrue);
         expect(l10n.t('codec_compat_hint').isNotEmpty, isTrue);
         expect(l10n.t('back_to_home').isNotEmpty, isTrue);
         expect(l10n.t('settings_output_folder').isNotEmpty, isTrue);
@@ -279,13 +278,12 @@ void main() {
       expect(opts.container, equals(VideoContainer.mp4));
     });
 
-    test('Non-convert containers exclude webm for H264 stability', () {
-      final safeContainers =
-          VideoContainer.values.where((c) => c != VideoContainer.webm).toList();
+    test('Supported containers are MP4, MKV, and MOV for stability', () {
+      final safeContainers = VideoContainer.values.toList();
       expect(safeContainers.contains(VideoContainer.mp4), isTrue);
       expect(safeContainers.contains(VideoContainer.mkv), isTrue);
       expect(safeContainers.contains(VideoContainer.mov), isTrue);
-      expect(safeContainers.contains(VideoContainer.webm), isFalse);
+      expect(safeContainers.length, equals(3));
     });
   });
 

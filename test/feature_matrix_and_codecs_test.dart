@@ -25,18 +25,15 @@ void main() {
     test('VideoCodec enum definitions are correct with valid ffmpeg codec strings', () {
       expect(VideoCodec.h264.ffmpegCodec, equals('libx264'));
       expect(VideoCodec.hevc.ffmpegCodec, equals('libx265'));
-      expect(VideoCodec.vp9.ffmpegCodec, equals('libvpx-vp9'));
 
       expect(VideoCodec.h264.displayName, contains('H.264'));
       expect(VideoCodec.hevc.displayName, contains('H.265'));
-      expect(VideoCodec.vp9.displayName, equals('VP9'));
     });
 
     test('VideoContainer extensions and display names match specification', () {
       expect(VideoContainer.mp4.extension, equals('mp4'));
       expect(VideoContainer.mkv.extension, equals('mkv'));
       expect(VideoContainer.mov.extension, equals('mov'));
-      expect(VideoContainer.webm.extension, equals('webm'));
     });
 
     test('CRF Rate Control calculates correct bitrate targets for H264 across resolutions', () {
