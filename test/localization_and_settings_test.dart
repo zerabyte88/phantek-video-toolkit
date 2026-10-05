@@ -751,6 +751,97 @@ void main() {
         socName: unisocT820Cpu,
       );
       expect(unisocT820Gpu, equals('Mali-G57 MP4'));
+
+      // Additional requested SoCs (Snapdragon 8 Elite Gen 5, Dimensity 7050/9500/9600, Unisoc, Snapdragon 6 & 7 series)
+      final snapdragon8EliteGen5Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'sun',
+        manufacturer: 'Qualcomm',
+        socModel: 'SM8850',
+      );
+      expect(snapdragon8EliteGen5Cpu, equals('Qualcomm Snapdragon 8 Elite Gen 5'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'sm8850', board: 'sun', socName: snapdragon8EliteGen5Cpu),
+        equals('Adreno 830'),
+      );
+
+      final dimensity7050Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6877v',
+        board: 'mt6877',
+        manufacturer: 'MediaTek',
+      );
+      expect(dimensity7050Cpu, equals('MediaTek Dimensity 7050'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'mt6877v', board: 'mt6877', socName: dimensity7050Cpu),
+        equals('Mali-G68 MC4'),
+      );
+
+      final dimensity9500Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6993',
+        board: 'mt6993',
+        manufacturer: 'MediaTek',
+      );
+      expect(dimensity9500Cpu, equals('MediaTek Dimensity 9500'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'mt6993', board: 'mt6993', socName: dimensity9500Cpu),
+        equals('Immortalis-G925 MC12'),
+      );
+
+      final dimensity9600Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6995',
+        board: 'mt6995',
+        manufacturer: 'MediaTek',
+      );
+      expect(dimensity9600Cpu, equals('MediaTek Dimensity 9600'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'mt6995', board: 'mt6995', socName: dimensity9600Cpu),
+        equals('Immortalis-G925 MC12'),
+      );
+
+      final snapdragon778GCpu = DeviceSpecHelper.detectSocName(
+        hardware: 'sm7325',
+        board: 'yupik',
+        manufacturer: 'Qualcomm',
+      );
+      expect(snapdragon778GCpu, equals('Qualcomm Snapdragon 778G'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'sm7325', board: 'yupik', socName: snapdragon778GCpu),
+        equals('Adreno 642L'),
+      );
+
+      final snapdragon660Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'sdm660',
+        board: 'sdm660',
+        manufacturer: 'Qualcomm',
+      );
+      expect(snapdragon660Cpu, equals('Qualcomm Snapdragon 660'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'sdm660', board: 'sdm660', socName: snapdragon660Cpu),
+        equals('Adreno 512'),
+      );
+
+      final unisocT770Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'ums512t',
+        board: 't770',
+        manufacturer: 'Unisoc',
+      );
+      expect(unisocT770Cpu, equals('Unisoc T770'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'ums512t', board: 't770', socName: unisocT770Cpu),
+        equals('Mali-G57 MP4'),
+      );
+
+      final unisocT618Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'ums512',
+        board: 't618',
+        manufacturer: 'Unisoc',
+        socModel: 'T618',
+      );
+      expect(unisocT618Cpu, equals('Unisoc T618'));
+      expect(
+        DeviceSpecHelper.detectGpuName(hardware: 'ums512', board: 't618', socName: unisocT618Cpu),
+        equals('Mali-G57 MP1'),
+      );
     });
 
     test('DeviceSpecHelper getHardwareInfo returns full specifications dictionary with all expected keys', () async {
