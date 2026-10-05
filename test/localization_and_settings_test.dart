@@ -242,6 +242,12 @@ void main() {
       expect(rssMb, greaterThanOrEqualTo(0));
     });
 
+    test('DeviceSpecHelper getProcessCpuUsagePercent returns valid percentage within 0-100', () {
+      final cpuUsage = DeviceSpecHelper.getProcessCpuUsagePercent();
+      expect(cpuUsage, greaterThanOrEqualTo(0.0));
+      expect(cpuUsage, lessThanOrEqualTo(100.0));
+    });
+
     test('AppSettings copyWith properly updates outputDirectory and other fields', () {
       const original = AppSettings();
       final updated = original.copyWith(

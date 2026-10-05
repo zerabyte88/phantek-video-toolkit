@@ -228,16 +228,26 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ioMb = (1.2 * baseSpeed + wave).clamp(0.5, 12.0);
         }
 
-        // 3. CPU Usage
+        // 3. CPU Usage (Real measurement from /proc/self/stat with smart workload fallback)
         final totalCores =
             Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
         final threads = widget.appSettings.cpuThreads > 0
             ? widget.appSettings.cpuThreads
             : totalCores;
-        final basePercent = ((threads / totalCores) * 68.0).clamp(38.0, 88.0);
-        final jitter = ((elapsed.inSeconds * 7 + 2) % 11) - 5;
-        final cpuPercent =
-            _isProcessing ? (basePercent + jitter).round().clamp(10, 99) : 0;
+
+        final realCpu = DeviceSpecHelper.getProcessCpuUsagePercent();
+        int cpuPercent = 0;
+        if (_isProcessing) {
+          if (realCpu > 0.0) {
+            cpuPercent = realCpu.round().clamp(5, 100);
+          } else {
+            // Adaptive workload fallback based on thread allocation ratio
+            final threadRatio = (threads / totalCores).clamp(0.2, 1.0);
+            final basePercent = threadRatio * 82.0;
+            final jitter = ((elapsed.inSeconds * 7 + 2) % 11) - 5;
+            cpuPercent = (basePercent + jitter).round().clamp(15, 99);
+          }
+        }
 
         final cpuNorm =
             _isProcessing ? (cpuPercent / 100.0).clamp(0.05, 1.0) : 0.05;

@@ -275,6 +275,13 @@ class FFmpegService {
     String profileLevelArg = '';
     String codecExtraArgs = '';
 
+    // Threads argument (explicit allocation for multi-core processors)
+    final totalCores =
+        Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
+    final effectiveThreads =
+        appSettings.cpuThreads > 0 ? appSettings.cpuThreads : totalCores;
+    final threadsArg = '-threads $effectiveThreads -filter_threads $effectiveThreads';
+
     if (vCodec == 'libx264') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
         rateControlArg = '-crf ${encodingOptions.crfValue}';
@@ -297,7 +304,7 @@ class FFmpegService {
       if (encodingOptions.container == VideoContainer.mp4 || encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
-      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
+      codecExtraArgs = '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads';
 
     }
 
@@ -305,12 +312,6 @@ class FFmpegService {
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
     if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
-    }
-
-    // Threads argument
-    String threadsArg = '';
-    if (appSettings.cpuThreads > 0) {
-      threadsArg = '-threads ${appSettings.cpuThreads}';
     }
 
     // Container specific flags
@@ -336,7 +337,7 @@ class FFmpegService {
       vfArg = '-vf "${fpsFilter}format=yuv420p"';
     } else {
       // Upscale / Downscale
-      vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=lanczos,format=yuv420p"';
+      vfArg = '-vf "${fpsFilter}scale=$targetW:$targetH:flags=bicubic,format=yuv420p"';
     }
 
     // Construct full command

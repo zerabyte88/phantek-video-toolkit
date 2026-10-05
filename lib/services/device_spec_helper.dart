@@ -32,6 +32,9 @@ class DeviceSpecHelper {
     return 4096; // Fallback to 4GB
   }
 
+  static int _prevProcessTicks = 0;
+  static int _prevSystemTimeMs = 0;
+
   /// Read real physical process memory usage (VmRSS) from Linux /proc filesystem on Android,
   /// falling back to ProcessInfo.currentRss.
   static int getProcessRssMb() {
@@ -54,6 +57,41 @@ class DeviceSpecHelper {
       if (rss > 0) return rss ~/ (1024 * 1024);
     } catch (_) {}
     return 0;
+  }
+
+  /// Calculate real CPU usage percentage of the current process (0.0 - 100.0%)
+  /// by inspecting process utime + stime from Linux /proc/self/stat.
+  static double getProcessCpuUsagePercent() {
+    try {
+      if (Platform.isAndroid) {
+        final statStr = File('/proc/self/stat').readAsStringSync();
+        final parts = statStr.trim().split(RegExp(r'\s+'));
+        if (parts.length > 15) {
+          final utime = int.tryParse(parts[13]) ?? 0;
+          final stime = int.tryParse(parts[14]) ?? 0;
+          final currentProcessTicks = utime + stime;
+          final nowMs = DateTime.now().millisecondsSinceEpoch;
+
+          if (_prevSystemTimeMs > 0 && _prevProcessTicks > 0) {
+            final deltaTicks = currentProcessTicks - _prevProcessTicks;
+            final deltaTimeMs = nowMs - _prevSystemTimeMs;
+            if (deltaTimeMs > 0) {
+              final cores =
+                  Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
+              // Linux USER_HZ is standard 100 ticks per second (1 tick = 10ms)
+              final cpuPercent =
+                  (deltaTicks / ((deltaTimeMs / 10.0) * cores)) * 100.0;
+              _prevProcessTicks = currentProcessTicks;
+              _prevSystemTimeMs = nowMs;
+              return cpuPercent.clamp(0.0, 100.0);
+            }
+          }
+          _prevProcessTicks = currentProcessTicks;
+          _prevSystemTimeMs = nowMs;
+        }
+      }
+    } catch (_) {}
+    return 0.0;
   }
 
   static int getMarketedRamGb(int ramMb) {
