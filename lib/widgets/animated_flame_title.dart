@@ -1,14 +1,12 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// A sleek AppBar title widget wrapped in a dynamic, fiery animated border.
 class AnimatedFlameTitle extends StatefulWidget {
   final String title;
 
-  const AnimatedFlameTitle({
-    super.key,
-    this.title = 'Phantek',
-  });
+  const AnimatedFlameTitle({super.key, this.title = 'Phantek'});
 
   @override
   State<AnimatedFlameTitle> createState() => _AnimatedFlameTitleState();
@@ -101,10 +99,7 @@ class _FlameBorderPainter extends CustomPainter {
   final double progress;
   final List<Color> colors;
 
-  _FlameBorderPainter({
-    required this.progress,
-    required this.colors,
-  });
+  _FlameBorderPainter({required this.progress, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {

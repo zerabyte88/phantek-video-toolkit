@@ -1,8 +1,16 @@
 import 'dart:math' as math;
 
 enum VideoCodec {
-  h264('H.264 / AVC', 'libx264', 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.'),
-  hevc('H.265 / HEVC', 'libx265', 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.');
+  h264(
+    'H.264 / AVC',
+    'libx264',
+    'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.',
+  ),
+  hevc(
+    'H.265 / HEVC',
+    'libx265',
+    'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.',
+  );
 
   final String displayName;
   final String ffmpegCodec;
@@ -12,9 +20,21 @@ enum VideoCodec {
 }
 
 enum VideoContainer {
-  mp4('MP4', 'mp4', 'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.'),
-  mkv('MKV', 'mkv', 'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.'),
-  mov('MOV', 'mov', 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).');
+  mp4(
+    'MP4',
+    'mp4',
+    'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.',
+  ),
+  mkv(
+    'MKV',
+    'mkv',
+    'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.',
+  ),
+  mov(
+    'MOV',
+    'mov',
+    'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).',
+  );
 
   final String displayName;
   final String extension;
@@ -24,8 +44,14 @@ enum VideoContainer {
 }
 
 enum RateControlMode {
-  crf('Constant Rate Factor (CRF)', 'Mempertahankan kualitas visual yang konsisten tanpa memedulikan ukuran akhir file. Sangat direkomendasikan.'),
-  bitrate('Bitrate (CBR/VBR)', 'Memaksa video untuk mencapai ukuran target MB yang pasti, kualitas visual akan menyesuaikan.');
+  crf(
+    'Constant Rate Factor (CRF)',
+    'Mempertahankan kualitas visual yang konsisten tanpa memedulikan ukuran akhir file. Sangat direkomendasikan.',
+  ),
+  bitrate(
+    'Bitrate (CBR/VBR)',
+    'Memaksa video untuk mencapai ukuran target MB yang pasti, kualitas visual akan menyesuaikan.',
+  );
 
   final String displayName;
   final String description;
@@ -34,22 +60,42 @@ enum RateControlMode {
 }
 
 enum AudioFormat {
-  mp3('MP3', 'mp3', 'libmp3lame', 'Universal (Kompatibel dengan semua perangkat dan pemutar)'),
-  m4a('M4A / AAC', 'm4a', 'aac', 'Kualitas Tinggi & Efisiensi Terbaik (Apple & Android)'),
-  wav('WAV', 'wav', 'pcm_s16le', 'Lossless Uncompressed (Kualitas Audio Studio Mentah)');
+  mp3(
+    'MP3',
+    'mp3',
+    'libmp3lame',
+    'Universal (Kompatibel dengan semua perangkat dan pemutar)',
+  ),
+  m4a(
+    'M4A / AAC',
+    'm4a',
+    'aac',
+    'Kualitas Tinggi & Efisiensi Terbaik (Apple & Android)',
+  ),
+  wav(
+    'WAV',
+    'wav',
+    'pcm_s16le',
+    'Lossless Uncompressed (Kualitas Audio Studio Mentah)',
+  );
 
   final String displayName;
   final String extension;
   final String ffmpegCodec;
   final String description;
 
-  const AudioFormat(this.displayName, this.extension, this.ffmpegCodec, this.description);
+  const AudioFormat(
+    this.displayName,
+    this.extension,
+    this.ffmpegCodec,
+    this.description,
+  );
 }
 
 class EncodingOptions {
   final VideoCodec codec;
   final VideoContainer container;
-  
+
   // Rate control
   final RateControlMode rateControlMode;
   final int crfValue;
@@ -60,7 +106,8 @@ class EncodingOptions {
 
   // Audio extraction
   final AudioFormat audioFormat;
-  final int audioExtractBitrateKbps; // 0 for copy original stream, or 128, 192, 256, 320
+  final int
+  audioExtractBitrateKbps; // 0 for copy original stream, or 128, 192, 256, 320
 
   const EncodingOptions({
     this.codec = VideoCodec.h264,
@@ -108,7 +155,7 @@ class EncodingOptions {
     if (rateControlMode == RateControlMode.bitrate) {
       return customBitrateKbps;
     }
-    
+
     // For CRF mode, calculate baseline bitrate based on target resolution
     final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
     double baseMbps = 4.5; // High-quality 1080p baseline (~4.5 Mbps)

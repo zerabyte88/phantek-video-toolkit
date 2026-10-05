@@ -97,18 +97,12 @@ class VideoInfoCard extends StatelessWidget {
         label: l10n.t('resolution'),
         value: '${videoInfo.width} × ${videoInfo.height}',
       ),
-      _SpecItem(
-        label: l10n.t('duration'),
-        value: videoInfo.formattedDuration,
-      ),
+      _SpecItem(label: l10n.t('duration'), value: videoInfo.formattedDuration),
       _SpecItem(
         label: l10n.t('fps'),
         value: '${videoInfo.fps.toStringAsFixed(1)} fps',
       ),
-      _SpecItem(
-        label: l10n.t('bitrate'),
-        value: videoInfo.formattedBitrate,
-      ),
+      _SpecItem(label: l10n.t('bitrate'), value: videoInfo.formattedBitrate),
     ];
 
     return Row(
@@ -167,7 +161,9 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bg = isNeutral
-        ? (theme.brightness == Brightness.dark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
+        ? (theme.brightness == Brightness.dark
+              ? const Color(0xFF334155)
+              : const Color(0xFFE2E8F0))
         : color.withAlpha(25);
     final fg = isNeutral ? theme.colorScheme.onSurface : color;
 

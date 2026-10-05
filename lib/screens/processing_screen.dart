@@ -59,12 +59,21 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   double _storageIoRateMb = 0.0;
   int _cpuUsagePercent = 0;
   static const int _historySampleCount = 18;
-  final List<double> _cpuHistory =
-      List<double>.generate(_historySampleCount, (_) => 0.05, growable: true);
-  final List<double> _memoryHistory =
-      List<double>.generate(_historySampleCount, (_) => 0.08, growable: true);
-  final List<double> _storageHistory =
-      List<double>.generate(_historySampleCount, (_) => 0.02, growable: true);
+  final List<double> _cpuHistory = List<double>.generate(
+    _historySampleCount,
+    (_) => 0.05,
+    growable: true,
+  );
+  final List<double> _memoryHistory = List<double>.generate(
+    _historySampleCount,
+    (_) => 0.08,
+    growable: true,
+  );
+  final List<double> _storageHistory = List<double>.generate(
+    _historySampleCount,
+    (_) => 0.02,
+    growable: true,
+  );
   int _prevSizeBytes = 0;
   int _latestOutputBytes = 0;
 
@@ -91,9 +100,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _pulseController.dispose();
     ForegroundServiceManager().stopService();
     // Restore wakelock to the user's preference.
-    WakelockPlus.toggle(
-      enable: _settingsService.settings.keepScreenAwake,
-    );
+    WakelockPlus.toggle(enable: _settingsService.settings.keepScreenAwake);
     if (_isProcessing) {
       FFmpegService.cancelAll();
       CacheManagerService().clearAllCache(
@@ -181,7 +188,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                    l10n.t('device_temp_warning', args: {'temp': temp.toStringAsFixed(1)})),
+                  l10n.t(
+                    'device_temp_warning',
+                    args: {'temp': temp.toStringAsFixed(1)},
+                  ),
+                ),
                 backgroundColor: Colors.red,
                 duration: const Duration(seconds: 3),
               ),
@@ -229,8 +240,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         }
 
         // 3. CPU Usage (Real measurement from /proc/self/stat with smart workload fallback)
-        final totalCores =
-            Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
+        final totalCores = Platform.numberOfProcessors > 0
+            ? Platform.numberOfProcessors
+            : 8;
         final threads = widget.appSettings.cpuThreads > 0
             ? widget.appSettings.cpuThreads
             : totalCores;
@@ -249,8 +261,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           }
         }
 
-        final cpuNorm =
-            _isProcessing ? (cpuPercent / 100.0).clamp(0.05, 1.0) : 0.05;
+        final cpuNorm = _isProcessing
+            ? (cpuPercent / 100.0).clamp(0.05, 1.0)
+            : 0.05;
         _cpuHistory.add(cpuNorm);
         if (_cpuHistory.length > _historySampleCount) {
           _cpuHistory.removeAt(0);
@@ -265,8 +278,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           _memoryHistory.removeAt(0);
         }
 
-        final ioNorm =
-            _isProcessing ? (ioMb / 8.0).clamp(0.08, 1.0) : 0.02;
+        final ioNorm = _isProcessing ? (ioMb / 8.0).clamp(0.08, 1.0) : 0.02;
         _storageHistory.add(ioNorm);
         if (_storageHistory.length > _historySampleCount) {
           _storageHistory.removeAt(0);
@@ -304,21 +316,25 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 speed = parts[1].replaceAll('Speed:', '').trim();
                 if (_latestOutputBytes <= 0) {
                   if (size.contains('MB')) {
-                    final val = double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
+                    final val =
+                        double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
                     _latestOutputBytes = (val * 1024 * 1024).round();
                   } else if (size.contains('KB')) {
-                    final val = double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
+                    final val =
+                        double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
                     _latestOutputBytes = (val * 1024).round();
                   }
                 }
               }
 
               final now = DateTime.now();
-              final elapsed =
-                  _startTime != null ? now.difference(_startTime!) : Duration.zero;
+              final elapsed = _startTime != null
+                  ? now.difference(_startTime!)
+                  : Duration.zero;
               final remaining = _calculateRemainingTime(progress, elapsed);
-              final etaStr =
-                  remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+              final etaStr = remaining != null
+                  ? ' | ETA: ${_formatDuration(remaining)}'
+                  : '';
 
               ForegroundServiceManager().updateService(
                 title: l10n.t('app_title'),
@@ -334,8 +350,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   }
                   _speedText = speed;
                   _currentSizeText = size;
-                  _statusText =
-                      '$actionText ${_formatPercentage(progress)}';
+                  _statusText = '$actionText ${_formatPercentage(progress)}';
                 });
               }
             },
@@ -343,7 +358,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               if (mounted) {
                 if (log.contains('Extraction failed:') ||
                     log.toLowerCase().contains('error')) {
-                  _errorMessage = log.replaceFirst('\nExtraction failed: ', '').trim();
+                  _errorMessage = log
+                      .replaceFirst('\nExtraction failed: ', '')
+                      .trim();
                 }
                 debugPrint(log);
               }
@@ -366,27 +383,30 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 speed = parts[1].replaceAll('Speed:', '').trim();
                 if (_latestOutputBytes <= 0) {
                   if (size.contains('MB')) {
-                    final val = double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
+                    final val =
+                        double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
                     _latestOutputBytes = (val * 1024 * 1024).round();
                   } else if (size.contains('KB')) {
-                    final val = double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
+                    final val =
+                        double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
                     _latestOutputBytes = (val * 1024).round();
                   }
                 }
               }
 
               final now = DateTime.now();
-              final elapsed =
-                  _startTime != null ? now.difference(_startTime!) : Duration.zero;
+              final elapsed = _startTime != null
+                  ? now.difference(_startTime!)
+                  : Duration.zero;
               final remaining = _calculateRemainingTime(progress, elapsed);
-              final etaStr =
-                  remaining != null ? ' | ETA: ${_formatDuration(remaining)}' : '';
+              final etaStr = remaining != null
+                  ? ' | ETA: ${_formatDuration(remaining)}'
+                  : '';
 
               // Always update foreground notification even if app is minimized
               ForegroundServiceManager().updateService(
                 title: l10n.t('app_title'),
-                text:
-                    '$actionText ${_formatPercentage(progress)}$etaStr',
+                text: '$actionText ${_formatPercentage(progress)}$etaStr',
               );
 
               if (mounted) {
@@ -398,8 +418,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   }
                   _speedText = speed;
                   _currentSizeText = size;
-                  _statusText =
-                      '$actionText ${_formatPercentage(progress)}';
+                  _statusText = '$actionText ${_formatPercentage(progress)}';
                 });
               }
             },
@@ -407,7 +426,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               if (mounted) {
                 if (log.contains('Encoding failed:') ||
                     log.toLowerCase().contains('error')) {
-                  _errorMessage = log.replaceFirst('\nEncoding failed: ', '').trim();
+                  _errorMessage = log
+                      .replaceFirst('\nEncoding failed: ', '')
+                      .trim();
                 }
                 debugPrint(log);
               }
@@ -424,9 +445,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       );
     }
     // Restore wakelock to user's preference now that encoding is done.
-    WakelockPlus.toggle(
-      enable: _settingsService.settings.keepScreenAwake,
-    );
+    WakelockPlus.toggle(enable: _settingsService.settings.keepScreenAwake);
     Future.delayed(const Duration(seconds: 4), () {
       ForegroundServiceManager().stopService();
     });
@@ -500,7 +519,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       if (result.type != ResultType.done && mounted) {
         final l10n = _settingsService.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.t('error_open_file')}: ${result.message}')),
+          SnackBar(
+            content: Text('${l10n.t('error_open_file')}: ${result.message}'),
+          ),
         );
       }
     } catch (e) {
@@ -736,8 +757,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
   /// Live System Telemetry Cards: Processor Load (Left), RAM Allocation (Middle), and Disk Write (Right)
   Widget _buildLiveSystemTelemetry(ThemeData theme, l10n) {
-    final totalCores = Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8;
-    final threads = widget.appSettings.cpuThreads > 0 ? widget.appSettings.cpuThreads : totalCores;
+    final totalCores = Platform.numberOfProcessors > 0
+        ? Platform.numberOfProcessors
+        : 8;
+    final threads = widget.appSettings.cpuThreads > 0
+        ? widget.appSettings.cpuThreads
+        : totalCores;
 
     return Row(
       children: [
@@ -899,9 +924,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     theme: theme,
                     icon: Icons.timer_outlined,
                     label: l10n.t('proc_elapsed_time'),
-                    value: _formatDuration(_isProcessing
-                        ? _elapsedDuration
-                        : (_totalDuration ?? _elapsedDuration)),
+                    value: _formatDuration(
+                      _isProcessing
+                          ? _elapsedDuration
+                          : (_totalDuration ?? _elapsedDuration),
+                    ),
                   ),
                 ),
                 Container(
@@ -917,8 +944,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     label: l10n.t('proc_remaining_time'),
                     value: _isProcessing
                         ? (_estimatedRemaining != null
-                            ? '~${_formatDuration(_estimatedRemaining!)}'
-                            : l10n.t('proc_calculating'))
+                              ? '~${_formatDuration(_estimatedRemaining!)}'
+                              : l10n.t('proc_calculating'))
                         : (_isSuccess ? l10n.t('proc_completed') : '-'),
                   ),
                 ),
@@ -933,8 +960,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   if (_speedText.isNotEmpty)
                     Row(
                       children: [
-                        Icon(Icons.speed_outlined,
-                            size: 15, color: theme.colorScheme.primary),
+                        Icon(
+                          Icons.speed_outlined,
+                          size: 15,
+                          color: theme.colorScheme.primary,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           '${l10n.t('fps')}: $_speedText',
@@ -948,8 +978,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   if (_currentSizeText.isNotEmpty)
                     Row(
                       children: [
-                        Icon(Icons.storage_outlined,
-                            size: 15, color: theme.colorScheme.secondary),
+                        Icon(
+                          Icons.storage_outlined,
+                          size: 15,
+                          color: theme.colorScheme.secondary,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           '${l10n.t('file_size')}: $_currentSizeText',
@@ -968,12 +1001,17 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.check_circle_outline_rounded,
-                      size: 16, color: Color(0xFF10B981)),
+                  const Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 16,
+                    color: Color(0xFF10B981),
+                  ),
                   const SizedBox(width: 6),
                   Text(
-                    l10n.t('proc_total_time',
-                        args: {'time': _formatDuration(_totalDuration!)}),
+                    l10n.t(
+                      'proc_total_time',
+                      args: {'time': _formatDuration(_totalDuration!)},
+                    ),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -1158,13 +1196,15 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   final isBigger = size > widget.videoInfo.fileSizeBytes;
                   final diffPercent = widget.videoInfo.fileSizeBytes > 0
                       ? ((size - widget.videoInfo.fileSizeBytes).abs() /
-                              widget.videoInfo.fileSizeBytes *
-                              100)
-                          .toStringAsFixed(0)
+                                widget.videoInfo.fileSizeBytes *
+                                100)
+                            .toStringAsFixed(0)
                       : '0';
                   final savingsBadge = isBigger
-                      ? l10n.t('proc_size_increase',
-                          args: {'percent': diffPercent})
+                      ? l10n.t(
+                          'proc_size_increase',
+                          args: {'percent': diffPercent},
+                        )
                       : l10n.t('proc_savings', args: {'percent': diffPercent});
                   return _buildInfoRow(
                     theme,
@@ -1189,7 +1229,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   Widget _buildInfoRow(
-      ThemeData theme, String label, String value, String subtitle) {
+    ThemeData theme,
+    String label,
+    String value,
+    String subtitle,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -1266,8 +1310,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.error_outline_rounded,
-                          color: Colors.redAccent, size: 18),
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.redAccent,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         l10n.t('error_details'),
@@ -1405,16 +1452,14 @@ class _SuccessBottomSheet extends StatelessWidget {
     final isBigger = outputSize > originalSize;
     final diffRatio = originalSize > 0
         ? ((outputSize - originalSize).abs() / originalSize * 100)
-            .toStringAsFixed(0)
+              .toStringAsFixed(0)
         : '0';
 
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border(
-          top: BorderSide(color: theme.colorScheme.outline),
-        ),
+        border: Border(top: BorderSide(color: theme.colorScheme.outline)),
       ),
       child: SafeArea(
         child: Padding(
@@ -1436,8 +1481,11 @@ class _SuccessBottomSheet extends StatelessWidget {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded,
-                      color: Color(0xFF10B981), size: 28),
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: Color(0xFF10B981),
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -1462,8 +1510,10 @@ class _SuccessBottomSheet extends StatelessWidget {
                     Icons.folder_outlined,
                     theme.colorScheme.onSurface.withAlpha(160),
                   ),
-                  Icon(Icons.arrow_forward_rounded,
-                      color: theme.colorScheme.onSurface.withAlpha(60)),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: theme.colorScheme.onSurface.withAlpha(60),
+                  ),
                   _buildStatColumn(
                     theme,
                     l10n.t('proc_target'),
@@ -1505,10 +1555,14 @@ class _SuccessBottomSheet extends StatelessWidget {
                         children: [
                           Text(
                             isBigger
-                                ? l10n.t('proc_size_increase_title',
-                                    args: {'percent': diffRatio})
-                                : l10n.t('proc_savings_title',
-                                    args: {'percent': diffRatio}),
+                                ? l10n.t(
+                                    'proc_size_increase_title',
+                                    args: {'percent': diffRatio},
+                                  )
+                                : l10n.t(
+                                    'proc_savings_title',
+                                    args: {'percent': diffRatio},
+                                  ),
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
@@ -1523,8 +1577,9 @@ class _SuccessBottomSheet extends StatelessWidget {
                               l10n.t('proc_size_increase_hint'),
                               style: TextStyle(
                                 fontSize: 11,
-                                color:
-                                    theme.colorScheme.onSurface.withAlpha(160),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  160,
+                                ),
                               ),
                             ),
                           ],
@@ -1538,10 +1593,7 @@ class _SuccessBottomSheet extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () async {
                   final mime = _ProcessingScreenState.getMimeType(outputPath);
-                  var res = await OpenFile.open(
-                    outputPath,
-                    type: mime,
-                  );
+                  var res = await OpenFile.open(outputPath, type: mime);
                   if (res.type != ResultType.done && mime != null) {
                     await OpenFile.open(outputPath);
                   }
@@ -1613,8 +1665,13 @@ class _SuccessBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildStatColumn(ThemeData theme, String label, String value,
-      IconData icon, Color color) {
+  Widget _buildStatColumn(
+    ThemeData theme,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),

@@ -16,18 +16,21 @@ class AppLocalizations {
     'id': {
       'desc_crf': 'Mempertahankan kualitas visual yang konsisten tanpa memedulikan ukuran akhir file. Semakin kecil angkanya, semakin tinggi kualitasnya namun ukurannya semakin besar. Sangat direkomendasikan.',
       'desc_bitrate': 'Memaksa video untuk mencapai ukuran target MB yang pasti, kualitas visual akan menyesuaikan.',
-      'desc_mp4': 'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.',
+      'desc_mp4':
+          'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.',
       'desc_mkv': 'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.',
       'desc_mov': 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).',
       'desc_h264': 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.',
       'desc_hevc': 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.',
       'est_size_title': 'Estimasi Ukuran Output:',
       'est_size_warning': '* Ukuran asli dapat bervariasi bergantung tingkat kerumitan visual video.',
-      'crf_label': 'Nilai CRF (Lebih kecil = Kualitas makin baik, Ukuran makin besar)',
+      'crf_label':
+          'Nilai CRF (Lebih kecil = Kualitas makin baik, Ukuran makin besar)',
       'bitrate_label': 'Target Bitrate (Mbps)',
       'app_title': 'Phantek',
       'app_long_title': 'Phantek - Video Toolkit',
-      'app_tagline': 'Konversi video 4K/2K ke resolusi\nyang lebih kecil dengan mudah',
+      'app_tagline':
+          'Konversi video 4K/2K ke resolusi\nyang lebih kecil dengan mudah',
       'pick_video': 'Pilih Video',
       'change_video': 'Ganti Video',
       'reset': 'Reset',
@@ -36,7 +39,8 @@ class AppLocalizations {
       'settings': 'Pengaturan',
       'loading_pick': 'Mempersiapkan pemilihan video...',
       'loading_analyzing': 'Menganalisis & memuat info video...',
-      'loading_large_hint': 'Video berukuran besar membutuhkan beberapa detik untuk dianalisis.',
+      'loading_large_hint':
+          'Video berukuran besar membutuhkan beberapa detik untuk dianalisis.',
       'error_read_video': 'Gagal membaca informasi video',
       'source_video': 'Video Sumber',
       'resolution': 'Resolusi',
@@ -49,7 +53,8 @@ class AppLocalizations {
       'target_resolution': 'Target Resolusi',
       'original_resolution': 'Asli (Sama dengan sumber)',
       'video_already_low': 'Video sudah beresolusi rendah',
-      'can_still_compress': 'Anda masih bisa mengompresi bitrate atau mengubah format/codec.',
+      'can_still_compress':
+          'Anda masih bisa mengompresi bitrate atau mengubah format/codec.',
       'video_options': 'Opsi Video & Kompresi',
       'bitrate_setting': 'Target Bitrate',
       'container_format': 'Format Video',
@@ -81,7 +86,8 @@ class AppLocalizations {
       'settings_ram_high': '1024 MB (Performa Tinggi)',
       'settings_ram_max': '2048 MB (Maksimum)',
       'settings_ram_ultra': '4096 MB (Ultra 4GB)',
-      'settings_ram_4gb_disabled_hint': 'Opsi 4096 MB memerlukan perangkat dengan RAM fisik di atas 4GB.',
+      'settings_ram_4gb_disabled_hint':
+          'Opsi 4096 MB memerlukan perangkat dengan RAM fisik di atas 4GB.',
       'settings_cpu_preset': 'Preset Kecepatan CPU (Preset)',
       'settings_cpu_preset_desc': 'Pilih Fast untuk proses lebih cepat, atau Normal untuk hasil seimbang antara kecepatan dan ukuran file.',
       'preset_fast': 'Fast (Tanpa Kompres)',
@@ -138,7 +144,8 @@ class AppLocalizations {
       'settings_storage_desc': 'Kelola file cache sementara untuk mencegah aplikasi menggunakan ruang penyimpanan berlebih.',
       'settings_cache_size': 'Ukuran Cache Saat Ini',
       'settings_clear_cache': 'Bersihkan Cache Sekarang',
-      'settings_clear_cache_success': 'Cache berhasil dibersihkan! {size} ruang dibebaskan.',
+      'settings_clear_cache_success':
+          'Cache berhasil dibersihkan! {size} ruang dibebaskan.',
       'settings_cache_info': 'Pembersihan Otomatis Aktif',
       'settings_cache_info_desc': 'Salinan video sementara dari pemilih file otomatis dihapus setelah konversi selesai.',
       'device_specs': 'Spesifikasi Perangkat',
@@ -172,7 +179,8 @@ class AppLocalizations {
       'proc_cancel_btn': 'Batalkan',
       'rate_control': 'Kontrol Bitrate / Kualitas',
       'feature_offline_fast': 'Offline & Cepat',
-      'feature_offline_fast_desc': 'Diproses langsung di CPU/GPU perangkat Anda',
+      'feature_offline_fast_desc':
+          'Diproses langsung di CPU/GPU perangkat Anda',
       'feature_crf_bitrate': 'Kontrol CRF & Bitrate',
       'feature_crf_bitrate_desc': 'Presisi kualitas dan kompresi ukuran file',
       'feature_privacy': 'Privasi 100%',
@@ -194,7 +202,8 @@ class AppLocalizations {
       'settings_audio_output_folder': 'Folder Penyimpanan Audio',
       'settings_audio_output_folder_desc': 'Pilih lokasi folder penyimpanan file audio hasil ekstraksi pada perangkat Anda.',
       'settings_audio_reset_folder': 'Reset ke Music',
-      'settings_audio_folder_changed': 'Lokasi penyimpanan audio berhasil diubah',
+      'settings_audio_folder_changed':
+          'Lokasi penyimpanan audio berhasil diubah',
       'settings_audio_folder_default': 'Default (Music)',
       'category_video': 'Video',
       'category_audio': 'Audio',
@@ -205,10 +214,12 @@ class AppLocalizations {
       'audio_copy': 'Salin Asli (Paling Cepat)',
       'start_audio_extraction': 'Mulai Ekstrak Audio',
       'proc_extracting': 'Mengekstrak Audio...',
-      'proc_audio_completed': 'Ekstraksi Selesai! Audio disimpan di folder tujuan.',
+      'proc_audio_completed':
+          'Ekstraksi Selesai! Audio disimpan di folder tujuan.',
       'proc_play_audio': 'Buka / Putar Audio',
       'no_audio_track': 'Video ini tidak memiliki trek audio untuk diekstrak.',
-      'desc_audio_mp3': 'Universal (Kompatibel dengan semua perangkat dan pemutar)',
+      'desc_audio_mp3':
+          'Universal (Kompatibel dengan semua perangkat dan pemutar)',
       'desc_audio_m4a': 'Kualitas Tinggi & Efisiensi Terbaik (Apple & Android)',
       'desc_audio_wav': 'Lossless Uncompressed (Kualitas Audio Studio Mentah)',
       'audio_track': 'Trek Audio',
@@ -222,7 +233,8 @@ class AppLocalizations {
       'desc_crf': 'Maintains consistent visual quality regardless of final file size. Lower value means better quality but larger size. Highly recommended.',
       'desc_bitrate': 'Forces the video to meet an exact target MB size, visual quality will adjust accordingly.',
       'desc_mp4': 'Lightweight and universal. Social Media, Phone Recordings, Video sharing.',
-      'desc_mkv': 'Multiple audio & subtitles in 1 file. Movies, Anime, TV Series.',
+      'desc_mkv':
+          'Multiple audio & subtitles in 1 file. Movies, Anime, TV Series.',
       'desc_mov': 'High visual raw quality. Professional Video Editing (Premiere/FCPX).',
       'desc_h264': 'Live Streaming, Web Video, Standard Phone recordings. Excellent Compatibility.',
       'desc_hevc': '4K Streaming, High Quality Movies. Very High Compression Efficiency.',
@@ -241,7 +253,8 @@ class AppLocalizations {
       'settings': 'Settings',
       'loading_pick': 'Preparing file picker...',
       'loading_analyzing': 'Analyzing & probing video info...',
-      'loading_large_hint': 'Large video files may take several seconds to analyze.',
+      'loading_large_hint':
+          'Large video files may take several seconds to analyze.',
       'error_read_video': 'Failed to read video information',
       'source_video': 'Source Video',
       'resolution': 'Resolution',
@@ -254,7 +267,8 @@ class AppLocalizations {
       'target_resolution': 'Target Resolution',
       'original_resolution': 'Original (Same as source)',
       'video_already_low': 'Video already has low resolution',
-      'can_still_compress': 'You can still re-encode bitrate or change format/codec.',
+      'can_still_compress':
+          'You can still re-encode bitrate or change format/codec.',
       'video_options': 'Video & Compression Options',
       'bitrate_setting': 'Target Bitrate',
       'container_format': 'Video Format',
@@ -266,7 +280,8 @@ class AppLocalizations {
       'feature_offline': '100% Offline',
       'settings_title': 'Settings',
       'settings_language': 'Language',
-      'settings_language_desc': 'Select your preferred user interface language.',
+      'settings_language_desc':
+          'Select your preferred user interface language.',
       'settings_theme': 'Theme Appearance',
       'settings_theme_desc': 'Choose between Standard Dark mode, battery-saving OLED Dark mode for AMOLED screens, or Light mode.',
       'theme_dark': 'Dark Mode',
@@ -286,7 +301,8 @@ class AppLocalizations {
       'settings_ram_high': '1024 MB (High Performance)',
       'settings_ram_max': '2048 MB (Maximum)',
       'settings_ram_ultra': '4096 MB (Ultra 4GB)',
-      'settings_ram_4gb_disabled_hint': '4096 MB option requires a device with more than 4GB physical RAM.',
+      'settings_ram_4gb_disabled_hint':
+          '4096 MB option requires a device with more than 4GB physical RAM.',
       'settings_cpu_preset': 'Encoding Speed Preset (x264/x265)',
       'settings_cpu_preset_desc': 'Choose Fast for quicker processing, or Normal for a balanced speed and file size.',
       'preset_fast': 'Fast (No Compress)',
@@ -297,7 +313,8 @@ class AppLocalizations {
       'settings_audio_mute': 'Mute (No Audio)',
       'settings_reset_default': 'Reset to Default Settings',
       'settings_reset_confirm_title': 'Reset Settings?',
-      'settings_reset_confirm_desc': 'Are you sure you want to restore all settings to default values?',
+      'settings_reset_confirm_desc':
+          'Are you sure you want to restore all settings to default values?',
       'settings_reset_success': 'Settings successfully restored to default',
       'settings_about': 'About Phantek',
       'about_phantek_subtitle': 'Offline Video Transcoder & Audio Extractor',
@@ -343,7 +360,8 @@ class AppLocalizations {
       'settings_storage_desc': 'Manage temporary cache files to prevent excessive app storage usage.',
       'settings_cache_size': 'Current Cache Size',
       'settings_clear_cache': 'Clear Cache Now',
-      'settings_clear_cache_success': 'Cache cleared successfully! {size} freed.',
+      'settings_clear_cache_success':
+          'Cache cleared successfully! {size} freed.',
       'settings_cache_info': 'Auto-cleanup Active',
       'settings_cache_info_desc': 'Temporary video copies from file picker are automatically deleted after conversion.',
       'device_specs': 'Device Specifications',
@@ -379,7 +397,8 @@ class AppLocalizations {
       'feature_offline_fast': 'Offline & Fast',
       'feature_offline_fast_desc': 'Processed directly on your device CPU/GPU',
       'feature_crf_bitrate': 'CRF & Bitrate Control',
-      'feature_crf_bitrate_desc': 'Precision visual quality and file size compression',
+      'feature_crf_bitrate_desc':
+          'Precision visual quality and file size compression',
       'feature_privacy': '100% Privacy',
       'feature_privacy_desc': 'No uploading to servers or 3rd-party clouds',
       'error_details': 'Error Details',
@@ -399,7 +418,8 @@ class AppLocalizations {
       'settings_audio_output_folder': 'Audio Storage Folder',
       'settings_audio_output_folder_desc': 'Choose the folder location where extracted audio files will be saved on your device.',
       'settings_audio_reset_folder': 'Reset to Music',
-      'settings_audio_folder_changed': 'Audio storage location changed successfully',
+      'settings_audio_folder_changed':
+          'Audio storage location changed successfully',
       'settings_audio_folder_default': 'Default (Music)',
       'category_video': 'Video',
       'category_audio': 'Audio',
@@ -410,12 +430,16 @@ class AppLocalizations {
       'audio_copy': 'Copy Original (Fastest)',
       'start_audio_extraction': 'Start Audio Extraction',
       'proc_extracting': 'Extracting audio...',
-      'proc_audio_completed': 'Extraction Completed! Audio saved to destination.',
+      'proc_audio_completed':
+          'Extraction Completed! Audio saved to destination.',
       'proc_play_audio': 'Open / Play Audio',
       'no_audio_track': 'This video does not have an audio track to extract.',
-      'desc_audio_mp3': 'Universal (Compatible with all devices and media players)',
-      'desc_audio_m4a': 'High Quality & Best Efficiency (Optimized for Apple & Android)',
-      'desc_audio_wav': 'Lossless Uncompressed (Studio-grade raw audio quality)',
+      'desc_audio_mp3':
+          'Universal (Compatible with all devices and media players)',
+      'desc_audio_m4a':
+          'High Quality & Best Efficiency (Optimized for Apple & Android)',
+      'desc_audio_wav':
+          'Lossless Uncompressed (Studio-grade raw audio quality)',
       'audio_track': 'Audio Track',
       'audio_extracted': 'Audio Extracted',
       'unit_core': 'Core',
@@ -424,7 +448,8 @@ class AppLocalizations {
       'telemetry_storage_io': 'Disk Write Rate',
     },
     'ja': {
-      'desc_crf': '最終ファイルサイズに関係なく一定の画質を維持します。数値が小さいほど高画質になりますが、サイズが大きくなります。強く推奨されます。',
+      'desc_crf':
+          '最終ファイルサイズに関係なく一定の画質を維持します。数値が小さいほど高画質になりますが、サイズが大きくなります。強く推奨されます。',
       'desc_bitrate': '指定した目標サイズ（MB）に正確に収まるようにビットレートを固定します。画質は自動調整されます。',
       'desc_mp4': '軽量で最も高い互換性。SNS、スマホ撮影、動画共有に最適。',
       'desc_mkv': '1つのファイルに複数の音声や字幕を保持可能。映画、アニメ、TV番組向け。',
@@ -473,32 +498,38 @@ class AppLocalizations {
       'settings_language': '言語 (Language)',
       'settings_language_desc': 'アプリの表示言語を選択します。',
       'settings_theme': 'テーマ設定',
-      'settings_theme_desc': '標準のダークモード、AMOLED画面で省電力なOLEDダークモード、またはライトモードを選択します。',
+      'settings_theme_desc':
+          '標準のダークモード、AMOLED画面で省電力なOLEDダークモード、またはライトモードを選択します。',
       'theme_dark': 'ダークモード',
       'theme_oled': 'OLED ダーク',
       'theme_light': 'ライトモード',
       'settings_wakelock': '画面スリープ防止',
-      'settings_wakelock_desc': '動画の変換中やアプリ使用中に画面がスリープするのを防ぎます。⚠️ 警告: この機能を有効にするとバッテリーの消費が早くなります。',
+      'settings_wakelock_desc':
+          '動画の変換中やアプリ使用中に画面がスリープするのを防ぎます。⚠️ 警告: この機能を有効にするとバッテリーの消費が早くなります。',
       'settings_hardware': 'ハードウェア・パフォーマンス',
       'settings_cpu_threads': 'CPUコア数 / スレッド数',
       'settings_cpu_threads_desc': 'エンコードに使用するスレッド数を指定します。コア数が多いほど高速に変換できます。',
       'settings_detected_cores': 'この端末で {count} 個のCPUコアを検出',
       'settings_auto_cores': '自動 (全コア使用)',
       'settings_ram_buffer': 'RAM・メモリバッファ制限',
-      'settings_ram_buffer_desc': 'メモリ不足(OOM)を防ぐためのFFmpegキャッシュメモリバッファサイズを設定します。',
+      'settings_ram_buffer_desc':
+          'メモリ不足(OOM)を防ぐためのFFmpegキャッシュメモリバッファサイズを設定します。',
       'settings_ram_low': '256 MB (省メモリ)',
       'settings_ram_standard': '512 MB (標準・バランス)',
       'settings_ram_high': '1024 MB (高性能)',
       'settings_ram_max': '2048 MB (最大)',
       'settings_ram_ultra': '4096 MB (ウルトラ 4GB)',
-      'settings_ram_4gb_disabled_hint': '4096 MB オプションには 4GB を超える物理 RAM を搭載した端末が必要です。',
+      'settings_ram_4gb_disabled_hint':
+          '4096 MB オプションには 4GB を超える物理 RAM を搭載した端末が必要です。',
       'settings_cpu_preset': 'エンコード速度プリセット',
-      'settings_cpu_preset_desc': '高速処理にはFast、速度とファイルサイズのバランスにはNormalを選択してください。',
+      'settings_cpu_preset_desc':
+          '高速処理にはFast、速度とファイルサイズのバランスにはNormalを選択してください。',
       'preset_fast': 'Fast (無圧縮・高速)',
       'preset_normal': 'Normal (バランス)',
       'preset_slow': 'Slow (最大圧縮)',
       'settings_audio_quality': '音質 (ビットレート)',
-      'settings_audio_quality_desc': 'AAC音声ビットレートを設定します。無音を選択すると音声トラックを削除して容量を節約できます。',
+      'settings_audio_quality_desc':
+          'AAC音声ビットレートを設定します。無音を選択すると音声トラックを削除して容量を節約できます。',
       'settings_audio_mute': 'ミュート (無音)',
       'settings_reset_default': '初期設定に戻す',
       'settings_reset_confirm_title': '設定を初期化しますか？',
@@ -511,7 +542,8 @@ class AppLocalizations {
       'license_label': 'ライセンス',
       'developer_role': '開発者＆メンテナー',
       'view_github_repo': 'GitHubでリポジトリを表示',
-      'settings_about_desc': 'Phantek - Video Toolkitは、完全オフラインで動作する安心の動画縮小・圧縮アプリです。',
+      'settings_about_desc':
+          'Phantek - Video Toolkitは、完全オフラインで動作する安心の動画縮小・圧縮アプリです。',
       'bitrate_auto': '自動 (推奨)',
       'bitrate_high': '高画質',
       'bitrate_medium': 'バランス',
@@ -593,7 +625,8 @@ class AppLocalizations {
       'device_temp_warning': '警告: デバイス温度が高温です ({temp}°C)',
       'error_open_file': '動画ファイルを開けませんでした',
       'codec_hevc_warning': '互換性の注意: H.265 (HEVC) は専用のハードウェアデコーダーが必要です。一部のスマートフォン標準ギャラリー／動画アプリでは直接再生できない場合があります。VLC／MX Playerを使用するか、互換性を最優先する場合は H.264 を選択してください。',
-      'codec_compat_hint': '注意: 標準のギャラリーで動画が再生できない場合は、VLC または MX Player をご使用ください。',
+      'codec_compat_hint':
+          '注意: 標準のギャラリーで動画が再生できない場合は、VLC または MX Player をご使用ください。',
       'back_to_home': 'ホームに戻る',
       'settings_output_folder': '動画保存先フォルダー',
       'settings_output_folder_desc': '変換された動画を保存する端末内のフォルダーを選択します。',
@@ -716,7 +749,8 @@ class AppLocalizations {
       'license_label': '许可证',
       'developer_role': '创建者与维护者',
       'view_github_repo': '在 GitHub 上查看仓库',
-      'settings_about_desc': 'Phantek - Video Toolkit 是一款完全离线运行的移动端视频转码压缩工具，保障您的绝对隐私。',
+      'settings_about_desc':
+          'Phantek - Video Toolkit 是一款完全离线运行的移动端视频转码压缩工具，保障您的绝对隐私。',
       'bitrate_auto': '自动 (推荐计算)',
       'bitrate_high': '高画质',
       'bitrate_medium': '均衡',
@@ -888,7 +922,8 @@ class AppLocalizations {
       'theme_oled': 'OLED 純黑',
       'theme_light': '淺色模式',
       'settings_wakelock': '保持螢幕常亮',
-      'settings_wakelock_desc': '在應用程式執行或轉檔影片時防止手機休眠關閉螢幕。⚠️ 警告：開啟此功能將會加快電池電量消耗。',
+      'settings_wakelock_desc':
+          '在應用程式執行或轉檔影片時防止手機休眠關閉螢幕。⚠️ 警告：開啟此功能將會加快電池電量消耗。',
       'settings_hardware': '硬體與效能設定',
       'settings_cpu_threads': 'CPU 核心 / 執行緒數',
       'settings_cpu_threads_desc': '設定轉檔使用的執行緒數量。核心越多轉檔越快，但耗電與發熱會增加。',
@@ -921,7 +956,8 @@ class AppLocalizations {
       'license_label': '授權條款',
       'developer_role': '建立者與維護者',
       'view_github_repo': '在 GitHub 上查看儲存庫',
-      'settings_about_desc': 'Phantek - Video Toolkit 是一款完全離線執行的行動端影片轉檔壓縮工具，全力保護您的隱私。',
+      'settings_about_desc':
+          'Phantek - Video Toolkit 是一款完全離線執行的行動端影片轉檔壓縮工具，全力保護您的隱私。',
       'bitrate_auto': '自動 (推薦計算)',
       'bitrate_high': '高畫質',
       'bitrate_medium': '平衡',
@@ -1088,7 +1124,8 @@ class AppLocalizations {
       'settings_language': '언어 (Language)',
       'settings_language_desc': '앱 인터페이스 표시 언어를 선택하세요.',
       'settings_theme': '화면 테마',
-      'settings_theme_desc': '표준 다크 모드, AMOLED 화면에서 배터리를 절약하는 OLED 다크 모드, 또는 라이트 모드 중에서 선택하세요.',
+      'settings_theme_desc':
+          '표준 다크 모드, AMOLED 화면에서 배터리를 절약하는 OLED 다크 모드, 또는 라이트 모드 중에서 선택하세요.',
       'theme_dark': '다크 모드',
       'theme_oled': '다크 OLED',
       'theme_light': '라이트 모드',
@@ -1096,7 +1133,8 @@ class AppLocalizations {
       'settings_wakelock_desc': '동영상 인코딩 중이나 앱 사용 중에 화면이 꺼지거나 절전 모드로 들어가는 것을 방지합니다. ⚠️ 경고: 배터리가 더 빠르게 소모될 수 있습니다.',
       'settings_hardware': '하드웨어 및 성능 설정',
       'settings_cpu_threads': 'CPU 코어 / 스레드 수',
-      'settings_cpu_threads_desc': '인코딩에 사용할 CPU 스레드 수를 설정합니다. 코어가 많을수록 변환이 빨라집니다.',
+      'settings_cpu_threads_desc':
+          '인코딩에 사용할 CPU 스레드 수를 설정합니다. 코어가 많을수록 변환이 빨라집니다.',
       'settings_detected_cores': '이 기기에서 {count}개의 CPU 코어가 감지됨',
       'settings_auto_cores': '자동 (모든 코어 사용)',
       'settings_ram_buffer': 'RAM 및 메모리 버퍼 한도',
@@ -1106,14 +1144,17 @@ class AppLocalizations {
       'settings_ram_high': '1024 MB (고성능)',
       'settings_ram_max': '2048 MB (최대 용량)',
       'settings_ram_ultra': '4096 MB (울트라 4GB)',
-      'settings_ram_4gb_disabled_hint': '4096 MB 옵션은 물리적 RAM이 4GB를 초과하는 기기에서만 지원됩니다.',
+      'settings_ram_4gb_disabled_hint':
+          '4096 MB 옵션은 물리적 RAM이 4GB를 초과하는 기기에서만 지원됩니다.',
       'settings_cpu_preset': 'CPU 인코딩 속도 프리셋',
-      'settings_cpu_preset_desc': '더 빠른 처리를 원하시면 Fast를, 속도와 파일 크기의 균형을 원하시면 Normal을 선택하세요.',
+      'settings_cpu_preset_desc':
+          '더 빠른 처리를 원하시면 Fast를, 속도와 파일 크기의 균형을 원하시면 Normal을 선택하세요.',
       'preset_fast': 'Fast (최소 압축/빠름)',
       'preset_normal': 'Normal (균형)',
       'preset_slow': 'Slow (최대 압축)',
       'settings_audio_quality': '오디오 품질 (비트레이트)',
-      'settings_audio_quality_desc': '출력 AAC 오디오 비트레이트를 설정하거나 음소거를 선택하여 오디오를 제거하고 용량을 줄입니다.',
+      'settings_audio_quality_desc':
+          '출력 AAC 오디오 비트레이트를 설정하거나 음소거를 선택하여 오디오를 제거하고 용량을 줄입니다.',
       'settings_audio_mute': '음소거 (소리 없음)',
       'settings_reset_default': '기본값으로 재설정',
       'settings_reset_confirm_title': '설정을 재설정하시겠습니까?',
@@ -1208,7 +1249,8 @@ class AppLocalizations {
       'device_temp_warning': '경고: 기기 온도가 높습니다 ({temp}°C)',
       'error_open_file': '동영상 파일을 열 수 없습니다',
       'codec_hevc_warning': '호환성 안내: H.265 (HEVC)는 기기의 하드웨어 디코더 지원이 필요합니다. 일부 스마트폰 기본 갤러리/동영상 앱에서는 재생되지 않을 수 있습니다. VLC/MX Player를 사용하거나 호환성을 위해 H.264를 선택하세요.',
-      'codec_compat_hint': '참고: 기본 갤러리 앱에서 동영상이 재생되지 않는 경우 VLC 또는 MX Player를 사용해 보세요.',
+      'codec_compat_hint':
+          '참고: 기본 갤러리 앱에서 동영상이 재생되지 않는 경우 VLC 또는 MX Player를 사용해 보세요.',
       'back_to_home': '홈으로 돌아가기',
       'settings_output_folder': '동영상 저장 폴더',
       'settings_output_folder_desc': '변환된 동영상이 저장될 기기 내 폴더 위치를 선택합니다.',
@@ -1246,7 +1288,8 @@ class AppLocalizations {
   };
 
   String t(String key, {Map<String, String>? args}) {
-    final langValues = _localizedValues[languageCode] ?? _localizedValues['en'] ?? {};
+    final langValues =
+        _localizedValues[languageCode] ?? _localizedValues['en'] ?? {};
     String value = langValues[key] ?? _localizedValues['en']?[key] ?? key;
     if (args != null) {
       args.forEach((k, v) {

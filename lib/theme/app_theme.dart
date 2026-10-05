@@ -85,20 +85,23 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFF1E293B),
         selectedColor: _primaryColor,
-        labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
-        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        labelStyle: const TextStyle(
+          color: textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
         ),
+        secondaryLabelStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         checkmarkColor: Colors.white,
@@ -122,15 +125,18 @@ class AppTheme {
         circularTrackColor: Color(0xFF334155),
         linearTrackColor: Color(0xFF334155),
       ),
-      dividerTheme: const DividerThemeData(
-        color: outlineColor,
-        thickness: 1,
-      ),
+      dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? Colors.white : const Color(0xFF64748B)),
-        trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? _primaryColor : const Color(0xFF334155)),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.white
+              : const Color(0xFF64748B),
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? _primaryColor
+              : const Color(0xFF334155),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: const Color(0xFF1E293B),
@@ -144,9 +150,21 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyLarge: TextStyle(fontSize: 15, color: textPrimary, height: 1.5),
         bodyMedium: TextStyle(fontSize: 13, color: textSecondary, height: 1.5),
-        bodySmall: TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.4),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimary),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
+        bodySmall: TextStyle(
+          fontSize: 11,
+          color: Color(0xFF64748B),
+          height: 1.4,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
       ),
     );
   }
@@ -216,20 +234,23 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surfaceBg,
         selectedColor: _primaryColor,
-        labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
-        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        labelStyle: const TextStyle(
+          color: textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
         ),
+        secondaryLabelStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         checkmarkColor: Colors.white,
@@ -253,15 +274,18 @@ class AppTheme {
         circularTrackColor: Color(0xFF27272A),
         linearTrackColor: Color(0xFF27272A),
       ),
-      dividerTheme: const DividerThemeData(
-        color: outlineColor,
-        thickness: 1,
-      ),
+      dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? Colors.white : const Color(0xFF71717A)),
-        trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? _primaryColor : const Color(0xFF27272A)),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.white
+              : const Color(0xFF71717A),
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? _primaryColor
+              : const Color(0xFF27272A),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: surfaceBg,
@@ -275,9 +299,21 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyLarge: TextStyle(fontSize: 15, color: textPrimary, height: 1.5),
         bodyMedium: TextStyle(fontSize: 13, color: textSecondary, height: 1.5),
-        bodySmall: TextStyle(fontSize: 11, color: Color(0xFF71717A), height: 1.4),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimary),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
+        bodySmall: TextStyle(
+          fontSize: 11,
+          color: Color(0xFF71717A),
+          height: 1.4,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
       ),
     );
   }
@@ -347,20 +383,23 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFFF1F5F9),
         selectedColor: _primaryColor,
-        labelStyle: const TextStyle(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
-        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        labelStyle: const TextStyle(
+          color: textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
         ),
+        secondaryLabelStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         side: const BorderSide(color: outlineColor, width: 1.0),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         checkmarkColor: Colors.white,
@@ -384,30 +423,43 @@ class AppTheme {
         circularTrackColor: Color(0xFFE2E8F0),
         linearTrackColor: Color(0xFFE2E8F0),
       ),
-      dividerTheme: const DividerThemeData(
-        color: outlineColor,
-        thickness: 1,
-      ),
+      dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? Colors.white : const Color(0xFF94A3B8)),
-        trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? _primaryColor : const Color(0xFFE2E8F0)),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.white
+              : const Color(0xFF94A3B8),
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? _primaryColor
+              : const Color(0xFFE2E8F0),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: const Color(0xFF0F172A),
         contentTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         behavior: SnackBarBehavior.floating,
       ),
       textTheme: const TextTheme(
         bodyLarge: TextStyle(fontSize: 15, color: textPrimary, height: 1.5),
         bodyMedium: TextStyle(fontSize: 13, color: textSecondary, height: 1.5),
-        bodySmall: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), height: 1.4),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimary),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
+        bodySmall: TextStyle(
+          fontSize: 11,
+          color: Color(0xFF94A3B8),
+          height: 1.4,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
       ),
     );
   }

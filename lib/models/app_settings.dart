@@ -91,7 +91,10 @@ class AppSettings {
   /// Sanitize preset to ensure only fast, medium, or slow are used.
   static String sanitizePreset(String? preset) {
     if (preset == 'fast' || preset == 'slow') return preset!;
-    if (preset == 'ultrafast' || preset == 'superfast' || preset == 'veryfast' || preset == 'faster') {
+    if (preset == 'ultrafast' ||
+        preset == 'superfast' ||
+        preset == 'veryfast' ||
+        preset == 'faster') {
       return 'fast';
     }
     return 'medium';

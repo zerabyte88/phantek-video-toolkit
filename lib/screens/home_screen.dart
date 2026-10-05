@@ -86,9 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
         });
 
         if (info == null && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.t('error_read_video'))),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.t('error_read_video'))));
         }
       } else {
         setState(() => _isLoading = false);
@@ -142,32 +142,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ─── Mode Switching ──────────────────────────────────────────────────────
 
-  List<VideoResolution> _getResolutionsForMode(_AppMode mode, [VideoInfo? source]) {
+  List<VideoResolution> _getResolutionsForMode(
+    _AppMode mode, [
+    VideoInfo? source,
+  ]) {
     final info = source ?? _videoInfo;
     if (info == null) return [];
 
     final targets = <VideoResolution>[];
 
     if (mode == _AppMode.convert || mode == _AppMode.extractor) {
-      targets.add(VideoResolution(
-        label: 'Original (${info.resolution})',
-        width: info.width,
-        height: info.height,
-      ));
+      targets.add(
+        VideoResolution(
+          label: 'Original (${info.resolution})',
+          width: info.width,
+          height: info.height,
+        ),
+      );
       return targets;
     }
 
     final dim = info.shortDimension;
 
     if (mode == _AppMode.downscale) {
-      final downscaleOptions =
-          VideoResolution.standardResolutions.where((r) => r.height < dim).toList();
+      final downscaleOptions = VideoResolution.standardResolutions
+          .where((r) => r.height < dim)
+          .toList();
       if (downscaleOptions.isEmpty) {
-        targets.add(VideoResolution(
-          label: 'Original (${info.resolution})',
-          width: info.width,
-          height: info.height,
-        ));
+        targets.add(
+          VideoResolution(
+            label: 'Original (${info.resolution})',
+            width: info.width,
+            height: info.height,
+          ),
+        );
       } else {
         targets.addAll(downscaleOptions);
       }
@@ -185,9 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _selectedResolution = resolutions.first;
       }
       if (mode != _AppMode.convert) {
-        _encodingOptions = _encodingOptions.copyWith(
-          codec: VideoCodec.h264,
-        );
+        _encodingOptions = _encodingOptions.copyWith(codec: VideoCodec.h264);
       }
     });
   }
@@ -200,9 +206,12 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    if (_selectedMode != _AppMode.extractor && _selectedResolution == null) return;
+    if (_selectedMode != _AppMode.extractor && _selectedResolution == null) {
+      return;
+    }
 
-    final fallbackRes = _selectedResolution ??
+    final fallbackRes =
+        _selectedResolution ??
         VideoResolution(
           label: 'Original (${_videoInfo!.resolution})',
           width: _videoInfo!.width,
@@ -211,9 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final options = _selectedMode == _AppMode.convert
         ? _encodingOptions
-        : _encodingOptions.copyWith(
-            codec: VideoCodec.h264,
-          );
+        : _encodingOptions.copyWith(codec: VideoCodec.h264);
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => ProcessingScreen(
@@ -251,9 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: l10n.t('back_to_home'),
               )
             : null,
-        title: AnimatedFlameTitle(
-          title: l10n.t('app_title'),
-        ),
+        title: AnimatedFlameTitle(title: l10n.t('app_title')),
         centerTitle: true,
         actions: [
           if (_videoInfo != null && !_isLoading)
@@ -263,9 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
               tooltip: l10n.t('reset_options'),
             ),
           IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            ),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
             icon: const Icon(Icons.settings_outlined),
             tooltip: l10n.t('settings'),
           ),
@@ -275,8 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: _isLoading
             ? _buildLoadingState(theme, l10n)
             : _videoInfo == null
-                ? _buildEmptyState(theme, l10n)
-                : _buildContent(theme, l10n),
+            ? _buildEmptyState(theme, l10n)
+            : _buildContent(theme, l10n),
       ),
     );
   }
@@ -335,7 +340,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: constraints.maxHeight > 40 ? constraints.maxHeight - 40 : 0,
+              minHeight: constraints.maxHeight > 40
+                  ? constraints.maxHeight - 40
+                  : 0,
             ),
             child: IntrinsicHeight(
               child: Column(
@@ -369,7 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Modern, clean Segmented Control for Mode selection
   Widget _buildSegmentedModeBar(ThemeData theme, l10n) {
     final isVideoActive =
-        _selectedMode == _AppMode.convert || _selectedMode == _AppMode.downscale;
+        _selectedMode == _AppMode.convert ||
+        _selectedMode == _AppMode.downscale;
     final isAudioActive = _selectedMode == _AppMode.extractor;
 
     return Column(
@@ -538,10 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.outline,
-            width: 1.2,
-          ),
+          border: Border.all(color: theme.colorScheme.outline, width: 1.2),
         ),
         child: Column(
           children: [
@@ -582,8 +587,10 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
               label: Text(l10n.t('pick_video')),
               style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -598,9 +605,21 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Clean, professional feature highlights row
   Widget _buildFeatureHighlights(ThemeData theme, l10n) {
     final features = [
-      (Icons.bolt_rounded, l10n.t('feature_offline_fast'), l10n.t('feature_offline_fast_desc')),
-      (Icons.tune_rounded, l10n.t('feature_crf_bitrate'), l10n.t('feature_crf_bitrate_desc')),
-      (Icons.security_rounded, l10n.t('feature_privacy'), l10n.t('feature_privacy_desc')),
+      (
+        Icons.bolt_rounded,
+        l10n.t('feature_offline_fast'),
+        l10n.t('feature_offline_fast_desc'),
+      ),
+      (
+        Icons.tune_rounded,
+        l10n.t('feature_crf_bitrate'),
+        l10n.t('feature_crf_bitrate_desc'),
+      ),
+      (
+        Icons.security_rounded,
+        l10n.t('feature_privacy'),
+        l10n.t('feature_privacy_desc'),
+      ),
     ];
 
     return Column(
@@ -694,8 +713,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Start conversion CTA
           ElevatedButton.icon(
-            onPressed: ((_selectedMode == _AppMode.extractor && (_videoInfo?.hasAudio ?? true)) ||
-                    (_selectedMode != _AppMode.extractor && _selectedResolution != null))
+            onPressed:
+                ((_selectedMode == _AppMode.extractor &&
+                        (_videoInfo?.hasAudio ?? true)) ||
+                    (_selectedMode != _AppMode.extractor &&
+                        _selectedResolution != null))
                 ? _startProcessing
                 : null,
             icon: Icon(
@@ -704,9 +726,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   : Icons.play_arrow_rounded,
               size: 22,
             ),
-            label: Text(_selectedMode == _AppMode.extractor
-                ? l10n.t('start_audio_extraction')
-                : l10n.t('start_conversion')),
+            label: Text(
+              _selectedMode == _AppMode.extractor
+                  ? l10n.t('start_audio_extraction')
+                  : l10n.t('start_conversion'),
+            ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -801,9 +825,7 @@ class _SegmentItem extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary
-              : Colors.transparent,
+          color: isSelected ? theme.colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
