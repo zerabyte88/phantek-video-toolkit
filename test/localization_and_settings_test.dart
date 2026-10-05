@@ -671,6 +671,86 @@ void main() {
         socName: snapdragon685,
       );
       expect(snapdragon685Gpu, equals('Adreno 610'));
+
+      // New 64-bit SoCs (2024-2026)
+      final snapdragon8EliteCpu = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'sun',
+        manufacturer: 'Qualcomm',
+        socModel: 'SM8750',
+      );
+      expect(snapdragon8EliteCpu, equals('Qualcomm Snapdragon 8 Elite'));
+      final snapdragon8EliteGpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'sm8750',
+        board: 'sun',
+        socName: snapdragon8EliteCpu,
+      );
+      expect(snapdragon8EliteGpu, equals('Adreno 830'));
+
+      final dimensity9400Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6991',
+        board: 'mt6991',
+        manufacturer: 'MediaTek',
+      );
+      expect(dimensity9400Cpu, equals('MediaTek Dimensity 9400'));
+      final dimensity9400Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'mt6991',
+        board: 'mt6991',
+        socName: dimensity9400Cpu,
+      );
+      expect(dimensity9400Gpu, equals('Immortalis-G925 MC12'));
+
+      final exynos2500Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 's5e9955',
+        board: 's5e9955',
+        manufacturer: 'Samsung',
+      );
+      expect(exynos2500Cpu, equals('Samsung Exynos 2500'));
+      final exynos2500Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 's5e9955',
+        board: 's5e9955',
+        socName: exynos2500Cpu,
+      );
+      expect(exynos2500Gpu, equals('Samsung Xclipse 950'));
+
+      final exynos1480Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 's5e8845',
+        board: 's5e8845',
+        manufacturer: 'Samsung',
+      );
+      expect(exynos1480Cpu, equals('Samsung Exynos 1480'));
+      final exynos1480Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 's5e8845',
+        board: 's5e8845',
+        socName: exynos1480Cpu,
+      );
+      expect(exynos1480Gpu, equals('Samsung Xclipse 530'));
+
+      final tensorG5Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'google',
+        board: 'laguna',
+        manufacturer: 'Google',
+      );
+      expect(tensorG5Cpu, equals('Google Tensor G5'));
+      final tensorG5Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'google',
+        board: 'laguna',
+        socName: tensorG5Cpu,
+      );
+      expect(tensorG5Gpu, equals('IMG D-Series GPU'));
+
+      final unisocT820Cpu = DeviceSpecHelper.detectSocName(
+        hardware: 'ums9620',
+        board: 't820',
+        manufacturer: 'Unisoc',
+      );
+      expect(unisocT820Cpu, equals('Unisoc T820'));
+      final unisocT820Gpu = DeviceSpecHelper.detectGpuName(
+        hardware: 'ums9620',
+        board: 't820',
+        socName: unisocT820Cpu,
+      );
+      expect(unisocT820Gpu, equals('Mali-G57 MP4'));
     });
 
     test('DeviceSpecHelper getHardwareInfo returns full specifications dictionary with all expected keys', () async {

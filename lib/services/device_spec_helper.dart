@@ -206,21 +206,39 @@ class DeviceSpecHelper {
     }
 
     // Qualcomm Snapdragon SoCs
-    if (hwLower.contains('sm8650') || boardLower.contains('pineapple')) return 'Qualcomm Snapdragon 8 Gen 3';
-    if (hwLower.contains('sm8550') || boardLower.contains('kalama')) return 'Qualcomm Snapdragon 8 Gen 2';
-    if (hwLower.contains('sm8475')) return 'Qualcomm Snapdragon 8+ Gen 1';
-    if (hwLower.contains('sm8450') || boardLower.contains('taro')) return 'Qualcomm Snapdragon 8 Gen 1';
-    if (hwLower.contains('sm8350') || boardLower.contains('lahaina')) return 'Qualcomm Snapdragon 888';
-    if (hwLower.contains('sm8250') || boardLower.contains('kona')) return 'Qualcomm Snapdragon 865 / 870';
-    if (hwLower.contains('sm8150')) return 'Qualcomm Snapdragon 855';
-    if (hwLower.contains('sm7550')) return 'Qualcomm Snapdragon 7 Gen 3';
-    if (hwLower.contains('sm7475')) return 'Qualcomm Snapdragon 7+ Gen 2';
-    if (hwLower.contains('sm7450')) return 'Qualcomm Snapdragon 7 Gen 1';
-    if (hwLower.contains('sm7435') || hwLower.contains('sm6450') || boardLower.contains('crow')) {
+    if (hwLower.contains('sm8750') || socLower.contains('sm8750') || boardLower.contains('sun')) {
+      return 'Qualcomm Snapdragon 8 Elite';
+    }
+    if (hwLower.contains('sm8635') || socLower.contains('sm8635') || boardLower.contains('volcano')) {
+      return 'Qualcomm Snapdragon 8s Gen 3';
+    }
+    if (hwLower.contains('sm8650') || socLower.contains('sm8650') || boardLower.contains('pineapple')) {
+      return 'Qualcomm Snapdragon 8 Gen 3';
+    }
+    if (hwLower.contains('sm8550') || socLower.contains('sm8550') || boardLower.contains('kalama')) {
+      return 'Qualcomm Snapdragon 8 Gen 2';
+    }
+    if (hwLower.contains('sm8475') || socLower.contains('sm8475')) return 'Qualcomm Snapdragon 8+ Gen 1';
+    if (hwLower.contains('sm8450') || socLower.contains('sm8450') || boardLower.contains('taro')) return 'Qualcomm Snapdragon 8 Gen 1';
+    if (hwLower.contains('sm8350') || socLower.contains('sm8350') || boardLower.contains('lahaina')) return 'Qualcomm Snapdragon 888';
+    if (hwLower.contains('sm8250') || socLower.contains('sm8250') || boardLower.contains('kona')) return 'Qualcomm Snapdragon 865 / 870';
+    if (hwLower.contains('sm8150') || socLower.contains('sm8150')) return 'Qualcomm Snapdragon 855';
+    if (hwLower.contains('sm7675') || socLower.contains('sm7675')) return 'Qualcomm Snapdragon 7+ Gen 3';
+    if (hwLower.contains('sm7635') || socLower.contains('sm7635')) return 'Qualcomm Snapdragon 7s Gen 3';
+    if (hwLower.contains('sm7550') || socLower.contains('sm7550')) return 'Qualcomm Snapdragon 7 Gen 3';
+    if (hwLower.contains('sm7475') || socLower.contains('sm7475')) return 'Qualcomm Snapdragon 7+ Gen 2';
+    if (hwLower.contains('sm7450') || socLower.contains('sm7450')) return 'Qualcomm Snapdragon 7 Gen 1';
+    if (hwLower.contains('sm7435') ||
+        socLower.contains('sm7435') ||
+        hwLower.contains('sm6450') ||
+        socLower.contains('sm6450') ||
+        boardLower.contains('crow')) {
       return 'Qualcomm Snapdragon 7s Gen 2';
     }
-    if (hwLower.contains('sm7325') || boardLower.contains('yupik')) return 'Qualcomm Snapdragon 778G';
-    if (hwLower.contains('sm6375') || boardLower.contains('holi')) return 'Qualcomm Snapdragon 695 5G';
+    if (hwLower.contains('sm7325') || socLower.contains('sm7325') || boardLower.contains('yupik')) return 'Qualcomm Snapdragon 778G';
+    if (hwLower.contains('sm6475') || socLower.contains('sm6475')) return 'Qualcomm Snapdragon 6 Gen 3';
+    if (hwLower.contains('sm6375') || socLower.contains('sm6375') || boardLower.contains('holi')) return 'Qualcomm Snapdragon 695 5G';
+    if (hwLower.contains('sm4635') || socLower.contains('sm4635')) return 'Qualcomm Snapdragon 4s Gen 2';
 
     // Multi-signal Android hardware detection (soc_id, machine, GPU model, clock speed)
     if (Platform.isAndroid) {
@@ -285,42 +303,124 @@ class DeviceSpecHelper {
       return 'Qualcomm Snapdragon 662';
     }
 
-    if (hwLower.contains('sm4450')) return 'Qualcomm Snapdragon 4 Gen 2';
-    if (hwLower.contains('sm4375')) return 'Qualcomm Snapdragon 4 Gen 1';
+    if (hwLower.contains('sm4450') || socLower.contains('sm4450')) return 'Qualcomm Snapdragon 4 Gen 2';
+    if (hwLower.contains('sm4375') || socLower.contains('sm4375')) return 'Qualcomm Snapdragon 4 Gen 1';
 
     // MediaTek Dimensity & Helio SoCs
-    if (hwLower.contains('mt6991')) return 'MediaTek Dimensity 9400';
-    if (hwLower.contains('mt6989')) return 'MediaTek Dimensity 9300';
-    if (hwLower.contains('mt6985')) return 'MediaTek Dimensity 9200';
-    if (hwLower.contains('mt6983')) return 'MediaTek Dimensity 9000';
-    if (hwLower.contains('mt6897')) return 'MediaTek Dimensity 8300';
-    if (hwLower.contains('mt6895')) return 'MediaTek Dimensity 8100';
-    if (hwLower.contains('mt6893')) return 'MediaTek Dimensity 1200';
-    if (hwLower.contains('mt6877')) return 'MediaTek Dimensity 1080 / 900';
-    if (hwLower.contains('mt6853')) return 'MediaTek Dimensity 720';
-    if (hwLower.contains('mt6833')) return 'MediaTek Dimensity 700 / 6020';
-    if (hwLower.contains('mt6789')) return 'MediaTek Helio G99';
-    if (hwLower.contains('mt6785')) return 'MediaTek Helio G90 / G95';
-    if (hwLower.contains('mt6769')) return 'MediaTek Helio G80 / G85';
-    if (hwLower.contains('mt6768')) return 'MediaTek Helio P65';
-    if (hwLower.contains('mt6765')) return 'MediaTek Helio P35';
-    if (hwLower.contains('mt6762')) return 'MediaTek Helio P22';
+    if (hwLower.contains('mt6991') || socLower.contains('mt6991') || boardLower.contains('mt6991')) {
+      return 'MediaTek Dimensity 9400';
+    }
+    if (hwLower.contains('mt6989') || socLower.contains('mt6989') || boardLower.contains('mt6989')) {
+      return 'MediaTek Dimensity 9300';
+    }
+    if (hwLower.contains('mt6985') || socLower.contains('mt6985') || boardLower.contains('mt6985')) {
+      return 'MediaTek Dimensity 9200';
+    }
+    if (hwLower.contains('mt6983') || socLower.contains('mt6983') || boardLower.contains('mt6983')) {
+      return 'MediaTek Dimensity 9000';
+    }
+    if (hwLower.contains('mt6899') || socLower.contains('mt6899') || boardLower.contains('mt6899')) {
+      return 'MediaTek Dimensity 8400';
+    }
+    if (hwLower.contains('mt6897') || socLower.contains('mt6897') || boardLower.contains('mt6897')) {
+      return 'MediaTek Dimensity 8300';
+    }
+    if (hwLower.contains('mt6896') || socLower.contains('mt6896') || boardLower.contains('mt6896')) {
+      return 'MediaTek Dimensity 8200';
+    }
+    if (hwLower.contains('mt6895') || socLower.contains('mt6895') || boardLower.contains('mt6895')) {
+      return 'MediaTek Dimensity 8100';
+    }
+    if (hwLower.contains('mt6893') || socLower.contains('mt6893') || boardLower.contains('mt6893')) {
+      return 'MediaTek Dimensity 1200';
+    }
+    if (hwLower.contains('mt6886') || socLower.contains('mt6886') || boardLower.contains('mt6886')) {
+      return 'MediaTek Dimensity 7200';
+    }
+    if (hwLower.contains('mt6878') || socLower.contains('mt6878') || boardLower.contains('mt6878')) {
+      return 'MediaTek Dimensity 7300';
+    }
+    if (hwLower.contains('mt6877') || socLower.contains('mt6877') || boardLower.contains('mt6877')) {
+      return 'MediaTek Dimensity 1080 / 900';
+    }
+    if (hwLower.contains('mt6855') || socLower.contains('mt6855') || boardLower.contains('mt6855')) {
+      return 'MediaTek Dimensity 7020 / 7025';
+    }
+    if (hwLower.contains('mt6853') || socLower.contains('mt6853') || boardLower.contains('mt6853')) {
+      return 'MediaTek Dimensity 720';
+    }
+    if (hwLower.contains('mt6835') || socLower.contains('mt6835') || boardLower.contains('mt6835')) {
+      return 'MediaTek Dimensity 6300 / 6100+';
+    }
+    if (hwLower.contains('mt6833') || socLower.contains('mt6833') || boardLower.contains('mt6833')) {
+      return 'MediaTek Dimensity 700 / 6020';
+    }
+    if (hwLower.contains('mt6789') || socLower.contains('mt6789') || boardLower.contains('mt6789')) {
+      return 'MediaTek Helio G99 / G100';
+    }
+    if (hwLower.contains('mt6785') || socLower.contains('mt6785')) return 'MediaTek Helio G90 / G95';
+    if (hwLower.contains('mt6769') || socLower.contains('mt6769')) return 'MediaTek Helio G80 / G85';
+    if (hwLower.contains('mt6768') || socLower.contains('mt6768')) return 'MediaTek Helio P65';
+    if (hwLower.contains('mt6765') || socLower.contains('mt6765')) return 'MediaTek Helio P35';
+    if (hwLower.contains('mt6762') || socLower.contains('mt6762')) return 'MediaTek Helio P22';
 
     // Samsung Exynos SoCs
-    if (hwLower.contains('s5e9945')) return 'Samsung Exynos 2400';
-    if (hwLower.contains('s5e9925') || boardLower.contains('erd9925')) return 'Samsung Exynos 2200';
-    if (hwLower.contains('s5e9840')) return 'Samsung Exynos 2100';
-    if (hwLower.contains('s5e8835')) return 'Samsung Exynos 1380';
-    if (hwLower.contains('s5e8825')) return 'Samsung Exynos 1280';
-    if (hwLower.contains('universal990')) return 'Samsung Exynos 990';
-    if (hwLower.contains('universal9820')) return 'Samsung Exynos 9820';
-    if (hwLower.contains('universal9810')) return 'Samsung Exynos 9810';
+    if (hwLower.contains('s5e9955') || socLower.contains('s5e9955') || boardLower.contains('erd9955')) {
+      return 'Samsung Exynos 2500';
+    }
+    if (hwLower.contains('s5e9945') || socLower.contains('s5e9945') || boardLower.contains('erd9945')) {
+      return 'Samsung Exynos 2400';
+    }
+    if (hwLower.contains('s5e9925') || socLower.contains('s5e9925') || boardLower.contains('erd9925')) {
+      return 'Samsung Exynos 2200';
+    }
+    if (hwLower.contains('s5e9840') || socLower.contains('s5e9840')) return 'Samsung Exynos 2100';
+    if (hwLower.contains('s5e8855') || socLower.contains('s5e8855')) return 'Samsung Exynos 1580';
+    if (hwLower.contains('s5e8845') || socLower.contains('s5e8845')) return 'Samsung Exynos 1480';
+    if (hwLower.contains('s5e8835') || socLower.contains('s5e8835')) return 'Samsung Exynos 1380';
+    if (hwLower.contains('s5e8825') || socLower.contains('s5e8825')) return 'Samsung Exynos 1280';
+    if (hwLower.contains('universal990') || socLower.contains('universal990')) return 'Samsung Exynos 990';
+    if (hwLower.contains('universal9820') || socLower.contains('universal9820')) return 'Samsung Exynos 9820';
+    if (hwLower.contains('universal9810') || socLower.contains('universal9810')) return 'Samsung Exynos 9810';
 
     // Google Tensor SoCs
-    if (boardLower.contains('zumapro')) return 'Google Tensor G4';
-    if (boardLower.contains('zuma')) return 'Google Tensor G3';
-    if (boardLower.contains('gs201') || boardLower.contains('cloudripper')) return 'Google Tensor G2';
-    if (boardLower.contains('gs101') || boardLower.contains('whitechapel')) return 'Google Tensor';
+    if (boardLower.contains('laguna') || boardLower.contains('frankel') || socLower.contains('tensor g5')) {
+      return 'Google Tensor G5';
+    }
+    if (boardLower.contains('zumapro') || socLower.contains('tensor g4')) return 'Google Tensor G4';
+    if (boardLower.contains('zuma') || socLower.contains('tensor g3')) return 'Google Tensor G3';
+    if (boardLower.contains('gs201') || boardLower.contains('cloudripper') || socLower.contains('tensor g2')) {
+      return 'Google Tensor G2';
+    }
+    if (boardLower.contains('gs101') || boardLower.contains('whitechapel') || socLower.contains('tensor')) {
+      return 'Google Tensor';
+    }
+
+    // Unisoc SoCs (64-bit)
+    if (hwLower.contains('ums9620') || socLower.contains('ums9620') || boardLower.contains('t820') || socLower.contains('t820')) {
+      return 'Unisoc T820';
+    }
+    if (hwLower.contains('t760') || socLower.contains('t760') || boardLower.contains('t760')) {
+      return 'Unisoc T760';
+    }
+    if (hwLower.contains('t750') || socLower.contains('t750') || boardLower.contains('t750')) {
+      return 'Unisoc T750';
+    }
+    if (hwLower.contains('t619') || socLower.contains('t619') || boardLower.contains('t619')) {
+      return 'Unisoc T619';
+    }
+    if (hwLower.contains('t616') || socLower.contains('t616') || boardLower.contains('t616')) {
+      return 'Unisoc T616';
+    }
+    if (hwLower.contains('t612') || socLower.contains('t612') || boardLower.contains('t612')) {
+      return 'Unisoc T612';
+    }
+    if (hwLower.contains('t606') || socLower.contains('t606') || boardLower.contains('t606')) {
+      return 'Unisoc T606';
+    }
+    if (hwLower.contains('ums9230') || socLower.contains('ums9230')) {
+      return 'Unisoc T606 / T616';
+    }
 
     // Android device sysfs / procfs fallback for unlisted chipsets
     if (Platform.isAndroid) {
@@ -408,51 +508,80 @@ class DeviceSpecHelper {
     final b = board.toLowerCase();
 
     // Qualcomm Adreno GPU series
+    if (s.contains('8 elite') || h.contains('sm8750') || b.contains('sun')) return 'Adreno 830';
+    if (s.contains('8s gen 3') || h.contains('sm8635') || b.contains('volcano')) return 'Adreno 735';
     if (s.contains('8 gen 3') || h.contains('sm8650') || b.contains('pineapple')) return 'Adreno 750';
     if (s.contains('8 gen 2') || h.contains('sm8550') || b.contains('kalama')) return 'Adreno 740';
     if (s.contains('8+ gen 1') || s.contains('8 gen 1') || h.contains('sm8475') || h.contains('sm8450')) return 'Adreno 730';
     if (s.contains('888') || h.contains('sm8350')) return 'Adreno 660';
     if (s.contains('865') || s.contains('870') || h.contains('sm8250')) return 'Adreno 650';
     if (s.contains('855') || h.contains('sm8150')) return 'Adreno 640';
+    if (s.contains('7+ gen 3') || h.contains('sm7675')) return 'Adreno 732';
+    if (s.contains('7s gen 3') || h.contains('sm7635')) return 'Adreno 810';
     if (s.contains('7 gen 3') || h.contains('sm7550')) return 'Adreno 720';
     if (s.contains('7+ gen 2') || h.contains('sm7475')) return 'Adreno 725';
     if (s.contains('7s gen 2') || h.contains('sm7435') || h.contains('sm6450') || b.contains('crow')) return 'Adreno 710';
     if (s.contains('778g') || h.contains('sm7325')) return 'Adreno 642L';
+    if (s.contains('6 gen 3') || h.contains('sm6475')) return 'Adreno 710';
     if (s.contains('695') || h.contains('sm6375') || h.contains('sm4375')) return 'Adreno 619';
     if (s.contains('685') || s.contains('680') || s.contains('665') || h.contains('sm6225') || h.contains('sm6125')) {
       return 'Adreno 610';
     }
+    if (s.contains('4s gen 2') || h.contains('sm4635')) return 'Adreno 611';
     if (s.contains('4 gen 2') || h.contains('sm4450')) return 'Adreno 613';
     if (s.contains('adreno') || h.contains('qcom')) return 'Qualcomm Adreno GPU';
 
     // MediaTek Dimensity & Helio Mali / Immortalis
-    if (s.contains('9400') || h.contains('mt6991')) return 'Immortalis-G925';
+    if (s.contains('9400') || h.contains('mt6991')) return 'Immortalis-G925 MC12';
     if (s.contains('9300') || h.contains('mt6989')) return 'Immortalis-G720 MC12';
     if (s.contains('9200') || h.contains('mt6985')) return 'Immortalis-G715 MC11';
     if (s.contains('9000') || h.contains('mt6983')) return 'Mali-G710 MC10';
+    if (s.contains('8400') || h.contains('mt6899')) return 'Mali-G720 MC7';
     if (s.contains('8300') || h.contains('mt6897')) return 'Mali-G615 MC6';
-    if (s.contains('8100') || s.contains('8200') || h.contains('mt6895')) return 'Mali-G610 MC6';
+    if (s.contains('8100') || s.contains('8200') || h.contains('mt6895') || h.contains('mt6896')) return 'Mali-G610 MC6';
+    if (s.contains('7300') || h.contains('mt6878')) return 'Mali-G615 MC2';
+    if (s.contains('7200') || h.contains('mt6886')) return 'Mali-G610 MC4';
+    if (s.contains('7020') || s.contains('7025') || h.contains('mt6855')) return 'IMG BXM-8-256';
     if (s.contains('1200') || s.contains('1100') || h.contains('mt6893')) return 'Mali-G77 MC9';
     if (s.contains('1080') || s.contains('900') || s.contains('7050') || h.contains('mt6877')) return 'Mali-G68 MC4';
-    if (s.contains('700') || s.contains('6020') || s.contains('g99') || h.contains('mt6833') || h.contains('mt6789')) return 'Mali-G57 MC2';
+    if (s.contains('700') ||
+        s.contains('6020') ||
+        s.contains('6300') ||
+        s.contains('6100') ||
+        s.contains('g99') ||
+        s.contains('g100') ||
+        h.contains('mt6833') ||
+        h.contains('mt6835') ||
+        h.contains('mt6789')) {
+      return 'Mali-G57 MC2';
+    }
     if (s.contains('g90') || s.contains('g95') || h.contains('mt6785')) return 'Mali-G76 MC4';
     if (s.contains('g80') || s.contains('g85') || s.contains('g88') || h.contains('mt6769')) return 'Mali-G52 MC2';
     if (s.contains('p35') || s.contains('g35') || h.contains('mt6765')) return 'PowerVR GE8320';
     if (h.startsWith('mt') || s.contains('mediatek') || s.contains('dimensity')) return 'ARM Mali GPU';
 
     // Samsung Exynos (AMD RDNA Xclipse / Mali)
+    if (s.contains('2500') || h.contains('s5e9955')) return 'Samsung Xclipse 950';
     if (s.contains('2400') || h.contains('s5e9945')) return 'Samsung Xclipse 940';
     if (s.contains('2200') || h.contains('s5e9925')) return 'Samsung Xclipse 920';
     if (s.contains('2100') || h.contains('s5e9840')) return 'Mali-G78 MP14';
+    if (s.contains('1580') || h.contains('s5e8855')) return 'Samsung Xclipse 540';
+    if (s.contains('1480') || h.contains('s5e8845')) return 'Samsung Xclipse 530';
     if (s.contains('1380') || h.contains('s5e8835')) return 'Mali-G68 MP5';
     if (s.contains('1280') || h.contains('s5e8825')) return 'Mali-G68 MP4';
     if (s.contains('exynos')) return 'ARM Mali / Xclipse GPU';
 
     // Google Tensor
+    if (b.contains('laguna') || b.contains('frankel') || s.contains('tensor g5')) return 'IMG D-Series GPU';
     if (b.contains('zumapro') || s.contains('tensor g4')) return 'Mali-G715';
     if (b.contains('zuma') || s.contains('tensor g3')) return 'Immortalis-G715s';
     if (b.contains('gs201') || s.contains('tensor g2')) return 'Mali-G710 MP7';
     if (b.contains('gs101') || s.contains('tensor')) return 'Mali-G78 MP20';
+
+    // Unisoc
+    if (s.contains('t820') || s.contains('t760') || h.contains('ums9620') || b.contains('t820') || b.contains('t760')) return 'Mali-G57 MP4';
+    if (s.contains('t750') || b.contains('t750')) return 'Mali-G57 MP2';
+    if (s.contains('t619') || s.contains('t616') || s.contains('t612') || s.contains('t606') || s.contains('unisoc') || h.contains('ums9230')) return 'Mali-G57 MP1';
 
     return 'Hardware Graphics Accelerator';
   }
