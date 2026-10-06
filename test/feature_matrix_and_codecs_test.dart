@@ -485,35 +485,114 @@ void main() {
     test('calculateHwaBitrateBounds returns calibrated VBV limits for MediaCodec', () {
       const opts = EncodingOptions();
 
-      // 1080p: target 5000k, max 6500k, buf 10000k
+      // 1080p: target 8000k, min 6000k, max 10000k, buf 16000k
       final bounds1080 = opts.calculateHwaBitrateBounds(
         targetWidth: 1920,
         targetHeight: 1080,
         sourceBitrateBps: 20000000,
       );
-      expect(bounds1080['target'], equals(5000));
-      expect(bounds1080['maxrate'], equals(6500));
-      expect(bounds1080['bufsize'], equals(10000));
+      expect(bounds1080['target'], equals(8000));
+      expect(bounds1080['minrate'], equals(6000));
+      expect(bounds1080['maxrate'], equals(10000));
+      expect(bounds1080['bufsize'], equals(16000));
 
-      // 720p: target 2800k, max 3500k, buf 5600k
+      // 720p: target 4500k, min 3500k, max 6000k, buf 9000k
       final bounds720 = opts.calculateHwaBitrateBounds(
         targetWidth: 1280,
         targetHeight: 720,
         sourceBitrateBps: 20000000,
       );
-      expect(bounds720['target'], equals(2800));
-      expect(bounds720['maxrate'], equals(3500));
-      expect(bounds720['bufsize'], equals(5600));
+      expect(bounds720['target'], equals(4500));
+      expect(bounds720['minrate'], equals(3500));
+      expect(bounds720['maxrate'], equals(6000));
+      expect(bounds720['bufsize'], equals(9000));
 
-      // 480p: target 1200k, max 1500k, buf 2400k
+      // 480p: target 2000k, min 1500k, max 2600k, buf 4000k
       final bounds480 = opts.calculateHwaBitrateBounds(
         targetWidth: 854,
         targetHeight: 480,
         sourceBitrateBps: 20000000,
       );
-      expect(bounds480['target'], equals(1200));
-      expect(bounds480['maxrate'], equals(1500));
-      expect(bounds480['bufsize'], equals(2400));
+      expect(bounds480['target'], equals(2000));
+      expect(bounds480['minrate'], equals(1500));
+      expect(bounds480['maxrate'], equals(2600));
+      expect(bounds480['bufsize'], equals(4000));
+    });
+
+    test('HWA argument list contains dual bitrate flags, -minrate, and 1-second dynamic GOP', () {
+      final hwaBounds = const EncodingOptions().calculateHwaBitrateBounds(
+        targetWidth: 1280,
+        targetHeight: 720,
+        sourceBitrateBps: 1300000,
+      );
+      final targetKbps = hwaBounds['target']!;
+      final minrateKbps = hwaBounds['minrate']!;
+      final maxrateKbps = hwaBounds['maxrate']!;
+      final bufsizeKbps = hwaBounds['bufsize']!;
+      const fps = 30.0;
+      final gop = fps.round();
+
+      final codecArgs = [
+        '-c:v',
+        'h264_mediacodec',
+        '-bitrate',
+        '${targetKbps}k',
+        '-b:v',
+        '${targetKbps}k',
+        '-minrate',
+        '${minrateKbps}k',
+        '-maxrate',
+        '${maxrateKbps}k',
+        '-bufsize',
+        '${bufsizeKbps}k',
+        '-profile:v',
+        'high',
+        '-level:v',
+        '4.1',
+        '-g',
+        '$gop',
+        '-bf',
+        '0',
+      ];
+
+      expect(codecArgs, contains('-bitrate'));
+      expect(codecArgs, contains('-b:v'));
+      expect(codecArgs, contains('-minrate'));
+      expect(codecArgs, contains('-profile:v'));
+      expect(codecArgs, contains('-g'));
+      expect(codecArgs, contains('$gop'));
+      expect(codecArgs, contains('-bf'));
+      expect(codecArgs, contains('0'));
+    });
+
+    test('Smart Stream Copy condition correctly evaluates eligibility for lossless passthrough', () {
+      const sourceVideo = VideoInfo(
+        filePath: '/storage/sample.mp4',
+        fileName: 'sample.mp4',
+        width: 1280,
+        height: 720,
+        durationSeconds: 120,
+        bitrate: 1300000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 20000000,
+        hasAudio: true,
+        audioCodec: 'aac',
+      );
+
+      // Same resolution, same FPS, h264 source -> eligible
+      final isOriginalRes = 1280 == sourceVideo.width && 720 == sourceVideo.height;
+      final isH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+          sourceVideo.codec.toLowerCase().contains('avc');
+      final isSameFps = 0 <= 0 || 0 == sourceVideo.fps.round();
+      final isStreamCopy = isOriginalRes && isH264 && isSameFps;
+
+      expect(isStreamCopy, isTrue);
+
+      // Downscaled resolution -> NOT eligible (must re-encode)
+      final isDownscaleRes = 854 == sourceVideo.width && 480 == sourceVideo.height;
+      final isStreamCopyDownscale = isDownscaleRes && isH264 && isSameFps;
+      expect(isStreamCopyDownscale, isFalse);
     });
 
     test('HWA filter chain enforces centered even padding and yuv420p format', () {

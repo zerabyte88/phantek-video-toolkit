@@ -282,8 +282,6 @@ class FFmpegService {
     final effectiveThreads = appSettings.cpuThreads > 0
         ? appSettings.cpuThreads
         : (totalCores > 4 ? totalCores - 2 : totalCores).clamp(1, 6);
-    final threadsArg =
-        '-threads $effectiveThreads -filter_threads $effectiveThreads';
 
     // FPS filter
     String fpsFilter = '';
@@ -294,22 +292,51 @@ class FFmpegService {
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
 
+    // Check eligibility for Smart Stream Copy (Lossless Passthrough)
+    final isSourceH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+        sourceVideo.codec.toLowerCase().contains('avc');
+    final isFpsSame = encodingOptions.targetFps <= 0 ||
+        encodingOptions.targetFps == sourceVideo.fps.round();
+    final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
+
     // Determine whether to use Hardware Acceleration (MediaCodec)
     final bool useHwa =
         appSettings.enableHardwareAcceleration && !forceSoftwareFallback;
 
-    String vfArg = '';
+    String vfFilter = '';
     List<String> codecArgs = [];
+    List<String> audioArgs = [];
 
-    if (useHwa) {
+    if (isStreamCopy) {
+      // ─── Smart Stream Copy Pipeline (Lossless Passthrough) ────────────────
+      onLog('Smart Stream Copy (Lossless Passthrough) active');
+      codecArgs = ['-c:v', 'copy'];
+
+      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
+        audioArgs = ['-an'];
+      } else {
+        final isSourceAac =
+            sourceVideo.audioCodec?.toLowerCase().contains('aac') ?? false;
+        if (isSourceAac || encodingOptions.container == VideoContainer.mkv) {
+          audioArgs = ['-c:a', 'copy'];
+        } else {
+          audioArgs = [
+            '-c:a',
+            'aac',
+            '-b:a',
+            '${appSettings.audioBitrateKbps}k',
+          ];
+        }
+      }
+    } else if (useHwa) {
       // ─── Hardware Acceleration Pipeline (MediaCodec GPU/NPU) ─────────────
       // Strict scale with decrease aspect preservation, centered even padding, and yuv420p format
       if (isOriginalResolution) {
-        vfArg =
-            '-vf "${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+        vfFilter =
+            '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       } else {
-        vfArg =
-            '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+        vfFilter =
+            '${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       }
 
       final hwaBounds = encodingOptions.calculateHwaBitrateBounds(
@@ -318,18 +345,46 @@ class FFmpegService {
         sourceBitrateBps: sourceVideo.bitrate,
       );
       final targetKbps = hwaBounds['target']!;
+      final minrateKbps = hwaBounds['minrate']!;
       final maxrateKbps = hwaBounds['maxrate']!;
       final bufsizeKbps = hwaBounds['bufsize']!;
+      final gopInterval =
+          sourceVideo.fps > 0 ? sourceVideo.fps.round().clamp(24, 60) : 30;
 
-      // Put rate control, GOP, and B-frame options strictly AFTER -c:v h264_mediacodec
+      // Injeksi -bitrate dan -b:v bersamaan, -minrate, GOP 1 detik, dan Profile High
       codecArgs = [
-        '-c:v h264_mediacodec',
-        '-b:v ${targetKbps}k',
-        '-maxrate ${maxrateKbps}k',
-        '-bufsize ${bufsizeKbps}k',
-        '-g 60',
-        '-bf 0',
+        '-c:v',
+        'h264_mediacodec',
+        '-bitrate',
+        '${targetKbps}k',
+        '-b:v',
+        '${targetKbps}k',
+        '-minrate',
+        '${minrateKbps}k',
+        '-maxrate',
+        '${maxrateKbps}k',
+        '-bufsize',
+        '${bufsizeKbps}k',
+        '-profile:v',
+        'high',
+        '-level:v',
+        '4.1',
+        '-g',
+        '$gopInterval',
+        '-bf',
+        '0',
       ];
+
+      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
+        audioArgs = ['-an'];
+      } else {
+        audioArgs = [
+          '-c:a',
+          'aac',
+          '-b:a',
+          '${appSettings.audioBitrateKbps}k',
+        ];
+      }
     } else {
       // ─── Software Encoding Pipeline (libx264 CPU) ──────────────────────────
       final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
@@ -341,9 +396,11 @@ class FFmpegService {
       );
 
       final String x264Preset;
+      String? x264Tune;
       switch (appSettings.cpuPreset) {
         case 'fast':
-          x264Preset = 'ultrafast -tune fastdecode';
+          x264Preset = 'ultrafast';
+          x264Tune = 'fastdecode';
           break;
         case 'slow':
           x264Preset = 'faster';
@@ -354,72 +411,104 @@ class FFmpegService {
           break;
       }
 
-      final String rateControlArg;
+      final List<String> rateControlArgs;
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg =
-            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+        rateControlArgs = [
+          '-crf',
+          '${encodingOptions.crfValue}',
+          '-maxrate',
+          '${targetBitrateKbps * 2}k',
+          '-bufsize',
+          '${targetBitrateKbps * 4}k',
+        ];
       } else {
-        rateControlArg =
-            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+        rateControlArgs = [
+          '-b:v',
+          '${targetBitrateKbps}k',
+          '-maxrate',
+          '${targetBitrateKbps * 2}k',
+          '-bufsize',
+          '${targetBitrateKbps * 4}k',
+        ];
       }
 
       if (isOriginalResolution) {
-        vfArg = '-vf "${fpsFilter}format=yuv420p"';
+        vfFilter = '${fpsFilter}format=yuv420p';
       } else {
         final scaleFlag =
             appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
-        vfArg =
-            '-vf "${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p"';
+        vfFilter =
+            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
 
       codecArgs = [
-        '-c:v libx264',
-        '-preset $x264Preset',
-        '-profile:v high',
-        '-level:v 4.1',
-        rateControlArg,
-        '-pix_fmt yuv420p',
+        '-c:v',
+        'libx264',
+        '-preset',
+        x264Preset,
+        if (x264Tune != null) ...['-tune', x264Tune],
+        '-profile:v',
+        'high',
+        '-level:v',
+        '4.1',
+        ...rateControlArgs,
+        '-pix_fmt',
+        'yuv420p',
       ];
-    }
 
-    // Audio options: encode to clean compliant AAC for MP4, MKV, and MOV
-    String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
-    if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
-      audioArgs = '-an';
+      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
+        audioArgs = ['-an'];
+      } else {
+        audioArgs = [
+          '-c:a',
+          'aac',
+          '-b:a',
+          '${appSettings.audioBitrateKbps}k',
+        ];
+      }
     }
 
     // Container specific flags
-    String containerFlags = '';
+    final List<String> containerFlags = [];
     if (encodingOptions.container == VideoContainer.mp4 ||
         encodingOptions.container == VideoContainer.mov) {
-      containerFlags = '-movflags +faststart';
+      containerFlags.addAll(['-movflags', '+faststart']);
     }
 
-    // Construct full command
-    final cmdParts = <String>[
-      '-i "${sourceVideo.filePath}"',
-      '-map 0:v:0',
-      '-map 0:a:0?',
-      threadsArg,
-      vfArg,
+    // Construct full command as tokenized List<String>
+    final arguments = <String>[
+      '-i',
+      sourceVideo.filePath,
+      '-map',
+      '0:v:0',
+      '-map',
+      '0:a:0?',
+      '-threads',
+      '$effectiveThreads',
+      '-filter_threads',
+      '$effectiveThreads',
+      if (!isStreamCopy && vfFilter.isNotEmpty) ...['-vf', vfFilter],
       ...codecArgs,
-      audioArgs,
-      containerFlags,
-      '-y "$outputPath"',
-    ]..removeWhere((element) => element.trim().isEmpty);
+      ...audioArgs,
+      ...containerFlags,
+      '-y',
+      outputPath,
+    ];
 
-    final command = cmdParts.join(' ');
-
-    onLog('Command: ffmpeg $command');
+    final commandDebug =
+        arguments.map((a) => a.contains(' ') ? '"$a"' : a).join(' ');
+    onLog('Command: ffmpeg $commandDebug');
     onLog(
-      'Output: ${targetW}x$targetH via ${useHwa ? "Hardware (MediaCodec)" : "Software (libx264)"}',
+      isStreamCopy
+          ? 'Output: ${targetW}x$targetH via Lossless Stream Copy'
+          : 'Output: ${targetW}x$targetH via ${useHwa ? "Hardware (MediaCodec)" : "Software (libx264)"}',
     );
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();
 
-    await FFmpegKit.executeAsync(
-      command,
+    await FFmpegKit.executeWithArgumentsAsync(
+      arguments,
       (FFmpegSession session) {
         if (!completer.isCompleted) {
           completer.complete(session);
@@ -502,46 +591,42 @@ class FFmpegService {
             (srcCodec == 'aac' || srcCodec == 'mp4a')) ||
         (audioFormat == AudioFormat.wav && srcCodec.startsWith('pcm'));
 
-    String audioCodecArg;
+    final List<String> audioCodecArgs;
     if (audioBitrateKbps <= 0 && canCopy) {
-      audioCodecArg = '-c:a copy';
+      audioCodecArgs = ['-c:a', 'copy'];
     } else {
       final effectiveBitrate = audioBitrateKbps > 0 ? audioBitrateKbps : 192;
       switch (audioFormat) {
         case AudioFormat.mp3:
-          audioCodecArg = '-c:a libmp3lame -b:a ${effectiveBitrate}k';
+          audioCodecArgs = ['-c:a', 'libmp3lame', '-b:a', '${effectiveBitrate}k'];
           break;
         case AudioFormat.m4a:
-          audioCodecArg = '-c:a aac -b:a ${effectiveBitrate}k';
+          audioCodecArgs = ['-c:a', 'aac', '-b:a', '${effectiveBitrate}k'];
           break;
         case AudioFormat.wav:
-          audioCodecArg = '-c:a pcm_s16le';
+          audioCodecArgs = ['-c:a', 'pcm_s16le'];
           break;
       }
     }
 
-    final threadsArg = appSettings.cpuThreads > 0
-        ? '-threads ${appSettings.cpuThreads}'
-        : '';
-    final m4aFlags = audioFormat == AudioFormat.m4a
-        ? '-movflags +faststart'
-        : '';
-
-    final cmdParts = <String>[
-      '-i "${sourceVideo.filePath}"',
-      threadsArg,
+    final arguments = <String>[
+      '-i',
+      sourceVideo.filePath,
+      if (appSettings.cpuThreads > 0) ...['-threads', '${appSettings.cpuThreads}'],
       '-vn',
       '-sn',
       '-dn',
-      '-map 0:a:0?',
-      audioCodecArg,
-      m4aFlags,
-      '-y "$outputPath"',
-    ]..removeWhere((e) => e.trim().isEmpty);
+      '-map',
+      '0:a:0?',
+      ...audioCodecArgs,
+      if (audioFormat == AudioFormat.m4a) ...['-movflags', '+faststart'],
+      '-y',
+      outputPath,
+    ];
 
-    final command = cmdParts.join(' ');
-
-    onLog('Command: ffmpeg $command');
+    final commandDebug =
+        arguments.map((a) => a.contains(' ') ? '"$a"' : a).join(' ');
+    onLog('Command: ffmpeg $commandDebug');
     onLog(
       'Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : (canCopy ? "Original Copy" : "Auto 192 kbps")}',
     );
@@ -549,8 +634,8 @@ class FFmpegService {
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();
 
-    await FFmpegKit.executeAsync(
-      command,
+    await FFmpegKit.executeWithArgumentsAsync(
+      arguments,
       (FFmpegSession session) {
         if (!completer.isCompleted) {
           completer.complete(session);
