@@ -284,14 +284,10 @@ class FFmpegService {
       sourceBitrateBps: sourceVideo.bitrate,
     );
 
-    // GOP (keyframe interval)
-    final gop = (sourceVideo.fps * 2).round().clamp(24, 250);
-
-    // Rate control, preset, profile, and codec-specific arguments
+    // Rate control, preset, and profile arguments
     String rateControlArg = '';
     String presetArg = '';
     String profileLevelArg = '';
-    String codecExtraArgs = '';
 
     // Threads argument (calibrated for mobile ARM big.LITTLE processors to prevent thermal throttling)
     final totalCores = Platform.numberOfProcessors > 0
@@ -305,59 +301,28 @@ class FFmpegService {
 
     // Mobile-calibrated encoder preset mapping
     final String x264Preset;
-    final String x265Preset;
     switch (appSettings.cpuPreset) {
       case 'fast':
         x264Preset = 'ultrafast -tune fastdecode';
-        x265Preset = 'ultrafast';
         break;
       case 'slow':
         x264Preset = 'faster';
-        x265Preset = 'veryfast';
         break;
       case 'medium':
       default:
         x264Preset = 'veryfast';
-        x265Preset = 'superfast';
         break;
     }
 
-    if (vCodec == 'libx264') {
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg =
-            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
-      } else {
-        rateControlArg =
-            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
-      }
-      presetArg = '-preset $x264Preset';
-      profileLevelArg = '-profile:v high -level:v 4.1';
-    } else if (vCodec == 'libx265') {
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg =
-            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
-      } else {
-        rateControlArg =
-            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
-      }
-      presetArg = '-preset $x265Preset';
-      profileLevelArg = '';
-
-      String hvc1Tag = '';
-      if (encodingOptions.container == VideoContainer.mp4 ||
-          encodingOptions.container == VideoContainer.mov) {
-        hvc1Tag = '-tag:v hvc1 ';
-      }
-
-      final bframeSettings = appSettings.cpuPreset == 'fast'
-          ? 'bframes=0:b-adapt=0'
-          : (appSettings.cpuPreset == 'slow'
-              ? 'bframes=3:b-adapt=2'
-              : 'bframes=2:b-adapt=1');
-
-      codecExtraArgs =
-          '$hvc1Tag-x265-params profile=main:level-idc=4.1:no-open-gop=1:repeat-headers=1:aud=1:no-sao=1:ctu=32:keyint=$gop:min-keyint=${(gop ~/ 2)}:$bframeSettings';
+    if (encodingOptions.rateControlMode == RateControlMode.crf) {
+      rateControlArg =
+          '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+    } else {
+      rateControlArg =
+          '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
     }
+    presetArg = '-preset $x264Preset';
+    profileLevelArg = '-profile:v high -level:v 4.1';
 
     // Audio options: encode to clean compliant AAC for MP4, MKV, and MOV
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
@@ -407,7 +372,6 @@ class FFmpegService {
       presetArg,
       profileLevelArg,
       rateControlArg,
-      codecExtraArgs,
       '-pix_fmt yuv420p',
       audioArgs,
       containerFlags,

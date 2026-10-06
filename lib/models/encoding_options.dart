@@ -5,11 +5,6 @@ enum VideoCodec {
     'H.264 / AVC',
     'libx264',
     'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.',
-  ),
-  hevc(
-    'H.265 / HEVC',
-    'libx265',
-    'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.',
   );
 
   final String displayName;
@@ -183,11 +178,6 @@ class EncodingOptions {
       if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {
         estimatedBitrateMbps = (sourceKbps / 1000.0) * 0.95;
       }
-    }
-
-    // HEVC has ~30% higher compression efficiency, so target bitrate can be slightly leaner
-    if (codec == VideoCodec.hevc) {
-      estimatedBitrateMbps *= 0.75;
     }
 
     return (estimatedBitrateMbps * 1000).round().clamp(300, 50000);

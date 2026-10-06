@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.0.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -22,9 +22,8 @@
 ### 1. Video Processing (Convert & Downscale)
 - **Resolution Downscaling:** Reduces high-resolution videos (4K, 2K) to standard targets (1080p, 720p, 480p, 360p) while preserving original aspect ratios (landscape or portrait) without stretching or letterboxing.
 - **Format & Codec Conversion:** Supports container formats **MP4** (with the `+faststart` flag for instant streaming playback), **MKV**, and **MOV**.
-- **Video Codec Options:**
-  - **H.264 / AVC (`libx264`):** Universal compatibility across all Android devices, desktop media players, and social media platforms.
-  - **H.265 / HEVC (`libx265`):** High-efficiency compression that significantly reduces file size while retaining visual quality.
+- **Video Codec Standard:**
+  - **H.264 / AVC (`libx264`):** Universal high-throughput compatibility across all Android hardware decoders, desktop media players (VLC, Windows Media Player, QuickTime), and social media platforms.
 - **Rate Control Modes:**
   - **CRF (Constant Rate Factor):** Ensures consistent, natural visual fidelity throughout the video.
   - **Target Bitrate:** Enforces custom bitrates tailored to targeted file size constraints.
@@ -91,9 +90,9 @@
 
 | Category | Format / Container | Codec | Technical Notes |
 | :--- | :--- | :--- | :--- |
-| **Video** | `.mp4` | H.264 (`libx264`), H.265 (`libx265`) | Injects `-movflags +faststart` & `-tag:v hvc1` |
-| **Video** | `.mkv` | H.264 (`libx264`), H.265 (`libx265`) | Flexible container for multi-audio and subtitles |
-| **Video** | `.mov` | H.264 (`libx264`), H.265 (`libx265`) | Standard format for video editing workflows |
+| **Video** | `.mp4` | H.264 (`libx264`) | Injects `-movflags +faststart` for instant streaming playback |
+| **Video** | `.mkv` | H.264 (`libx264`) | Flexible modern container for video & audio packaging |
+| **Video** | `.mov` | H.264 (`libx264`) | Universal format for mobile playback and video editing |
 | **Audio** | `.mp3` | MP3 (`libmp3lame`) | Bitrates from 64 to 320 kbps or direct stream copy |
 | **Audio** | `.m4a` | AAC (`aac`) | High acoustic fidelity optimized for mobile devices |
 | **Audio** | `.wav` | PCM (`pcm_s16le`) | Uncompressed lossless studio acoustics |
@@ -111,12 +110,17 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.3.1.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.0.0.apk`
 
 ---
 
 ## Version History
 
+- **v3.0.0 (Build 23) - Major Release:**
+  - **Standardized Pure H.264 / AVC Pipeline:** Completely removed the experimental H.265 (HEVC) codec across all video containers (`.mp4`, `.mkv`, `.mov`) to guarantee 100% stable playback without stuttering, black screens, or hardware decoder incompatibilities across all Android devices and desktop media players.
+  - **Streamlined Conversion Interface:** Eliminated redundant codec selectors from the conversion interface, delivering a faster, simpler, and error-proof user experience.
+  - **Polished Continuous Buffering Ring:** Perfected the processing loading animation into a smooth continuous 1000ms rotating buffering sweep ring with seamless rounded caps.
+  - **Preserved Speed Presets:** Maintained customizable Fast, Normal, and Slow CPU encoding presets for optimal balance between battery efficiency, throughput, and visual compression quality.
 - **v2.3.1 (Build 22):**
   - **Continuous Looping Buffering Ring Animation:** Transformed the conversion circular progress bar into a smooth, dynamic continuous looping buffering ring with sweep gradient and glowing head dot during processing, providing seamless real-time visual feedback.
   - **H.265 (HEVC) Decoder Parameter Hardening:** Enforced strict closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), access unit delimiters (`aud=1`), explicit stream mapping (`-map 0:v:0 -map 0:a:0?`), and CTU 32 mobile optimization to resolve video stutter and black screen issues across MP4, MKV, and MOV.
