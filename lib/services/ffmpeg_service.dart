@@ -309,11 +309,11 @@ class FFmpegService {
     switch (appSettings.cpuPreset) {
       case 'fast':
         x264Preset = 'ultrafast -tune fastdecode';
-        x265Preset = 'ultrafast -tune fastdecode';
+        x265Preset = 'ultrafast';
         break;
       case 'slow':
         x264Preset = 'faster';
-        x265Preset = 'faster';
+        x265Preset = 'veryfast';
         break;
       case 'medium':
       default:
@@ -347,20 +347,12 @@ class FFmpegService {
           encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
-      // no-open-gop=1 and repeat-headers=1 prevent frame drops and stuttering on Android hardware decoders
       codecExtraArgs =
-          '$hvc1Tag-x265-params log-level=error:no-open-gop=1:repeat-headers=1:keyint=$gop:min-keyint=${(gop ~/ 2)}:vbv-maxrate=${targetBitrateKbps * 2}:vbv-bufsize=${targetBitrateKbps * 4}:pools=$effectiveThreads';
+          '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
     }
 
-    // Audio options with fast stream-copy optimization when applicable
+    // Audio options: encode to clean compliant AAC for MP4, MKV, and MOV
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
-    final srcAudio = sourceVideo.audioCodec?.toLowerCase() ?? '';
-    final isAacCompatible = encodingOptions.container == VideoContainer.mp4 ||
-        encodingOptions.container == VideoContainer.mov ||
-        encodingOptions.container == VideoContainer.mkv;
-    if (srcAudio == 'aac' && isAacCompatible && appSettings.audioBitrateKbps == 128) {
-      audioArgs = '-c:a copy';
-    }
     if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
     }
@@ -389,8 +381,9 @@ class FFmpegService {
       vfArg = '-vf "${fpsFilter}format=yuv420p"';
     } else {
       // Upscale / Downscale: bilinear for fast/medium, bicubic for slow
-      final scaleFlag =
-          appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
+      final scaleFlag = appSettings.cpuPreset == 'slow'
+          ? 'bicubic'
+          : 'bilinear';
       vfArg =
           '-vf "${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p"';
     }

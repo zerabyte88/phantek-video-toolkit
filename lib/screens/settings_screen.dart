@@ -23,8 +23,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.2.1';
-  String _buildNumber = '20';
+  String _appVersion = 'v2.3.0';
+  String _buildNumber = '21';
 
   @override
   void initState() {
@@ -42,14 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '20';
+              : '21';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.2.1';
-          _buildNumber = '20';
+          _appVersion = 'v2.3.0';
+          _buildNumber = '21';
         });
       }
     }
@@ -1766,74 +1766,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          'Developer: zerabyte88',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () async {
-                              final uri = Uri.parse(
-                                'https://github.com/zerabyte88',
-                              );
-                              try {
-                                await launchUrl(
-                                  uri,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              } catch (_) {}
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2.5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withAlpha(20),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    80,
-                                  ),
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.open_in_new_rounded,
-                                    size: 11.5,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 3.5),
-                                  Text(
-                                    'GitHub',
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Developer: zerabyte88',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       l10n.t('developer_role'),
                       style: TextStyle(
@@ -1843,6 +1784,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () async {
+                    final uri = Uri.parse(
+                      'https://github.com/zerabyte88',
+                    );
+                    try {
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (_) {}
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withAlpha(22),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withAlpha(90),
+                        width: 0.9,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 13,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'GitHub',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],

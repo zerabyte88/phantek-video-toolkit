@@ -32,6 +32,8 @@ class ConversionOptionsCard extends StatefulWidget {
 
 class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   int _customBitrateMbps = 4;
+  bool _isCustomFps = false;
+  late int _customFps;
 
   @override
   void initState() {
@@ -39,6 +41,28 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
         .clamp(1, 30);
+    final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+    final maxFps = sourceFps.clamp(15, 120);
+    final currentFps = widget.encodingOptions.targetFps;
+    if (currentFps > 0 && currentFps != 24 && currentFps != 30 && currentFps != 60) {
+      _isCustomFps = true;
+      _customFps = currentFps.clamp(10, maxFps);
+    } else {
+      _isCustomFps = false;
+      _customFps = (currentFps > 0 ? currentFps : maxFps).clamp(10, maxFps);
+    }
+  }
+
+  @override
+  void didUpdateWidget(ConversionOptionsCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sourceVideo != widget.sourceVideo) {
+      final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+      final maxFps = sourceFps.clamp(15, 120);
+      if (_customFps > maxFps) {
+        _customFps = maxFps;
+      }
+    }
   }
 
   @override
@@ -595,6 +619,11 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   }
 
   Widget _buildFpsSelector(ThemeData theme, AppLocalizations l10n) {
+    final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+    final maxFps = sourceFps.clamp(15, 120);
+    final minFps = (10 < maxFps) ? 10 : 1;
+    final targetFps = widget.encodingOptions.targetFps;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -615,38 +644,261 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             children: [
               _buildChoiceChip(
                 label: l10n.t('fps_original'),
-                isSelected: widget.encodingOptions.targetFps == 0,
+                isSelected: !_isCustomFps && targetFps == 0,
                 onSelected: (val) {
                   if (val) {
+                    setState(() {
+                      _isCustomFps = false;
+                    });
                     widget.onOptionsChanged(
                       widget.encodingOptions.copyWith(targetFps: 0),
                     );
                   }
                 },
               ),
-              _buildChoiceChip(
-                label: '30 FPS',
-                isSelected: widget.encodingOptions.targetFps == 30,
-                onSelected: (val) {
-                  if (val) {
-                    widget.onOptionsChanged(
-                      widget.encodingOptions.copyWith(targetFps: 30),
-                    );
-                  }
-                },
-              ),
+              if (maxFps >= 50)
+                _buildChoiceChip(
+                  label: '60 FPS',
+                  isSelected: !_isCustomFps && targetFps == 60,
+                  onSelected: (val) {
+                    if (val) {
+                      setState(() {
+                        _isCustomFps = false;
+                      });
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(targetFps: 60),
+                      );
+                    }
+                  },
+                ),
+              if (maxFps >= 30)
+                _buildChoiceChip(
+                  label: '30 FPS',
+                  isSelected: !_isCustomFps && targetFps == 30,
+                  onSelected: (val) {
+                    if (val) {
+                      setState(() {
+                        _isCustomFps = false;
+                      });
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(targetFps: 30),
+                      );
+                    }
+                  },
+                ),
               _buildChoiceChip(
                 label: '24 FPS',
-                isSelected: widget.encodingOptions.targetFps == 24,
+                isSelected: !_isCustomFps && targetFps == 24,
                 onSelected: (val) {
                   if (val) {
+                    setState(() {
+                      _isCustomFps = false;
+                    });
                     widget.onOptionsChanged(
                       widget.encodingOptions.copyWith(targetFps: 24),
                     );
                   }
                 },
               ),
+              _buildChoiceChip(
+                label: l10n.t('fps_custom'),
+                isSelected: _isCustomFps,
+                onSelected: (val) {
+                  if (val) {
+                    setState(() {
+                      _isCustomFps = true;
+                      if (_customFps > maxFps) _customFps = maxFps;
+                    });
+                    widget.onOptionsChanged(
+                      widget.encodingOptions.copyWith(targetFps: _customFps),
+                    );
+                  }
+                },
+              ),
             ],
+          ),
+        ),
+
+        // Custom Slider Section (Shown when Custom is selected)
+        if (_isCustomFps) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withAlpha(
+                theme.brightness == Brightness.dark ? 40 : 60,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: theme.colorScheme.primary.withAlpha(35),
+                width: 0.8,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${l10n.t('fps_custom')}: $_customFps FPS',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      '${l10n.t('fps_max')}: $maxFps FPS',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 3,
+                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+                  ),
+                  child: Slider(
+                    value: _customFps.toDouble().clamp(minFps.toDouble(), maxFps.toDouble()),
+                    min: minFps.toDouble(),
+                    max: maxFps.toDouble(),
+                    divisions: (maxFps - minFps) > 0 ? (maxFps - minFps) : 1,
+                    label: '$_customFps FPS',
+                    onChanged: (val) {
+                      final newFps = val.round();
+                      setState(() {
+                        _customFps = newFps;
+                      });
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(targetFps: newFps),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // Explanations Card (Strictly without emojis)
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest.withAlpha(
+              theme.brightness == Brightness.dark ? 30 : 50,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: theme.dividerColor.withAlpha(40),
+              width: 0.8,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 14,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    l10n.t('fps_info_title'),
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildFpsInfoRow(
+                theme: theme,
+                title: l10n.t('fps_original'),
+                desc: l10n.t('fps_desc_original'),
+                isActive: !_isCustomFps && targetFps == 0,
+              ),
+              if (maxFps >= 50) ...[
+                const SizedBox(height: 6),
+                _buildFpsInfoRow(
+                  theme: theme,
+                  title: '60 FPS',
+                  desc: l10n.t('fps_desc_60'),
+                  isActive: !_isCustomFps && targetFps == 60,
+                ),
+              ],
+              if (maxFps >= 30) ...[
+                const SizedBox(height: 6),
+                _buildFpsInfoRow(
+                  theme: theme,
+                  title: '30 FPS',
+                  desc: l10n.t('fps_desc_30'),
+                  isActive: !_isCustomFps && targetFps == 30,
+                ),
+              ],
+              const SizedBox(height: 6),
+              _buildFpsInfoRow(
+                theme: theme,
+                title: '24 FPS',
+                desc: l10n.t('fps_desc_24'),
+                isActive: !_isCustomFps && targetFps == 24,
+              ),
+              const SizedBox(height: 6),
+              _buildFpsInfoRow(
+                theme: theme,
+                title: l10n.t('fps_custom'),
+                desc: l10n.t('fps_desc_custom'),
+                isActive: _isCustomFps,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFpsInfoRow({
+    required ThemeData theme,
+    required String title,
+    required String desc,
+    required bool isActive,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 72,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+              color: isActive
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withAlpha(200),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            desc,
+            style: TextStyle(
+              fontSize: 10.5,
+              height: 1.35,
+              color: theme.colorScheme.onSurface.withAlpha(isActive ? 220 : 150),
+            ),
           ),
         ),
       ],
