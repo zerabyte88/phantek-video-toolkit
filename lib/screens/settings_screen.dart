@@ -23,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v1.4.0';
+  String _appVersion = 'v2.2.0';
   String _buildNumber = '19';
 
   @override
@@ -48,7 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.4.0';
+          _appVersion = 'v2.2.0';
           _buildNumber = '19';
         });
       }
