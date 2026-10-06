@@ -30,10 +30,6 @@ class SettingsService extends ChangeNotifier {
       if (jsonStr != null) {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         _settings = AppSettings.fromJson(data);
-        if (_settings.cpuPreset == 'slow') {
-          _settings = _settings.copyWith(cpuPreset: 'medium');
-          await _saveSettings();
-        }
         if (_settings.ramBufferMb > 2048) {
           final totalRamMb = DeviceSpecHelper.getTotalRamMb();
           final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(totalRamMb);
