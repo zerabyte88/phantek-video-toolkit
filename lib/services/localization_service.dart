@@ -6,7 +6,6 @@ class AppLocalizations {
   static const List<Map<String, String>> supportedLanguages = [
     {'code': 'id', 'name': 'Bahasa Indonesia', 'flag': '🇮🇩'},
     {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
-    {'code': 'zh', 'name': '简体中文 (Chinese)', 'flag': '🇨🇳'},
     {'code': 'es', 'name': 'Español (Spanish)', 'flag': '🇪🇸'},
     {'code': 'pt', 'name': 'Português (Portuguese)', 'flag': '🇵🇹'},
     {'code': 'ja', 'name': '日本語 (Japanese)', 'flag': '🇯🇵'},
@@ -15,7 +14,6 @@ class AppLocalizations {
     {'code': 'ar', 'name': 'العربية (Arabic)', 'flag': '🇸🇦'},
     {'code': 'fr', 'name': 'Français (French)', 'flag': '🇫🇷'},
     {'code': 'ru', 'name': 'Русский (Russian)', 'flag': '🇷🇺'},
-    // Aliases for backward compatibility:
     {'code': 'zh_CN', 'name': '简体中文 (China)', 'flag': '🇨🇳'},
     {'code': 'zh_TW', 'name': '繁體中文 (Taiwan)', 'flag': '🇹🇼'},
   ];

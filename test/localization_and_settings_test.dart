@@ -13,6 +13,21 @@ import 'package:video_downscaler/screens/settings_screen.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
 import 'package:video_downscaler/widgets/conversion_options_card.dart';
 
+const supportedUiCodes = [
+  'id',
+  'en',
+  'es',
+  'pt',
+  'ja',
+  'ko',
+  'hi',
+  'ar',
+  'fr',
+  'ru',
+  'zh_CN',
+  'zh_TW',
+];
+
 const supportedCodes = [
   'id',
   'en',
@@ -31,17 +46,19 @@ const supportedCodes = [
 
 void main() {
   group('Localization tests', () {
-    test('All 11 requested languages and aliases are available in supportedLanguages', () {
+    test('All requested UI languages are available in supportedLanguages without duplicates', () {
       final codes = AppLocalizations.supportedLanguages
           .map((l) => l['code'])
           .toList();
-      for (final code in supportedCodes) {
+      for (final code in supportedUiCodes) {
         expect(
           codes.contains(code),
           isTrue,
           reason: 'Language $code must be supported',
         );
       }
+      expect(codes.contains('zh'), isFalse, reason: 'Duplicate zh should not be in supportedLanguages');
+      expect(codes.length, equals(supportedUiCodes.length));
     });
 
     test('Translations resolve correctly for all supported languages', () {

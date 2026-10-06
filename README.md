@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.2.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -110,12 +110,16 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.2.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.2.1.apk`
 
 ---
 
 ## Version History
 
+- **v3.2.1 (Build 28) - UI Polish & Localization Fixes:**
+  - **Keep Screen Awake Full Text Display:** Removed fixed line truncation constraints on the wakelock setting description, allowing full text and battery advisory notices to render seamlessly across all screen sizes and languages.
+  - **Clean Language Selector:** Eliminated duplicate Chinese language entry from the settings selection modal while maintaining robust backward-compatible fallback mapping to Simplified Chinese (`zh_CN`).
+  - **Test Suite Verification:** Updated localization verification tests ensuring 100% passing test matrix across all supported language configurations.
 - **v3.2.0 (Build 27) - Software Encoding Standardization & HWA Removal:**
   - **100% libx264 Software Pipeline:** Completely eliminated MediaCodec hardware acceleration (`h264_mediacodec`) to guarantee uniform, distortion-free CRF visual quality and eliminate GPU/NPU driver inconsistencies across all Android vendor devices.
   - **Unconstrained CRF Rate Control:** Default CRF calibrated to 23 for crisp, natural output with no artificial VBV bitrate clamps.

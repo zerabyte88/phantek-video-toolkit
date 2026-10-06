@@ -23,8 +23,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v3.2.0';
-  String _buildNumber = '27';
+  String _appVersion = 'v3.2.1';
+  String _buildNumber = '28';
 
   @override
   void initState() {
@@ -42,14 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '27';
+              : '28';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v3.2.0';
-          _buildNumber = '27';
+          _appVersion = 'v3.2.1';
+          _buildNumber = '28';
         });
       }
     }
@@ -511,7 +511,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ) {
     // Find active language metadata
     final active = AppLocalizations.supportedLanguages.firstWhere(
-      (l) => l['code'] == settings.languageCode,
+      (l) =>
+          l['code'] == settings.languageCode ||
+          (settings.languageCode == 'zh' && l['code'] == 'zh_CN'),
       orElse: () => {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
     );
 
@@ -674,7 +676,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     itemBuilder: (_, index) {
                       final item = AppLocalizations.supportedLanguages[index];
                       final code = item['code']!;
-                      final isSelected = settings.languageCode == code;
+                      final isSelected = settings.languageCode == code ||
+                          (settings.languageCode == 'zh' && code == 'zh_CN');
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 6),
@@ -962,8 +965,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 2),
               Text(
                 l10n.t('settings_wakelock_desc'),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 11,
                   color: theme.colorScheme.onSurface.withAlpha(130),
