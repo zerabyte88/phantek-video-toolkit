@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.2.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -111,12 +111,17 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.2.1.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.3.0.apk`
 
 ---
 
 ## Version History
 
+- **v2.3.0 (Build 21):**
+  - **Dynamic Custom Target FPS & Interactive Slider:** Added custom FPS option with dynamic slider clamping bounded strictly to source video frame rate (e.g. 30 FPS video caps slider at 30 FPS, 60 FPS video caps at 60 FPS).
+  - **FPS Technical Guidance Card:** Added comprehensive technical explanation card breaking down the exact purpose and behavior of each FPS setting (Original, 60 FPS, 30 FPS, 24 FPS, Custom) with zero emojis.
+  - **Balanced Developer Profile Card:** Relocated the GitHub profile button to the far right trailing edge of the developer card in Settings with polished button dimensions and touch targets.
+  - **Expanded Multilingual Coverage:** Added 8 new localization keys across 12 supported languages and aliases with 100% test coverage.
 - **v2.2.1 (Build 20):**
   - **H.265 (HEVC) Playback Stutter Fix:** Resolved open-GOP IDR keyframe desynchronization and decoder buffer underflow on Android hardware decoders across `.mp4`, `.mkv`, and `.mov` by enforcing closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), and strict VBV bounds (`maxrate=6M`, `bufsize=12M`).
   - **Mobile Encoding Speed Acceleration:** Mapped software CPU presets to high-throughput mobile presets (`ultrafast`, `superfast`, `veryfast`) and introduced Smart Adaptive Scaling (`bilinear` on Fast/Normal modes saving ~35% CPU overhead, and `bicubic` 16-point interpolation on Slow mode for pixel perfection).

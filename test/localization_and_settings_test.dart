@@ -11,6 +11,7 @@ import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 import 'package:video_downscaler/screens/settings_screen.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
+import 'package:video_downscaler/widgets/conversion_options_card.dart';
 
 const supportedCodes = [
   'id',
@@ -1039,6 +1040,173 @@ void main() {
         expect(find.text('Developer: zerabyte88'), findsOneWidget);
         expect(find.text('GitHub'), findsOneWidget);
         expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
+      },
+    );
+
+    test('Target FPS guide keys are completely free of emojis across all supported languages', () {
+      final emojiRegex = RegExp(r'[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]', unicode: true);
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        final title = l10n.t('fps_info_title');
+        final orig = l10n.t('fps_desc_original');
+        final fps60 = l10n.t('fps_desc_60');
+        final fps30 = l10n.t('fps_desc_30');
+        final fps24 = l10n.t('fps_desc_24');
+        final custom = l10n.t('fps_desc_custom');
+
+        expect(title.isNotEmpty, isTrue);
+        expect(orig.isNotEmpty, isTrue);
+        expect(fps60.isNotEmpty, isTrue);
+        expect(fps30.isNotEmpty, isTrue);
+        expect(fps24.isNotEmpty, isTrue);
+        expect(custom.isNotEmpty, isTrue);
+
+        expect(emojiRegex.hasMatch(title), isFalse, reason: '$code title has emoji');
+        expect(emojiRegex.hasMatch(orig), isFalse, reason: '$code orig has emoji');
+        expect(emojiRegex.hasMatch(fps60), isFalse, reason: '$code fps60 has emoji');
+        expect(emojiRegex.hasMatch(fps30), isFalse, reason: '$code fps30 has emoji');
+        expect(emojiRegex.hasMatch(fps24), isFalse, reason: '$code fps24 has emoji');
+        expect(emojiRegex.hasMatch(custom), isFalse, reason: '$code custom has emoji');
+      }
+    });
+
+    testWidgets(
+      'Target FPS slider clamps to 30 for 30 FPS video and hides 60 FPS chip',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        const video30 = VideoInfo(
+          filePath: '/test/video.mp4',
+          fileName: 'video.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 10.0,
+          bitrate: 5000000,
+          fps: 30.0,
+          codec: 'h264',
+          fileSizeBytes: 1000000,
+        );
+
+        EncodingOptions options = const EncodingOptions();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('dark'),
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (context, setState) {
+                  return ConversionOptionsCard(
+                    sourceVideo: video30,
+                    resolutions: VideoResolution.standardResolutions,
+                    selectedResolution: VideoResolution.standardResolutions[2],
+                    encodingOptions: options,
+                    onResolutionChanged: (_) {},
+                    onOptionsChanged: (newOpts) {
+                      setState(() {
+                        options = newOpts;
+                      });
+                    },
+                    l10n: const AppLocalizations('id'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 60 FPS chip should NOT be present for 30 FPS video
+        expect(find.widgetWithText(ChoiceChip, '60 FPS'), findsNothing);
+        // 30 FPS, 24 FPS, Asli, and Kustom chips should be present
+        expect(find.widgetWithText(ChoiceChip, '30 FPS'), findsOneWidget);
+        expect(find.widgetWithText(ChoiceChip, '24 FPS'), findsOneWidget);
+        expect(find.widgetWithText(ChoiceChip, 'Asli'), findsOneWidget);
+        expect(find.widgetWithText(ChoiceChip, 'Kustom'), findsOneWidget);
+
+        // Tap Kustom chip
+        await tester.tap(find.widgetWithText(ChoiceChip, 'Kustom'));
+        await tester.pumpAndSettle();
+
+        // Slider should appear and its max must be exactly 30.0
+        final sliderFinder = find.byWidgetPredicate(
+          (w) => w is Slider && (w.label?.contains('FPS') ?? false),
+        );
+        expect(sliderFinder, findsOneWidget);
+        final sliderWidget = tester.widget<Slider>(sliderFinder);
+        expect(sliderWidget.max, 30.0);
+        expect(sliderWidget.min, 10.0);
+
+        // FPS guide card is visible without emojis
+        expect(find.text('Panduan Target FPS'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Target FPS slider clamps to 60 for 60 FPS video and shows 60 FPS chip',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        const video60 = VideoInfo(
+          filePath: '/test/video60.mp4',
+          fileName: 'video60.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 10.0,
+          bitrate: 8000000,
+          fps: 60.0,
+          codec: 'h264',
+          fileSizeBytes: 2000000,
+        );
+
+        EncodingOptions options = const EncodingOptions();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('dark'),
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (context, setState) {
+                  return ConversionOptionsCard(
+                    sourceVideo: video60,
+                    resolutions: VideoResolution.standardResolutions,
+                    selectedResolution: VideoResolution.standardResolutions[2],
+                    encodingOptions: options,
+                    onResolutionChanged: (_) {},
+                    onOptionsChanged: (newOpts) {
+                      setState(() {
+                        options = newOpts;
+                      });
+                    },
+                    l10n: const AppLocalizations('id'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 60 FPS chip SHOULD be present for 60 FPS video
+        expect(find.widgetWithText(ChoiceChip, '60 FPS'), findsOneWidget);
+
+        // Tap Kustom chip
+        await tester.tap(find.widgetWithText(ChoiceChip, 'Kustom'));
+        await tester.pumpAndSettle();
+
+        // Slider should appear and its max must be exactly 60.0
+        final sliderFinder = find.byWidgetPredicate(
+          (w) => w is Slider && (w.label?.contains('FPS') ?? false),
+        );
+        expect(sliderFinder, findsOneWidget);
+        final sliderWidget = tester.widget<Slider>(sliderFinder);
+        expect(sliderWidget.max, 60.0);
+        expect(sliderWidget.min, 10.0);
       },
     );
   });
