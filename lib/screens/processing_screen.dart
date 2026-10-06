@@ -1168,7 +1168,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               widget.targetResolution.label.startsWith('Original')
                   ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
                   : widget.targetResolution.label,
-              '${widget.targetResolution.width}×${widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
+              '${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.height : widget.targetResolution.width}×${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.width : widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
             ),
             Divider(height: 20, color: theme.colorScheme.outline),
             _buildInfoRow(

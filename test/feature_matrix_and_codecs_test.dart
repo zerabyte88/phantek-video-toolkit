@@ -606,5 +606,222 @@ void main() {
       expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
       expect(vf, contains('format=yuv420p'));
     });
+
+    test('FFmpegService.buildVideoArguments strictly excludes -crf and applies 8000k VBV bounds on portrait HWA downscale', () {
+      const portraitSource = VideoInfo(
+        filePath: '/storage/emulated/0/DCIM/portrait_video.mp4',
+        fileName: 'portrait_video.mp4',
+        width: 1512,
+        height: 2688,
+        durationSeconds: 14.5,
+        bitrate: 41400000,
+        fps: 30.0,
+        codec: 'h264',
+        fileSizeBytes: 75200000,
+      );
+
+      const target1080p = VideoResolution(
+        label: '1080p',
+        width: 1920,
+        height: 1080,
+      );
+
+      const encodingOpts = EncodingOptions(
+        rateControlMode: RateControlMode.crf,
+        crfValue: 20,
+      );
+
+      const appSettings = AppSettings(
+        enableHardwareAcceleration: true,
+      );
+
+      final args = FFmpegService.buildVideoArguments(
+        sourceVideo: portraitSource,
+        targetResolution: target1080p,
+        encodingOptions: encodingOpts,
+        appSettings: appSettings,
+        outputPath: '/storage/emulated/0/Movies/output-1080p.mp4',
+      );
+
+      // Verify CRF is completely excluded under HWA
+      expect(args.contains('-crf'), isFalse, reason: 'HWA MediaCodec must never receive -crf');
+
+      // Verify MediaCodec encoder is selected
+      expect(args, contains('h264_mediacodec'));
+
+      // Verify VBV bounds: 1080p -> target 8000k, min 6000k, max 10000k, bufsize 16000k
+      final bitrateIdx = args.indexOf('-bitrate');
+      expect(bitrateIdx, isNot(-1));
+      expect(args[bitrateIdx + 1], equals('8000k'));
+
+      final bvIdx = args.indexOf('-b:v');
+      expect(bvIdx, isNot(-1));
+      expect(args[bvIdx + 1], equals('8000k'));
+
+      final minrateIdx = args.indexOf('-minrate');
+      expect(minrateIdx, isNot(-1));
+      expect(args[minrateIdx + 1], equals('6000k'));
+
+      final maxrateIdx = args.indexOf('-maxrate');
+      expect(maxrateIdx, isNot(-1));
+      expect(args[maxrateIdx + 1], equals('10000k'));
+
+      final bufsizeIdx = args.indexOf('-bufsize');
+      expect(bufsizeIdx, isNot(-1));
+      expect(args[bufsizeIdx + 1], equals('16000k'));
+
+      // Verify GOP 1 second and B-frames disabled
+      final gIdx = args.indexOf('-g');
+      expect(gIdx, isNot(-1));
+      expect(args[gIdx + 1], equals('30'));
+
+      final bfIdx = args.indexOf('-bf');
+      expect(bfIdx, isNot(-1));
+      expect(args[bfIdx + 1], equals('0'));
+
+      // Verify portrait dimensions swapped: scale target is 1080x1920
+      final vfIdx = args.indexOf('-vf');
+      expect(vfIdx, isNot(-1));
+      final vf = args[vfIdx + 1];
+      expect(vf, contains('scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
+      expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
+      expect(vf, contains('format=yuv420p'));
+    });
+
+    test('FFmpegService.buildVideoArguments respects custom bitrate in Bitrate mode under HWA', () {
+      const sourceVideo = VideoInfo(
+        filePath: '/sample.mp4',
+        fileName: 'sample.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 10.0,
+        bitrate: 15000000,
+        fps: 30.0,
+        codec: 'h264',
+        fileSizeBytes: 18000000,
+      );
+
+      const target720p = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
+
+      const encodingOpts = EncodingOptions(
+        rateControlMode: RateControlMode.bitrate,
+        customBitrateKbps: 12000,
+      );
+
+      const appSettings = AppSettings(
+        enableHardwareAcceleration: true,
+      );
+
+      final args = FFmpegService.buildVideoArguments(
+        sourceVideo: sourceVideo,
+        targetResolution: target720p,
+        encodingOptions: encodingOpts,
+        appSettings: appSettings,
+        outputPath: '/output-720p.mp4',
+      );
+
+      expect(args.contains('-crf'), isFalse);
+      expect(args, contains('h264_mediacodec'));
+
+      final bitrateIdx = args.indexOf('-bitrate');
+      expect(args[bitrateIdx + 1], equals('12000k'));
+
+      final minrateIdx = args.indexOf('-minrate');
+      expect(args[minrateIdx + 1], equals('9000k')); // 12000 * 0.75
+
+      final maxrateIdx = args.indexOf('-maxrate');
+      expect(args[maxrateIdx + 1], equals('15600k')); // 12000 * 1.3
+    });
+
+    test('FFmpegService.buildVideoArguments applies libx264 with -crf in software mode', () {
+      const sourceVideo = VideoInfo(
+        filePath: '/sample.mp4',
+        fileName: 'sample.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 10.0,
+        bitrate: 15000000,
+        fps: 30.0,
+        codec: 'h264',
+        fileSizeBytes: 18000000,
+      );
+
+      const target720p = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
+
+      const encodingOpts = EncodingOptions(
+        rateControlMode: RateControlMode.crf,
+        crfValue: 22,
+      );
+
+      // Hardware acceleration disabled
+      const appSettings = AppSettings(
+        enableHardwareAcceleration: false,
+      );
+
+      final args = FFmpegService.buildVideoArguments(
+        sourceVideo: sourceVideo,
+        targetResolution: target720p,
+        encodingOptions: encodingOpts,
+        appSettings: appSettings,
+        outputPath: '/output-720p.mp4',
+      );
+
+      expect(args, contains('libx264'));
+      expect(args, isNot(contains('h264_mediacodec')));
+
+      final crfIdx = args.indexOf('-crf');
+      expect(crfIdx, isNot(-1));
+      expect(args[crfIdx + 1], equals('22'));
+    });
+
+    test('FFmpegService.buildVideoArguments respects forceSoftwareFallback even if HWA is enabled in settings', () {
+      const sourceVideo = VideoInfo(
+        filePath: '/sample.mp4',
+        fileName: 'sample.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 10.0,
+        bitrate: 15000000,
+        fps: 30.0,
+        codec: 'h264',
+        fileSizeBytes: 18000000,
+      );
+
+      const target720p = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
+
+      const encodingOpts = EncodingOptions(
+        rateControlMode: RateControlMode.crf,
+        crfValue: 21,
+      );
+
+      const appSettings = AppSettings(
+        enableHardwareAcceleration: true,
+      );
+
+      final args = FFmpegService.buildVideoArguments(
+        sourceVideo: sourceVideo,
+        targetResolution: target720p,
+        encodingOptions: encodingOpts,
+        appSettings: appSettings,
+        outputPath: '/output-720p.mp4',
+        forceSoftwareFallback: true,
+      );
+
+      expect(args, contains('libx264'));
+      expect(args, isNot(contains('h264_mediacodec')));
+      expect(args, contains('-crf'));
+    });
   });
 }

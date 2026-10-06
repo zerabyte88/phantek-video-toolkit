@@ -224,31 +224,16 @@ class FFmpegService {
     }
   }
 
-  /// Transcode and downscale a video to a target resolution.
-  /// [onProgress] reports progress from 0.0 to 1.0.
-  /// [forceSoftwareFallback] forces libx264 software encoding even if HWA is enabled in appSettings.
-  /// Returns the output file path on success, null on failure.
-  static Future<String?> processVideo({
+  /// Construct tokenized FFmpeg CLI arguments for video transcoding/downscaling.
+  /// Pure method without side-effects, allowing deterministic unit testing.
+  static List<String> buildVideoArguments({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
-    EncodingOptions encodingOptions = const EncodingOptions(),
-    AppSettings appSettings = const AppSettings(),
+    required EncodingOptions encodingOptions,
+    required AppSettings appSettings,
+    required String outputPath,
     bool forceSoftwareFallback = false,
-    required void Function(double progress, String stats, [int? sizeBytes])
-    onProgress,
-    required void Function(String log) onLog,
-  }) async {
-    final outputDir = await getOutputDirectory(
-      customPath: appSettings.outputDirectory,
-    );
-
-    final outputPath = await generateUniqueOutputPath(
-      outputDir: outputDir,
-      fileName: sourceVideo.fileName,
-      targetResolution: targetResolution,
-      container: encodingOptions.container,
-    );
-
+  }) {
     // Calculate target dimensions (must be even numbers)
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
@@ -309,7 +294,6 @@ class FFmpegService {
 
     if (isStreamCopy) {
       // ─── Smart Stream Copy Pipeline (Lossless Passthrough) ────────────────
-      onLog('Smart Stream Copy (Lossless Passthrough) active');
       codecArgs = ['-c:v', 'copy'];
 
       if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
@@ -351,7 +335,8 @@ class FFmpegService {
       final gopInterval =
           sourceVideo.fps > 0 ? sourceVideo.fps.round().clamp(24, 60) : 30;
 
-      // Injeksi -bitrate dan -b:v bersamaan, -minrate, GOP 1 detik, dan Profile High
+      // Injeksi -bitrate dan -b:v bersamaan, -minrate, GOP 1 detik, dan Profile High.
+      // Parameter -crf WAJIB DIABAIKAN total dari pipeline HWA.
       codecArgs = [
         '-c:v',
         'h264_mediacodec',
@@ -475,8 +460,7 @@ class FFmpegService {
       containerFlags.addAll(['-movflags', '+faststart']);
     }
 
-    // Construct full command as tokenized List<String>
-    final arguments = <String>[
+    return <String>[
       '-i',
       sourceVideo.filePath,
       '-map',
@@ -494,9 +478,75 @@ class FFmpegService {
       '-y',
       outputPath,
     ];
+  }
 
-    final commandDebug =
-        arguments.map((a) => a.contains(' ') ? '"$a"' : a).join(' ');
+  /// Transcode and downscale a video to a target resolution.
+  /// [onProgress] reports progress from 0.0 to 1.0.
+  /// [forceSoftwareFallback] forces libx264 software encoding even if HWA is enabled in appSettings.
+  /// Returns the output file path on success, null on failure.
+  static Future<String?> processVideo({
+    required VideoInfo sourceVideo,
+    required VideoResolution targetResolution,
+    EncodingOptions encodingOptions = const EncodingOptions(),
+    AppSettings appSettings = const AppSettings(),
+    bool forceSoftwareFallback = false,
+    required void Function(double progress, String stats, [int? sizeBytes])
+    onProgress,
+    required void Function(String log) onLog,
+  }) async {
+    final outputDir = await getOutputDirectory(
+      customPath: appSettings.outputDirectory,
+    );
+
+    final outputPath = await generateUniqueOutputPath(
+      outputDir: outputDir,
+      fileName: sourceVideo.fileName,
+      targetResolution: targetResolution,
+      container: encodingOptions.container,
+    );
+
+    // Calculate target dimensions for logging and metadata
+    int targetW = targetResolution.width;
+    int targetH = targetResolution.height;
+    if (sourceVideo.height > sourceVideo.width) {
+      targetW = targetResolution.height;
+      targetH = targetResolution.width;
+    }
+    final sourceAspect =
+        sourceVideo.width / (sourceVideo.height > 0 ? sourceVideo.height : 1);
+    final targetAspect = targetW / (targetH > 0 ? targetH : 1);
+    if (sourceAspect > targetAspect) {
+      targetH = (targetW / sourceAspect).round();
+    } else {
+      targetW = (targetH * sourceAspect).round();
+    }
+    targetW = (targetW ~/ 2) * 2;
+    targetH = (targetH ~/ 2) * 2;
+
+    final isOriginalResolution =
+        targetW == sourceVideo.width && targetH == sourceVideo.height;
+    final isSourceH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+        sourceVideo.codec.toLowerCase().contains('avc');
+    final isFpsSame = encodingOptions.targetFps <= 0 ||
+        encodingOptions.targetFps == sourceVideo.fps.round();
+    final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
+    final bool useHwa =
+        appSettings.enableHardwareAcceleration && !forceSoftwareFallback;
+
+    final arguments = buildVideoArguments(
+      sourceVideo: sourceVideo,
+      targetResolution: targetResolution,
+      encodingOptions: encodingOptions,
+      appSettings: appSettings,
+      outputPath: outputPath,
+      forceSoftwareFallback: forceSoftwareFallback,
+    );
+
+    if (isStreamCopy) {
+      onLog('Smart Stream Copy (Lossless Passthrough) active');
+    }
+
+    final commandDebug = arguments.join(' ');
     onLog('Command: ffmpeg $commandDebug');
     onLog(
       isStreamCopy
