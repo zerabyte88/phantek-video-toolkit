@@ -117,33 +117,32 @@ The compiled release APK will be generated at:
 
 ## Version History
 
-- **v1.4.0 (Build 19):**
+- **v2.2.0 (Build 19):**
   - Overhauled Settings Screen into a modern, minimalist 4-container Material 3 surface architecture.
   - Expanded localization support to 11 full languages + aliases with 100% dictionary coverage (222 identical keys each).
   - Completely eliminated all remaining hardcoded text across the entire application.
   - Enhanced continuous particle and celestial background animations across all themes (Aurora, Moon & Meteors, Sakura Branches & Petals, Sunbeams).
   - Added offline circular developer profile card with direct GitHub link.
   - Performed whole-repo dead code removal, type-safety refactoring, and code formatting adhering strictly to Dart lint standards.
-- **v1.3.0 (Build 18):**
+- **2.1.0 (Build 18):**
   - Added continuous, seamlessly looping dynamic animated canvas backgrounds for Dark, OLED, Light, and AMOLED Sakura themes.
   - Added Easter Egg theme **AMOLED Sakura** (activated by tapping "Phantek" on header 10 times).
   - Added theme-adaptive glowing borders and iconography to header title (Electric Cyan Bolt, Amber Fire, Azure Sun, Sakura Blossom).
   - Cleaned up developer card interactions and removed external repository button.
-- **v1.2.1 (Build 17):**
+- **v2.0.0 (Build 17):**
+  - BREAKING CHANGE: Standardized application package ID and Android namespace to com.phantek.cygnus.albireo (requires clean install / resets OS-level application continuity).
   - Deprecated and removed VP9 codec and WebM container to resolve mobile encoding stability issues.
   - Standardized video pipelines to pure H.264 & H.265 (MP4, MKV, MOV) and audio to AAC, MP3, WAV.
-  - Thoroughly cleaned up unused code and expanded 64-bit modern SoC & GPU detection.
-- **v1.2.0 (Build 16):**
-  - Standardized application package ID and Android namespace to `com.phantek.cygnus.albireo`.
   - Streamlined CPU encoding presets in Settings.
-- **v1.1.5 (Build 15):**
+  - Thoroughly cleaned up unused code and expanded 64-bit modern SoC & GPU detection.
+- **v1.3.0 (Build 16):**
   - Integrated real-time conversion telemetry dashboard (CPU %, RAM RSS Linux `/proc/self/status`, Storage I/O throughput).
   - Added 320 kbps audio quality and 4096 MB RAM buffer with hardware OOM protection.
-- **v1.1.3 - v1.1.4:**
+- **v1.2.0 (Build 15):**
   - Added dedicated Audio Extractor feature (MP3, M4A, WAV).
   - Implemented orientation-aware resolution classification for portrait and landscape videos.
   - Integrated comprehensive hardware specifications display in Settings.
-- **v1.1.2:**
+- **v1.1.0 (Build 14):**
   - Integrated Android Foreground Service and CPU Wakelock for background persistence and screen-off execution.
 
 ---
