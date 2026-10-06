@@ -23,8 +23,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.2.0';
-  String _buildNumber = '19';
+  String _appVersion = 'v2.2.1';
+  String _buildNumber = '20';
 
   @override
   void initState() {
@@ -42,14 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '19';
+              : '20';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.2.0';
-          _buildNumber = '19';
+          _appVersion = 'v2.2.1';
+          _buildNumber = '20';
         });
       }
     }
@@ -413,21 +413,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 20),
 
               // Reset Defaults Button
-              OutlinedButton.icon(
-                onPressed: () => _confirmResetDefaults(context),
-                icon: const Icon(Icons.restart_alt_rounded, size: 18),
-                label: Text(
-                  l10n.t('settings_reset_default'),
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFEF4444),
-                  side: BorderSide(
-                    color: const Color(0xFFEF4444).withAlpha(120),
+              Center(
+                child: OutlinedButton.icon(
+                  onPressed: () => _confirmResetDefaults(context),
+                  icon: const Icon(Icons.restart_alt_rounded, size: 18),
+                  label: Text(
+                    l10n.t('settings_reset_default'),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFEF4444),
+                    side: BorderSide(
+                      color: const Color(0xFFEF4444).withAlpha(120),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
@@ -797,7 +802,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'desc': l10n.t('theme_sakura_desc'),
         'icon': Icons.local_florist_rounded,
         'accent': const Color(0xFFF472B6),
-        'badge': '🌸 AMOLED',
+        'badge': 'AMOLED',
       },
       {
         'id': 'light',
@@ -816,7 +821,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 82,
+        mainAxisExtent: 68,
       ),
       itemCount: themes.length,
       itemBuilder: (context, index) {
@@ -844,79 +849,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: Border.all(
                   color: isSelected
                       ? accent
-                      : theme.colorScheme.outline.withAlpha(25),
-                  width: isSelected ? 1.5 : 1.0,
+                      : theme.colorScheme.outline.withAlpha(30),
+                  width: isSelected ? 1.6 : 1.0,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        item['icon'] as IconData,
-                        size: 17,
-                        color: isSelected
-                            ? accent
-                            : theme.colorScheme.onSurface,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          item['icon'] as IconData,
+                          size: 17,
+                          color: isSelected
+                              ? accent
+                              : theme.colorScheme.onSurface,
+                        ),
+                        const SizedBox(width: 7),
+                        Flexible(
+                          child: Text(
+                            item['title'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                              color: isSelected
+                                  ? accent
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (badge != null) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accent.withAlpha(20),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                         child: Text(
-                          item['title'] as String,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          badge,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w600,
-                            color: isSelected
-                                ? accent
-                                : theme.colorScheme.onSurface,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: accent,
                           ),
                         ),
                       ),
-                      if (isSelected)
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 14,
-                          color: accent,
-                        ),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  if (badge != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 1.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: accent.withAlpha(20),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        badge,
-                        style: TextStyle(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w600,
-                          color: accent,
-                        ),
-                      ),
-                    )
-                  else
-                    Text(
-                      (item['desc'] as String).split('•').first.trim(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: theme.colorScheme.onSurface.withAlpha(120),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1046,33 +1044,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          children: [
-            _buildChoiceChip(
-              theme: theme,
-              label: l10n.t('settings_auto_cores'),
-              selected: settings.cpuThreads == 0,
-              onSelected: () async {
-                await _settingsService.setCpuThreads(0);
-                setState(() {});
-              },
-            ),
-            ...[1, 2, 4, 6, 8]
-                .where((c) => c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
-                .map(
-                  (c) => _buildChoiceChip(
-                    theme: theme,
-                    label: '$c ${l10n.t('unit_core')}',
-                    selected: settings.cpuThreads == c,
-                    onSelected: () async {
-                      await _settingsService.setCpuThreads(c);
-                      setState(() {});
-                    },
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildChoiceChip(
+                theme: theme,
+                label: l10n.t('settings_auto_cores'),
+                selected: settings.cpuThreads == 0,
+                onSelected: () async {
+                  await _settingsService.setCpuThreads(0);
+                  setState(() {});
+                },
+              ),
+              ...[1, 2, 4, 6, 8]
+                  .where((c) => c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
+                  .map(
+                    (c) => _buildChoiceChip(
+                      theme: theme,
+                      label: '$c ${l10n.t('unit_core')}',
+                      selected: settings.cpuThreads == c,
+                      onSelected: () async {
+                        await _settingsService.setCpuThreads(c);
+                        setState(() {});
+                      },
+                    ),
                   ),
-                ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -1136,59 +1137,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          children: [
-            _buildChoiceChip(
-              theme: theme,
-              label: '256 MB',
-              selected: settings.ramBufferMb == 256,
-              onSelected: () async {
-                await _settingsService.setRamBuffer(256);
-                setState(() {});
-              },
-            ),
-            _buildChoiceChip(
-              theme: theme,
-              label: '512 MB',
-              selected: settings.ramBufferMb == 512,
-              onSelected: () async {
-                await _settingsService.setRamBuffer(512);
-                setState(() {});
-              },
-            ),
-            _buildChoiceChip(
-              theme: theme,
-              label: '1024 MB',
-              selected: settings.ramBufferMb == 1024,
-              onSelected: () async {
-                await _settingsService.setRamBuffer(1024);
-                setState(() {});
-              },
-            ),
-            _buildChoiceChip(
-              theme: theme,
-              label: '2048 MB',
-              selected: settings.ramBufferMb == 2048,
-              onSelected: () async {
-                await _settingsService.setRamBuffer(2048);
-                setState(() {});
-              },
-            ),
-            _buildChoiceChip(
-              theme: theme,
-              label: '4096 MB',
-              selected: settings.ramBufferMb == 4096,
-              enabled: !is4GbDisabled,
-              onSelected: !is4GbDisabled
-                  ? () async {
-                      await _settingsService.setRamBuffer(4096);
-                      setState(() {});
-                    }
-                  : null,
-            ),
-          ],
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildChoiceChip(
+                theme: theme,
+                label: '256 MB',
+                selected: settings.ramBufferMb == 256,
+                onSelected: () async {
+                  await _settingsService.setRamBuffer(256);
+                  setState(() {});
+                },
+              ),
+              _buildChoiceChip(
+                theme: theme,
+                label: '512 MB',
+                selected: settings.ramBufferMb == 512,
+                onSelected: () async {
+                  await _settingsService.setRamBuffer(512);
+                  setState(() {});
+                },
+              ),
+              _buildChoiceChip(
+                theme: theme,
+                label: '1024 MB',
+                selected: settings.ramBufferMb == 1024,
+                onSelected: () async {
+                  await _settingsService.setRamBuffer(1024);
+                  setState(() {});
+                },
+              ),
+              _buildChoiceChip(
+                theme: theme,
+                label: '2048 MB',
+                selected: settings.ramBufferMb == 2048,
+                onSelected: () async {
+                  await _settingsService.setRamBuffer(2048);
+                  setState(() {});
+                },
+              ),
+              _buildChoiceChip(
+                theme: theme,
+                label: '4096 MB',
+                selected: settings.ramBufferMb == 4096,
+                enabled: !is4GbDisabled,
+                onSelected: !is4GbDisabled
+                    ? () async {
+                        await _settingsService.setRamBuffer(4096);
+                        setState(() {});
+                      }
+                    : null,
+              ),
+            ],
+          ),
         ),
         if (is4GbDisabled) ...[
           const SizedBox(height: 6),
@@ -1242,32 +1246,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _buildChoiceChip(
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildChoiceChip(
                 theme: theme,
-                label: l10n.t('preset_fast'),
+                label: l10n.t('preset_fast_title'),
                 selected: settings.cpuPreset == 'fast',
                 onSelected: () async {
                   await _settingsService.setCpuPreset('fast');
                   setState(() {});
                 },
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildChoiceChip(
+              _buildChoiceChip(
                 theme: theme,
-                label: l10n.t('preset_normal'),
+                label: l10n.t('preset_normal_title'),
                 selected: settings.cpuPreset == 'medium',
                 onSelected: () async {
                   await _settingsService.setCpuPreset('medium');
                   setState(() {});
                 },
               ),
+              _buildChoiceChip(
+                theme: theme,
+                label: l10n.t('preset_slow_title'),
+                selected: settings.cpuPreset == 'slow',
+                onSelected: () async {
+                  await _settingsService.setCpuPreset('slow');
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest.withAlpha(40),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: theme.colorScheme.outline.withAlpha(25),
+              width: 1.0,
             ),
-          ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                settings.cpuPreset == 'fast'
+                    ? Icons.bolt_rounded
+                    : (settings.cpuPreset == 'slow'
+                          ? Icons.diamond_outlined
+                          : Icons.balance_rounded),
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  settings.cpuPreset == 'fast'
+                      ? l10n.t('preset_fast_desc')
+                      : (settings.cpuPreset == 'slow'
+                            ? l10n.t('preset_slow_desc')
+                            : l10n.t('preset_normal_desc')),
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.35,
+                    color: theme.colorScheme.onSurface.withAlpha(160),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1332,31 +1387,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          children: [
-            _buildChoiceChip(
-              theme: theme,
-              label: l10n.t('settings_audio_mute'),
-              selected: settings.audioBitrateKbps == 0,
-              onSelected: () async {
-                await _settingsService.setAudioBitrate(0);
-                setState(() {});
-              },
-            ),
-            ...[64, 128, 192, 256, 320].map(
-              (kbps) => _buildChoiceChip(
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildChoiceChip(
                 theme: theme,
-                label: '$kbps kbps',
-                selected: settings.audioBitrateKbps == kbps,
+                label: l10n.t('settings_audio_mute'),
+                selected: settings.audioBitrateKbps == 0,
                 onSelected: () async {
-                  await _settingsService.setAudioBitrate(kbps);
+                  await _settingsService.setAudioBitrate(0);
                   setState(() {});
                 },
               ),
-            ),
-          ],
+              ...[64, 128, 192, 256, 320].map(
+                (kbps) => _buildChoiceChip(
+                  theme: theme,
+                  label: '$kbps kbps',
+                  selected: settings.audioBitrateKbps == kbps,
+                  onSelected: () async {
+                    await _settingsService.setAudioBitrate(kbps);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1422,34 +1480,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            OutlinedButton.icon(
-              onPressed: onChange,
-              icon: const Icon(Icons.folder_open_rounded, size: 15),
-              label: Text(l10n.t('settings_change_folder')),
-              style: OutlinedButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                textStyle: const TextStyle(fontSize: 12),
-              ),
-            ),
-            if (onReset != null) ...[
-              const SizedBox(width: 8),
-              TextButton.icon(
-                onPressed: onReset,
-                icon: const Icon(Icons.restore_rounded, size: 15),
-                label: Text(l10n.t('settings_reset_folder')),
-                style: TextButton.styleFrom(
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onChange,
+                icon: const Icon(Icons.folder_open_rounded, size: 15),
+                label: Text(l10n.t('settings_change_folder')),
+                style: OutlinedButton.styleFrom(
                   visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
+              if (onReset != null)
+                TextButton.icon(
+                  onPressed: onReset,
+                  icon: const Icon(Icons.restore_rounded, size: 15),
+                  label: Text(l10n.t('settings_reset_folder')),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(fontSize: 12),
+                  ),
+                ),
             ],
-          ],
+          ),
         ),
       ],
     );

@@ -293,23 +293,44 @@ class FFmpegService {
     String profileLevelArg = '';
     String codecExtraArgs = '';
 
-    // Threads argument (explicit allocation for multi-core processors)
+    // Threads argument (calibrated for mobile ARM big.LITTLE processors to prevent thermal throttling)
     final totalCores = Platform.numberOfProcessors > 0
         ? Platform.numberOfProcessors
         : 8;
     final effectiveThreads = appSettings.cpuThreads > 0
         ? appSettings.cpuThreads
-        : totalCores;
+        : (totalCores > 4 ? totalCores - 2 : totalCores).clamp(1, 6);
     final threadsArg =
         '-threads $effectiveThreads -filter_threads $effectiveThreads';
 
+    // Mobile-calibrated encoder preset mapping
+    final String x264Preset;
+    final String x265Preset;
+    switch (appSettings.cpuPreset) {
+      case 'fast':
+        x264Preset = 'ultrafast -tune fastdecode';
+        x265Preset = 'ultrafast -tune fastdecode';
+        break;
+      case 'slow':
+        x264Preset = 'faster';
+        x265Preset = 'faster';
+        break;
+      case 'medium':
+      default:
+        x264Preset = 'veryfast';
+        x265Preset = 'superfast';
+        break;
+    }
+
     if (vCodec == 'libx264') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg = '-crf ${encodingOptions.crfValue}';
+        rateControlArg =
+            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
       } else {
-        rateControlArg = '-b:v ${targetBitrateKbps}k';
+        rateControlArg =
+            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
       }
-      presetArg = '-preset ${appSettings.cpuPreset}';
+      presetArg = '-preset $x264Preset';
       profileLevelArg = '-profile:v high -level:v 4.1';
     } else if (vCodec == 'libx265') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
@@ -317,7 +338,7 @@ class FFmpegService {
       } else {
         rateControlArg = '-b:v ${targetBitrateKbps}k';
       }
-      presetArg = '-preset ${appSettings.cpuPreset}';
+      presetArg = '-preset $x265Preset';
       profileLevelArg =
           ''; // libx265 does not accept -profile:v main directly as a CLI flag
 
@@ -326,12 +347,20 @@ class FFmpegService {
           encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
+      // no-open-gop=1 and repeat-headers=1 prevent frame drops and stuttering on Android hardware decoders
       codecExtraArgs =
-          '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}:pools=$effectiveThreads';
+          '$hvc1Tag-x265-params log-level=error:no-open-gop=1:repeat-headers=1:keyint=$gop:min-keyint=${(gop ~/ 2)}:vbv-maxrate=${targetBitrateKbps * 2}:vbv-bufsize=${targetBitrateKbps * 4}:pools=$effectiveThreads';
     }
 
-    // Audio options
+    // Audio options with fast stream-copy optimization when applicable
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
+    final srcAudio = sourceVideo.audioCodec?.toLowerCase() ?? '';
+    final isAacCompatible = encodingOptions.container == VideoContainer.mp4 ||
+        encodingOptions.container == VideoContainer.mov ||
+        encodingOptions.container == VideoContainer.mkv;
+    if (srcAudio == 'aac' && isAacCompatible && appSettings.audioBitrateKbps == 128) {
+      audioArgs = '-c:a copy';
+    }
     if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = '-an';
     }
@@ -353,15 +382,17 @@ class FFmpegService {
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
 
-    // Build video filter (-vf)
+    // Build video filter (-vf) with Smart Adaptive Scaler
     String vfArg = '';
 
     if (isOriginalResolution) {
       vfArg = '-vf "${fpsFilter}format=yuv420p"';
     } else {
-      // Upscale / Downscale
+      // Upscale / Downscale: bilinear for fast/medium, bicubic for slow
+      final scaleFlag =
+          appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
       vfArg =
-          '-vf "${fpsFilter}scale=$targetW:$targetH:flags=bicubic,format=yuv420p"';
+          '-vf "${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p"';
     }
 
     // Construct full command
@@ -374,6 +405,7 @@ class FFmpegService {
       profileLevelArg,
       rateControlArg,
       codecExtraArgs,
+      '-pix_fmt yuv420p',
       audioArgs,
       containerFlags,
       '-y "$outputPath"',

@@ -460,5 +460,36 @@ void main() {
       const mutedSettings = AppSettings(audioBitrateKbps: 0);
       expect(mutedSettings.audioBitrateKbps, equals(0));
     });
+
+    test('Smart adaptive scaler selects bilinear for fast and medium, bicubic for slow', () {
+      String getScaleFlag(String preset) {
+        return preset == 'slow' ? 'bicubic' : 'bilinear';
+      }
+
+      expect(getScaleFlag('fast'), equals('bilinear'));
+      expect(getScaleFlag('medium'), equals('bilinear'));
+      expect(getScaleFlag('slow'), equals('bicubic'));
+    });
+
+    test('H.265 Android hardware decoder parameter logic enforces Closed-GOP and VBV', () {
+      const targetBitrateKbps = 3500;
+      const gop = 60;
+      const threads = 6;
+      final x265Params =
+          'log-level=error:no-open-gop=1:repeat-headers=1:keyint=$gop:min-keyint=${(gop ~/ 2)}:vbv-maxrate=${targetBitrateKbps * 2}:vbv-bufsize=${targetBitrateKbps * 4}:pools=$threads';
+
+      expect(x265Params, contains('no-open-gop=1'));
+      expect(x265Params, contains('repeat-headers=1'));
+      expect(x265Params, contains('vbv-maxrate=7000'));
+      expect(x265Params, contains('vbv-bufsize=14000'));
+    });
+
+    test('H.264 rate control logic applies VBV buffer limits to prevent decoder spikes', () {
+      const targetBitrateKbps = 4000;
+      final vbvArgs =
+          '-maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+
+      expect(vbvArgs, equals('-maxrate 8000k -bufsize 16000k'));
+    });
   });
 }

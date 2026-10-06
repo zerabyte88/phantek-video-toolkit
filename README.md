@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.2.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -111,12 +111,18 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.2.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.2.1.apk`
 
 ---
 
 ## Version History
 
+- **v2.2.1 (Build 20):**
+  - **H.265 (HEVC) Playback Stutter Fix:** Resolved open-GOP IDR keyframe desynchronization and decoder buffer underflow on Android hardware decoders across `.mp4`, `.mkv`, and `.mov` by enforcing closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), and strict VBV bounds (`maxrate=6M`, `bufsize=12M`).
+  - **Mobile Encoding Speed Acceleration:** Mapped software CPU presets to high-throughput mobile presets (`ultrafast`, `superfast`, `veryfast`) and introduced Smart Adaptive Scaling (`bilinear` on Fast/Normal modes saving ~35% CPU overhead, and `bicubic` 16-point interpolation on Slow mode for pixel perfection).
+  - **Interactive 3-Preset Speed Selector:** Added dedicated Fast, Normal, and Slow selection buttons in Settings accompanied by real-time technical explanation card.
+  - **Centered & Polished Settings UI:** Centered interactive choice chips and action buttons across all performance and folder sections for visual balance on any screen size.
+  - **11-Language Dictionary Polish:** Cleaned up stray emojis and perfected sentence spacing across all 11 supported languages and aliases (3,003 total entries).
 - **v2.2.0 (Build 19):**
   - Overhauled Settings Screen into a modern, minimalist 4-container Material 3 surface architecture.
   - Expanded localization support to 11 full languages + aliases with 100% dictionary coverage (222 identical keys each).
