@@ -1915,20 +1915,30 @@ class _DualRingProgressPainter extends CustomPainter {
         endAngle: orbitSweep,
         colors: [
           color.withAlpha(0),
-          color.withAlpha(30),
+          color.withAlpha(0),
+          color.withAlpha(35),
           color.withAlpha(160),
           color,
         ],
-        stops: const [0.0, 0.25, 0.7, 1.0],
+        stops: const [0.0, 0.06, 0.35, 0.75, 1.0],
       );
 
       final orbitPaint = Paint()
         ..shader = orbitGradient.createShader(outerRect)
         ..strokeWidth = outerStrokeWidth
-        ..strokeCap = StrokeCap.round
+        ..strokeCap = StrokeCap.butt
         ..style = PaintingStyle.stroke;
 
       canvas.drawArc(outerRect, 0.0, orbitSweep, false, orbitPaint);
+
+      // Smooth rounded tip ONLY at the leading head (tail fades cleanly to 0 opacity with no artifact dot)
+      final headX = center.dx + outerRadius * math.cos(orbitSweep);
+      final headY = center.dy + outerRadius * math.sin(orbitSweep);
+      final headPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(headX, headY), outerStrokeWidth / 2, headPaint);
+
       canvas.restore();
     } else {
       // Completed or Error state full ring
