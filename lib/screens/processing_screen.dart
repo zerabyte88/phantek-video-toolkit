@@ -15,6 +15,7 @@ import '../services/device_spec_helper.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/foreground_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/theme_animated_background.dart';
 
 class ProcessingScreen extends StatefulWidget {
   final VideoInfo videoInfo;
@@ -640,24 +641,26 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               },
             ),
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  _buildProgressSection(theme, l10n),
-                  const SizedBox(height: 20),
-                  _buildLiveSystemTelemetry(theme, l10n),
-                  const SizedBox(height: 16),
-                  _buildTimeTelemetryCard(theme, l10n),
-                  const SizedBox(height: 16),
-                  _buildInfoSection(theme, l10n),
-                  const SizedBox(height: 28),
-                  if (!_isProcessing) _buildActionButtons(theme, l10n),
-                  if (_isProcessing) _buildCancelButton(theme, l10n),
-                  const SizedBox(height: 16),
-                ],
+          body: ThemeAnimatedBackground(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    _buildProgressSection(theme, l10n),
+                    const SizedBox(height: 20),
+                    _buildLiveSystemTelemetry(theme, l10n),
+                    const SizedBox(height: 16),
+                    _buildTimeTelemetryCard(theme, l10n),
+                    const SizedBox(height: 16),
+                    _buildInfoSection(theme, l10n),
+                    const SizedBox(height: 28),
+                    if (!_isProcessing) _buildActionButtons(theme, l10n),
+                    if (_isProcessing) _buildCancelButton(theme, l10n),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ),

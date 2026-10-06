@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_downscaler/models/app_settings.dart';
 import 'package:video_downscaler/models/encoding_options.dart';
@@ -8,6 +9,7 @@ import 'package:video_downscaler/services/cache_manager_service.dart';
 import 'package:video_downscaler/services/device_spec_helper.dart';
 import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
+import 'package:video_downscaler/theme/app_theme.dart';
 
 void main() {
   group('Localization tests', () {
@@ -961,6 +963,38 @@ void main() {
       expect((info['gpu'] as String).isNotEmpty, isTrue);
       expect((info['ram'] as String).isNotEmpty, isTrue);
       expect((info['storage'] as String).isNotEmpty, isTrue);
+    });
+  });
+
+  group('Theme System and AMOLED Sakura Easter Egg tests', () {
+    test('AppTheme returns valid ThemeData for all modes including sakura', () {
+      final dark = AppTheme.getTheme('dark');
+      final oled = AppTheme.getTheme('oled');
+      final light = AppTheme.getTheme('light');
+      final sakura = AppTheme.getTheme('sakura');
+      final oledSakura = AppTheme.getTheme('oled_sakura');
+
+      expect(dark.brightness, equals(Brightness.dark));
+      expect(oled.brightness, equals(Brightness.dark));
+      expect(oled.scaffoldBackgroundColor, equals(Colors.black));
+      expect(light.brightness, equals(Brightness.light));
+
+      expect(sakura.brightness, equals(Brightness.dark));
+      expect(sakura.scaffoldBackgroundColor, equals(Colors.black));
+      expect(sakura.colorScheme.primary, equals(const Color(0xFFF472B6)));
+      expect(oledSakura.colorScheme.primary, equals(const Color(0xFFF472B6)));
+    });
+
+    test('Sakura theme and easter egg strings exist across all 6 languages', () {
+      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('theme_sakura').isNotEmpty, isTrue);
+        expect(l10n.t('theme_sakura_desc').isNotEmpty, isTrue);
+        expect(l10n.t('easter_egg_sakura_unlocked').isNotEmpty, isTrue);
+        expect(l10n.t('theme_sakura'), isNot(equals('theme_sakura')));
+        expect(l10n.t('easter_egg_sakura_unlocked'), isNot(equals('easter_egg_sakura_unlocked')));
+      }
     });
   });
 }

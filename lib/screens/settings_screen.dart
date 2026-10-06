@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_settings.dart';
 import '../services/cache_manager_service.dart';
 import '../services/device_spec_helper.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/theme_animated_background.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -22,8 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v1.2.1';
-  String _buildNumber = '17';
+  String _appVersion = 'v1.3.1';
+  String _buildNumber = '18';
 
   @override
   void initState() {
@@ -41,34 +41,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '17';
+              : '18';
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v1.2.1';
-          _buildNumber = '17';
+          _appVersion = 'v1.3.1';
+          _buildNumber = '18';
         });
       }
-    }
-  }
-
-  Future<void> _launchUrl(String urlString) async {
-    final uri = Uri.parse(urlString);
-    try {
-      final launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-      if (!launched) {
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
-      }
-    } catch (e) {
-      debugPrint('Could not launch $urlString: $e');
-      try {
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
-      } catch (_) {}
     }
   }
 
@@ -102,10 +84,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.t('settings_title'))),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          children: [
+      body: ThemeAnimatedBackground(
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            children: [
             // 1. Language Section
             _buildSectionHeader(
               icon: Icons.language_rounded,
@@ -238,6 +221,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       current: settings.themeMode,
                       theme: theme,
                       badge: 'AMOLED',
+                    ),
+                    const SizedBox(height: 6),
+                    _buildThemeTile(
+                      icon: Icons.local_florist_outlined,
+                      title: l10n.t('theme_sakura'),
+                      subtitle: l10n.t('theme_sakura_desc'),
+                      value: 'sakura',
+                      current: settings.themeMode,
+                      theme: theme,
+                      badge: '🌸 AMOLED',
                     ),
                     const SizedBox(height: 6),
                     _buildThemeTile(
@@ -1457,113 +1450,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Developer Tile (Offline avatar)
-                    InkWell(
-                      onTap: () => _launchUrl('https://github.com/zerabyte88'),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF06B6D4),
-                                  width: 2.0,
+                    // Developer Tile (Offline avatar) - No web navigation
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xFF06B6D4),
+                                width: 2.0,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF06B6D4)
+                                      .withAlpha(70),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF06B6D4)
-                                        .withAlpha(70),
-                                    blurRadius: 6,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/icon/developer_avatar.png',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.person_rounded,
+                                      color: Color(0xFF06B6D4),
+                                      size: 24,
+                                    ),
                               ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/icon/developer_avatar.png',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(
-                                        Icons.person_rounded,
-                                        color: Color(0xFF06B6D4),
-                                        size: 24,
-                                      ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Developer: zerabyte88',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Developer: zerabyte88',
-                                    style: TextStyle(
-                                      fontSize: 13.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: theme.colorScheme.onSurface,
-                                    ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.t('developer_role'),
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.colorScheme.onSurface
+                                        .withAlpha(130),
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    l10n.t('developer_role'),
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.colorScheme.onSurface
-                                          .withAlpha(130),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const Icon(
-                              Icons.open_in_new_rounded,
-                              size: 18,
-                              color: Color(0xFF06B6D4),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // View Repository on GitHub Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _launchUrl(
-                          'https://github.com/zerabyte88/phantek-video-toolkit',
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(
-                            color: theme.colorScheme.outline.withAlpha(70),
-                            width: 1.0,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.open_in_new_rounded,
-                          size: 16,
-                          color: Color(0xFF06B6D4),
-                        ),
-                        label: Text(
-                          l10n.t('view_github_repo'),
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF06B6D4),
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
@@ -1575,7 +1524,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildAboutDetailRow(ThemeData theme, String label, String value) {

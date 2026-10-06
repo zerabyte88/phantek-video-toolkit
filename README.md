@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.2.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -59,8 +59,14 @@
 - **Non-Destructive File Naming:** Automatically detects filename collisions and appends incremental identifiers (`-2`, `-3`) to avoid overwriting existing media.
 - **Automated Cache Purge:** Cleans up temporary file picker caches to ensure storage space remains clutter-free.
 
-### 6. User Interface & Multi-Language Localization
-- **Theme Modes:** Slate Dark, Dark OLED (Pitch Black for AMOLED power efficiency), and Clean Light mode.
+### 6. Dynamic Visual Engine & Multi-Language Localization
+- **Continuous Looping Background Animations:** Battery-friendly, mathematically seamless animated canvas tailored to each active theme:
+  - **Slate Dark:** Tech cyber dust & ambient glowing energy.
+  - **Dark OLED:** Twinkling minimalist stardust on true pitch black (`#000000`) for 0-watt AMOLED pixel power savings.
+  - **Clean Light:** Soft airy ambient sunlight bokeh drifting upward.
+  - **AMOLED Sakura:** Fluttering and rotating cherry blossom petals drifting with gentle wind sway over pitch black.
+- **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Electric Cyan Bolt*, *Amber Fire*, *Azure Sun*, or *Sakura Blossom*).
+- **Easter Egg Theme (AMOLED Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively.
 - **Full 6-Language Parity:**
   - 🇮🇩 Indonesian (Bahasa Indonesia)
   - 🇺🇸 English
@@ -95,12 +101,17 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v1.2.1.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v1.3.1.apk`
 
 ---
 
 ## Version History
 
+- **v1.3.1 (Build 18):**
+  - Added continuous, seamlessly looping dynamic animated canvas backgrounds for Dark, OLED, Light, and AMOLED Sakura themes.
+  - Added Easter Egg theme **AMOLED Sakura** (activated by tapping "Phantek" on header 10 times).
+  - Added theme-adaptive glowing borders and iconography to header title (Electric Cyan Bolt, Amber Fire, Azure Sun, Sakura Blossom).
+  - Cleaned up developer card interactions and removed external repository button.
 - **v1.2.1 (Build 17):**
   - Deprecated and removed VP9 codec and WebM container to resolve mobile encoding stability issues.
   - Standardized video pipelines to pure H.264 & H.265 (MP4, MKV, MOV) and audio to AAC, MP3, WAV.
