@@ -644,7 +644,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           body: ThemeAnimatedBackground(
             child: SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Column(
                   children: [
                     const SizedBox(height: 10),

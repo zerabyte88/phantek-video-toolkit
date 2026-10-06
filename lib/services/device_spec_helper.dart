@@ -585,7 +585,10 @@ class DeviceSpecHelper {
         h.contains('sdm') ||
         h.contains('msm') ||
         h.contains('qcom')) {
-      if (has('8 elite') || has('sm8850') || has('sm8750') || b.contains('sun')) {
+      if (has('8 elite') ||
+          has('sm8850') ||
+          has('sm8750') ||
+          b.contains('sun')) {
         return 'Adreno 830';
       }
       if (has('8s gen 3') || has('sm8635') || b.contains('volcano')) {

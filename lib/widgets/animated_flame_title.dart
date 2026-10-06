@@ -19,43 +19,43 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  // 1. OLED AMOLED Plasma Flame
-  static const _oledColors = [
-    Color(0xFFFF1E00), // Deep Crimson Red
-    Color(0xFFFF6A00), // Hot Blaze Orange
-    Color(0xFFFFD000), // Fiery Gold
-    Color(0xFFFF3B30), // Electric Coral
-    Color(0xFFFF9500), // Bright Amber
-    Color(0xFFFF1E00), // Back to Crimson
-  ];
-
-  // 2. Dark Slate Electric Cyber Cyan/Blue
+  // 1. Dark Mode: Aurora Borealis & Falling Snow
   static const _darkColors = [
-    Color(0xFF00E5FF), // Electric Cyan
-    Color(0xFF00B0FF), // Sky Light Blue
-    Color(0xFF2979FF), // Vivid Royal Blue
-    Color(0xFF38BDF8), // Light Cyan
-    Color(0xFF60A5FA), // Soft Blue
-    Color(0xFF00E5FF), // Back to Cyan
+    Color(0xFF10B981), // Emerald Aurora Green
+    Color(0xFF06B6D4), // Vivid Arctic Teal
+    Color(0xFF00E5FF), // Electric Arctic Cyan
+    Color(0xFF8B5CF6), // Cosmic Aurora Violet
+    Color(0xFF059669), // Deep Polar Emerald
+    Color(0xFF10B981), // Back to Emerald Aurora
   ];
 
-  // 3. Light Mode Azure Breeze
+  // 2. Dark OLED: Glowing Moon, Twinkling Stars & Shooting Meteors
+  static const _oledColors = [
+    Color(0xFFE2E8F0), // Lunar Silver
+    Color(0xFF818CF8), // Cosmic Starlight Violet
+    Color(0xFF6366F1), // Deep Night Indigo
+    Color(0xFFFDE68A), // Pale Moonlight Gold
+    Color(0xFF38BDF8), // Electric Starlight Blue
+    Color(0xFFE2E8F0), // Back to Lunar Silver
+  ];
+
+  // 3. Light Mode: Warm Sunbeams & Daylight Sky
   static const _lightColors = [
-    Color(0xFF2563EB), // Cobalt Blue
-    Color(0xFF0284C7), // Sky Blue
-    Color(0xFF38BDF8), // Light Cyan
-    Color(0xFF6366F1), // Indigo
-    Color(0xFF0EA5E9), // Ocean Blue
-    Color(0xFF2563EB), // Back to Cobalt
+    Color(0xFFF59E0B), // Warm Sun Amber
+    Color(0xFFFBBF24), // Bright Daylight Gold
+    Color(0xFF0284C7), // Sky Azure
+    Color(0xFF38BDF8), // Light Cyan Breeze
+    Color(0xFFEA580C), // Radiant Sunburst Orange
+    Color(0xFFF59E0B), // Back to Warm Sun Amber
   ];
 
-  // 4. AMOLED Sakura Cherry Blossom
+  // 4. AMOLED Sakura: Cherry Blossom & Blooming Branches
   static const _sakuraColors = [
     Color(0xFFFF69B4), // Hot Pink
-    Color(0xFFFFB7C5), // Cherry Blossom
+    Color(0xFFFFB7C5), // Cherry Blossom Pink
     Color(0xFFF472B6), // Pink 400
     Color(0xFFFDA4AF), // Rose 300
-    Color(0xFFFF1493), // Deep Pink
+    Color(0xFFFF1493), // Deep Cherry Pink
     Color(0xFFFF69B4), // Back to Hot Pink
   ];
 
@@ -102,10 +102,10 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
             break;
           case 'oled':
             activeColors = _oledColors;
-            activeIcon = Icons.local_fire_department_rounded;
+            activeIcon = Icons.nightlight_round;
             iconColor = Color.lerp(
-              const Color(0xFFFF3D00),
-              const Color(0xFFFFC107),
+              const Color(0xFFFDE68A),
+              const Color(0xFFE2E8F0),
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
@@ -113,7 +113,7 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
             activeColors = _lightColors;
             activeIcon = Icons.wb_sunny_rounded;
             iconColor = Color.lerp(
-              const Color(0xFF2563EB),
+              const Color(0xFFF59E0B),
               const Color(0xFF0284C7),
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
@@ -121,10 +121,10 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
           case 'dark':
           default:
             activeColors = _darkColors;
-            activeIcon = Icons.bolt_rounded;
+            activeIcon = Icons.ac_unit_rounded;
             iconColor = Color.lerp(
+              const Color(0xFF10B981),
               const Color(0xFF00E5FF),
-              const Color(0xFF2979FF),
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
@@ -146,11 +146,7 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    activeIcon,
-                    size: 16,
-                    color: iconColor,
-                  ),
+                  Icon(activeIcon, size: 16, color: iconColor),
                   const SizedBox(width: 6),
                   Text(
                     widget.title,

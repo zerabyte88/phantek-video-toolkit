@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.4.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -51,29 +51,39 @@
 - **Screen-Off Execution (CPU Wakelock):** Employs CPU wakelocks to keep transcoding active when the device display turns off.
 - **Notification Tray Updates:** Real-time conversion progress is directly visible from the system notification shade.
 
-### 5. Hardware Management & Device Specifications
+### 5. Modern Minimalist Settings & Hardware Management
+- **4-Container Surface Architecture:** Clean, comfortable Material 3 cards grouping Appearance & Language, Performance & Hardware, Storage & Cache, and Device Specs & About.
+- **Interactive Language Selector:** Displays national flags and opens a sleek rounded modal bottom sheet.
+- **2x2 Grid Theme Selector:** Visual cards with contextual color accents and status badges.
 - **Comprehensive Hardware Recognition:** Automatically inspects and displays Device Name, Model Code, Processor / SoC (Qualcomm Snapdragon, MediaTek Dimensity/Helio, Samsung Exynos, Google Tensor, Unisoc), Graphics Processor (GPU Adreno, Mali, Xclipse), Physical RAM, and Available Storage.
 - **CPU Thread Allocation:** Customize encoding thread count or choose automatic multi-core allocation.
 - **RAM Buffer Boundaries:** Configurable memory cache buffer limits (256 MB to 4096 MB) with automatic Out-Of-Memory (OOM) protection disabling the 4GB option on devices with $\le 4\text{ GB}$ physical RAM.
-- **Custom Output Folder:** Freely choose output save locations for videos (defaults to `/Movies`) and audio (defaults to `/Music`).
+- **Dedicated Video & Audio Output Directories:** Custom folder pickers with one-tap reset defaults.
+- **Developer Card:** Offline circular avatar with cyan glow, developer name, role, and direct `[GitHub ↗]` button.
 - **Non-Destructive File Naming:** Automatically detects filename collisions and appends incremental identifiers (`-2`, `-3`) to avoid overwriting existing media.
-- **Automated Cache Purge:** Cleans up temporary file picker caches to ensure storage space remains clutter-free.
+- **Automated Cache Purge:** Cleans up temporary file picker caches with live size feedback to keep device storage clean.
 
-### 6. Dynamic Visual Engine & Multi-Language Localization
+### 6. Dynamic Visual Engine & 11-Language Localization
 - **Continuous Looping Background Animations:** Battery-friendly, mathematically seamless animated canvas tailored to each active theme:
-  - **Slate Dark:** Tech cyber dust & ambient glowing energy.
-  - **Dark OLED:** Twinkling minimalist stardust on true pitch black (`#000000`) for 0-watt AMOLED pixel power savings.
-  - **Clean Light:** Soft airy ambient sunlight bokeh drifting upward.
-  - **AMOLED Sakura:** Fluttering and rotating cherry blossom petals drifting with gentle wind sway over pitch black.
-- **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Electric Cyan Bolt*, *Amber Fire*, *Azure Sun*, or *Sakura Blossom*).
+  - **Dark Aurora:** Vivid arctic aurora borealis curtains and gentle falling snowflakes ❄️.
+  - **OLED Cosmic Moon:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency.
+  - **Clean Daylight:** Warm morning sunbeams and fresh airy breeze ☀️.
+  - **AMOLED Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸.
+- **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Emerald Arctic Snowflake*, *Moonlight Starlight*, *Sunburst Gold*, or *Sakura Blossom*).
 - **Easter Egg Theme (AMOLED Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively.
-- **Full 6-Language Parity:**
+- **100% Dictionary Coverage across 11 Languages (222 Keys Each):**
   - 🇮🇩 Indonesian (Bahasa Indonesia)
   - 🇺🇸 English
-  - 🇯🇵 Japanese (日本語)
   - 🇨🇳 Simplified Chinese (简体中文)
   - 🇹🇼 Traditional Chinese (繁體中文)
+  - 🇪🇸 Spanish (Español)
+  - 🇵🇹 Portuguese (Português)
+  - 🇯🇵 Japanese (日本語)
   - 🇰🇷 Korean (한국어)
+  - 🇮🇳 Hindi (हिन्दी)
+  - 🇸🇦 Arabic (العربية)
+  - 🇫🇷 French (Français)
+  - 🇷🇺 Russian (Русский)
 
 ---
 
@@ -101,13 +111,20 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v1.3.1.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v1.4.0.apk`
 
 ---
 
 ## Version History
 
-- **v1.3.1 (Build 18):**
+- **v1.4.0 (Build 19):**
+  - Overhauled Settings Screen into a modern, minimalist 4-container Material 3 surface architecture.
+  - Expanded localization support to 11 full languages + aliases with 100% dictionary coverage (222 identical keys each).
+  - Completely eliminated all remaining hardcoded text across the entire application.
+  - Enhanced continuous particle and celestial background animations across all themes (Aurora, Moon & Meteors, Sakura Branches & Petals, Sunbeams).
+  - Added offline circular developer profile card with direct GitHub link.
+  - Performed whole-repo dead code removal, type-safety refactoring, and code formatting adhering strictly to Dart lint standards.
+- **v1.3.0 (Build 18):**
   - Added continuous, seamlessly looping dynamic animated canvas backgrounds for Dark, OLED, Light, and AMOLED Sakura themes.
   - Added Easter Egg theme **AMOLED Sakura** (activated by tapping "Phantek" on header 10 times).
   - Added theme-adaptive glowing borders and iconography to header title (Electric Cyan Bolt, Amber Fire, Azure Sun, Sakura Blossom).

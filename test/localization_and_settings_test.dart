@@ -9,13 +9,28 @@ import 'package:video_downscaler/services/cache_manager_service.dart';
 import 'package:video_downscaler/services/device_spec_helper.dart';
 import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
+import 'package:video_downscaler/screens/settings_screen.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
+
+const supportedCodes = [
+  'id',
+  'en',
+  'zh',
+  'es',
+  'pt',
+  'ja',
+  'ko',
+  'hi',
+  'ar',
+  'fr',
+  'ru',
+  'zh_CN',
+  'zh_TW',
+];
 
 void main() {
   group('Localization tests', () {
-    const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
-
-    test('All 6 requested languages are available in supportedLanguages', () {
+    test('All 11 requested languages and aliases are available in supportedLanguages', () {
       final codes = AppLocalizations.supportedLanguages
           .map((l) => l['code'])
           .toList();
@@ -75,7 +90,7 @@ void main() {
       }
     });
 
-    test('Device specifications keys resolve properly and accurately in all 6 languages', () {
+    test('Device specifications keys resolve properly and accurately in all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
         expect(l10n.t('device_name').isNotEmpty, isTrue);
@@ -117,7 +132,7 @@ void main() {
       expect(l10nJa.t('device_storage'), equals('ストレージ'));
     });
 
-    test('100% of all l10n.t keys used across lib are translated in all 6 supported languages', () {
+    test('100% of all l10n.t keys used across lib are translated in all supported languages', () {
       final allCalls = <String>{};
       final libDir = Directory('lib');
       final dartFiles = libDir
@@ -212,7 +227,7 @@ void main() {
     });
 
     test('New theme, wakelock, and cache storage translations exist', () {
-      for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
+      for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
         expect(l10n.t('settings_theme').isNotEmpty, isTrue);
         expect(l10n.t('theme_oled').isNotEmpty, isTrue);
@@ -499,8 +514,7 @@ void main() {
       );
     });
 
-    test('Navigation and options reset localization keys resolve correctly in all 6 languages', () {
-      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
+    test('Navigation and options reset localization keys resolve correctly in all supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
         expect(l10n.t('back_to_home').isNotEmpty, isTrue);
@@ -515,35 +529,31 @@ void main() {
       }
     });
 
-    test(
-      'Audio Extractor localization keys resolve properly in all 6 languages',
-      () {
-        const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
-        for (final code in supportedCodes) {
-          final l10n = AppLocalizations(code);
-          expect(l10n.t('category_video').isNotEmpty, isTrue);
-          expect(l10n.t('category_audio').isNotEmpty, isTrue);
-          expect(l10n.t('category_video'), isNot(equals('category_video')));
-          expect(l10n.t('category_audio'), isNot(equals('category_audio')));
-          expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
-          expect(l10n.t('audio_options').isNotEmpty, isTrue);
-          expect(l10n.t('audio_format').isNotEmpty, isTrue);
-          expect(l10n.t('audio_bitrate').isNotEmpty, isTrue);
-          expect(l10n.t('audio_copy').isNotEmpty, isTrue);
-          expect(l10n.t('start_audio_extraction').isNotEmpty, isTrue);
-          expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
-          expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
-          expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
-          expect(l10n.t('desc_audio_mp3').isNotEmpty, isTrue);
-          expect(l10n.t('desc_audio_m4a').isNotEmpty, isTrue);
-          expect(l10n.t('desc_audio_wav').isNotEmpty, isTrue);
-          expect(l10n.t('desc_audio_mp3'), isNot(equals('desc_audio_mp3')));
-          expect(l10n.t('desc_audio_m4a'), isNot(equals('desc_audio_m4a')));
-          expect(l10n.t('desc_audio_wav'), isNot(equals('desc_audio_wav')));
-          expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
-        }
-      },
-    );
+    test('Audio Extractor localization keys resolve properly in all supported languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('category_video').isNotEmpty, isTrue);
+        expect(l10n.t('category_audio').isNotEmpty, isTrue);
+        expect(l10n.t('category_video'), isNot(equals('category_video')));
+        expect(l10n.t('category_audio'), isNot(equals('category_audio')));
+        expect(l10n.t('mode_extractor').isNotEmpty, isTrue);
+        expect(l10n.t('audio_options').isNotEmpty, isTrue);
+        expect(l10n.t('audio_format').isNotEmpty, isTrue);
+        expect(l10n.t('audio_bitrate').isNotEmpty, isTrue);
+        expect(l10n.t('audio_copy').isNotEmpty, isTrue);
+        expect(l10n.t('start_audio_extraction').isNotEmpty, isTrue);
+        expect(l10n.t('proc_extracting').isNotEmpty, isTrue);
+        expect(l10n.t('proc_audio_completed').isNotEmpty, isTrue);
+        expect(l10n.t('proc_play_audio').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_mp3').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_m4a').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_wav').isNotEmpty, isTrue);
+        expect(l10n.t('desc_audio_mp3'), isNot(equals('desc_audio_mp3')));
+        expect(l10n.t('desc_audio_m4a'), isNot(equals('desc_audio_m4a')));
+        expect(l10n.t('desc_audio_wav'), isNot(equals('desc_audio_wav')));
+        expect(l10n.t('mode_extractor'), isNot(equals('mode_extractor')));
+      }
+    });
   });
 
   group('Audio Extractor and Format tests', () {
@@ -625,17 +635,14 @@ void main() {
       expect(withoutAudio.audioCodec, isNull);
     });
 
-    test(
-      'no_audio_track localization resolves properly across all 6 languages',
-      () {
-        for (final code in ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko']) {
-          final l10n = AppLocalizations(code);
-          final translated = l10n.t('no_audio_track');
-          expect(translated.isNotEmpty, isTrue);
-          expect(translated, isNot(equals('no_audio_track')));
-        }
-      },
-    );
+    test('no_audio_track localization resolves properly across all supported languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        final translated = l10n.t('no_audio_track');
+        expect(translated.isNotEmpty, isTrue);
+        expect(translated, isNot(equals('no_audio_track')));
+      }
+    });
 
     test(
       'FFmpegService getOutputDirectory respects custom path and isAudio flag',
@@ -985,16 +992,54 @@ void main() {
       expect(oledSakura.colorScheme.primary, equals(const Color(0xFFF472B6)));
     });
 
-    test('Sakura theme and easter egg strings exist across all 6 languages', () {
-      const supportedCodes = ['id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'];
-      for (final code in supportedCodes) {
-        final l10n = AppLocalizations(code);
-        expect(l10n.t('theme_sakura').isNotEmpty, isTrue);
-        expect(l10n.t('theme_sakura_desc').isNotEmpty, isTrue);
-        expect(l10n.t('easter_egg_sakura_unlocked').isNotEmpty, isTrue);
-        expect(l10n.t('theme_sakura'), isNot(equals('theme_sakura')));
-        expect(l10n.t('easter_egg_sakura_unlocked'), isNot(equals('easter_egg_sakura_unlocked')));
-      }
-    });
+    test(
+      'All theme description strings exist across all supported languages',
+      () {
+        for (final code in supportedCodes) {
+          final l10n = AppLocalizations(code);
+          expect(l10n.t('theme_dark').isNotEmpty, isTrue);
+          expect(l10n.t('theme_dark_desc').isNotEmpty, isTrue);
+          expect(l10n.t('theme_dark_desc'), isNot(equals('theme_dark_desc')));
+
+          expect(l10n.t('theme_oled').isNotEmpty, isTrue);
+          expect(l10n.t('theme_oled_desc').isNotEmpty, isTrue);
+          expect(l10n.t('theme_oled_desc'), isNot(equals('theme_oled_desc')));
+
+          expect(l10n.t('theme_light').isNotEmpty, isTrue);
+          expect(l10n.t('theme_light_desc').isNotEmpty, isTrue);
+          expect(l10n.t('theme_light_desc'), isNot(equals('theme_light_desc')));
+
+          expect(l10n.t('theme_sakura').isNotEmpty, isTrue);
+          expect(l10n.t('theme_sakura_desc').isNotEmpty, isTrue);
+          expect(
+            l10n.t('theme_sakura_desc'),
+            isNot(equals('theme_sakura_desc')),
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'SettingsScreen displays developer profile button with open icon',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('dark'),
+            home: const SettingsScreen(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.text('Developer: zerabyte88'), findsOneWidget);
+        expect(find.text('GitHub'), findsOneWidget);
+        expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
+      },
+    );
   });
 }
