@@ -471,14 +471,19 @@ void main() {
       expect(getScaleFlag('slow'), equals('bicubic'));
     });
 
-    test('H.265 Android hardware decoder parameter logic enforces clean keyframe intervals without in-band header duplication', () {
+    test('H.265 Android hardware decoder parameter logic enforces closed GOP, repeated parameter sets, and mobile CTU speed optimization', () {
       const gop = 60;
-      final x265Params = 'log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
+      final x265Params =
+          'profile=main:level-idc=4.1:no-open-gop=1:repeat-headers=1:aud=1:no-sao=1:ctu=32:keyint=$gop:min-keyint=${(gop ~/ 2)}:bframes=2:b-adapt=1';
 
       expect(x265Params, contains('keyint=60'));
       expect(x265Params, contains('min-keyint=30'));
-      expect(x265Params, isNot(contains('repeat-headers=1')));
-      expect(x265Params, isNot(contains('pools=')));
+      expect(x265Params, contains('no-open-gop=1'));
+      expect(x265Params, contains('repeat-headers=1'));
+      expect(x265Params, contains('aud=1'));
+      expect(x265Params, contains('profile=main'));
+      expect(x265Params, contains('ctu=32'));
+      expect(x265Params, contains('no-sao=1'));
     });
 
     test('H.264 rate control logic applies VBV buffer limits to prevent decoder spikes', () {

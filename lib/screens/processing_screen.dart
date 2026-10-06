@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -87,8 +88,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         : _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
     // Force wakelock ON so the screen & CPU stay active during encoding,
     // regardless of the user's global "Keep Screen Awake" setting.
     WakelockPlus.enable();
@@ -686,18 +687,20 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              SizedBox(
-                width: 180,
-                height: 180,
-                child: CircularProgressIndicator(
-                  value: _isProcessing
-                      ? (_progress > 0 ? _progress : null)
-                      : (_isSuccess ? 1.0 : 0.0),
-                  strokeWidth: 8,
-                  strokeCap: StrokeCap.round,
-                  color: progressColor,
-                  backgroundColor: theme.colorScheme.outline.withAlpha(40),
-                ),
+              AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    size: const Size(180, 180),
+                    painter: _BufferingRingPainter(
+                      animationValue: _pulseController.value,
+                      isProcessing: _isProcessing,
+                      isSuccess: _isSuccess,
+                      color: progressColor,
+                      trackColor: theme.colorScheme.outline.withAlpha(35),
+                    ),
+                  );
+                },
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1854,4 +1857,104 @@ class _WindowsGraphPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _WindowsGraphPainter oldDelegate) => true;
+}
+
+class _BufferingRingPainter extends CustomPainter {
+  final double animationValue;
+  final bool isProcessing;
+  final bool isSuccess;
+  final Color color;
+  final Color trackColor;
+
+  _BufferingRingPainter({
+    required this.animationValue,
+    required this.isProcessing,
+    required this.isSuccess,
+    required this.color,
+    required this.trackColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    const strokeWidth = 8.0;
+    final radius = (size.width - strokeWidth) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // 1. Base track circle
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, radius, trackPaint);
+
+    if (isProcessing) {
+      // 2. Continuous rotating buffering arc with sweep gradient
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(animationValue * 2 * math.pi);
+      canvas.translate(-center.dx, -center.dy);
+
+      const sweepAngle = math.pi * 1.35;
+      final sweepGradient = SweepGradient(
+        startAngle: 0.0,
+        endAngle: sweepAngle,
+        colors: [
+          color.withAlpha(0),
+          color.withAlpha(35),
+          color.withAlpha(150),
+          color,
+        ],
+        stops: const [0.0, 0.25, 0.7, 1.0],
+      );
+
+      final arcPaint = Paint()
+        ..shader = sweepGradient.createShader(rect)
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke;
+
+      canvas.drawArc(rect, 0.0, sweepAngle, false, arcPaint);
+
+      // 3. Glowing leading head dot at the tip of the buffering stream
+      const headAngle = sweepAngle;
+      final headOffset = Offset(
+        center.dx + radius * math.cos(headAngle),
+        center.dy + radius * math.sin(headAngle),
+      );
+
+      // Outer glow
+      final glowPaint = Paint()
+        ..color = color.withAlpha(120)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.5);
+      canvas.drawCircle(headOffset, strokeWidth / 2 + 1.2, glowPaint);
+
+      // Inner white core
+      final corePaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(headOffset, strokeWidth / 3.2, corePaint);
+
+      canvas.restore();
+    } else {
+      // Static completed (green) or error (red) full ring
+      final resultPaint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke;
+      canvas.drawArc(rect, -math.pi / 2, 2 * math.pi, false, resultPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BufferingRingPainter oldDelegate) {
+    return oldDelegate.animationValue != animationValue ||
+        oldDelegate.isProcessing != isProcessing ||
+        oldDelegate.isSuccess != isSuccess ||
+        oldDelegate.color != color ||
+        oldDelegate.trackColor != trackColor;
+  }
 }
