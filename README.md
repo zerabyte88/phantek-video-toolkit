@@ -7,7 +7,7 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -111,12 +111,15 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.3.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.3.1.apk`
 
 ---
 
 ## Version History
 
+- **v2.3.1 (Build 22):**
+  - **Continuous Looping Buffering Ring Animation:** Transformed the conversion circular progress bar into a smooth, dynamic continuous looping buffering ring with sweep gradient and glowing head dot during processing, providing seamless real-time visual feedback.
+  - **H.265 (HEVC) Decoder Parameter Hardening:** Enforced strict closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), access unit delimiters (`aud=1`), explicit stream mapping (`-map 0:v:0 -map 0:a:0?`), and CTU 32 mobile optimization to resolve video stutter and black screen issues across MP4, MKV, and MOV.
 - **v2.3.0 (Build 21):**
   - **Dynamic Custom Target FPS & Interactive Slider:** Added custom FPS option with dynamic slider clamping bounded strictly to source video frame rate (e.g. 30 FPS video caps slider at 30 FPS, 60 FPS video caps at 60 FPS).
   - **FPS Technical Guidance Card:** Added comprehensive technical explanation card breaking down the exact purpose and behavior of each FPS setting (Original, 60 FPS, 30 FPS, 24 FPS, Custom) with zero emojis.

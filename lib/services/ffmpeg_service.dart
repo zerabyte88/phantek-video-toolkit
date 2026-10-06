@@ -334,21 +334,29 @@ class FFmpegService {
       profileLevelArg = '-profile:v high -level:v 4.1';
     } else if (vCodec == 'libx265') {
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArg = '-crf ${encodingOptions.crfValue}';
+        rateControlArg =
+            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
       } else {
-        rateControlArg = '-b:v ${targetBitrateKbps}k';
+        rateControlArg =
+            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
       }
       presetArg = '-preset $x265Preset';
-      profileLevelArg =
-          ''; // libx265 does not accept -profile:v main directly as a CLI flag
+      profileLevelArg = '';
 
       String hvc1Tag = '';
       if (encodingOptions.container == VideoContainer.mp4 ||
           encodingOptions.container == VideoContainer.mov) {
         hvc1Tag = '-tag:v hvc1 ';
       }
+
+      final bframeSettings = appSettings.cpuPreset == 'fast'
+          ? 'bframes=0:b-adapt=0'
+          : (appSettings.cpuPreset == 'slow'
+              ? 'bframes=3:b-adapt=2'
+              : 'bframes=2:b-adapt=1');
+
       codecExtraArgs =
-          '$hvc1Tag-x265-params log-level=error:keyint=$gop:min-keyint=${(gop ~/ 2)}';
+          '$hvc1Tag-x265-params profile=main:level-idc=4.1:no-open-gop=1:repeat-headers=1:aud=1:no-sao=1:ctu=32:keyint=$gop:min-keyint=${(gop ~/ 2)}:$bframeSettings';
     }
 
     // Audio options: encode to clean compliant AAC for MP4, MKV, and MOV
@@ -391,6 +399,8 @@ class FFmpegService {
     // Construct full command
     final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
+      '-map 0:v:0',
+      '-map 0:a:0?',
       threadsArg,
       vfArg,
       '-c:v $vCodec',
