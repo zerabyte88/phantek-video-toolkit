@@ -9,6 +9,7 @@ import '../services/settings_service.dart';
 import '../widgets/animated_flame_title.dart';
 import '../widgets/audio_extractor_card.dart';
 import '../widgets/conversion_options_card.dart';
+import '../widgets/theme_animated_background.dart';
 import '../widgets/video_info_card.dart';
 import 'processing_screen.dart';
 import 'settings_screen.dart';
@@ -25,6 +26,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
+
+  // Easter Egg State
+  int _easterEggTapCount = 0;
+  DateTime? _lastEasterEggTapTime;
 
   // State
   _AppMode _selectedMode = _AppMode.convert;
@@ -242,6 +247,58 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // ─── Easter Egg ─────────────────────────────────────────────────────────
+
+  void _onHeaderTitleTap() async {
+    final now = DateTime.now();
+    if (_lastEasterEggTapTime == null ||
+        now.difference(_lastEasterEggTapTime!) > const Duration(seconds: 2)) {
+      _easterEggTapCount = 1;
+    } else {
+      _easterEggTapCount++;
+    }
+    _lastEasterEggTapTime = now;
+
+    if (_easterEggTapCount >= 10) {
+      _easterEggTapCount = 0;
+      await _settingsService.setThemeMode('sakura');
+      if (mounted) {
+        final l10n = _settingsService.l10n;
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.local_florist_rounded,
+                  color: Color(0xFFF472B6),
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.t('easter_egg_sakura_unlocked'),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFFF1F2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF140D13),
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Color(0xFFF472B6), width: 1.5),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   // ─── Build ───────────────────────────────────────────────────────────────
 
   @override
@@ -258,7 +315,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: l10n.t('back_to_home'),
               )
             : null,
-        title: AnimatedFlameTitle(title: l10n.t('app_title')),
+        title: GestureDetector(
+          onTap: _onHeaderTitleTap,
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedFlameTitle(title: l10n.t('app_title')),
+        ),
         centerTitle: true,
         actions: [
           if (_videoInfo != null && !_isLoading)
@@ -276,12 +337,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: _isLoading
-            ? _buildLoadingState(theme, l10n)
-            : _videoInfo == null
-            ? _buildEmptyState(theme, l10n)
-            : _buildContent(theme, l10n),
+      body: ThemeAnimatedBackground(
+        child: SafeArea(
+          child: _isLoading
+              ? _buildLoadingState(theme, l10n)
+              : _videoInfo == null
+              ? _buildEmptyState(theme, l10n)
+              : _buildContent(theme, l10n),
+        ),
       ),
     );
   }

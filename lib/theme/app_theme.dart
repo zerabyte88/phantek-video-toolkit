@@ -10,6 +10,9 @@ class AppTheme {
 
   static ThemeData getTheme(String mode) {
     switch (mode) {
+      case 'sakura':
+      case 'oled_sakura':
+        return sakuraTheme;
       case 'oled':
         return oledTheme;
       case 'light':
@@ -18,6 +21,157 @@ class AppTheme {
       default:
         return darkTheme;
     }
+  }
+
+  /// AMOLED Sakura theme (Pitch Black with Cherry Blossom Pink Accents)
+  static ThemeData get sakuraTheme {
+    const sakuraPrimary = Color(0xFFF472B6); // Sakura Pink
+    const sakuraSecondary = Color(0xFFFDA4AF); // Rose Quartz / Cherry Accent
+    const scaffoldBg = Colors.black;
+    const surfaceBg = Color(0xFF140D13);
+    const outlineColor = Color(0xFF381525);
+    const textPrimary = Color(0xFFFFF1F2);
+    const textSecondary = Color(0xFFD4A5B8);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
+        primary: sakuraPrimary,
+        secondary: sakuraSecondary,
+        surface: surfaceBg,
+        onSurface: textPrimary,
+        outline: outlineColor,
+        outlineVariant: Color(0xFF220C17),
+      ),
+      scaffoldBackgroundColor: scaffoldBg,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: scaffoldBg,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
+        ),
+        iconTheme: IconThemeData(color: textPrimary),
+      ),
+      cardTheme: CardThemeData(
+        color: surfaceBg,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: outlineColor, width: 1.0),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: sakuraPrimary,
+          foregroundColor: Colors.black,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.1,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: textPrimary,
+          side: const BorderSide(color: outlineColor, width: 1.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: surfaceBg,
+        selectedColor: sakuraPrimary,
+        labelStyle: const TextStyle(
+          color: textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        side: const BorderSide(color: outlineColor, width: 1.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        checkmarkColor: Colors.black,
+        showCheckmark: false,
+      ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: sakuraPrimary,
+        inactiveTrackColor: sakuraPrimary.withAlpha(35),
+        thumbColor: sakuraPrimary,
+        overlayColor: sakuraPrimary.withAlpha(25),
+        valueIndicatorColor: sakuraPrimary,
+        valueIndicatorTextStyle: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+        ),
+        trackHeight: 4,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: sakuraPrimary,
+        circularTrackColor: Color(0xFF28101C),
+        linearTrackColor: Color(0xFF28101C),
+      ),
+      dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.black
+              : const Color(0xFF835A6D),
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? sakuraPrimary
+              : const Color(0xFF28101C),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: surfaceBg,
+        contentTextStyle: const TextStyle(color: textPrimary, fontSize: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: outlineColor),
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(fontSize: 15, color: textPrimary, height: 1.5),
+        bodyMedium: TextStyle(fontSize: 13, color: textSecondary, height: 1.5),
+        bodySmall: TextStyle(
+          fontSize: 11,
+          color: Color(0xFF835A6D),
+          height: 1.4,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+      ),
+    );
   }
 
   /// Modern Slate Dark theme (Clean Slate 900 / Slate 800)
