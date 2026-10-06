@@ -88,7 +88,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         : _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1500),
     )..repeat();
     // Force wakelock ON so the screen & CPU stay active during encoding,
     // regardless of the user's global "Keep Screen Awake" setting.
@@ -300,142 +300,118 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       }
     });
 
-    final result = widget.isAudioExtraction
-        ? await FFmpegService.extractAudio(
-            sourceVideo: widget.videoInfo,
-            audioFormat: widget.encodingOptions.audioFormat,
-            audioBitrateKbps: widget.encodingOptions.audioExtractBitrateKbps,
-            appSettings: widget.appSettings,
-            onProgress: (progress, stats, [sizeBytes]) {
-              if (sizeBytes != null && sizeBytes > 0) {
-                _latestOutputBytes = sizeBytes;
-              }
-              String speed = '';
-              String size = '';
-              if (stats.contains('|')) {
-                final parts = stats.split('|');
-                size = parts[0].replaceAll('Size:', '').trim();
-                speed = parts[1].replaceAll('Speed:', '').trim();
-                if (_latestOutputBytes <= 0) {
-                  if (size.contains('MB')) {
-                    final val =
-                        double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
-                    _latestOutputBytes = (val * 1024 * 1024).round();
-                  } else if (size.contains('KB')) {
-                    final val =
-                        double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
-                    _latestOutputBytes = (val * 1024).round();
-                  }
-                }
-              }
+    void handleProgress(double progress, String stats, [int? sizeBytes]) {
+      if (sizeBytes != null && sizeBytes > 0) {
+        _latestOutputBytes = sizeBytes;
+      }
+      String speed = '';
+      String size = '';
+      if (stats.contains('|')) {
+        final parts = stats.split('|');
+        size = parts[0].replaceAll('Size:', '').trim();
+        speed = parts[1].replaceAll('Speed:', '').trim();
+        if (_latestOutputBytes <= 0) {
+          if (size.contains('MB')) {
+            final val =
+                double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
+            _latestOutputBytes = (val * 1024 * 1024).round();
+          } else if (size.contains('KB')) {
+            final val =
+                double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
+            _latestOutputBytes = (val * 1024).round();
+          }
+        }
+      }
 
-              final now = DateTime.now();
-              final elapsed = _startTime != null
-                  ? now.difference(_startTime!)
-                  : Duration.zero;
-              final remaining = _calculateRemainingTime(progress, elapsed);
-              final etaStr = remaining != null
-                  ? ' | ETA: ${_formatDuration(remaining)}'
-                  : '';
+      final now = DateTime.now();
+      final elapsed = _startTime != null
+          ? now.difference(_startTime!)
+          : Duration.zero;
+      final remaining = _calculateRemainingTime(progress, elapsed);
+      final etaStr = remaining != null
+          ? ' | ETA: ${_formatDuration(remaining)}'
+          : '';
 
-              ForegroundServiceManager().updateService(
-                title: l10n.t('app_title'),
-                text: '$actionText ${_formatPercentage(progress)}$etaStr',
-              );
+      // Always update foreground notification even if app is minimized
+      ForegroundServiceManager().updateService(
+        title: l10n.t('app_title'),
+        text: '$actionText ${_formatPercentage(progress)}$etaStr',
+      );
 
-              if (mounted) {
-                setState(() {
-                  _progress = progress;
-                  _elapsedDuration = elapsed;
-                  if (remaining != null) {
-                    _estimatedRemaining = remaining;
-                  }
-                  _speedText = speed;
-                  _currentSizeText = size;
-                  _statusText = '$actionText ${_formatPercentage(progress)}';
-                });
-              }
-            },
-            onLog: (log) {
-              if (mounted) {
-                if (log.contains('Extraction failed:') ||
-                    log.toLowerCase().contains('error')) {
-                  _errorMessage = log
-                      .replaceFirst('\nExtraction failed: ', '')
-                      .trim();
-                }
-                debugPrint(log);
-              }
-            },
-          )
-        : await FFmpegService.processVideo(
-            sourceVideo: widget.videoInfo,
-            targetResolution: widget.targetResolution,
-            encodingOptions: widget.encodingOptions,
-            appSettings: widget.appSettings,
-            onProgress: (progress, stats, [sizeBytes]) {
-              if (sizeBytes != null && sizeBytes > 0) {
-                _latestOutputBytes = sizeBytes;
-              }
-              String speed = '';
-              String size = '';
-              if (stats.contains('|')) {
-                final parts = stats.split('|');
-                size = parts[0].replaceAll('Size:', '').trim();
-                speed = parts[1].replaceAll('Speed:', '').trim();
-                if (_latestOutputBytes <= 0) {
-                  if (size.contains('MB')) {
-                    final val =
-                        double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
-                    _latestOutputBytes = (val * 1024 * 1024).round();
-                  } else if (size.contains('KB')) {
-                    final val =
-                        double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
-                    _latestOutputBytes = (val * 1024).round();
-                  }
-                }
-              }
+      if (mounted) {
+        setState(() {
+          _progress = progress;
+          _elapsedDuration = elapsed;
+          if (remaining != null) {
+            _estimatedRemaining = remaining;
+          }
+          _speedText = speed;
+          _currentSizeText = size;
+          _statusText = '$actionText ${_formatPercentage(progress)}';
+        });
+      }
+    }
 
-              final now = DateTime.now();
-              final elapsed = _startTime != null
-                  ? now.difference(_startTime!)
-                  : Duration.zero;
-              final remaining = _calculateRemainingTime(progress, elapsed);
-              final etaStr = remaining != null
-                  ? ' | ETA: ${_formatDuration(remaining)}'
-                  : '';
+    void handleLog(String log) {
+      if (mounted) {
+        if (log.contains('Encoding failed:') ||
+            log.contains('Extraction failed:') ||
+            log.toLowerCase().contains('error')) {
+          _errorMessage = log
+              .replaceFirst(RegExp(r'\n(Encoding|Extraction) failed:\s*'), '')
+              .trim();
+        }
+        debugPrint(log);
+      }
+    }
 
-              // Always update foreground notification even if app is minimized
-              ForegroundServiceManager().updateService(
-                title: l10n.t('app_title'),
-                text: '$actionText ${_formatPercentage(progress)}$etaStr',
-              );
+    String? result;
+    if (widget.isAudioExtraction) {
+      result = await FFmpegService.extractAudio(
+        sourceVideo: widget.videoInfo,
+        audioFormat: widget.encodingOptions.audioFormat,
+        audioBitrateKbps: widget.encodingOptions.audioExtractBitrateKbps,
+        appSettings: widget.appSettings,
+        onProgress: handleProgress,
+        onLog: handleLog,
+      );
+    } else {
+      result = await FFmpegService.processVideo(
+        sourceVideo: widget.videoInfo,
+        targetResolution: widget.targetResolution,
+        encodingOptions: widget.encodingOptions,
+        appSettings: widget.appSettings,
+        onProgress: handleProgress,
+        onLog: handleLog,
+      );
 
-              if (mounted) {
-                setState(() {
-                  _progress = progress;
-                  _elapsedDuration = elapsed;
-                  if (remaining != null) {
-                    _estimatedRemaining = remaining;
-                  }
-                  _speedText = speed;
-                  _currentSizeText = size;
-                  _statusText = '$actionText ${_formatPercentage(progress)}';
-                });
-              }
-            },
-            onLog: (log) {
-              if (mounted) {
-                if (log.contains('Encoding failed:') ||
-                    log.toLowerCase().contains('error')) {
-                  _errorMessage = log
-                      .replaceFirst('\nEncoding failed: ', '')
-                      .trim();
-                }
-                debugPrint(log);
-              }
-            },
-          );
+      // Automatic Graceful Fallback: if Hardware Acceleration fails, retry via Software (CPU)
+      if (result == null &&
+          widget.appSettings.enableHardwareAcceleration &&
+          mounted) {
+        debugPrint('HWA failed. Attempting automatic software fallback...');
+        setState(() {
+          _statusText = l10n.t('proc_hw_fallback_notice');
+          _progress = 0.0;
+          _speedText = '';
+          _currentSizeText = '';
+        });
+        ForegroundServiceManager().updateService(
+          title: l10n.t('app_title'),
+          text: l10n.t('proc_hw_fallback_notice'),
+        );
+
+        result = await FFmpegService.processVideo(
+          sourceVideo: widget.videoInfo,
+          targetResolution: widget.targetResolution,
+          encodingOptions: widget.encodingOptions,
+          appSettings: widget.appSettings,
+          forceSoftwareFallback: true,
+          onProgress: handleProgress,
+          onLog: handleLog,
+        );
+      }
+    }
 
     if (result != null) {
       ForegroundServiceManager().updateService(
@@ -680,10 +656,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     return Column(
       children: [
-        // Main circular progress
+        // Main circular dual-ring progress with center radial glow
         SizedBox(
-          width: 180,
-          height: 180,
+          width: 190,
+          height: 190,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -691,56 +667,69 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 animation: _pulseController,
                 builder: (context, child) {
                   return CustomPaint(
-                    size: const Size(180, 180),
-                    painter: _BufferingRingPainter(
+                    size: const Size(190, 190),
+                    painter: _DualRingProgressPainter(
+                      progress: _progress,
                       animationValue: _pulseController.value,
                       isProcessing: _isProcessing,
                       isSuccess: _isSuccess,
                       color: progressColor,
-                      trackColor: theme.colorScheme.outline.withAlpha(35),
+                      trackColor: theme.colorScheme.outline.withAlpha(30),
                     ),
                   );
                 },
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (_isProcessing)
-                    Icon(
-                      widget.isAudioExtraction
-                          ? Icons.audiotrack_rounded
-                          : Icons.movie_filter_outlined,
-                      size: 32,
-                      color: theme.colorScheme.primary,
-                    )
-                  else
+                  if (_isProcessing) ...[
+                    Text(
+                      _formatPercentage(_progress),
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        color: progressColor,
+                        letterSpacing: -1.0,
+                      ),
+                    ),
+                    if (_speedText.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: progressColor.withAlpha(20),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          _speedText,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: progressColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ] else ...[
                     Icon(
                       _isSuccess
                           ? Icons.check_circle_rounded
                           : Icons.error_rounded,
-                      size: 40,
+                      size: 44,
                       color: progressColor,
                     ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _isProcessing
-                        ? _formatPercentage(_progress)
-                        : (_isSuccess ? '100%' : 'Error'),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: progressColor,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  if (_isProcessing && _speedText.isNotEmpty) ...[
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      _speedText,
+                      _isSuccess ? '100%' : 'Error',
                       style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withAlpha(140),
-                        fontWeight: FontWeight.w500,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: progressColor,
+                        letterSpacing: -0.5,
                       ),
                     ),
                   ],
@@ -1832,14 +1821,16 @@ class _WindowsGraphPainter extends CustomPainter {
   bool shouldRepaint(covariant _WindowsGraphPainter oldDelegate) => true;
 }
 
-class _BufferingRingPainter extends CustomPainter {
+class _DualRingProgressPainter extends CustomPainter {
+  final double progress;
   final double animationValue;
   final bool isProcessing;
   final bool isSuccess;
   final Color color;
   final Color trackColor;
 
-  _BufferingRingPainter({
+  _DualRingProgressPainter({
+    required this.progress,
     required this.animationValue,
     required this.isProcessing,
     required this.isSuccess,
@@ -1852,60 +1843,108 @@ class _BufferingRingPainter extends CustomPainter {
     if (size.width <= 0 || size.height <= 0) return;
 
     final center = Offset(size.width / 2, size.height / 2);
-    const strokeWidth = 8.0;
-    final radius = (size.width - strokeWidth) / 2;
-    final rect = Rect.fromCircle(center: center, radius: radius);
+    const mainStrokeWidth = 7.5;
+    const outerStrokeWidth = 2.4;
 
-    // 1. Base track circle
-    final trackPaint = Paint()
-      ..color = trackColor
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-    canvas.drawCircle(center, radius, trackPaint);
+    // Main inner track radius
+    final mainRadius = (size.width - 28) / 2;
+    final mainRect = Rect.fromCircle(center: center, radius: mainRadius);
+
+    // Outer orbit radius
+    final outerRadius = mainRadius + 8.5;
+    final outerRect = Rect.fromCircle(center: center, radius: outerRadius);
 
     if (isProcessing) {
-      // 2. Continuous rotating buffering arc with sweep gradient
+      // 1. Dynamic Center Radial Glow Aura (Pulsing breath)
+      final glowPulse = 0.5 + 0.5 * math.sin(animationValue * 2 * math.pi);
+      final glowRadius = mainRadius * 0.75;
+      final glowPaint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            color.withAlpha((22 + glowPulse * 25).round()),
+            color.withAlpha(0),
+          ],
+          stops: const [0.0, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: glowRadius));
+      canvas.drawCircle(center, glowRadius, glowPaint);
+    }
+
+    // 2. Base track circle (Inner)
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..strokeWidth = mainStrokeWidth
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, mainRadius, trackPaint);
+
+    if (isProcessing) {
+      // 3. Outer faint Orbit Guide Track
+      final outerGuidePaint = Paint()
+        ..color = color.withAlpha(15)
+        ..strokeWidth = 1.0
+        ..style = PaintingStyle.stroke;
+      canvas.drawCircle(center, outerRadius, outerGuidePaint);
+
+      // 4. Deterministic Progress Arc (0.0 to 1.0)
+      final clampedProgress = progress.clamp(0.0, 1.0);
+      if (clampedProgress > 0.005) {
+        final sweepAngle = clampedProgress * 2 * math.pi;
+        final progressPaint = Paint()
+          ..color = color
+          ..strokeWidth = mainStrokeWidth
+          ..strokeCap = StrokeCap.round
+          ..style = PaintingStyle.stroke;
+
+        canvas.drawArc(
+          mainRect,
+          -math.pi / 2,
+          sweepAngle,
+          false,
+          progressPaint,
+        );
+      }
+
+      // 5. Outer Orbiting Energy Pulse Arc (Continuous 1500ms rotation)
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.rotate(animationValue * 2 * math.pi);
       canvas.translate(-center.dx, -center.dy);
 
-      const sweepAngle = math.pi * 1.35;
-      final sweepGradient = SweepGradient(
+      const orbitSweep = math.pi * 0.85; // ~153 degrees
+      final orbitGradient = SweepGradient(
         startAngle: 0.0,
-        endAngle: sweepAngle,
+        endAngle: orbitSweep,
         colors: [
           color.withAlpha(0),
-          color.withAlpha(35),
-          color.withAlpha(150),
+          color.withAlpha(30),
+          color.withAlpha(160),
           color,
         ],
         stops: const [0.0, 0.25, 0.7, 1.0],
       );
 
-      final arcPaint = Paint()
-        ..shader = sweepGradient.createShader(rect)
-        ..strokeWidth = strokeWidth
+      final orbitPaint = Paint()
+        ..shader = orbitGradient.createShader(outerRect)
+        ..strokeWidth = outerStrokeWidth
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
 
-      canvas.drawArc(rect, 0.0, sweepAngle, false, arcPaint);
-
+      canvas.drawArc(outerRect, 0.0, orbitSweep, false, orbitPaint);
       canvas.restore();
     } else {
-      // Static completed (green) or error (red) full ring
+      // Completed or Error state full ring
       final resultPaint = Paint()
-        ..color = color
-        ..strokeWidth = strokeWidth
+        ..color = isSuccess ? const Color(0xFF10B981) : const Color(0xFFEF4444)
+        ..strokeWidth = mainStrokeWidth
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
-      canvas.drawArc(rect, -math.pi / 2, 2 * math.pi, false, resultPaint);
+      canvas.drawArc(mainRect, -math.pi / 2, 2 * math.pi, false, resultPaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _BufferingRingPainter oldDelegate) {
-    return oldDelegate.animationValue != animationValue ||
+  bool shouldRepaint(covariant _DualRingProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.animationValue != animationValue ||
         oldDelegate.isProcessing != isProcessing ||
         oldDelegate.isSuccess != isSuccess ||
         oldDelegate.color != color ||
