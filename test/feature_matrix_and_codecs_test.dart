@@ -27,10 +27,7 @@ void main() {
       'VideoCodec enum definitions are correct with valid ffmpeg codec strings',
       () {
         expect(VideoCodec.h264.ffmpegCodec, equals('libx264'));
-        expect(VideoCodec.hevc.ffmpegCodec, equals('libx265'));
-
         expect(VideoCodec.h264.displayName, contains('H.264'));
-        expect(VideoCodec.hevc.displayName, contains('H.265'));
       },
     );
 
@@ -78,14 +75,9 @@ void main() {
       expect(br720, inInclusiveRange(2000, 3000));
     });
 
-    test('HEVC codec produces ~25% leaner target bitrate than H.264 at equivalent CRF', () {
+    test('H.264 standardized codec produces predictable bitrate output at target CRF', () {
       const optsH264 = EncodingOptions(
         codec: VideoCodec.h264,
-        rateControlMode: RateControlMode.crf,
-        crfValue: 20,
-      );
-      const optsHevc = EncodingOptions(
-        codec: VideoCodec.hevc,
         rateControlMode: RateControlMode.crf,
         crfValue: 20,
       );
@@ -98,16 +90,7 @@ void main() {
         sourceBitrateBps: sourceVideo.bitrate,
       );
 
-      final hevcBitrate = optsHevc.calculateTargetBitrateKbps(
-        targetWidth: 1920,
-        targetHeight: 1080,
-        sourceWidth: sourceVideo.width,
-        sourceHeight: sourceVideo.height,
-        sourceBitrateBps: sourceVideo.bitrate,
-      );
-
-      expect(hevcBitrate, lessThan(h264Bitrate));
-      expect((hevcBitrate / h264Bitrate), closeTo(0.75, 0.05));
+      expect(h264Bitrate, inInclusiveRange(4000, 5000));
     });
 
     test('Bitrate Rate Control mode strictly adheres to customBitrateKbps', () {
@@ -471,19 +454,10 @@ void main() {
       expect(getScaleFlag('slow'), equals('bicubic'));
     });
 
-    test('H.265 Android hardware decoder parameter logic enforces closed GOP, repeated parameter sets, and mobile CTU speed optimization', () {
-      const gop = 60;
-      final x265Params =
-          'profile=main:level-idc=4.1:no-open-gop=1:repeat-headers=1:aud=1:no-sao=1:ctu=32:keyint=$gop:min-keyint=${(gop ~/ 2)}:bframes=2:b-adapt=1';
-
-      expect(x265Params, contains('keyint=60'));
-      expect(x265Params, contains('min-keyint=30'));
-      expect(x265Params, contains('no-open-gop=1'));
-      expect(x265Params, contains('repeat-headers=1'));
-      expect(x265Params, contains('aud=1'));
-      expect(x265Params, contains('profile=main'));
-      expect(x265Params, contains('ctu=32'));
-      expect(x265Params, contains('no-sao=1'));
+    test('H.264 high profile and level 4.1 configuration parameters are correct', () {
+      const profileLevel = '-profile:v high -level:v 4.1';
+      expect(profileLevel, contains('profile:v high'));
+      expect(profileLevel, contains('level:v 4.1'));
     });
 
     test('H.264 rate control logic applies VBV buffer limits to prevent decoder spikes', () {

@@ -88,7 +88,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         : _settingsService.l10n.t('proc_preparing');
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 1000),
     )..repeat();
     // Force wakelock ON so the screen & CPU stay active during encoding,
     // regardless of the user's global "Keep Screen Awake" setting.
@@ -1619,33 +1619,6 @@ class _SuccessBottomSheet extends StatelessWidget {
                       : l10n.t('proc_play_video'),
                 ),
               ),
-              if (!isAudioExtraction && codec == VideoCodec.hevc) ...[
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline_rounded,
-                        size: 14,
-                        color: theme.colorScheme.onSurface.withAlpha(140),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          l10n.t('codec_compat_hint'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: theme.colorScheme.onSurface.withAlpha(150),
-                            height: 1.3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () {
@@ -1917,25 +1890,6 @@ class _BufferingRingPainter extends CustomPainter {
         ..style = PaintingStyle.stroke;
 
       canvas.drawArc(rect, 0.0, sweepAngle, false, arcPaint);
-
-      // 3. Glowing leading head dot at the tip of the buffering stream
-      const headAngle = sweepAngle;
-      final headOffset = Offset(
-        center.dx + radius * math.cos(headAngle),
-        center.dy + radius * math.sin(headAngle),
-      );
-
-      // Outer glow
-      final glowPaint = Paint()
-        ..color = color.withAlpha(120)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.5);
-      canvas.drawCircle(headOffset, strokeWidth / 2 + 1.2, glowPaint);
-
-      // Inner white core
-      final corePaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(headOffset, strokeWidth / 3.2, corePaint);
 
       canvas.restore();
     } else {

@@ -765,7 +765,6 @@ class _HomeScreenState extends State<HomeScreen> {
               resolutions: _getResolutionsForMode(_selectedMode),
               selectedResolution: _selectedResolution,
               encodingOptions: _encodingOptions,
-              showCodecSelection: _selectedMode == _AppMode.convert,
               onResolutionChanged: (res) =>
                   setState(() => _selectedResolution = res),
               onOptionsChanged: (opts) =>
