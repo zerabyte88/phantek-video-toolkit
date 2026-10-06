@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/localization_service.dart';
+import '../services/settings_service.dart';
 
 class ConversionOptionsCard extends StatefulWidget {
   final VideoInfo sourceVideo;
@@ -148,85 +149,106 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 15,
-                    color: theme.colorScheme.primary,
+            Builder(
+              builder: (context) {
+                final isHwa = SettingsService().settings.enableHardwareAcceleration;
+                final infoText = isHwa && widget.encodingOptions.rateControlMode == RateControlMode.crf
+                    ? l10n.t('rate_control_hwa_info')
+                    : (widget.encodingOptions.rateControlMode == RateControlMode.crf
+                        ? l10n.t('desc_crf')
+                        : l10n.t('desc_bitrate'));
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.encodingOptions.rateControlMode ==
-                              RateControlMode.crf
-                          ? l10n.t('desc_crf')
-                          : l10n.t('desc_bitrate'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withAlpha(160),
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (widget.encodingOptions.rateControlMode ==
-                RateControlMode.crf) ...[
-              Text(
-                l10n.t('crf_label'),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: theme.colorScheme.onSurface.withAlpha(140),
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      value: widget.encodingOptions.crfValue.toDouble(),
-                      min: 16,
-                      max: 28,
-                      divisions: 12,
-                      label: widget.encodingOptions.crfValue.toString(),
-                      onChanged: (val) {
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            crfValue: val.round(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Container(
-                    width: 44,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '${widget.encodingOptions.crfValue}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 15,
                         color: theme.colorScheme.primary,
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          infoText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: theme.colorScheme.onSurface.withAlpha(160),
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ] else ...[
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            Builder(
+              builder: (context) {
+                final isHwa = SettingsService().settings.enableHardwareAcceleration;
+                if (widget.encodingOptions.rateControlMode == RateControlMode.crf) {
+                  if (isHwa) {
+                    return const SizedBox.shrink();
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.t('crf_label'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withAlpha(140),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: widget.encodingOptions.crfValue.toDouble(),
+                              min: 16,
+                              max: 28,
+                              divisions: 12,
+                              label: widget.encodingOptions.crfValue.toString(),
+                              onChanged: (val) {
+                                widget.onOptionsChanged(
+                                  widget.encodingOptions.copyWith(
+                                    crfValue: val.round(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: 44,
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withAlpha(25),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${widget.encodingOptions.crfValue}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            if (widget.encodingOptions.rateControlMode == RateControlMode.bitrate) ...[
               Text(
                 l10n.t('bitrate_label'),
                 style: TextStyle(

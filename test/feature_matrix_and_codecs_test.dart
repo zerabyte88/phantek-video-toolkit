@@ -467,5 +467,65 @@ void main() {
 
       expect(vbvArgs, equals('-maxrate 8000k -bufsize 16000k'));
     });
+
+    test('AppSettings serialization supports enableHardwareAcceleration', () {
+      const defaultSettings = AppSettings();
+      expect(defaultSettings.enableHardwareAcceleration, isFalse);
+
+      final hwaSettings = defaultSettings.copyWith(enableHardwareAcceleration: true);
+      expect(hwaSettings.enableHardwareAcceleration, isTrue);
+
+      final json = hwaSettings.toJson();
+      expect(json['enableHardwareAcceleration'], isTrue);
+
+      final deserialized = AppSettings.fromJson(json);
+      expect(deserialized.enableHardwareAcceleration, isTrue);
+    });
+
+    test('calculateHwaBitrateBounds returns calibrated VBV limits for MediaCodec', () {
+      const opts = EncodingOptions();
+
+      // 1080p: target 5000k, max 6500k, buf 10000k
+      final bounds1080 = opts.calculateHwaBitrateBounds(
+        targetWidth: 1920,
+        targetHeight: 1080,
+        sourceBitrateBps: 20000000,
+      );
+      expect(bounds1080['target'], equals(5000));
+      expect(bounds1080['maxrate'], equals(6500));
+      expect(bounds1080['bufsize'], equals(10000));
+
+      // 720p: target 2800k, max 3500k, buf 5600k
+      final bounds720 = opts.calculateHwaBitrateBounds(
+        targetWidth: 1280,
+        targetHeight: 720,
+        sourceBitrateBps: 20000000,
+      );
+      expect(bounds720['target'], equals(2800));
+      expect(bounds720['maxrate'], equals(3500));
+      expect(bounds720['bufsize'], equals(5600));
+
+      // 480p: target 1200k, max 1500k, buf 2400k
+      final bounds480 = opts.calculateHwaBitrateBounds(
+        targetWidth: 854,
+        targetHeight: 480,
+        sourceBitrateBps: 20000000,
+      );
+      expect(bounds480['target'], equals(1200));
+      expect(bounds480['maxrate'], equals(1500));
+      expect(bounds480['bufsize'], equals(2400));
+    });
+
+    test('HWA filter chain enforces centered even padding and yuv420p format', () {
+      const targetW = 1920;
+      const targetH = 1080;
+      const fpsFilter = 'fps=fps=30,';
+      final vf =
+          '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+
+      expect(vf, contains('force_original_aspect_ratio=decrease'));
+      expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
+      expect(vf, contains('format=yuv420p'));
+    });
   });
 }

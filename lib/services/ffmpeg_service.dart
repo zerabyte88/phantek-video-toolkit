@@ -226,12 +226,14 @@ class FFmpegService {
 
   /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
+  /// [forceSoftwareFallback] forces libx264 software encoding even if HWA is enabled in appSettings.
   /// Returns the output file path on success, null on failure.
   static Future<String?> processVideo({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
     EncodingOptions encodingOptions = const EncodingOptions(),
     AppSettings appSettings = const AppSettings(),
+    bool forceSoftwareFallback = false,
     required void Function(double progress, String stats, [int? sizeBytes])
     onProgress,
     required void Function(String log) onLog,
@@ -273,22 +275,6 @@ class FFmpegService {
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Video codec selection (pure software encoding)
-    final String vCodec = encodingOptions.codec.ffmpegCodec;
-
-    final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
-      targetWidth: targetW,
-      targetHeight: targetH,
-      sourceWidth: sourceVideo.width,
-      sourceHeight: sourceVideo.height,
-      sourceBitrateBps: sourceVideo.bitrate,
-    );
-
-    // Rate control, preset, and profile arguments
-    String rateControlArg = '';
-    String presetArg = '';
-    String profileLevelArg = '';
-
     // Threads argument (calibrated for mobile ARM big.LITTLE processors to prevent thermal throttling)
     final totalCores = Platform.numberOfProcessors > 0
         ? Platform.numberOfProcessors
@@ -299,30 +285,102 @@ class FFmpegService {
     final threadsArg =
         '-threads $effectiveThreads -filter_threads $effectiveThreads';
 
-    // Mobile-calibrated encoder preset mapping
-    final String x264Preset;
-    switch (appSettings.cpuPreset) {
-      case 'fast':
-        x264Preset = 'ultrafast -tune fastdecode';
-        break;
-      case 'slow':
-        x264Preset = 'faster';
-        break;
-      case 'medium':
-      default:
-        x264Preset = 'veryfast';
-        break;
+    // FPS filter
+    String fpsFilter = '';
+    if (encodingOptions.targetFps > 0) {
+      fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
     }
 
-    if (encodingOptions.rateControlMode == RateControlMode.crf) {
-      rateControlArg =
-          '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+    final isOriginalResolution =
+        targetW == sourceVideo.width && targetH == sourceVideo.height;
+
+    // Determine whether to use Hardware Acceleration (MediaCodec)
+    final bool useHwa =
+        appSettings.enableHardwareAcceleration && !forceSoftwareFallback;
+
+    String vfArg = '';
+    List<String> codecArgs = [];
+
+    if (useHwa) {
+      // ─── Hardware Acceleration Pipeline (MediaCodec GPU/NPU) ─────────────
+      // Strict scale with decrease aspect preservation, centered even padding, and yuv420p format
+      if (isOriginalResolution) {
+        vfArg =
+            '-vf "${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+      } else {
+        vfArg =
+            '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+      }
+
+      final hwaBounds = encodingOptions.calculateHwaBitrateBounds(
+        targetWidth: targetW,
+        targetHeight: targetH,
+        sourceBitrateBps: sourceVideo.bitrate,
+      );
+      final targetKbps = hwaBounds['target']!;
+      final maxrateKbps = hwaBounds['maxrate']!;
+      final bufsizeKbps = hwaBounds['bufsize']!;
+
+      // Put rate control, GOP, and B-frame options strictly AFTER -c:v h264_mediacodec
+      codecArgs = [
+        '-c:v h264_mediacodec',
+        '-b:v ${targetKbps}k',
+        '-maxrate ${maxrateKbps}k',
+        '-bufsize ${bufsizeKbps}k',
+        '-g 60',
+        '-bf 0',
+      ];
     } else {
-      rateControlArg =
-          '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+      // ─── Software Encoding Pipeline (libx264 CPU) ──────────────────────────
+      final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+        targetWidth: targetW,
+        targetHeight: targetH,
+        sourceWidth: sourceVideo.width,
+        sourceHeight: sourceVideo.height,
+        sourceBitrateBps: sourceVideo.bitrate,
+      );
+
+      final String x264Preset;
+      switch (appSettings.cpuPreset) {
+        case 'fast':
+          x264Preset = 'ultrafast -tune fastdecode';
+          break;
+        case 'slow':
+          x264Preset = 'faster';
+          break;
+        case 'medium':
+        default:
+          x264Preset = 'veryfast';
+          break;
+      }
+
+      final String rateControlArg;
+      if (encodingOptions.rateControlMode == RateControlMode.crf) {
+        rateControlArg =
+            '-crf ${encodingOptions.crfValue} -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+      } else {
+        rateControlArg =
+            '-b:v ${targetBitrateKbps}k -maxrate ${targetBitrateKbps * 2}k -bufsize ${targetBitrateKbps * 4}k';
+      }
+
+      if (isOriginalResolution) {
+        vfArg = '-vf "${fpsFilter}format=yuv420p"';
+      } else {
+        final scaleFlag =
+            appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
+        vfArg =
+            '-vf "${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p"';
+      }
+
+      codecArgs = [
+        '-c:v libx264',
+        '-preset $x264Preset',
+        '-profile:v high',
+        '-level:v 4.1',
+        rateControlArg,
+        '-pix_fmt yuv420p',
+      ];
     }
-    presetArg = '-preset $x264Preset';
-    profileLevelArg = '-profile:v high -level:v 4.1';
 
     // Audio options: encode to clean compliant AAC for MP4, MKV, and MOV
     String audioArgs = '-c:a aac -b:a ${appSettings.audioBitrateKbps}k';
@@ -337,30 +395,6 @@ class FFmpegService {
       containerFlags = '-movflags +faststart';
     }
 
-    // FPS filter
-    String fpsFilter = '';
-    if (encodingOptions.targetFps > 0) {
-      fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
-    }
-
-    // Detect Mode
-    final isOriginalResolution =
-        targetW == sourceVideo.width && targetH == sourceVideo.height;
-
-    // Build video filter (-vf) with Smart Adaptive Scaler
-    String vfArg = '';
-
-    if (isOriginalResolution) {
-      vfArg = '-vf "${fpsFilter}format=yuv420p"';
-    } else {
-      // Upscale / Downscale: bilinear for fast/medium, bicubic for slow
-      final scaleFlag = appSettings.cpuPreset == 'slow'
-          ? 'bicubic'
-          : 'bilinear';
-      vfArg =
-          '-vf "${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p"';
-    }
-
     // Construct full command
     final cmdParts = <String>[
       '-i "${sourceVideo.filePath}"',
@@ -368,11 +402,7 @@ class FFmpegService {
       '-map 0:a:0?',
       threadsArg,
       vfArg,
-      '-c:v $vCodec',
-      presetArg,
-      profileLevelArg,
-      rateControlArg,
-      '-pix_fmt yuv420p',
+      ...codecArgs,
       audioArgs,
       containerFlags,
       '-y "$outputPath"',
@@ -381,7 +411,9 @@ class FFmpegService {
     final command = cmdParts.join(' ');
 
     onLog('Command: ffmpeg $command');
-    onLog('Output: ${targetW}x$targetH @ $rateControlArg using $vCodec');
+    onLog(
+      'Output: ${targetW}x$targetH via ${useHwa ? "Hardware (MediaCodec)" : "Software (libx264)"}',
+    );
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();

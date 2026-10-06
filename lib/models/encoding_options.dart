@@ -182,4 +182,66 @@ class EncodingOptions {
 
     return (estimatedBitrateMbps * 1000).round().clamp(300, 50000);
   }
+
+  /// Returns a map with {'target': targetKbps, 'maxrate': maxrateKbps, 'bufsize': bufsizeKbps}
+  /// calibrated specifically for Android MediaCodec (h264_mediacodec) to prevent compression blur
+  /// and bitrate collapse while strictly respecting buffer limits.
+  Map<String, int> calculateHwaBitrateBounds({
+    required int targetWidth,
+    required int targetHeight,
+    required int sourceBitrateBps,
+  }) {
+    int targetKbps;
+    int maxrateKbps;
+    int bufsizeKbps;
+
+    if (rateControlMode == RateControlMode.bitrate) {
+      targetKbps = customBitrateKbps;
+      maxrateKbps = (targetKbps * 1.3).round();
+      bufsizeKbps = (targetKbps * 2.0).round();
+    } else {
+      final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
+      if (maxDim >= 3840) {
+        targetKbps = 15000;
+        maxrateKbps = 20000;
+        bufsizeKbps = 30000;
+      } else if (maxDim >= 2560) {
+        targetKbps = 8500;
+        maxrateKbps = 11000;
+        bufsizeKbps = 17000;
+      } else if (maxDim >= 1920) {
+        targetKbps = 5000;
+        maxrateKbps = 6500;
+        bufsizeKbps = 10000;
+      } else if (maxDim >= 1280) {
+        targetKbps = 2800;
+        maxrateKbps = 3500;
+        bufsizeKbps = 5600;
+      } else if (maxDim >= 854) {
+        targetKbps = 1200;
+        maxrateKbps = 1500;
+        bufsizeKbps = 2400;
+      } else {
+        targetKbps = 800;
+        maxrateKbps = 1000;
+        bufsizeKbps = 1600;
+      }
+
+      // If source video bitrate is known and lower than target, cap gracefully
+      if (sourceBitrateBps > 0) {
+        final sourceKbps = sourceBitrateBps ~/ 1000;
+        if (sourceKbps > 500 && targetKbps > sourceKbps) {
+          targetKbps = (sourceKbps * 0.95).round();
+          maxrateKbps = (targetKbps * 1.3).round();
+          bufsizeKbps = (targetKbps * 2.0).round();
+        }
+      }
+    }
+
+    return {
+      'target': targetKbps.clamp(400, 60000),
+      'maxrate': maxrateKbps.clamp(500, 80000),
+      'bufsize': bufsizeKbps.clamp(800, 120000),
+    };
+  }
 }
