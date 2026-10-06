@@ -5,6 +5,7 @@ import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/cache_manager_service.dart';
 import '../services/ffmpeg_service.dart';
+import '../services/localization_service.dart';
 import '../services/settings_service.dart';
 import '../widgets/animated_flame_title.dart';
 import '../widgets/audio_extractor_card.dart';
@@ -351,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ─── Loading State ───────────────────────────────────────────────────────
 
-  Widget _buildLoadingState(ThemeData theme, l10n) {
+  Widget _buildLoadingState(ThemeData theme, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -396,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ─── Empty / Landing State ───────────────────────────────────────────────
 
-  Widget _buildEmptyState(ThemeData theme, l10n) {
+  Widget _buildEmptyState(ThemeData theme, AppLocalizations l10n) {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -426,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const Spacer(),
                   const SizedBox(height: 24),
-                  _buildMadeWithLoveFooter(theme),
+                  _buildMadeWithLoveFooter(theme, l10n),
                 ],
               ),
             ),
@@ -437,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Modern, clean Segmented Control for Mode selection
-  Widget _buildSegmentedModeBar(ThemeData theme, l10n) {
+  Widget _buildSegmentedModeBar(ThemeData theme, AppLocalizations l10n) {
     final isVideoActive =
         _selectedMode == _AppMode.convert ||
         _selectedMode == _AppMode.downscale;
@@ -600,7 +601,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Clean, modern Import / Select Video Card
-  Widget _buildImportCard(ThemeData theme, l10n) {
+  Widget _buildImportCard(ThemeData theme, AppLocalizations l10n) {
     return InkWell(
       onTap: _pickVideo,
       borderRadius: BorderRadius.circular(16),
@@ -638,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'MP4, MKV, MOV (up to 4K / 60 FPS)',
+              l10n.t('supported_formats_hint'),
               style: TextStyle(
                 fontSize: 12,
                 color: theme.colorScheme.onSurface.withAlpha(140),
@@ -666,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Clean, professional feature highlights row
-  Widget _buildFeatureHighlights(ThemeData theme, l10n) {
+  Widget _buildFeatureHighlights(ThemeData theme, AppLocalizations l10n) {
     final features = [
       (
         Icons.bolt_rounded,
@@ -735,7 +736,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ─── Content State (Video Loaded) ─────────────────────────────────────────
 
-  Widget _buildContent(ThemeData theme, l10n) {
+  Widget _buildContent(ThemeData theme, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       child: Column(
@@ -810,13 +811,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildMadeWithLoveFooter(theme),
+          _buildMadeWithLoveFooter(theme, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildMadeWithLoveFooter(ThemeData theme) {
+  Widget _buildMadeWithLoveFooter(ThemeData theme, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -827,7 +828,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Made with ',
+                '${l10n.t('made_with_love')} ',
                 style: TextStyle(
                   fontSize: 12.5,
                   color: theme.colorScheme.onSurface.withAlpha(150),
@@ -839,7 +840,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Color(0xFFEF4444),
               ),
               Text(
-                ' by Zerabyte88',
+                ' ${l10n.t('by_developer')}',
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
@@ -850,7 +851,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Crafted for high performance & offline privacy',
+            l10n.t('app_footer_tagline'),
             style: TextStyle(
               fontSize: 11,
               color: theme.colorScheme.onSurface.withAlpha(100),

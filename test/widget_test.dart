@@ -8,6 +8,6 @@ void main() {
 
     expect(find.text('Phantek'), findsOneWidget);
     expect(find.text('Pilih Video'), findsWidgets);
-    expect(find.textContaining('Made with'), findsOneWidget);
+    expect(find.textContaining('Zerabyte88'), findsOneWidget);
   });
 }
