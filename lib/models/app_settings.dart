@@ -31,9 +31,6 @@ class AppSettings {
   /// Custom output directory path for extracted audio files. If empty, defaults to Music folder.
   final String audioOutputDirectory;
 
-  /// Enable Hardware Acceleration (MediaCodec / h264_mediacodec on Android GPU/NPU)
-  final bool enableHardwareAcceleration;
-
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -45,7 +42,6 @@ class AppSettings {
     this.isFirstLaunch = true,
     this.outputDirectory = '',
     this.audioOutputDirectory = '',
-    this.enableHardwareAcceleration = false,
   });
 
   /// Detected hardware core count of the phone.
@@ -62,7 +58,6 @@ class AppSettings {
     bool? isFirstLaunch,
     String? outputDirectory,
     String? audioOutputDirectory,
-    bool? enableHardwareAcceleration,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -75,8 +70,6 @@ class AppSettings {
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
       outputDirectory: outputDirectory ?? this.outputDirectory,
       audioOutputDirectory: audioOutputDirectory ?? this.audioOutputDirectory,
-      enableHardwareAcceleration:
-          enableHardwareAcceleration ?? this.enableHardwareAcceleration,
     );
   }
 
@@ -92,7 +85,6 @@ class AppSettings {
       'isFirstLaunch': isFirstLaunch,
       'outputDirectory': outputDirectory,
       'audioOutputDirectory': audioOutputDirectory,
-      'enableHardwareAcceleration': enableHardwareAcceleration,
     };
   }
 
@@ -120,8 +112,6 @@ class AppSettings {
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
       outputDirectory: json['outputDirectory'] as String? ?? '',
       audioOutputDirectory: json['audioOutputDirectory'] as String? ?? '',
-      enableHardwareAcceleration:
-          json['enableHardwareAcceleration'] as bool? ?? false,
     );
   }
 }

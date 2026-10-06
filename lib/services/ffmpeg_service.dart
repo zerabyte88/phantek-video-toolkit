@@ -232,7 +232,6 @@ class FFmpegService {
     required EncodingOptions encodingOptions,
     required AppSettings appSettings,
     required String outputPath,
-    bool forceSoftwareFallback = false,
   }) {
     // Calculate target dimensions (must be even numbers)
     int targetW = targetResolution.width;
@@ -284,10 +283,6 @@ class FFmpegService {
         encodingOptions.targetFps == sourceVideo.fps.round();
     final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
 
-    // Determine whether to use Hardware Acceleration (MediaCodec)
-    final bool useHwa =
-        appSettings.enableHardwareAcceleration && !forceSoftwareFallback;
-
     String vfFilter = '';
     List<String> codecArgs = [];
     List<String> audioArgs = [];
@@ -311,64 +306,6 @@ class FFmpegService {
             '${appSettings.audioBitrateKbps}k',
           ];
         }
-      }
-    } else if (useHwa) {
-      // ─── Hardware Acceleration Pipeline (MediaCodec GPU/NPU) ─────────────
-      // Strict scale with decrease aspect preservation, centered even padding, and yuv420p format
-      if (isOriginalResolution) {
-        vfFilter =
-            '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
-      } else {
-        vfFilter =
-            '${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
-      }
-
-      final hwaBounds = encodingOptions.calculateHwaBitrateBounds(
-        targetWidth: targetW,
-        targetHeight: targetH,
-        sourceBitrateBps: sourceVideo.bitrate,
-      );
-      final targetKbps = hwaBounds['target']!;
-      final minrateKbps = hwaBounds['minrate']!;
-      final maxrateKbps = hwaBounds['maxrate']!;
-      final bufsizeKbps = hwaBounds['bufsize']!;
-      final gopInterval =
-          sourceVideo.fps > 0 ? sourceVideo.fps.round().clamp(24, 60) : 30;
-
-      // Injeksi -bitrate dan -b:v bersamaan, -minrate, GOP 1 detik, dan Profile High.
-      // Parameter -crf WAJIB DIABAIKAN total dari pipeline HWA.
-      codecArgs = [
-        '-c:v',
-        'h264_mediacodec',
-        '-bitrate',
-        '${targetKbps}k',
-        '-b:v',
-        '${targetKbps}k',
-        '-minrate',
-        '${minrateKbps}k',
-        '-maxrate',
-        '${maxrateKbps}k',
-        '-bufsize',
-        '${bufsizeKbps}k',
-        '-profile:v',
-        'high',
-        '-level:v',
-        '4.1',
-        '-g',
-        '$gopInterval',
-        '-bf',
-        '0',
-      ];
-
-      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
-        audioArgs = ['-an'];
-      } else {
-        audioArgs = [
-          '-c:a',
-          'aac',
-          '-b:a',
-          '${appSettings.audioBitrateKbps}k',
-        ];
       }
     } else {
       // ─── Software Encoding Pipeline (libx264 CPU) ──────────────────────────
@@ -401,29 +338,22 @@ class FFmpegService {
         rateControlArgs = [
           '-crf',
           '${encodingOptions.crfValue}',
-          '-maxrate',
-          '${targetBitrateKbps * 2}k',
-          '-bufsize',
-          '${targetBitrateKbps * 4}k',
         ];
       } else {
         rateControlArgs = [
           '-b:v',
           '${targetBitrateKbps}k',
-          '-maxrate',
-          '${targetBitrateKbps * 2}k',
-          '-bufsize',
-          '${targetBitrateKbps * 4}k',
         ];
       }
 
       if (isOriginalResolution) {
-        vfFilter = '${fpsFilter}format=yuv420p';
+        vfFilter =
+            '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       } else {
         final scaleFlag =
             appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
         vfFilter =
-            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
+            '${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease:flags=$scaleFlag,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       }
 
       codecArgs = [
@@ -482,14 +412,12 @@ class FFmpegService {
 
   /// Transcode and downscale a video to a target resolution.
   /// [onProgress] reports progress from 0.0 to 1.0.
-  /// [forceSoftwareFallback] forces libx264 software encoding even if HWA is enabled in appSettings.
   /// Returns the output file path on success, null on failure.
   static Future<String?> processVideo({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
     EncodingOptions encodingOptions = const EncodingOptions(),
     AppSettings appSettings = const AppSettings(),
-    bool forceSoftwareFallback = false,
     required void Function(double progress, String stats, [int? sizeBytes])
     onProgress,
     required void Function(String log) onLog,
@@ -530,8 +458,6 @@ class FFmpegService {
     final isFpsSame = encodingOptions.targetFps <= 0 ||
         encodingOptions.targetFps == sourceVideo.fps.round();
     final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
-    final bool useHwa =
-        appSettings.enableHardwareAcceleration && !forceSoftwareFallback;
 
     final arguments = buildVideoArguments(
       sourceVideo: sourceVideo,
@@ -539,7 +465,6 @@ class FFmpegService {
       encodingOptions: encodingOptions,
       appSettings: appSettings,
       outputPath: outputPath,
-      forceSoftwareFallback: forceSoftwareFallback,
     );
 
     if (isStreamCopy) {
@@ -551,7 +476,7 @@ class FFmpegService {
     onLog(
       isStreamCopy
           ? 'Output: ${targetW}x$targetH via Lossless Stream Copy'
-          : 'Output: ${targetW}x$targetH via ${useHwa ? "Hardware (MediaCodec)" : "Software (libx264)"}',
+          : 'Output: ${targetW}x$targetH via Software (libx264)',
     );
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms

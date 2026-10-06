@@ -104,11 +104,14 @@ class EncodingOptions {
   final int
   audioExtractBitrateKbps; // 0 for copy original stream, or 128, 192, 256, 320
 
+  /// Convenience alias for [crfValue].
+  int get crf => crfValue;
+
   const EncodingOptions({
     this.codec = VideoCodec.h264,
     this.container = VideoContainer.mp4,
     this.rateControlMode = RateControlMode.crf,
-    this.crfValue = 20, // Default for 1080p
+    this.crfValue = 23, // Default for x264 software encoding
     this.customBitrateKbps = 6000,
     this.targetFps = 0,
     this.audioFormat = AudioFormat.mp3,
@@ -181,66 +184,5 @@ class EncodingOptions {
     }
 
     return (estimatedBitrateMbps * 1000).round().clamp(300, 50000);
-  }
-
-  /// Returns a map with {'target': targetKbps, 'minrate': minrateKbps, 'maxrate': maxrateKbps, 'bufsize': bufsizeKbps}
-  /// calibrated specifically for Android MediaCodec (h264_mediacodec) to prevent compression blur
-  /// and bitrate collapse while strictly respecting buffer limits.
-  Map<String, int> calculateHwaBitrateBounds({
-    required int targetWidth,
-    required int targetHeight,
-    required int sourceBitrateBps,
-  }) {
-    int targetKbps;
-    int minrateKbps;
-    int maxrateKbps;
-    int bufsizeKbps;
-
-    if (rateControlMode == RateControlMode.bitrate) {
-      targetKbps = customBitrateKbps;
-      minrateKbps = (targetKbps * 0.75).round();
-      maxrateKbps = (targetKbps * 1.3).round();
-      bufsizeKbps = (targetKbps * 2.0).round();
-    } else {
-      final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
-      if (maxDim >= 3840) {
-        targetKbps = 20000;
-        minrateKbps = 15000;
-        maxrateKbps = 26000;
-        bufsizeKbps = 40000;
-      } else if (maxDim >= 2560) {
-        targetKbps = 12000;
-        minrateKbps = 9000;
-        maxrateKbps = 15000;
-        bufsizeKbps = 24000;
-      } else if (maxDim >= 1920) {
-        targetKbps = 8000;
-        minrateKbps = 6000;
-        maxrateKbps = 10000;
-        bufsizeKbps = 16000;
-      } else if (maxDim >= 1280) {
-        targetKbps = 4500;
-        minrateKbps = 3500;
-        maxrateKbps = 6000;
-        bufsizeKbps = 9000;
-      } else if (maxDim >= 854) {
-        targetKbps = 2000;
-        minrateKbps = 1500;
-        maxrateKbps = 2600;
-        bufsizeKbps = 4000;
-      } else {
-        targetKbps = 1200;
-        minrateKbps = 900;
-        maxrateKbps = 1600;
-        bufsizeKbps = 2400;
-      }
-    }
-
-    return {
-      'target': targetKbps.clamp(800, 60000),
-      'minrate': minrateKbps.clamp(600, 50000),
-      'maxrate': maxrateKbps.clamp(1000, 80000),
-      'bufsize': bufsizeKbps.clamp(1500, 120000),
-    };
   }
 }

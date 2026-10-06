@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/localization_service.dart';
-import '../services/settings_service.dart';
 
 class ConversionOptionsCard extends StatefulWidget {
   final VideoInfo sourceVideo;
@@ -151,12 +150,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             const SizedBox(height: 10),
             Builder(
               builder: (context) {
-                final isHwa = SettingsService().settings.enableHardwareAcceleration;
-                final infoText = isHwa && widget.encodingOptions.rateControlMode == RateControlMode.crf
-                    ? l10n.t('rate_control_hwa_info')
-                    : (widget.encodingOptions.rateControlMode == RateControlMode.crf
+                final infoText =
+                    widget.encodingOptions.rateControlMode == RateControlMode.crf
                         ? l10n.t('desc_crf')
-                        : l10n.t('desc_bitrate'));
+                        : l10n.t('desc_bitrate');
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
@@ -188,15 +185,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               },
             ),
             const SizedBox(height: 12),
-            Builder(
-              builder: (context) {
-                final isHwa = SettingsService().settings.enableHardwareAcceleration;
-                if (widget.encodingOptions.rateControlMode == RateControlMode.crf) {
-                  if (isHwa) {
-                    return const SizedBox.shrink();
-                  }
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            if (widget.encodingOptions.rateControlMode == RateControlMode.crf)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         l10n.t('crf_label'),
@@ -243,11 +234,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         ],
                       ),
                     ],
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                  ),
             if (widget.encodingOptions.rateControlMode == RateControlMode.bitrate) ...[
               Text(
                 l10n.t('bitrate_label'),

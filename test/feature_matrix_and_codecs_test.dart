@@ -423,7 +423,7 @@ void main() {
     });
   });
 
-  group('4. Settings and Hardware Integration Tests', () {
+  group('4. Settings and Encoding Pipeline Integration Tests', () {
     test('AppSettings sanitizes invalid presets to medium', () {
       expect(AppSettings.sanitizePreset('fast'), equals('fast'));
       expect(AppSettings.sanitizePreset('slow'), equals('slow'));
@@ -468,101 +468,10 @@ void main() {
       expect(vbvArgs, equals('-maxrate 8000k -bufsize 16000k'));
     });
 
-    test('AppSettings serialization supports enableHardwareAcceleration', () {
-      const defaultSettings = AppSettings();
-      expect(defaultSettings.enableHardwareAcceleration, isFalse);
-
-      final hwaSettings = defaultSettings.copyWith(enableHardwareAcceleration: true);
-      expect(hwaSettings.enableHardwareAcceleration, isTrue);
-
-      final json = hwaSettings.toJson();
-      expect(json['enableHardwareAcceleration'], isTrue);
-
-      final deserialized = AppSettings.fromJson(json);
-      expect(deserialized.enableHardwareAcceleration, isTrue);
-    });
-
-    test('calculateHwaBitrateBounds returns calibrated VBV limits for MediaCodec', () {
+    test('EncodingOptions default crfValue is 23 and crf getter alias matches', () {
       const opts = EncodingOptions();
-
-      // 1080p: target 8000k, min 6000k, max 10000k, buf 16000k
-      final bounds1080 = opts.calculateHwaBitrateBounds(
-        targetWidth: 1920,
-        targetHeight: 1080,
-        sourceBitrateBps: 20000000,
-      );
-      expect(bounds1080['target'], equals(8000));
-      expect(bounds1080['minrate'], equals(6000));
-      expect(bounds1080['maxrate'], equals(10000));
-      expect(bounds1080['bufsize'], equals(16000));
-
-      // 720p: target 4500k, min 3500k, max 6000k, buf 9000k
-      final bounds720 = opts.calculateHwaBitrateBounds(
-        targetWidth: 1280,
-        targetHeight: 720,
-        sourceBitrateBps: 20000000,
-      );
-      expect(bounds720['target'], equals(4500));
-      expect(bounds720['minrate'], equals(3500));
-      expect(bounds720['maxrate'], equals(6000));
-      expect(bounds720['bufsize'], equals(9000));
-
-      // 480p: target 2000k, min 1500k, max 2600k, buf 4000k
-      final bounds480 = opts.calculateHwaBitrateBounds(
-        targetWidth: 854,
-        targetHeight: 480,
-        sourceBitrateBps: 20000000,
-      );
-      expect(bounds480['target'], equals(2000));
-      expect(bounds480['minrate'], equals(1500));
-      expect(bounds480['maxrate'], equals(2600));
-      expect(bounds480['bufsize'], equals(4000));
-    });
-
-    test('HWA argument list contains dual bitrate flags, -minrate, and 1-second dynamic GOP', () {
-      final hwaBounds = const EncodingOptions().calculateHwaBitrateBounds(
-        targetWidth: 1280,
-        targetHeight: 720,
-        sourceBitrateBps: 1300000,
-      );
-      final targetKbps = hwaBounds['target']!;
-      final minrateKbps = hwaBounds['minrate']!;
-      final maxrateKbps = hwaBounds['maxrate']!;
-      final bufsizeKbps = hwaBounds['bufsize']!;
-      const fps = 30.0;
-      final gop = fps.round();
-
-      final codecArgs = [
-        '-c:v',
-        'h264_mediacodec',
-        '-bitrate',
-        '${targetKbps}k',
-        '-b:v',
-        '${targetKbps}k',
-        '-minrate',
-        '${minrateKbps}k',
-        '-maxrate',
-        '${maxrateKbps}k',
-        '-bufsize',
-        '${bufsizeKbps}k',
-        '-profile:v',
-        'high',
-        '-level:v',
-        '4.1',
-        '-g',
-        '$gop',
-        '-bf',
-        '0',
-      ];
-
-      expect(codecArgs, contains('-bitrate'));
-      expect(codecArgs, contains('-b:v'));
-      expect(codecArgs, contains('-minrate'));
-      expect(codecArgs, contains('-profile:v'));
-      expect(codecArgs, contains('-g'));
-      expect(codecArgs, contains('$gop'));
-      expect(codecArgs, contains('-bf'));
-      expect(codecArgs, contains('0'));
+      expect(opts.crfValue, equals(23));
+      expect(opts.crf, equals(23));
     });
 
     test('Smart Stream Copy condition correctly evaluates eligibility for lossless passthrough', () {
@@ -595,19 +504,19 @@ void main() {
       expect(isStreamCopyDownscale, isFalse);
     });
 
-    test('HWA filter chain enforces centered even padding and yuv420p format', () {
+    test('Software filter chain enforces centered even padding and yuv420p format', () {
       const targetW = 1920;
       const targetH = 1080;
       const fpsFilter = 'fps=fps=30,';
       final vf =
-          '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
+          '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease:flags=bilinear,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
 
       expect(vf, contains('force_original_aspect_ratio=decrease'));
       expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
       expect(vf, contains('format=yuv420p'));
     });
 
-    test('FFmpegService.buildVideoArguments strictly excludes -crf and applies 8000k VBV bounds on portrait HWA downscale', () {
+    test('FFmpegService.buildVideoArguments swaps portrait dimensions and applies libx264 with -crf in CRF mode', () {
       const portraitSource = VideoInfo(
         filePath: '/storage/emulated/0/DCIM/portrait_video.mp4',
         fileName: 'portrait_video.mp4',
@@ -631,9 +540,7 @@ void main() {
         crfValue: 20,
       );
 
-      const appSettings = AppSettings(
-        enableHardwareAcceleration: true,
-      );
+      const appSettings = AppSettings();
 
       final args = FFmpegService.buildVideoArguments(
         sourceVideo: portraitSource,
@@ -643,41 +550,18 @@ void main() {
         outputPath: '/storage/emulated/0/Movies/output-1080p.mp4',
       );
 
-      // Verify CRF is completely excluded under HWA
-      expect(args.contains('-crf'), isFalse, reason: 'HWA MediaCodec must never receive -crf');
+      // Verify software libx264 encoder is selected
+      expect(args, contains('libx264'));
+      expect(args, isNot(contains('h264_mediacodec')));
 
-      // Verify MediaCodec encoder is selected
-      expect(args, contains('h264_mediacodec'));
-
-      // Verify VBV bounds: 1080p -> target 8000k, min 6000k, max 10000k, bufsize 16000k
-      final bitrateIdx = args.indexOf('-bitrate');
-      expect(bitrateIdx, isNot(-1));
-      expect(args[bitrateIdx + 1], equals('8000k'));
-
-      final bvIdx = args.indexOf('-b:v');
-      expect(bvIdx, isNot(-1));
-      expect(args[bvIdx + 1], equals('8000k'));
-
-      final minrateIdx = args.indexOf('-minrate');
-      expect(minrateIdx, isNot(-1));
-      expect(args[minrateIdx + 1], equals('6000k'));
-
-      final maxrateIdx = args.indexOf('-maxrate');
-      expect(maxrateIdx, isNot(-1));
-      expect(args[maxrateIdx + 1], equals('10000k'));
-
-      final bufsizeIdx = args.indexOf('-bufsize');
-      expect(bufsizeIdx, isNot(-1));
-      expect(args[bufsizeIdx + 1], equals('16000k'));
-
-      // Verify GOP 1 second and B-frames disabled
-      final gIdx = args.indexOf('-g');
-      expect(gIdx, isNot(-1));
-      expect(args[gIdx + 1], equals('30'));
-
-      final bfIdx = args.indexOf('-bf');
-      expect(bfIdx, isNot(-1));
-      expect(args[bfIdx + 1], equals('0'));
+      // Verify unconstrained CRF mode
+      final crfIdx = args.indexOf('-crf');
+      expect(crfIdx, isNot(-1));
+      expect(args[crfIdx + 1], equals('20'));
+      expect(args.contains('-bitrate'), isFalse);
+      expect(args.contains('-minrate'), isFalse);
+      expect(args.contains('-maxrate'), isFalse);
+      expect(args.contains('-bufsize'), isFalse);
 
       // Verify portrait dimensions swapped: scale target is 1080x1920
       final vfIdx = args.indexOf('-vf');
@@ -686,9 +570,15 @@ void main() {
       expect(vf, contains('scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
       expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
       expect(vf, contains('format=yuv420p'));
+
+      // Verify compatibility flags
+      expect(args, contains('-pix_fmt'));
+      expect(args[args.indexOf('-pix_fmt') + 1], equals('yuv420p'));
+      expect(args, contains('-movflags'));
+      expect(args[args.indexOf('-movflags') + 1], equals('+faststart'));
     });
 
-    test('FFmpegService.buildVideoArguments respects custom bitrate in Bitrate mode under HWA', () {
+    test('FFmpegService.buildVideoArguments respects custom bitrate in Bitrate mode', () {
       const sourceVideo = VideoInfo(
         filePath: '/sample.mp4',
         fileName: 'sample.mp4',
@@ -712,9 +602,7 @@ void main() {
         customBitrateKbps: 12000,
       );
 
-      const appSettings = AppSettings(
-        enableHardwareAcceleration: true,
-      );
+      const appSettings = AppSettings();
 
       final args = FFmpegService.buildVideoArguments(
         sourceVideo: sourceVideo,
@@ -725,16 +613,12 @@ void main() {
       );
 
       expect(args.contains('-crf'), isFalse);
-      expect(args, contains('h264_mediacodec'));
+      expect(args, contains('libx264'));
+      expect(args, isNot(contains('h264_mediacodec')));
 
-      final bitrateIdx = args.indexOf('-bitrate');
-      expect(args[bitrateIdx + 1], equals('12000k'));
-
-      final minrateIdx = args.indexOf('-minrate');
-      expect(args[minrateIdx + 1], equals('9000k')); // 12000 * 0.75
-
-      final maxrateIdx = args.indexOf('-maxrate');
-      expect(args[maxrateIdx + 1], equals('15600k')); // 12000 * 1.3
+      final bvIdx = args.indexOf('-b:v');
+      expect(bvIdx, isNot(-1));
+      expect(args[bvIdx + 1], equals('12000k'));
     });
 
     test('FFmpegService.buildVideoArguments applies libx264 with -crf in software mode', () {
@@ -761,10 +645,7 @@ void main() {
         crfValue: 22,
       );
 
-      // Hardware acceleration disabled
-      const appSettings = AppSettings(
-        enableHardwareAcceleration: false,
-      );
+      const appSettings = AppSettings();
 
       final args = FFmpegService.buildVideoArguments(
         sourceVideo: sourceVideo,
@@ -780,48 +661,6 @@ void main() {
       final crfIdx = args.indexOf('-crf');
       expect(crfIdx, isNot(-1));
       expect(args[crfIdx + 1], equals('22'));
-    });
-
-    test('FFmpegService.buildVideoArguments respects forceSoftwareFallback even if HWA is enabled in settings', () {
-      const sourceVideo = VideoInfo(
-        filePath: '/sample.mp4',
-        fileName: 'sample.mp4',
-        width: 1920,
-        height: 1080,
-        durationSeconds: 10.0,
-        bitrate: 15000000,
-        fps: 30.0,
-        codec: 'h264',
-        fileSizeBytes: 18000000,
-      );
-
-      const target720p = VideoResolution(
-        label: '720p',
-        width: 1280,
-        height: 720,
-      );
-
-      const encodingOpts = EncodingOptions(
-        rateControlMode: RateControlMode.crf,
-        crfValue: 21,
-      );
-
-      const appSettings = AppSettings(
-        enableHardwareAcceleration: true,
-      );
-
-      final args = FFmpegService.buildVideoArguments(
-        sourceVideo: sourceVideo,
-        targetResolution: target720p,
-        encodingOptions: encodingOpts,
-        appSettings: appSettings,
-        outputPath: '/output-720p.mp4',
-        forceSoftwareFallback: true,
-      );
-
-      expect(args, contains('libx264'));
-      expect(args, isNot(contains('h264_mediacodec')));
-      expect(args, contains('-crf'));
     });
   });
 }
