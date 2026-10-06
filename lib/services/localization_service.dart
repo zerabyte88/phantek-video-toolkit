@@ -22,11 +22,6 @@ class AppLocalizations {
 
   static const Map<String, Map<String, String>> _localizedValues = {
     'id': {
-      'settings_hw_accel': 'Akselerasi Hardware (GPU)',
-      'settings_hw_accel_desc': 'Mempercepat proses encoding menggunakan MediaCodec GPU/NPU dan menghemat konsumsi daya.',
-      'proc_hw_fallback_notice': 'Hardware encoding gagal. Mengulang otomatis menggunakan Software CPU...',
-      'rate_control_hwa_info': 'Akselerasi Hardware menggunakan bitrate adaptif VBV untuk kualitas visual optimal.',
-
       'about_phantek_subtitle': 'Transcoder Video & Ekstraktor Audio Offline',
       'active_language_badge': 'Aktif',
       'app_footer_tagline': 'Dibuat untuk performa tinggi & privasi offline',
@@ -278,11 +273,6 @@ class AppLocalizations {
       'view_github_repo': 'Lihat Repositori di GitHub',
     },
     'en': {
-      'settings_hw_accel': 'Hardware Acceleration (GPU)',
-      'settings_hw_accel_desc': 'Accelerates encoding via MediaCodec GPU/NPU and optimizes battery power consumption.',
-      'proc_hw_fallback_notice': 'Hardware encoding failed. Retrying automatically with Software CPU...',
-      'rate_control_hwa_info': 'Hardware Acceleration uses adaptive VBV bitrates for optimal visual quality.',
-
       'about_phantek_subtitle': 'Offline Video Transcoder & Audio Extractor',
       'active_language_badge': 'Active',
       'app_footer_tagline': 'Crafted for high performance & offline privacy',
@@ -537,11 +527,6 @@ class AppLocalizations {
       'view_github_repo': 'View Repository on GitHub',
     },
     'zh': {
-      'settings_hw_accel': '硬件加速 (GPU)',
-      'settings_hw_accel_desc': '使用 MediaCodec GPU/NPU 加速编码并优化电池电量消耗。',
-      'proc_hw_fallback_notice': '硬件编码失败。正在自动使用软件 CPU 重试...',
-      'rate_control_hwa_info': '硬件加速使用自适应 VBV 码率以确保最佳画质。',
-
       'about_phantek_subtitle': '离线视频转码与音频提取工具',
       'active_language_badge': '使用中',
       'app_footer_tagline': '专为高性能与完全离线隐私打造',
@@ -781,11 +766,6 @@ class AppLocalizations {
       'view_github_repo': '在 GitHub 上查看仓库',
     },
     'zh_CN': {
-      'settings_hw_accel': '硬件加速 (GPU)',
-      'settings_hw_accel_desc': '使用 MediaCodec GPU/NPU 加速编码并优化电池电量消耗。',
-      'proc_hw_fallback_notice': '硬件编码失败。正在自动使用软件 CPU 重试...',
-      'rate_control_hwa_info': '硬件加速使用自适应 VBV 码率以确保最佳画质。',
-
       'about_phantek_subtitle': '离线视频转码与音频提取工具',
       'active_language_badge': '使用中',
       'app_footer_tagline': '专为高性能与完全离线隐私打造',
@@ -1025,11 +1005,6 @@ class AppLocalizations {
       'view_github_repo': '在 GitHub 上查看仓库',
     },
     'zh_TW': {
-      'settings_hw_accel': '硬體加速 (GPU)',
-      'settings_hw_accel_desc': '使用 MediaCodec GPU/NPU 加速編碼並最佳化電池電量消耗。',
-      'proc_hw_fallback_notice': '硬體編碼失敗。正在自動使用軟體 CPU 重試...',
-      'rate_control_hwa_info': '硬體加速使用自適應 VBV 碼率以確保最佳畫質。',
-
       'about_phantek_subtitle': '離線影片轉檔與音訊擷取工具',
       'active_language_badge': '使用中',
       'app_footer_tagline': '專為高效能與完全離線隱私打造',
@@ -1269,11 +1244,6 @@ class AppLocalizations {
       'view_github_repo': '在 GitHub 上查看儲存庫',
     },
     'es': {
-      'settings_hw_accel': 'Aceleración por Hardware (GPU)',
-      'settings_hw_accel_desc': 'Acelera la codificación mediante MediaCodec GPU/NPU y reduce el consumo de batería.',
-      'proc_hw_fallback_notice': 'Error en la codificación por hardware. Reintentando automáticamente con CPU de software...',
-      'rate_control_hwa_info': 'La aceleración por hardware utiliza tasas de bits VBV adaptativas para una calidad visual óptima.',
-
       'about_phantek_subtitle':
           'Conjunto de herramientas de video y audio local y rápido',
       'active_language_badge': 'Activo',
@@ -1533,11 +1503,6 @@ class AppLocalizations {
       'view_github_repo': 'Ver Repositorio en GitHub',
     },
     'pt': {
-      'settings_hw_accel': 'Aceleração de Hardware (GPU)',
-      'settings_hw_accel_desc': 'Acelera a codificação via MediaCodec GPU/NPU e reduz o consumo de bateria.',
-      'proc_hw_fallback_notice': 'Falha na codificação por hardware. Tentando novamente com CPU de software...',
-      'rate_control_hwa_info': 'A aceleração de hardware utiliza taxas de bits VBV adaptativas para máxima qualidade visual.',
-
       'about_phantek_subtitle':
           'Conjunto de ferramentas de vídeo e áudio local e veloz',
       'active_language_badge': 'Ativo',
@@ -1793,11 +1758,6 @@ class AppLocalizations {
       'view_github_repo': 'Ver Repositório no GitHub',
     },
     'ja': {
-      'settings_hw_accel': 'ハードウェアアクセラレーション (GPU)',
-      'settings_hw_accel_desc': 'MediaCodec GPU/NPU を使用してエンコードを高速化し、バッテリー消費を抑えます。',
-      'proc_hw_fallback_notice': 'ハードウェアエンコードに失敗しました。ソフトウェア CPU で自動再試行中...',
-      'rate_control_hwa_info': 'ハードウェアアクセラレーションは最適な画質のために適応型 VBV ビットレートを使用します。',
-
       'about_phantek_subtitle': 'オフライン動画変換＆音声抽出ツール',
       'active_language_badge': '有効',
       'app_footer_tagline': '高性能と完全オフラインのプライバシーのために設計',
@@ -2045,11 +2005,6 @@ class AppLocalizations {
       'view_github_repo': 'GitHubでリポジトリを表示',
     },
     'ko': {
-      'settings_hw_accel': '하드웨어 가속 (GPU)',
-      'settings_hw_accel_desc': 'MediaCodec GPU/NPU를 통해 인코딩 속도를 높이고 배터리 소모를 최적화합니다.',
-      'proc_hw_fallback_notice': '하드웨어 인코딩에 실패했습니다. 소프트웨어 CPU로 자동 재시도 중...',
-      'rate_control_hwa_info': '하드웨어 가속은 최적의 화질을 위해 적응형 VBV 비트레이트를 사용합니다.',
-
       'about_phantek_subtitle': '오프라인 비디오 트랜스코더 & 오디오 추출기',
       'active_language_badge': '활성',
       'app_footer_tagline': '고성능과 완전한 오프라인 개인정보 보호를 위한 설계',
@@ -2295,11 +2250,6 @@ class AppLocalizations {
       'view_github_repo': 'GitHub에서 저장소 보기',
     },
     'hi': {
-      'settings_hw_accel': 'हार्डवेयर त्वरण (GPU)',
-      'settings_hw_accel_desc': 'MediaCodec GPU/NPU के माध्यम से एन्कोडिंग को गति दें और बैटरी की खपत को कम करें।',
-      'proc_hw_fallback_notice': 'हार्डवेयर एन्कोडिंग विफल। सॉफ़्टवेयर CPU के साथ स्वतः पुनः प्रयास किया जा रहा है...',
-      'rate_control_hwa_info': 'हार्डवेयर त्वरण इष्टतम दृश्य गुणवत्ता के लिए अनुकूली VBV बिटरेट का उपयोग करता है।',
-
       'about_phantek_subtitle': 'तेज़ और स्थानीय वीडियो एवं ऑडियो टूलकिट',
       'active_language_badge': 'सक्रिय',
       'app_footer_tagline': 'उच्च प्रदर्शन और ऑफ़लाइन गोपनीयता के लिए निर्मित',
@@ -2553,11 +2503,6 @@ class AppLocalizations {
       'view_github_repo': 'GitHub पर रिपॉजिटरी देखें',
     },
     'ar': {
-      'settings_hw_accel': 'تسريع الأجهزة (GPU)',
-      'settings_hw_accel_desc': 'تسريع عملية الترميز عبر MediaCodec GPU/NPU وتقليل استهلاك طاقة البطارية.',
-      'proc_hw_fallback_notice': 'فشل ترميز الأجهزة. جاري إعادة المحاولة تلقائياً عبر المعالج البرمجي...',
-      'rate_control_hwa_info': 'يستخدم تسريع الأجهزة معدلات بت VBV متكيفة لضمان أفضل جودة بصرية.',
-
       'about_phantek_subtitle': 'مجموعة أدوات فيديو وصوت محلية فائقة السرعة',
       'active_language_badge': 'نشط',
       'app_footer_tagline': 'مصمم لأداء عالٍ وخصوصية كاملة دون اتصال',
@@ -2815,11 +2760,6 @@ class AppLocalizations {
       'view_github_repo': 'عرض المستودع على GitHub',
     },
     'fr': {
-      'settings_hw_accel': 'Accélération Matérielle (GPU)',
-      'settings_hw_accel_desc': 'Accélère l\'encodage via MediaCodec GPU/NPU et optimise la consommation de batterie.',
-      'proc_hw_fallback_notice': 'Échec de l\'encodage matériel. Nouvelle tentative automatique avec le processeur logiciel...',
-      'rate_control_hwa_info': 'L\'accélération matérielle utilise des débits VBV adaptatifs pour une qualité visuelle optimale.',
-
       'about_phantek_subtitle':
           'Boîte à outils vidéo et audio locale et véloce',
       'active_language_badge': 'Actif',
@@ -3077,11 +3017,6 @@ class AppLocalizations {
       'view_github_repo': 'Voir le dépôt sur GitHub',
     },
     'ru': {
-      'settings_hw_accel': 'Аппаратное ускорение (GPU)',
-      'settings_hw_accel_desc': 'Ускоряет кодирование с помощью MediaCodec GPU/NPU и снижает расход заряда батареи.',
-      'proc_hw_fallback_notice': 'Сбой аппаратного кодирования. Автоматический повтор с помощью программного процессора...',
-      'rate_control_hwa_info': 'Аппаратное ускорение использует адаптивный битрейт VBV для наилучшего качества.',
-
       'about_phantek_subtitle':
           'Быстрый локальный инструментарий для видео и аудио',
       'active_language_badge': 'Активен',

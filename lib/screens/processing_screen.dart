@@ -384,33 +384,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         onProgress: handleProgress,
         onLog: handleLog,
       );
-
-      // Automatic Graceful Fallback: if Hardware Acceleration fails, retry via Software (CPU)
-      if (result == null &&
-          widget.appSettings.enableHardwareAcceleration &&
-          mounted) {
-        debugPrint('HWA failed. Attempting automatic software fallback...');
-        setState(() {
-          _statusText = l10n.t('proc_hw_fallback_notice');
-          _progress = 0.0;
-          _speedText = '';
-          _currentSizeText = '';
-        });
-        ForegroundServiceManager().updateService(
-          title: l10n.t('app_title'),
-          text: l10n.t('proc_hw_fallback_notice'),
-        );
-
-        result = await FFmpegService.processVideo(
-          sourceVideo: widget.videoInfo,
-          targetResolution: widget.targetResolution,
-          encodingOptions: widget.encodingOptions,
-          appSettings: widget.appSettings,
-          forceSoftwareFallback: true,
-          onProgress: handleProgress,
-          onLog: handleLog,
-        );
-      }
     }
 
     if (result != null) {

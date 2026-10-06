@@ -23,8 +23,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v3.1.2';
-  String _buildNumber = '26';
+  String _appVersion = 'v3.2.0';
+  String _buildNumber = '27';
 
   @override
   void initState() {
@@ -42,14 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '26';
+              : '27';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v3.1.2';
-          _buildNumber = '26';
+          _appVersion = 'v3.2.0';
+          _buildNumber = '27';
         });
       }
     }
@@ -171,17 +171,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Hardware Acceleration (MediaCodec GPU/NPU)
-                    _buildHardwareAccelTile(theme, settings, l10n),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
-
                     // CPU Cores Setting
                     _buildCpuCoresSection(theme, settings, deviceCores, l10n),
 
@@ -989,68 +978,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           value: settings.keepScreenAwake,
           onChanged: (val) async {
             await _settingsService.setKeepScreenAwake(val);
-            setState(() {});
-          },
-        ),
-      ],
-    );
-  }
-
-  // ── Hardware Acceleration Switch Tile ──────────────────────────────────────
-
-  Widget _buildHardwareAccelTile(
-    ThemeData theme,
-    AppSettings settings,
-    AppLocalizations l10n,
-  ) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withAlpha(20),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            settings.enableHardwareAcceleration
-                ? Icons.speed_rounded
-                : Icons.memory_rounded,
-            size: 18,
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.t('settings_hw_accel'),
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                l10n.t('settings_hw_accel_desc'),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: theme.colorScheme.onSurface.withAlpha(130),
-                  height: 1.25,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        Switch(
-          value: settings.enableHardwareAcceleration,
-          onChanged: (val) async {
-            await _settingsService.setHardwareAcceleration(val);
             setState(() {});
           },
         ),

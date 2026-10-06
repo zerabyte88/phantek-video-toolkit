@@ -138,10 +138,6 @@ class SettingsService extends ChangeNotifier {
     await updateSettings(_settings.copyWith(audioOutputDirectory: path.trim()));
   }
 
-  Future<void> setHardwareAcceleration(bool enable) async {
-    await updateSettings(_settings.copyWith(enableHardwareAcceleration: enable));
-  }
-
   Future<void> resetToDefaults() async {
     final currentLang = _settings.languageCode;
     _settings = AppSettings(languageCode: currentLang);
