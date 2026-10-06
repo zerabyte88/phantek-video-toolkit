@@ -504,16 +504,30 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                               : theme.colorScheme.onSurface,
                         ),
                       ),
-                      Text(
-                        '${res.width} × ${res.height}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isSelected
-                              ? (isDark
-                                    ? Colors.white.withAlpha(190)
-                                    : theme.colorScheme.primary.withAlpha(200))
-                              : theme.colorScheme.onSurface.withAlpha(120),
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final isPortrait =
+                              widget.sourceVideo.height > widget.sourceVideo.width;
+                          final displayW =
+                              isPortrait && !res.label.startsWith('Original')
+                                  ? res.height
+                                  : res.width;
+                          final displayH =
+                              isPortrait && !res.label.startsWith('Original')
+                                  ? res.width
+                                  : res.height;
+                          return Text(
+                            '$displayW × $displayH',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isSelected
+                                  ? (isDark
+                                        ? Colors.white.withAlpha(190)
+                                        : theme.colorScheme.primary.withAlpha(200))
+                                  : theme.colorScheme.onSurface.withAlpha(120),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
