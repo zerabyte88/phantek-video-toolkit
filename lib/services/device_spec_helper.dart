@@ -175,17 +175,45 @@ class DeviceSpecHelper {
     };
   }
 
+  static double? getMaxCpuClockGhz() {
+    if (!Platform.isAndroid && !Platform.isLinux) return null;
+    try {
+      int maxKhz = 0;
+      for (int i = 0; i < 16; i++) {
+        final freqFile =
+            File('/sys/devices/system/cpu/cpu$i/cpufreq/cpuinfo_max_freq');
+        if (freqFile.existsSync()) {
+          final val = int.tryParse(freqFile.readAsStringSync().trim());
+          if (val != null && val > maxKhz) maxKhz = val;
+        } else {
+          final scalingFile =
+              File('/sys/devices/system/cpu/cpu$i/cpufreq/scaling_max_freq');
+          if (scalingFile.existsSync()) {
+            final val = int.tryParse(scalingFile.readAsStringSync().trim());
+            if (val != null && val > maxKhz) maxKhz = val;
+          }
+        }
+      }
+      if (maxKhz > 0) {
+        return maxKhz / 1000000.0;
+      }
+    } catch (_) {}
+    return null;
+  }
+
   static String detectSocName({
     required String hardware,
     required String board,
     required String manufacturer,
     String? socModel,
+    double? maxClockGhz,
   }) {
     final hwLower = hardware.toLowerCase();
     final boardLower = board.toLowerCase();
     final socLower = (socModel ?? '').toLowerCase();
     final c = '$hwLower $boardLower $socLower';
     bool has(String k) => c.contains(k);
+    final effectiveClockGhz = maxClockGhz ?? getMaxCpuClockGhz();
 
     // Qualcomm Snapdragon SoCs
     if (has('sm8850') || has('8 elite gen 5')) {
@@ -236,7 +264,12 @@ class DeviceSpecHelper {
     if (has('sm6225-ad') || has('sm6225_ad') || has('685')) {
       return 'Qualcomm Snapdragon 685';
     }
-    if (has('sm6225') || has('khaje')) return 'Qualcomm Snapdragon 680';
+    if (has('sm6225') || has('khaje')) {
+      if (effectiveClockGhz != null && effectiveClockGhz > 2.60) {
+        return 'Qualcomm Snapdragon 685';
+      }
+      return 'Qualcomm Snapdragon 680';
+    }
     if (has('sm6150')) return 'Qualcomm Snapdragon 675';
     if (has('sdm670')) return 'Qualcomm Snapdragon 670';
     if (has('sm6125') || has('trinket')) return 'Qualcomm Snapdragon 665';
@@ -743,11 +776,13 @@ class DeviceSpecHelper {
     }
 
     // 3. CPU (Processor)
+    final maxClock = getMaxCpuClockGhz();
     final cpuSoc = detectSocName(
       hardware: hardware,
       board: board,
       manufacturer: manufacturer,
       socModel: socModel,
+      maxClockGhz: maxClock,
     );
 
     // 4. GPU (Graphics)

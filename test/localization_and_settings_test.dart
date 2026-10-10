@@ -16,32 +16,52 @@ import 'package:video_downscaler/widgets/conversion_options_card.dart';
 const supportedUiCodes = [
   'id',
   'en',
-  'es',
-  'pt',
-  'ja',
-  'ko',
-  'hi',
   'ar',
+  'ms',
+  'da',
+  'de',
+  'es',
   'fr',
+  'it',
+  'nl',
+  'no',
+  'pt',
   'ru',
+  'fi',
+  'sv',
+  'vi',
+  'th',
+  'hi',
+  'ja',
   'zh_CN',
   'zh_TW',
+  'ko',
 ];
 
 const supportedCodes = [
   'id',
   'en',
   'zh',
-  'es',
-  'pt',
-  'ja',
-  'ko',
-  'hi',
   'ar',
+  'ms',
+  'da',
+  'de',
+  'es',
   'fr',
+  'it',
+  'nl',
+  'no',
+  'pt',
   'ru',
+  'fi',
+  'sv',
+  'vi',
+  'th',
+  'hi',
+  'ja',
   'zh_CN',
   'zh_TW',
+  'ko',
 ];
 
 void main() {
@@ -763,6 +783,39 @@ void main() {
         socName: snapdragon685,
       );
       expect(snapdragon685Gpu, equals('Adreno 610'));
+
+      // Snapdragon 685 detection via clock speed > 2.60 GHz (e.g. 2.80 GHz) on sm6225 / khaje
+      final snapdragon685ByClock = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'khaje',
+        manufacturer: 'xiaomi',
+        maxClockGhz: 2.80,
+      );
+      expect(snapdragon685ByClock, equals('Qualcomm Snapdragon 685'));
+
+      final snapdragon685ByClockOnSm6225 = DeviceSpecHelper.detectSocName(
+        hardware: 'sm6225',
+        board: 'bengal',
+        manufacturer: 'realme',
+        maxClockGhz: 2.75,
+      );
+      expect(snapdragon685ByClockOnSm6225, equals('Qualcomm Snapdragon 685'));
+
+      // Snapdragon 680 detection when clock speed <= 2.60 GHz (e.g. 2.40 GHz) or null on sm6225 / khaje
+      final snapdragon680ByClock = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'khaje',
+        manufacturer: 'xiaomi',
+        maxClockGhz: 2.40,
+      );
+      expect(snapdragon680ByClock, equals('Qualcomm Snapdragon 680'));
+
+      final snapdragon680DefaultFallback = DeviceSpecHelper.detectSocName(
+        hardware: 'sm6225',
+        board: 'bengal',
+        manufacturer: 'xiaomi',
+      );
+      expect(snapdragon680DefaultFallback, equals('Qualcomm Snapdragon 680'));
 
       // New 64-bit SoCs (2024-2026)
       final snapdragon8EliteCpu = DeviceSpecHelper.detectSocName(
