@@ -4,7 +4,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_settings.dart';
-import '../services/cache_manager_service.dart';
 import '../services/device_spec_helper.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
@@ -19,17 +18,13 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
-  final _cacheManager = CacheManagerService();
-  int _cacheSizeBytes = 0;
-  bool _isClearingCache = false;
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v3.2.1';
-  String _buildNumber = '28';
+  String _appVersion = 'v3.3.0';
+  String _buildNumber = '29';
 
   @override
   void initState() {
     super.initState();
-    _loadCacheSize();
     _loadHardwareInfo();
     _loadAppVersion();
   }
@@ -42,14 +37,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '28';
+              : '29';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v3.2.1';
-          _buildNumber = '28';
+          _appVersion = 'v3.3.0';
+          _buildNumber = '29';
         });
       }
     }
@@ -60,15 +55,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() {
         _hardwareInfo = info;
-      });
-    }
-  }
-
-  Future<void> _loadCacheSize() async {
-    final size = await _cacheManager.getCacheSizeBytes();
-    if (mounted) {
-      setState(() {
-        _cacheSizeBytes = size;
       });
     }
   }
@@ -217,7 +203,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 20),
 
-              // ─── 3. Storage & Cache ─────────────────────────────────
+              // ─── 3. Storage ─────────────────────────────────────────
               _buildSectionTitle(
                 icon: Icons.folder_copy_outlined,
                 title: l10n.t('storage_cache'),
@@ -332,17 +318,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           : null,
                       l10n: l10n,
                     ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
-
-                    // Cache Size & Clear Section
-                    _buildCacheSection(context, theme, l10n),
                   ],
                 ),
               ),
@@ -1528,113 +1503,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // ── Cache Management Section ──────────────────────────────────────────────
-
-  Widget _buildCacheSection(
-    BuildContext context,
-    ThemeData theme,
-    AppLocalizations l10n,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.t('settings_cache_size'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurface.withAlpha(140),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  CacheManagerService.formatBytes(_cacheSizeBytes),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-            OutlinedButton.icon(
-              onPressed: _isClearingCache
-                  ? null
-                  : () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      setState(() => _isClearingCache = true);
-                      final freed = await _cacheManager.clearAllCache();
-                      await _loadCacheSize();
-                      if (!mounted) return;
-                      setState(() => _isClearingCache = false);
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            l10n.t(
-                              'settings_clear_cache_success',
-                              args: {
-                                'size': CacheManagerService.formatBytes(freed),
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-              icon: _isClearingCache
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.delete_outline_rounded, size: 16),
-              label: Text(l10n.t('settings_clear_cache')),
-              style: OutlinedButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            const Icon(
-              Icons.auto_delete_outlined,
-              size: 14,
-              color: Color(0xFF10B981),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              l10n.t('settings_cache_info'),
-              style: const TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF10B981),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Text(
-          l10n.t('settings_cache_info_desc'),
-          style: TextStyle(
-            fontSize: 11,
-            color: theme.colorScheme.onSurface.withAlpha(120),
-            height: 1.25,
-          ),
-        ),
-      ],
-    );
-  }
-
   // ── About & Developer Card ────────────────────────────────────────────────
 
   Widget _buildAboutCard(ThemeData theme, AppLocalizations l10n) {
@@ -1644,51 +1512,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline_rounded,
-                      size: 18,
-                      color: Color(0xFF06B6D4),
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        l10n.t('settings_about'),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const Icon(
+                Icons.info_outline_rounded,
+                size: 18,
+                color: Color(0xFF06B6D4),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 9,
-                  vertical: 3.5,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color(0xFF10B981).withAlpha(120),
-                    width: 0.8,
-                  ),
-                ),
-                child: Text(
-                  _appVersion,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF10B981),
-                  ),
+              Text(
+                l10n.t('settings_about'),
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
