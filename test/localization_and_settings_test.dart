@@ -10,6 +10,8 @@ import 'package:video_downscaler/services/device_spec_helper.dart';
 import 'package:video_downscaler/services/ffmpeg_service.dart';
 import 'package:video_downscaler/services/localization_service.dart';
 import 'package:video_downscaler/screens/settings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_downscaler/services/settings_service.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
 import 'package:video_downscaler/widgets/conversion_options_card.dart';
 
@@ -344,6 +346,26 @@ void main() {
         expect(updated.themeMode, equals(original.themeMode));
       },
     );
+
+    test('SettingsService properly toggles and persists keepScreenAwake', () async {
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+
+      expect(service.settings.keepScreenAwake, isFalse);
+
+      await service.setKeepScreenAwake(true);
+      expect(service.settings.keepScreenAwake, isTrue);
+
+      await service.setKeepScreenAwake(false);
+      expect(service.settings.keepScreenAwake, isFalse);
+
+      await service.setKeepScreenAwake(true);
+      expect(service.settings.keepScreenAwake, isTrue);
+
+      await service.resetToDefaults();
+      expect(service.settings.keepScreenAwake, isFalse);
+    });
 
     test('FFmpegService getOutputDirectory uses customPath when provided and valid', () async {
       final customTemp = Directory(
