@@ -63,7 +63,7 @@
 - **Non-Destructive File Naming:** Automatically detects filename collisions and appends incremental identifiers (`-2`, `-3`) to avoid overwriting existing media.
 - **Automated Cache Purge:** Cleans up temporary file picker caches with live size feedback to keep device storage clean.
 
-### 6. Dynamic Visual Engine & 11-Language Localization
+### 6. Dynamic Visual Engine & 22-Language Localization
 - **Continuous Looping Background Animations:** Battery-friendly, mathematically seamless animated canvas tailored to each active theme:
   - **Dark Aurora:** Vivid arctic aurora borealis curtains and gentle falling snowflakes ❄️.
   - **OLED Cosmic Moon:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency.
@@ -71,19 +71,29 @@
   - **AMOLED Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸.
 - **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Emerald Arctic Snowflake*, *Moonlight Starlight*, *Sunburst Gold*, or *Sakura Blossom*).
 - **Easter Egg Theme (AMOLED Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively.
-- **100% Dictionary Coverage across 11 Languages (222 Keys Each):**
+- **100% Dictionary Coverage across 22 Languages (222 Keys Each):**
   - 🇮🇩 Indonesian (Bahasa Indonesia)
   - 🇺🇸 English
+  - 🇸🇦 Arabic (العربية)
+  - 🇲🇾 Malay (Bahasa Melayu)
+  - 🇩🇰 Danish (Dansk)
+  - 🇩🇪 German (Deutsch)
+  - 🇪🇸 Spanish (Español)
+  - 🇫🇷 French (Français)
+  - 🇮🇹 Italian (Italiano)
+  - 🇳🇱 Dutch (Nederlands)
+  - 🇳🇴 Norwegian (Norsk)
+  - 🇵🇹 Portuguese (Português)
+  - 🇷🇺 Russian (Русский)
+  - 🇫🇮 Finnish (Suomi)
+  - 🇸🇪 Swedish (Svenska)
+  - 🇻🇳 Vietnamese (Tiếng Việt)
+  - 🇹🇭 Thai (ไทย)
+  - 🇮🇳 Hindi (हिन्दी)
+  - 🇯🇵 Japanese (日本語)
   - 🇨🇳 Simplified Chinese (简体中文)
   - 🇹🇼 Traditional Chinese (繁體中文)
-  - 🇪🇸 Spanish (Español)
-  - 🇵🇹 Portuguese (Português)
-  - 🇯🇵 Japanese (日本語)
   - 🇰🇷 Korean (한국어)
-  - 🇮🇳 Hindi (हिन्दी)
-  - 🇸🇦 Arabic (العربية)
-  - 🇫🇷 French (Français)
-  - 🇷🇺 Russian (Русский)
 
 ---
 
