@@ -277,9 +277,11 @@ class FFmpegService {
         targetW == sourceVideo.width && targetH == sourceVideo.height;
 
     // Check eligibility for Smart Stream Copy (Lossless Passthrough)
-    final isSourceH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+    final isSourceH264 =
+        sourceVideo.codec.toLowerCase().contains('h264') ||
         sourceVideo.codec.toLowerCase().contains('avc');
-    final isFpsSame = encodingOptions.targetFps <= 0 ||
+    final isFpsSame =
+        encodingOptions.targetFps <= 0 ||
         encodingOptions.targetFps == sourceVideo.fps.round();
     final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
 
@@ -335,23 +337,18 @@ class FFmpegService {
 
       final List<String> rateControlArgs;
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArgs = [
-          '-crf',
-          '${encodingOptions.crfValue}',
-        ];
+        rateControlArgs = ['-crf', '${encodingOptions.crfValue}'];
       } else {
-        rateControlArgs = [
-          '-b:v',
-          '${targetBitrateKbps}k',
-        ];
+        rateControlArgs = ['-b:v', '${targetBitrateKbps}k'];
       }
 
       if (isOriginalResolution) {
         vfFilter =
             '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       } else {
-        final scaleFlag =
-            appSettings.cpuPreset == 'slow' ? 'bicubic' : 'bilinear';
+        final scaleFlag = appSettings.cpuPreset == 'slow'
+            ? 'bicubic'
+            : 'bilinear';
         vfFilter =
             '${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease:flags=$scaleFlag,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
       }
@@ -374,12 +371,7 @@ class FFmpegService {
       if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
         audioArgs = ['-an'];
       } else {
-        audioArgs = [
-          '-c:a',
-          'aac',
-          '-b:a',
-          '${appSettings.audioBitrateKbps}k',
-        ];
+        audioArgs = ['-c:a', 'aac', '-b:a', '${appSettings.audioBitrateKbps}k'];
       }
     }
 
@@ -453,9 +445,11 @@ class FFmpegService {
 
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
-    final isSourceH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+    final isSourceH264 =
+        sourceVideo.codec.toLowerCase().contains('h264') ||
         sourceVideo.codec.toLowerCase().contains('avc');
-    final isFpsSame = encodingOptions.targetFps <= 0 ||
+    final isFpsSame =
+        encodingOptions.targetFps <= 0 ||
         encodingOptions.targetFps == sourceVideo.fps.round();
     final bool isStreamCopy = isOriginalResolution && isFpsSame && isSourceH264;
 
@@ -573,7 +567,12 @@ class FFmpegService {
       final effectiveBitrate = audioBitrateKbps > 0 ? audioBitrateKbps : 192;
       switch (audioFormat) {
         case AudioFormat.mp3:
-          audioCodecArgs = ['-c:a', 'libmp3lame', '-b:a', '${effectiveBitrate}k'];
+          audioCodecArgs = [
+            '-c:a',
+            'libmp3lame',
+            '-b:a',
+            '${effectiveBitrate}k',
+          ];
           break;
         case AudioFormat.m4a:
           audioCodecArgs = ['-c:a', 'aac', '-b:a', '${effectiveBitrate}k'];
@@ -587,7 +586,10 @@ class FFmpegService {
     final arguments = <String>[
       '-i',
       sourceVideo.filePath,
-      if (appSettings.cpuThreads > 0) ...['-threads', '${appSettings.cpuThreads}'],
+      if (appSettings.cpuThreads > 0) ...[
+        '-threads',
+        '${appSettings.cpuThreads}',
+      ],
       '-vn',
       '-sn',
       '-dn',
@@ -599,8 +601,9 @@ class FFmpegService {
       outputPath,
     ];
 
-    final commandDebug =
-        arguments.map((a) => a.contains(' ') ? '"$a"' : a).join(' ');
+    final commandDebug = arguments
+        .map((a) => a.contains(' ') ? '"$a"' : a)
+        .join(' ');
     onLog('Command: ffmpeg $commandDebug');
     onLog(
       'Output: Extracting audio as ${audioFormat.displayName} @ ${audioBitrateKbps > 0 ? "$audioBitrateKbps kbps" : (canCopy ? "Original Copy" : "Auto 192 kbps")}',

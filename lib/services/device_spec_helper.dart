@@ -180,14 +180,16 @@ class DeviceSpecHelper {
     try {
       int maxKhz = 0;
       for (int i = 0; i < 16; i++) {
-        final freqFile =
-            File('/sys/devices/system/cpu/cpu$i/cpufreq/cpuinfo_max_freq');
+        final freqFile = File(
+          '/sys/devices/system/cpu/cpu$i/cpufreq/cpuinfo_max_freq',
+        );
         if (freqFile.existsSync()) {
           final val = int.tryParse(freqFile.readAsStringSync().trim());
           if (val != null && val > maxKhz) maxKhz = val;
         } else {
-          final scalingFile =
-              File('/sys/devices/system/cpu/cpu$i/cpufreq/scaling_max_freq');
+          final scalingFile = File(
+            '/sys/devices/system/cpu/cpu$i/cpufreq/scaling_max_freq',
+          );
           if (scalingFile.existsSync()) {
             final val = int.tryParse(scalingFile.readAsStringSync().trim());
             if (val != null && val > maxKhz) maxKhz = val;

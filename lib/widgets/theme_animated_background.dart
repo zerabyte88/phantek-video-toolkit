@@ -148,105 +148,130 @@ class _ThemeBackgroundPainter extends CustomPainter {
         break;
       case 'dark':
       default:
-        _paintAuroraSnow(canvas, size, paint);
+        _paintSnowfallVillage(canvas, size, paint);
         break;
     }
   }
 
   // =========================================================================
-  // 1. DARK MODE: AURORA BOREALIS & FALLING SNOW
+  // 1. SNOWFALL MODE: WINTER VILLAGE NIGHT & WARM CABIN GLOW
   // =========================================================================
-  void _paintAuroraSnow(Canvas canvas, Size size, Paint paint) {
-    // A. Aurora Borealis waving light curtains across top of screen
-    final auroraCycle = progress * 2 * math.pi;
-
-    // Layer 1: Ethereal Aurora Green Curtain
-    final greenPath = Path();
-    final gY1 = size.height * 0.22 + math.sin(auroraCycle + 0.3) * 20.0;
-    final gY2 = size.height * 0.28 + math.sin(auroraCycle + 2.1) * 24.0;
-    final gY3 = size.height * 0.20 + math.sin(auroraCycle + 4.2) * 18.0;
-
-    greenPath.moveTo(0, 0);
-    greenPath.lineTo(0, gY1);
-    greenPath.cubicTo(
-      size.width * 0.35,
-      gY1 + 15,
+  void _paintSnowfallVillage(Canvas canvas, Size size, Paint paint) {
+    // A. Distant Snow Hill (Background rolling slope)
+    final backHillPath = Path();
+    final backHillBaseY = size.height * 0.83;
+    backHillPath.moveTo(0, backHillBaseY + 14);
+    backHillPath.cubicTo(
+      size.width * 0.30,
+      backHillBaseY - 24,
       size.width * 0.65,
-      gY2 - 15,
+      backHillBaseY + 20,
       size.width,
-      gY3,
+      backHillBaseY - 12,
     );
-    greenPath.lineTo(size.width, 0);
-    greenPath.close();
+    backHillPath.lineTo(size.width, size.height);
+    backHillPath.lineTo(0, size.height);
+    backHillPath.close();
 
-    final greenGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        const Color(0xFF10B981).withAlpha(50),
-        const Color(0xFF059669).withAlpha(30),
-        const Color(0xFF10B981).withAlpha(0),
-      ],
+    final backHillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF1E293B).withAlpha(120),
+          const Color(0xFF0F172A).withAlpha(190),
+        ],
+      ).createShader(Offset.zero & size);
+    canvas.drawPath(backHillPath, backHillPaint);
+
+    // Distant Snow Cap on back hill
+    final backHillSnowPaint = Paint()
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke
+      ..color = const Color(0xFF94A3B8).withAlpha(55);
+    canvas.drawPath(backHillPath, backHillSnowPaint);
+
+    // Pine trees on distant slope
+    _drawSnowyPine(
+      canvas,
+      Offset(size.width * 0.08, backHillBaseY + 10),
+      22,
+      38,
     );
-    final auroraPaint = Paint()
-      ..shader = greenGradient.createShader(Offset.zero & size);
-    canvas.drawPath(greenPath, auroraPaint);
+    _drawSnowyPine(
+      canvas,
+      Offset(size.width * 0.52, backHillBaseY + 16),
+      24,
+      40,
+    );
 
-    // Layer 2: Arctic Cyan / Electric Teal Ribbon
-    final cyanPath = Path();
-    final cY1 = size.height * 0.16 + math.sin(auroraCycle * 2 + 1.2) * 16.0;
-    final cY2 = size.height * 0.24 + math.sin(auroraCycle * 2 + 3.4) * 20.0;
-    final cY3 = size.height * 0.18 + math.sin(auroraCycle * 2 + 5.1) * 15.0;
-
-    cyanPath.moveTo(0, 0);
-    cyanPath.lineTo(0, cY1);
-    cyanPath.cubicTo(
-      size.width * 0.4,
-      cY2,
-      size.width * 0.7,
-      cY1 - 10,
+    // B. Foreground Village Hill (Main layer)
+    final hillPath = Path();
+    final hillBaseY = size.height * 0.88;
+    hillPath.moveTo(0, hillBaseY - 10);
+    hillPath.cubicTo(
+      size.width * 0.32,
+      hillBaseY + 18,
+      size.width * 0.68,
+      hillBaseY - 28,
       size.width,
-      cY3,
+      hillBaseY + 8,
     );
-    cyanPath.lineTo(size.width, 0);
-    cyanPath.close();
+    hillPath.lineTo(size.width, size.height);
+    hillPath.lineTo(0, size.height);
+    hillPath.close();
 
-    final cyanGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        const Color(0xFF00E5FF).withAlpha(40),
-        const Color(0xFF06B6D4).withAlpha(22),
-        const Color(0xFF00E5FF).withAlpha(0),
-      ],
+    final hillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF1E293B).withAlpha(220),
+          const Color(0xFF0F172A).withAlpha(255),
+        ],
+      ).createShader(Offset.zero & size);
+    canvas.drawPath(hillPath, hillPaint);
+
+    // Crisp Snow Ridge Crest along main hill
+    final snowRidgePaint = Paint()
+      ..strokeWidth = 3.0
+      ..style = PaintingStyle.stroke
+      ..shader = LinearGradient(
+        colors: [
+          const Color(0xFFCFF0FF).withAlpha(90),
+          const Color(0xFFBAE6FD).withAlpha(160),
+          const Color(0xFFCFF0FF).withAlpha(70),
+        ],
+      ).createShader(Offset.zero & size);
+    canvas.drawPath(hillPath, snowRidgePaint);
+
+    // Pine trees on foreground slope
+    _drawSnowyPine(canvas, Offset(size.width * 0.38, hillBaseY + 12), 18, 30);
+    _drawSnowyPine(canvas, Offset(size.width * 0.92, hillBaseY - 4), 20, 34);
+
+    // C. Village Cabins with warm glowing windows & chimney smoke
+    // Cabin 1: Left slope (cozy cottage)
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.22, hillBaseY + 6),
+      34.0,
+      30.0,
+      chimneyXOffset: 8,
+      hasChimney: true,
     );
-    auroraPaint.shader = cyanGradient.createShader(Offset.zero & size);
-    canvas.drawPath(cyanPath, auroraPaint);
 
-    // Layer 3: Cosmic Aurora Violet Shimmer
-    final violetPath = Path();
-    final vY1 = size.height * 0.12 + math.sin(auroraCycle + 1.8) * 14.0;
-    final vY2 = size.height * 0.19 + math.sin(auroraCycle + 4.0) * 16.0;
-
-    violetPath.moveTo(0, 0);
-    violetPath.lineTo(0, vY1);
-    violetPath.quadraticBezierTo(size.width * 0.5, vY2, size.width, vY1);
-    violetPath.lineTo(size.width, 0);
-    violetPath.close();
-
-    final violetGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        const Color(0xFF8B5CF6).withAlpha(35),
-        const Color(0xFF6366F1).withAlpha(15),
-        const Color(0xFF8B5CF6).withAlpha(0),
-      ],
+    // Cabin 2: Right slope (main village cabin)
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.74, hillBaseY - 18),
+      42.0,
+      36.0,
+      chimneyXOffset: -10,
+      hasChimney: true,
     );
-    auroraPaint.shader = violetGradient.createShader(Offset.zero & size);
-    canvas.drawPath(violetPath, auroraPaint);
 
-    // B. Falling Snowflakes (Smooth drifting and gentle wind sway)
+    // D. Falling Snowflakes in crystalline #CFF0FF
+    final snowBaseColor = const Color(0xFFCFF0FF);
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
       final currentProgress = (p.y + progress * p.cycles) % 1.0;
@@ -258,7 +283,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       final xPos = (p.x * size.width + sway) % size.width;
 
       final edgeFade = math.sin(currentProgress * math.pi);
-      final alpha = ((40 + 190 * edgeFade) * edgeFade).toInt().clamp(0, 255);
+      final alpha = ((50 + 190 * edgeFade) * edgeFade).toInt().clamp(0, 255);
 
       if (p.variant == 0) {
         // Crystal cross snowflake for prominent flakes
@@ -269,7 +294,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
 
         final arm = p.size * 0.85;
         final flakePaint = Paint()
-          ..color = const Color(0xFFE0F2FE).withAlpha(alpha)
+          ..color = snowBaseColor.withAlpha(alpha)
           ..strokeWidth = 1.1
           ..style = PaintingStyle.stroke;
 
@@ -281,13 +306,13 @@ class _ThemeBackgroundPainter extends CustomPainter {
         canvas.restore();
       } else if (p.variant == 1) {
         // Frosty soft snowflake with halo
-        paint.color = const Color(0xFFBAE6FD).withAlpha((alpha * 0.4).toInt());
+        paint.color = snowBaseColor.withAlpha((alpha * 0.35).toInt());
         canvas.drawCircle(Offset(xPos, yPos), p.size * 0.9, paint);
-        paint.color = const Color(0xFFFFFFFF).withAlpha(alpha);
+        paint.color = snowBaseColor.withAlpha(alpha);
         canvas.drawCircle(Offset(xPos, yPos), p.size * 0.45, paint);
       } else {
         // Crisp snow crystal dot
-        paint.color = const Color(0xFFF0F9FF).withAlpha(alpha);
+        paint.color = snowBaseColor.withAlpha(alpha);
         canvas.drawCircle(
           Offset(xPos, yPos),
           (p.size * 0.4).clamp(1.0, 2.8),
@@ -295,6 +320,180 @@ class _ThemeBackgroundPainter extends CustomPainter {
         );
       }
     }
+  }
+
+  void _drawSnowyPine(Canvas canvas, Offset base, double width, double height) {
+    final trunkHeight = height * 0.22;
+    final trunkWidth = width * 0.18;
+    final trunkRect = Rect.fromCenter(
+      center: Offset(base.dx, base.dy - trunkHeight / 2),
+      width: trunkWidth,
+      height: trunkHeight,
+    );
+    canvas.drawRect(trunkRect, Paint()..color = const Color(0xFF1E293B));
+
+    for (int tier = 0; tier < 3; tier++) {
+      final tierBottom = base.dy - trunkHeight * 0.8 - (tier * height * 0.26);
+      final tierTop = tierBottom - height * 0.38;
+      final tierW = width * (1.0 - tier * 0.25);
+
+      final foliagePath = Path();
+      foliagePath.moveTo(base.dx, tierTop);
+      foliagePath.lineTo(base.dx + tierW / 2, tierBottom);
+      foliagePath.lineTo(base.dx - tierW / 2, tierBottom);
+      foliagePath.close();
+
+      canvas.drawPath(
+        foliagePath,
+        Paint()..color = const Color(0xFF0F172A).withAlpha(240),
+      );
+
+      final snowPath = Path();
+      snowPath.moveTo(base.dx - tierW / 2, tierBottom);
+      snowPath.quadraticBezierTo(
+        base.dx,
+        tierBottom - 4,
+        base.dx + tierW / 2,
+        tierBottom,
+      );
+      canvas.drawPath(
+        snowPath,
+        Paint()
+          ..strokeWidth = 2.0
+          ..style = PaintingStyle.stroke
+          ..color = const Color(0xFFCFF0FF).withAlpha(180),
+      );
+    }
+  }
+
+  void _drawSnowyCabin(
+    Canvas canvas,
+    Offset base,
+    double width,
+    double height, {
+    required double chimneyXOffset,
+    required bool hasChimney,
+  }) {
+    final bodyHeight = height * 0.58;
+    final bodyRect = Rect.fromLTWH(
+      base.dx - width / 2,
+      base.dy - bodyHeight,
+      width,
+      bodyHeight,
+    );
+    canvas.drawRect(bodyRect, Paint()..color = const Color(0xFF1E293B));
+
+    // Warm golden glowing window
+    final winW = width * 0.32;
+    final winH = bodyHeight * 0.44;
+    final winRect = Rect.fromCenter(
+      center: Offset(base.dx, base.dy - bodyHeight * 0.48),
+      width: winW,
+      height: winH,
+    );
+
+    // Window warm ambient halo glow
+    final windowGlowPulse =
+        (math.sin(progress * 2 * math.pi + base.dx) + 1) / 2;
+    final haloPaint = Paint()
+      ..shader =
+          RadialGradient(
+            colors: [
+              const Color(0xFFFDE047)
+                  .withAlpha((90 + 35 * windowGlowPulse).toInt()),
+              const Color(0xFFFEF08A).withAlpha(25),
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.55, 1.0],
+          ).createShader(
+            Rect.fromCircle(center: winRect.center, radius: winW * 1.8),
+          );
+    canvas.drawCircle(winRect.center, winW * 1.8, haloPaint);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(winRect, const Radius.circular(2)),
+      Paint()..color = const Color(0xFFFDE047).withAlpha(235),
+    );
+
+    final framePaint = Paint()
+      ..color = const Color(0xFF0F172A)
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(
+      Offset(winRect.left, winRect.center.dy),
+      Offset(winRect.right, winRect.center.dy),
+      framePaint,
+    );
+    canvas.drawLine(
+      Offset(winRect.center.dx, winRect.top),
+      Offset(winRect.center.dx, winRect.bottom),
+      framePaint,
+    );
+
+    // Chimney & rising smoke
+    if (hasChimney) {
+      final chW = width * 0.16;
+      final chH = height * 0.34;
+      final chX = base.dx + chimneyXOffset;
+      final chY = base.dy - bodyHeight - height * 0.22;
+      canvas.drawRect(
+        Rect.fromLTWH(chX - chW / 2, chY, chW, chH),
+        Paint()..color = const Color(0xFF0F172A),
+      );
+
+      // Chimney snow cap
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(chX - chW * 0.65, chY - 2, chW * 1.3, 3),
+          const Radius.circular(1.5),
+        ),
+        Paint()..color = const Color(0xFFCFF0FF),
+      );
+
+      // Drifting chimney smoke puffs
+      for (int s = 0; s < 4; s++) {
+        final smokeProgress = (progress + s * 0.25) % 1.0;
+        final smokeY = chY - smokeProgress * 42.0;
+        final smokeSway =
+            math.sin(smokeProgress * math.pi * 3 + s) * 6.0 +
+            (smokeProgress * 7.0);
+        final smokeX = chX + smokeSway;
+        final smokeRadius = 2.4 + smokeProgress * 6.5;
+        final smokeAlpha = ((1.0 - smokeProgress) * 75).toInt().clamp(0, 255);
+
+        canvas.drawCircle(
+          Offset(smokeX, smokeY),
+          smokeRadius,
+          Paint()..color = const Color(0xFFE2E8F0).withAlpha(smokeAlpha),
+        );
+      }
+    }
+
+    // Snow-covered gable roof
+    final roofPeak = Offset(base.dx, base.dy - height);
+    final roofLeft = Offset(base.dx - width * 0.64, base.dy - bodyHeight + 2);
+    final roofRight = Offset(base.dx + width * 0.64, base.dy - bodyHeight + 2);
+
+    final roofPath = Path();
+    roofPath.moveTo(roofPeak.dx, roofPeak.dy);
+    roofPath.lineTo(roofRight.dx, roofRight.dy);
+    roofPath.lineTo(roofLeft.dx, roofLeft.dy);
+    roofPath.close();
+    canvas.drawPath(roofPath, Paint()..color = const Color(0xFF0F172A));
+
+    final snowRoofPath = Path();
+    snowRoofPath.moveTo(roofPeak.dx, roofPeak.dy - 3);
+    snowRoofPath.lineTo(roofRight.dx + 2, roofRight.dy - 1);
+    snowRoofPath.lineTo(roofRight.dx - 2, roofRight.dy + 3);
+    snowRoofPath.lineTo(roofPeak.dx, roofPeak.dy + 2);
+    snowRoofPath.lineTo(roofLeft.dx + 2, roofLeft.dy + 3);
+    snowRoofPath.lineTo(roofLeft.dx - 2, roofLeft.dy - 1);
+    snowRoofPath.close();
+
+    canvas.drawPath(
+      snowRoofPath,
+      Paint()..color = const Color(0xFFCFF0FF).withAlpha(240),
+    );
   }
 
   // =========================================================================

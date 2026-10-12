@@ -454,11 +454,14 @@ void main() {
       expect(getScaleFlag('slow'), equals('bicubic'));
     });
 
-    test('H.264 high profile and level 4.1 configuration parameters are correct', () {
-      const profileLevel = '-profile:v high -level:v 4.1';
-      expect(profileLevel, contains('profile:v high'));
-      expect(profileLevel, contains('level:v 4.1'));
-    });
+    test(
+      'H.264 high profile and level 4.1 configuration parameters are correct',
+      () {
+        const profileLevel = '-profile:v high -level:v 4.1';
+        expect(profileLevel, contains('profile:v high'));
+        expect(profileLevel, contains('level:v 4.1'));
+      },
+    );
 
     test('H.264 rate control logic applies VBV buffer limits to prevent decoder spikes', () {
       const targetBitrateKbps = 4000;
@@ -468,11 +471,14 @@ void main() {
       expect(vbvArgs, equals('-maxrate 8000k -bufsize 16000k'));
     });
 
-    test('EncodingOptions default crfValue is 23 and crf getter alias matches', () {
-      const opts = EncodingOptions();
-      expect(opts.crfValue, equals(23));
-      expect(opts.crf, equals(23));
-    });
+    test(
+      'EncodingOptions default crfValue is 23 and crf getter alias matches',
+      () {
+        const opts = EncodingOptions();
+        expect(opts.crfValue, equals(23));
+        expect(opts.crf, equals(23));
+      },
+    );
 
     test('Smart Stream Copy condition correctly evaluates eligibility for lossless passthrough', () {
       const sourceVideo = VideoInfo(
@@ -490,8 +496,10 @@ void main() {
       );
 
       // Same resolution, same FPS, h264 source -> eligible
-      final isOriginalRes = 1280 == sourceVideo.width && 720 == sourceVideo.height;
-      final isH264 = sourceVideo.codec.toLowerCase().contains('h264') ||
+      final isOriginalRes =
+          1280 == sourceVideo.width && 720 == sourceVideo.height;
+      final isH264 =
+          sourceVideo.codec.toLowerCase().contains('h264') ||
           sourceVideo.codec.toLowerCase().contains('avc');
       final isSameFps = 0 <= 0 || 0 == sourceVideo.fps.round();
       final isStreamCopy = isOriginalRes && isH264 && isSameFps;
@@ -499,7 +507,8 @@ void main() {
       expect(isStreamCopy, isTrue);
 
       // Downscaled resolution -> NOT eligible (must re-encode)
-      final isDownscaleRes = 854 == sourceVideo.width && 480 == sourceVideo.height;
+      final isDownscaleRes =
+          854 == sourceVideo.width && 480 == sourceVideo.height;
       final isStreamCopyDownscale = isDownscaleRes && isH264 && isSameFps;
       expect(isStreamCopyDownscale, isFalse);
     });
@@ -567,7 +576,10 @@ void main() {
       final vfIdx = args.indexOf('-vf');
       expect(vfIdx, isNot(-1));
       final vf = args[vfIdx + 1];
-      expect(vf, contains('scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
+      expect(
+        vf,
+        contains('scale=w=1080:h=1920:force_original_aspect_ratio=decrease'),
+      );
       expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
       expect(vf, contains('format=yuv420p'));
 

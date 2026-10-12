@@ -19,14 +19,14 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  // 1. Dark Mode: Aurora Borealis & Falling Snow
+  // 1. Snowfall: Winter Village Night & Crystalline Snow
   static const _darkColors = [
-    Color(0xFF10B981), // Emerald Aurora Green
-    Color(0xFF06B6D4), // Vivid Arctic Teal
-    Color(0xFF00E5FF), // Electric Arctic Cyan
-    Color(0xFF8B5CF6), // Cosmic Aurora Violet
-    Color(0xFF059669), // Deep Polar Emerald
-    Color(0xFF10B981), // Back to Emerald Aurora
+    Color(0xFF38BDF8), // Ice Sky Blue
+    Color(0xFFCFF0FF), // Crystalline Snow
+    Color(0xFFBAE6FD), // Soft Glacial Blue
+    Color(0xFFFDE047), // Warm Cabin Glow
+    Color(0xFF0284C7), // Deep Winter Slate
+    Color(0xFF38BDF8), // Back to Ice Sky Blue
   ];
 
   // 2. Dark OLED: Glowing Moon, Twinkling Stars & Shooting Meteors
@@ -123,8 +123,8 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
             activeColors = _darkColors;
             activeIcon = Icons.ac_unit_rounded;
             iconColor = Color.lerp(
-              const Color(0xFF10B981),
-              const Color(0xFF00E5FF),
+              const Color(0xFFCFF0FF),
+              const Color(0xFF38BDF8),
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;

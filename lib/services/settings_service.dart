@@ -29,14 +29,11 @@ class SettingsService extends ChangeNotifier {
       final jsonStr = prefs.getString(_storageKey);
       if (jsonStr != null) {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
+        final rawRamBuffer = data['ramBufferMb'] as int? ?? 512;
         _settings = AppSettings.fromJson(data);
-        if (_settings.ramBufferMb > 2048) {
-          final totalRamMb = DeviceSpecHelper.getTotalRamMb();
-          final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(totalRamMb);
-          if (marketedRamGb <= 4 || totalRamMb <= 4096) {
-            _settings = _settings.copyWith(ramBufferMb: 2048);
-            await _saveSettings();
-          }
+        if (rawRamBuffer > 2048) {
+          _settings = _settings.copyWith(ramBufferMb: 2048);
+          await _saveSettings();
         }
       }
 
@@ -107,7 +104,14 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> setThemeMode(String themeMode) async {
-    await updateSettings(_settings.copyWith(themeMode: themeMode));
+    final unlock = themeMode == 'sakura' ? true : _settings.isEasterEggUnlocked;
+    await updateSettings(
+      _settings.copyWith(themeMode: themeMode, isEasterEggUnlocked: unlock),
+    );
+  }
+
+  Future<void> setEasterEggUnlocked(bool unlocked) async {
+    await updateSettings(_settings.copyWith(isEasterEggUnlocked: unlocked));
   }
 
   Future<void> setKeepScreenAwake(bool enable) async {
@@ -136,6 +140,11 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setAudioOutputDirectory(String path) async {
     await updateSettings(_settings.copyWith(audioOutputDirectory: path.trim()));
+  }
+
+  Future<void> setCardOpacity(double opacity) async {
+    final clamped = opacity.clamp(0.5, 1.0);
+    await updateSettings(_settings.copyWith(cardOpacity: clamped));
   }
 
   Future<void> resetToDefaults() async {

@@ -8,6 +8,7 @@ import '../services/ffmpeg_service.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
 import '../widgets/animated_flame_title.dart';
+import '../widgets/app_glass_card.dart';
 import '../widgets/audio_extractor_card.dart';
 import '../widgets/conversion_options_card.dart';
 import '../widgets/theme_animated_background.dart';
@@ -262,9 +263,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (_easterEggTapCount >= 10) {
       _easterEggTapCount = 0;
-      await _settingsService.setThemeMode('sakura');
+      final isAlreadyUnlocked = _settingsService.settings.isEasterEggUnlocked;
+
+      if (!isAlreadyUnlocked) {
+        await _settingsService.setEasterEggUnlocked(true);
+        await _settingsService.setThemeMode('sakura');
+      }
+
       if (mounted) {
         final l10n = _settingsService.l10n;
+        final message = isAlreadyUnlocked
+            ? l10n.t('easter_egg_already_active')
+            : l10n.t('easter_egg_sakura_unlocked');
+
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -278,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    l10n.t('easter_egg_sakura_unlocked'),
+                    message,
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       color: Color(0xFFFFF1F2),
@@ -602,66 +613,56 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Clean, modern Import / Select Video Card
   Widget _buildImportCard(ThemeData theme, AppLocalizations l10n) {
-    return InkWell(
+    return AppGlassCard(
       onTap: _pickVideo,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.colorScheme.outline, width: 1.2),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withAlpha(20),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.file_upload_outlined,
-                size: 32,
-                color: theme.colorScheme.primary,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
+      border: Border.all(color: theme.colorScheme.outline, width: 1.2),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withAlpha(20),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.file_upload_outlined,
+              size: 32,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.t('pick_video'),
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.t('supported_formats_hint'),
+            style: TextStyle(
+              fontSize: 12,
+              color: theme.colorScheme.onSurface.withAlpha(140),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: _pickVideo,
+            icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+            label: Text(l10n.t('pick_video')),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.t('pick_video'),
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-                letterSpacing: -0.2,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              l10n.t('supported_formats_hint'),
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.onSurface.withAlpha(140),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _pickVideo,
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
-              label: Text(l10n.t('pick_video')),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.cygnus.albireo&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.3.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.4.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -54,10 +54,10 @@
 ### 5. Modern Minimalist Settings & Hardware Management
 - **4-Container Surface Architecture:** Clean, comfortable Material 3 cards grouping Appearance & Language, Performance & Hardware, Storage & Cache, and Device Specs & About.
 - **Interactive Language Selector:** Displays national flags and opens a sleek rounded modal bottom sheet.
-- **2x2 Grid Theme Selector:** Visual cards with contextual color accents and status badges.
+- **2x2 Grid Theme Selector:** Visual cards with contextual color accents, bordered category badges (`DARK`, `AMOLED`, `LIGHT`), and universal theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`).
 - **Comprehensive Hardware Recognition:** Automatically inspects and displays Device Name, Model Code, Processor / SoC (Qualcomm Snapdragon, MediaTek Dimensity/Helio, Samsung Exynos, Google Tensor, Unisoc), Graphics Processor (GPU Adreno, Mali, Xclipse), Physical RAM, and Available Storage.
 - **CPU Thread Allocation:** Customize encoding thread count or choose automatic multi-core allocation.
-- **RAM Buffer Boundaries:** Configurable memory cache buffer limits (256 MB to 4096 MB) with automatic Out-Of-Memory (OOM) protection disabling the 4GB option on devices with $\le 4\text{ GB}$ physical RAM.
+- **RAM Buffer Boundaries:** Configurable memory cache buffer limits (256 MB to 2048 MB) for optimized mobile FFmpeg memory caching.
 - **Dedicated Video & Audio Output Directories:** Custom folder pickers with one-tap reset defaults.
 - **Developer Card:** Offline circular avatar with cyan glow, developer name, role, and direct `[GitHub ↗]` button.
 - **Non-Destructive File Naming:** Automatically detects filename collisions and appends incremental identifiers (`-2`, `-3`) to avoid overwriting existing media.
@@ -65,31 +65,32 @@
 
 ### 6. Dynamic Visual Engine & 22-Language Localization
 - **Continuous Looping Background Animations:** Battery-friendly, mathematically seamless animated canvas tailored to each active theme:
-  - **Dark Aurora:** Vivid arctic aurora borealis curtains and gentle falling snowflakes ❄️.
-  - **OLED Cosmic Moon:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency.
-  - **Clean Daylight:** Warm morning sunbeams and fresh airy breeze ☀️.
-  - **AMOLED Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸.
-- **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Emerald Arctic Snowflake*, *Moonlight Starlight*, *Sunburst Gold*, or *Sakura Blossom*).
-- **Easter Egg Theme (AMOLED Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively.
-- **100% Dictionary Coverage across 22 Languages (222 Keys Each):**
+  - **Snowfall:** Winter village night landscape with snow-covered wooden cabins, warm golden window glow, chimney smoke puffs, snow-dusted pine trees, and drifting `#CFF0FF` crystalline snowflakes ❄️ (Badge: `DARK`).
+  - **Midnight:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency (Badge: `AMOLED`).
+  - **Daylight:** Warm morning sunbeams and fresh airy breeze ☀️ (Badge: `LIGHT`).
+  - **Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸 (Badge: `AMOLED`).
+- **Card Opacity & Glassmorphism Engine (60 FPS Optimized):** Adjustable card surface transparency from 100% solid down to 50% with an interactive live percentage slider (5% steps) and one-tap quick reset in Settings. When opacity < 100%, cards render a sleek frosted glassmorphism effect (`BackdropFilter` sigma 5.0). At 100% opacity, the blur shader is completely bypassed to guarantee zero GPU compositing overhead and butter-smooth 60 FPS performance.
+- **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Snowfall Crystal*, *Moonlight Starlight*, *Sunburst Gold*, or *Sakura Blossom*).
+- **Easter Egg Theme (Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively (revealing the Sakura theme option in Settings; subsequent 10 taps indicate that the easter egg is already active without re-triggering).
+- **100% Dictionary Coverage across 22 Languages (Alphabetical Latin A–Z then Non-Latin):**
   - 🇮🇩 Indonesian (Bahasa Indonesia)
-  - 🇺🇸 English
-  - 🇸🇦 Arabic (العربية)
   - 🇲🇾 Malay (Bahasa Melayu)
   - 🇩🇰 Danish (Dansk)
   - 🇩🇪 German (Deutsch)
+  - 🇺🇸 English
   - 🇪🇸 Spanish (Español)
   - 🇫🇷 French (Français)
   - 🇮🇹 Italian (Italiano)
   - 🇳🇱 Dutch (Nederlands)
   - 🇳🇴 Norwegian (Norsk)
   - 🇵🇹 Portuguese (Português)
-  - 🇷🇺 Russian (Русский)
   - 🇫🇮 Finnish (Suomi)
   - 🇸🇪 Swedish (Svenska)
   - 🇻🇳 Vietnamese (Tiếng Việt)
-  - 🇹🇭 Thai (ไทย)
+  - 🇷🇺 Russian (Русский)
+  - 🇸🇦 Arabic (العربية)
   - 🇮🇳 Hindi (हिन्दी)
+  - 🇹🇭 Thai (ไทย)
   - 🇯🇵 Japanese (日本語)
   - 🇨🇳 Simplified Chinese (简体中文)
   - 🇹🇼 Traditional Chinese (繁體中文)
@@ -121,11 +122,19 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.3.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.4.0.apk`
 
 ---
 
 ## Version History
+
+- **v3.4.0 (Build 31):**
+  - **Card Opacity & Glassmorphism Control (60 FPS Optimized):** Added interactive card surface transparency control in Settings (50% to 100%, 5% step intervals) with real-time live preview, quick reset button, and automatic zero-overhead shader bypass when at 100% opacity to guarantee flawless 60 FPS performance.
+  - **Theme System Redesign & Symmetrical Grid Alignment:** Standardized universal theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`) with styled category badges (`DARK`, `AMOLED`, `LIGHT`). Aligned theme titles and badges strictly on a shared vertical center axis, with left-aligned theme icons and safe horizontal padding to eliminate text-icon collisions across languages.
+  - **Snowfall Village Dynamic Canvas Engine:** Overhauled dark mode visual engine into a cozy winter village night landscape with snow-covered cabin silhouettes, warm glowing windows, chimney smoke puffs, snow-dusted pine trees, and drifting `#CFF0FF` crystalline snowflakes.
+  - **RAM Buffer Boundary & Balanced Memory Architecture:** Adjusted maximum memory cache buffer limit from 4096 MB to 2048 MB with a symmetrical, centered 4-chip selector (256 MB, 512 MB, 1024 MB, 2048 MB) and automated startup migration.
+  - **Easter Egg Guard & Persistence:** Added persistent unlock state for the AMOLED Sakura theme with notification feedback when already activated, and reset-to-defaults re-locking.
+  - **Alphabetical 22-Language Sorting:** Reordered language picker into clean alphabetical order (Latin A–Z followed by non-Latin scripts) with 100% dictionary completeness across all 22 languages.
 
 - **v3.3.0 (Build 29):**
   - **Qualcomm Snapdragon 685 Clock Speed Architecture:** Added dynamic maximum CPU clock frequency classification in `DeviceSpecHelper` to reliably differentiate between Qualcomm Snapdragon 680 (<= 2.40 GHz) and Snapdragon 685 (> 2.60 GHz) sharing the SM6225 chipset code.

@@ -8,23 +8,26 @@ class AppTheme {
   static const _primaryColor = Color(0xFF2563EB); // Modern Cobalt Blue
   static const _secondaryColor = Color(0xFF0284C7); // Sky Accent
 
-  static ThemeData getTheme(String mode) {
+  static ThemeData getTheme(String mode, {double cardOpacity = 1.0}) {
     switch (mode) {
       case 'sakura':
       case 'oled_sakura':
-        return sakuraTheme;
+        return buildSakuraTheme(cardOpacity: cardOpacity);
       case 'oled':
-        return oledTheme;
+        return buildOledTheme(cardOpacity: cardOpacity);
       case 'light':
-        return lightTheme;
+        return buildLightTheme(cardOpacity: cardOpacity);
       case 'dark':
       default:
-        return darkTheme;
+        return buildDarkTheme(cardOpacity: cardOpacity);
     }
   }
 
-  /// AMOLED Sakura theme (Pitch Black with Cherry Blossom Pink Accents)
-  static ThemeData get sakuraTheme {
+  /// AMOLED Sakura theme getter
+  static ThemeData get sakuraTheme => buildSakuraTheme();
+
+  /// AMOLED Sakura theme builder (Pitch Black with Cherry Blossom Pink Accents)
+  static ThemeData buildSakuraTheme({double cardOpacity = 1.0}) {
     const sakuraPrimary = Color(0xFFF472B6); // Sakura Pink
     const sakuraSecondary = Color(0xFFFDA4AF); // Rose Quartz / Cherry Accent
     const scaffoldBg = Colors.black;
@@ -33,16 +36,22 @@ class AppTheme {
     const textPrimary = Color(0xFFFFF1F2);
     const textSecondary = Color(0xFFD4A5B8);
 
+    final effectiveSurface = cardOpacity < 1.0
+        ? surfaceBg.withAlpha(
+            (255 * cardOpacity.clamp(0.5, 1.0)).round().clamp(0, 255),
+          )
+        : surfaceBg;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: sakuraPrimary,
         secondary: sakuraSecondary,
-        surface: surfaceBg,
+        surface: effectiveSurface,
         onSurface: textPrimary,
         outline: outlineColor,
-        outlineVariant: Color(0xFF220C17),
+        outlineVariant: const Color(0xFF220C17),
       ),
       scaffoldBackgroundColor: scaffoldBg,
       appBarTheme: const AppBarTheme(
@@ -58,7 +67,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: textPrimary),
       ),
       cardTheme: CardThemeData(
-        color: surfaceBg,
+        color: effectiveSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -174,24 +183,33 @@ class AppTheme {
     );
   }
 
-  /// Modern Slate Dark theme (Clean Slate 900 / Slate 800)
-  static ThemeData get darkTheme {
+  /// Modern Slate Dark theme getter
+  static ThemeData get darkTheme => buildDarkTheme();
+
+  /// Modern Slate Dark theme builder (Clean Slate 900 / Slate 800)
+  static ThemeData buildDarkTheme({double cardOpacity = 1.0}) {
     const scaffoldBg = Color(0xFF0F172A); // Slate 900
     const surfaceBg = Color(0xFF1E293B); // Slate 800
     const outlineColor = Color(0xFF334155); // Slate 700
     const textPrimary = Color(0xFFF8FAFC); // Slate 50
     const textSecondary = Color(0xFF94A3B8); // Slate 400
 
+    final effectiveSurface = cardOpacity < 1.0
+        ? surfaceBg.withAlpha(
+            (255 * cardOpacity.clamp(0.5, 1.0)).round().clamp(0, 255),
+          )
+        : surfaceBg;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: _primaryColor,
         secondary: _secondaryColor,
-        surface: surfaceBg,
+        surface: effectiveSurface,
         onSurface: textPrimary,
         outline: outlineColor,
-        outlineVariant: Color(0xFF1E293B),
+        outlineVariant: const Color(0xFF1E293B),
       ),
       scaffoldBackgroundColor: scaffoldBg,
       appBarTheme: const AppBarTheme(
@@ -207,7 +225,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: textPrimary),
       ),
       cardTheme: CardThemeData(
-        color: surfaceBg,
+        color: effectiveSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -323,24 +341,33 @@ class AppTheme {
     );
   }
 
-  /// Pure Pitch Black OLED theme for AMOLED displays
-  static ThemeData get oledTheme {
+  /// Pure Pitch Black OLED theme getter
+  static ThemeData get oledTheme => buildOledTheme();
+
+  /// Pure Pitch Black OLED theme builder for AMOLED displays
+  static ThemeData buildOledTheme({double cardOpacity = 1.0}) {
     const scaffoldBg = Colors.black;
     const surfaceBg = Color(0xFF121214);
     const outlineColor = Color(0xFF27272A); // Zinc 800
     const textPrimary = Color(0xFFFAFAFA);
     const textSecondary = Color(0xFFA1A1AA);
 
+    final effectiveSurface = cardOpacity < 1.0
+        ? surfaceBg.withAlpha(
+            (255 * cardOpacity.clamp(0.5, 1.0)).round().clamp(0, 255),
+          )
+        : surfaceBg;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: _primaryColor,
         secondary: _secondaryColor,
-        surface: surfaceBg,
+        surface: effectiveSurface,
         onSurface: textPrimary,
         outline: outlineColor,
-        outlineVariant: Color(0xFF18181B),
+        outlineVariant: const Color(0xFF18181B),
       ),
       scaffoldBackgroundColor: scaffoldBg,
       appBarTheme: const AppBarTheme(
@@ -356,7 +383,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: textPrimary),
       ),
       cardTheme: CardThemeData(
-        color: surfaceBg,
+        color: effectiveSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -472,24 +499,33 @@ class AppTheme {
     );
   }
 
-  /// Clean, crisp Light theme
-  static ThemeData get lightTheme {
+  /// Clean, crisp Light theme getter
+  static ThemeData get lightTheme => buildLightTheme();
+
+  /// Clean, crisp Light theme builder
+  static ThemeData buildLightTheme({double cardOpacity = 1.0}) {
     const scaffoldBg = Color(0xFFF8FAFC); // Slate 50
     const surfaceBg = Color(0xFFFFFFFF); // Pure White
     const outlineColor = Color(0xFFE2E8F0); // Slate 200
     const textPrimary = Color(0xFF0F172A); // Slate 900
     const textSecondary = Color(0xFF475569); // Slate 600
 
+    final effectiveSurface = cardOpacity < 1.0
+        ? surfaceBg.withAlpha(
+            (255 * cardOpacity.clamp(0.5, 1.0)).round().clamp(0, 255),
+          )
+        : surfaceBg;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: _primaryColor,
         secondary: _secondaryColor,
-        surface: surfaceBg,
+        surface: effectiveSurface,
         onSurface: textPrimary,
         outline: outlineColor,
-        outlineVariant: Color(0xFFF1F5F9),
+        outlineVariant: const Color(0xFFF1F5F9),
       ),
       scaffoldBackgroundColor: scaffoldBg,
       appBarTheme: const AppBarTheme(
@@ -505,7 +541,7 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: surfaceBg,
+        color: effectiveSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),

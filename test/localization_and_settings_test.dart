@@ -79,8 +79,41 @@ void main() {
           reason: 'Language $code must be supported',
         );
       }
-      expect(codes.contains('zh'), isFalse, reason: 'Duplicate zh should not be in supportedLanguages');
+      expect(
+        codes.contains('zh'),
+        isFalse,
+        reason: 'Duplicate zh should not be in supportedLanguages',
+      );
       expect(codes.length, equals(supportedUiCodes.length));
+      expect(
+        codes,
+        equals([
+          'id',
+          'ms',
+          'da',
+          'de',
+          'en',
+          'es',
+          'fr',
+          'it',
+          'nl',
+          'no',
+          'pt',
+          'fi',
+          'sv',
+          'vi',
+          'ru',
+          'ar',
+          'hi',
+          'th',
+          'ja',
+          'zh_CN',
+          'zh_TW',
+          'ko',
+        ]),
+        reason:
+            'supportedLanguages must be sorted Latin A-Z followed by non-Latin',
+      );
     });
 
     test('Translations resolve correctly for all supported languages', () {
@@ -118,6 +151,8 @@ void main() {
         expect(l10n.t('error_details').isNotEmpty, isTrue);
         expect(l10n.t('app_version').isNotEmpty, isTrue);
         expect(l10n.t('res_original').isNotEmpty, isTrue);
+        expect(l10n.t('settings_card_opacity').isNotEmpty, isTrue);
+        expect(l10n.t('settings_card_opacity_desc').isNotEmpty, isTrue);
 
         // Ensure keys do not return the literal key name
         expect(
@@ -127,6 +162,14 @@ void main() {
         expect(l10n.t('proc_continue_btn'), isNot(equals('proc_continue_btn')));
         expect(l10n.t('proc_cancel_btn'), isNot(equals('proc_cancel_btn')));
         expect(l10n.t('rate_control'), isNot(equals('rate_control')));
+        expect(
+          l10n.t('settings_card_opacity'),
+          isNot(equals('settings_card_opacity')),
+        );
+        expect(
+          l10n.t('settings_card_opacity_desc'),
+          isNot(equals('settings_card_opacity_desc')),
+        );
       }
     });
 
@@ -237,6 +280,7 @@ void main() {
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
       expect(settings.audioOutputDirectory, equals(''));
+      expect(settings.isEasterEggUnlocked, isFalse);
     });
 
     test('Serialization to and from JSON works', () {
@@ -250,6 +294,7 @@ void main() {
         keepScreenAwake: true,
         outputDirectory: '/custom/storage/Movies',
         audioOutputDirectory: '/custom/storage/Music',
+        isEasterEggUnlocked: true,
       );
 
       final json = original.toJson();
@@ -264,6 +309,11 @@ void main() {
       expect(restored.keepScreenAwake, isTrue);
       expect(restored.outputDirectory, equals('/custom/storage/Movies'));
       expect(restored.audioOutputDirectory, equals('/custom/storage/Music'));
+      expect(restored.isEasterEggUnlocked, isTrue);
+
+      // Legacy fallback: if themeMode is sakura without isEasterEggUnlocked key
+      final legacy = AppSettings.fromJson({'themeMode': 'sakura'});
+      expect(legacy.isEasterEggUnlocked, isTrue);
     });
 
     test('New theme, wakelock, and cache storage translations exist', () {
@@ -295,25 +345,25 @@ void main() {
         expect(l10n.t('settings_audio_reset_folder').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_changed').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_default').isNotEmpty, isTrue);
-        expect(l10n.t('settings_ram_ultra').isNotEmpty, isTrue);
-        expect(l10n.t('settings_ram_4gb_disabled_hint').isNotEmpty, isTrue);
+        expect(l10n.t('easter_egg_already_active').isNotEmpty, isTrue);
       }
     });
 
-    test(
-      'AppSettings supports 4096 MB RAM buffer serialization and copyWith',
-      () {
-        const original = AppSettings(ramBufferMb: 4096);
-        expect(original.ramBufferMb, equals(4096));
-        final json = original.toJson();
-        expect(json['ramBufferMb'], equals(4096));
-        final fromJson = AppSettings.fromJson(json);
-        expect(fromJson.ramBufferMb, equals(4096));
+    test('AppSettings clamps RAM buffer to 2048 MB on deserialization and copyWith', () {
+      const original = AppSettings(ramBufferMb: 2048);
+      expect(original.ramBufferMb, equals(2048));
+      final json = original.toJson();
+      expect(json['ramBufferMb'], equals(2048));
+      final fromJson = AppSettings.fromJson(json);
+      expect(fromJson.ramBufferMb, equals(2048));
 
-        final updated = original.copyWith(ramBufferMb: 2048);
-        expect(updated.ramBufferMb, equals(2048));
-      },
-    );
+      // Test clamping of values > 2048 MB from legacy stored json
+      final clampedFromJson = AppSettings.fromJson({'ramBufferMb': 4096});
+      expect(clampedFromJson.ramBufferMb, equals(2048));
+
+      final updated = original.copyWith(ramBufferMb: 4096);
+      expect(updated.ramBufferMb, equals(2048));
+    });
 
     test(
       'DeviceSpecHelper getProcessRssMb returns non-negative memory integer',
@@ -347,24 +397,68 @@ void main() {
       },
     );
 
-    test('SettingsService properly toggles and persists keepScreenAwake', () async {
-      SharedPreferences.setMockInitialValues({});
-      final service = SettingsService();
-      await service.init();
+    test(
+      'SettingsService properly toggles and persists keepScreenAwake',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final service = SettingsService();
+        await service.init();
 
-      expect(service.settings.keepScreenAwake, isFalse);
+        expect(service.settings.keepScreenAwake, isFalse);
 
-      await service.setKeepScreenAwake(true);
-      expect(service.settings.keepScreenAwake, isTrue);
+        await service.setKeepScreenAwake(true);
+        expect(service.settings.keepScreenAwake, isTrue);
 
-      await service.setKeepScreenAwake(false);
-      expect(service.settings.keepScreenAwake, isFalse);
+        await service.setKeepScreenAwake(false);
+        expect(service.settings.keepScreenAwake, isFalse);
 
-      await service.setKeepScreenAwake(true);
-      expect(service.settings.keepScreenAwake, isTrue);
+        await service.setKeepScreenAwake(true);
+        expect(service.settings.keepScreenAwake, isTrue);
 
-      await service.resetToDefaults();
-      expect(service.settings.keepScreenAwake, isFalse);
+        await service.resetToDefaults();
+        expect(service.settings.keepScreenAwake, isFalse);
+      },
+    );
+
+    test(
+      'SettingsService properly modifies, clamps and resets cardOpacity',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final service = SettingsService();
+        await service.init();
+
+        expect(service.settings.cardOpacity, equals(1.0));
+
+        await service.setCardOpacity(0.75);
+        expect(service.settings.cardOpacity, equals(0.75));
+
+        // Clamping below 0.5
+        await service.setCardOpacity(0.3);
+        expect(service.settings.cardOpacity, equals(0.5));
+
+        // Clamping above 1.0
+        await service.setCardOpacity(1.2);
+        expect(service.settings.cardOpacity, equals(1.0));
+
+        // Reset to defaults restores 1.0
+        await service.setCardOpacity(0.6);
+        await service.resetToDefaults();
+        expect(service.settings.cardOpacity, equals(1.0));
+      },
+    );
+
+    test('AppTheme.getTheme correctly factors cardOpacity into surface and card colors', () {
+      final solidDark = AppTheme.getTheme('dark', cardOpacity: 1.0);
+      final translucentDark = AppTheme.getTheme('dark', cardOpacity: 0.5);
+
+      expect(solidDark.cardTheme.color?.a, equals(1.0));
+      expect(translucentDark.cardTheme.color?.a, lessThan(1.0));
+
+      final solidLight = AppTheme.getTheme('light', cardOpacity: 1.0);
+      final translucentLight = AppTheme.getTheme('light', cardOpacity: 0.8);
+
+      expect(solidLight.cardTheme.color?.a, equals(1.0));
+      expect(translucentLight.cardTheme.color?.a, lessThan(1.0));
     });
 
     test('FFmpegService getOutputDirectory uses customPath when provided and valid', () async {
@@ -1102,12 +1196,10 @@ void main() {
           expect(l10n.t('theme_light_desc').isNotEmpty, isTrue);
           expect(l10n.t('theme_light_desc'), isNot(equals('theme_light_desc')));
 
-          expect(l10n.t('theme_sakura').isNotEmpty, isTrue);
-          expect(l10n.t('theme_sakura_desc').isNotEmpty, isTrue);
-          expect(
-            l10n.t('theme_sakura_desc'),
-            isNot(equals('theme_sakura_desc')),
-          );
+          expect(l10n.t('theme_dark'), equals('Snowfall'));
+          expect(l10n.t('theme_oled'), equals('Midnight'));
+          expect(l10n.t('theme_sakura'), equals('Sakura'));
+          expect(l10n.t('theme_light'), equals('Daylight'));
         }
       },
     );
@@ -1136,7 +1228,10 @@ void main() {
     );
 
     test('Target FPS guide keys are completely free of emojis across all supported languages', () {
-      final emojiRegex = RegExp(r'[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]', unicode: true);
+      final emojiRegex = RegExp(
+        r'[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]',
+        unicode: true,
+      );
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
         final title = l10n.t('fps_info_title');
@@ -1153,12 +1248,36 @@ void main() {
         expect(fps24.isNotEmpty, isTrue);
         expect(custom.isNotEmpty, isTrue);
 
-        expect(emojiRegex.hasMatch(title), isFalse, reason: '$code title has emoji');
-        expect(emojiRegex.hasMatch(orig), isFalse, reason: '$code orig has emoji');
-        expect(emojiRegex.hasMatch(fps60), isFalse, reason: '$code fps60 has emoji');
-        expect(emojiRegex.hasMatch(fps30), isFalse, reason: '$code fps30 has emoji');
-        expect(emojiRegex.hasMatch(fps24), isFalse, reason: '$code fps24 has emoji');
-        expect(emojiRegex.hasMatch(custom), isFalse, reason: '$code custom has emoji');
+        expect(
+          emojiRegex.hasMatch(title),
+          isFalse,
+          reason: '$code title has emoji',
+        );
+        expect(
+          emojiRegex.hasMatch(orig),
+          isFalse,
+          reason: '$code orig has emoji',
+        );
+        expect(
+          emojiRegex.hasMatch(fps60),
+          isFalse,
+          reason: '$code fps60 has emoji',
+        );
+        expect(
+          emojiRegex.hasMatch(fps30),
+          isFalse,
+          reason: '$code fps30 has emoji',
+        );
+        expect(
+          emojiRegex.hasMatch(fps24),
+          isFalse,
+          reason: '$code fps24 has emoji',
+        );
+        expect(
+          emojiRegex.hasMatch(custom),
+          isFalse,
+          reason: '$code custom has emoji',
+        );
       }
     });
 
