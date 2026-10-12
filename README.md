@@ -128,7 +128,7 @@ The compiled release APK will be generated at:
 
 ## Version History
 
-- **v3.4.0 (Build 31):**
+- **v3.4.0:**
   - **Card Opacity & Glassmorphism Control (60 FPS Optimized):** Added interactive card surface transparency control in Settings (50% to 100%, 5% step intervals) with real-time live preview, quick reset button, and automatic zero-overhead shader bypass when at 100% opacity to guarantee flawless 60 FPS performance.
   - **Theme System Redesign & Symmetrical Grid Alignment:** Standardized universal theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`) with styled category badges (`DARK`, `AMOLED`, `LIGHT`). Aligned theme titles and badges strictly on a shared vertical center axis, with left-aligned theme icons and safe horizontal padding to eliminate text-icon collisions across languages.
   - **Snowfall Village Dynamic Canvas Engine:** Overhauled dark mode visual engine into a cozy winter village night landscape with snow-covered cabin silhouettes, warm glowing windows, chimney smoke puffs, snow-dusted pine trees, and drifting `#CFF0FF` crystalline snowflakes.
@@ -136,47 +136,47 @@ The compiled release APK will be generated at:
   - **Easter Egg Guard & Persistence:** Added persistent unlock state for the AMOLED Sakura theme with notification feedback when already activated, and reset-to-defaults re-locking.
   - **Alphabetical 22-Language Sorting:** Reordered language picker into clean alphabetical order (Latin A–Z followed by non-Latin scripts) with 100% dictionary completeness across all 22 languages.
 
-- **v3.3.0 (Build 29):**
+- **v3.3.0:**
   - **Qualcomm Snapdragon 685 Clock Speed Architecture:** Added dynamic maximum CPU clock frequency classification in `DeviceSpecHelper` to reliably differentiate between Qualcomm Snapdragon 680 (<= 2.40 GHz) and Snapdragon 685 (> 2.60 GHz) sharing the SM6225 chipset code.
   - **10 New Global Languages Added:** Expanded language localization support from 12 to 22 world languages with native alphabetical sorting in Settings: German (Deutsch), Italian (Italiano), Swedish (Svenska), Danish (Dansk), Finnish (Suomi), Norwegian (Norsk Bokmål), Polish (Polski), Dutch (Nederlands), Turkish (Türkçe), and Portuguese (Português).
   - **Indonesian Audio Extractor Terminology Fix:** Refined Indonesian translation from English "audio extractor" to "ekstrak audio".
   - **Clean Home Screen & Pure CPU Telemetry:** Removed redundant header version badge (harmonizing with the dedicated footer version display) and removed GPU labels across performance cards to accurately represent the pure multi-threaded CPU software encoding pipeline.
 
-- **v3.2.1 (Build 28):**
+- **v3.2.1:**
   - **Keep Screen Awake Full Text Display:** Removed fixed line truncation constraints on the wakelock setting description, allowing full text and battery advisory notices to render seamlessly across all screen sizes and languages.
   - **Clean Language Selector:** Eliminated duplicate Chinese language entry from the settings selection modal while maintaining robust backward-compatible fallback mapping to Simplified Chinese (`zh_CN`).
   - **Test Suite Verification:** Updated localization verification tests ensuring 100% passing test matrix across all supported language configurations.
 
-- **v3.2.0 (Build 27):**
+- **v3.2.0:**
   - **100% libx264 Software Pipeline:** Completely eliminated MediaCodec hardware acceleration (`h264_mediacodec`) to guarantee uniform, distortion-free CRF visual quality and eliminate GPU/NPU driver inconsistencies across all Android vendor devices.
   - **Unconstrained CRF Rate Control:** Default CRF calibrated to 23 for crisp, natural output with no artificial VBV bitrate clamps.
   - **Unified Aspect Preservation & Even Padding:** Standardized downscale pipeline for both portrait and landscape videos (`force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2`) preventing encoder dimension errors.
   - **Streamlined UI & Settings:** Removed hardware acceleration switch, deprecated obsolete HWA telemetry notices, and made CRF controls permanently interactive in CRF mode.
 
-- **v3.0.0 (Build 23):**
+- **v3.0.0:**
   - **Standardized Pure H.264 / AVC Pipeline:** Completely removed the experimental H.265 (HEVC) codec across all video containers (`.mp4`, `.mkv`, `.mov`) to guarantee 100% stable playback without stuttering, black screens, or hardware decoder incompatibilities across all Android devices and desktop media players.
   - **Streamlined Conversion Interface:** Eliminated redundant codec selectors from the conversion interface, delivering a faster, simpler, and error-proof user experience.
   - **Polished Continuous Buffering Ring:** Perfected the processing loading animation into a smooth continuous 1000ms rotating buffering sweep ring with seamless rounded caps.
   - **Preserved Speed Presets:** Maintained customizable Fast, Normal, and Slow CPU encoding presets for optimal balance between battery efficiency, throughput, and visual compression quality.
 
-- **v2.3.1 (Build 22):**
+- **v2.3.1:**
   - **Continuous Looping Buffering Ring Animation:** Transformed the conversion circular progress bar into a smooth, dynamic continuous looping buffering ring with sweep gradient and glowing head dot during processing, providing seamless real-time visual feedback.
   - **H.265 (HEVC) Decoder Parameter Hardening:** Enforced strict closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), access unit delimiters (`aud=1`), explicit stream mapping (`-map 0:v:0 -map 0:a:0?`), and CTU 32 mobile optimization to resolve video stutter and black screen issues across MP4, MKV, and MOV.
 
-- **v2.3.0 (Build 21):**
+- **v2.3.0:**
   - **Dynamic Custom Target FPS & Interactive Slider:** Added custom FPS option with dynamic slider clamping bounded strictly to source video frame rate (e.g. 30 FPS video caps slider at 30 FPS, 60 FPS video caps at 60 FPS).
   - **FPS Technical Guidance Card:** Added comprehensive technical explanation card breaking down the exact purpose and behavior of each FPS setting (Original, 60 FPS, 30 FPS, 24 FPS, Custom) with zero emojis.
   - **Balanced Developer Profile Card:** Relocated the GitHub profile button to the far right trailing edge of the developer card in Settings with polished button dimensions and touch targets.
   - **Expanded Multilingual Coverage:** Added 8 new localization keys across 12 supported languages and aliases with 100% test coverage.
 
-- **v2.2.1 (Build 20):**
+- **v2.2.1:**
   - **H.265 (HEVC) Playback Stutter Fix:** Resolved open-GOP IDR keyframe desynchronization and decoder buffer underflow on Android hardware decoders across `.mp4`, `.mkv`, and `.mov` by enforcing closed-GOP (`no-open-gop=1`), parameter set repetition (`repeat-headers=1`), and strict VBV bounds (`maxrate=6M`, `bufsize=12M`).
   - **Mobile Encoding Speed Acceleration:** Mapped software CPU presets to high-throughput mobile presets (`ultrafast`, `superfast`, `veryfast`) and introduced Smart Adaptive Scaling (`bilinear` on Fast/Normal modes saving ~35% CPU overhead, and `bicubic` 16-point interpolation on Slow mode for pixel perfection).
   - **Interactive 3-Preset Speed Selector:** Added dedicated Fast, Normal, and Slow selection buttons in Settings accompanied by real-time technical explanation card.
   - **Centered & Polished Settings UI:** Centered interactive choice chips and action buttons across all performance and folder sections for visual balance on any screen size.
   - **11-Language Dictionary Polish:** Cleaned up stray emojis and perfected sentence spacing across all 11 supported languages and aliases (3,003 total entries).
 
-- **v2.2.0 (Build 19):**
+- **v2.2.0:**
   - Overhauled Settings Screen into a modern, minimalist 4-container Material 3 surface architecture.
   - Expanded localization support to 11 full languages + aliases with 100% dictionary coverage (222 identical keys each).
   - Completely eliminated all remaining hardcoded text across the entire application.
@@ -184,29 +184,29 @@ The compiled release APK will be generated at:
   - Added offline circular developer profile card with direct GitHub link.
   - Performed whole-repo dead code removal, type-safety refactoring, and code formatting adhering strictly to Dart lint standards.
 
-- **2.1.0 (Build 18):**
+- **2.1.0:**
   - Added continuous, seamlessly looping dynamic animated canvas backgrounds for Dark, OLED, Light, and AMOLED Sakura themes.
   - Added Easter Egg theme **AMOLED Sakura** (activated by tapping "Phantek" on header 10 times).
   - Added theme-adaptive glowing borders and iconography to header title (Electric Cyan Bolt, Amber Fire, Azure Sun, Sakura Blossom).
   - Cleaned up developer card interactions and removed external repository button.
 
-- **v2.0.0 (Build 17):**
+- **v2.0.0:**
   - BREAKING CHANGE: Standardized application package ID and Android namespace to com.phantek.cygnus.albireo (requires clean install / resets OS-level application continuity).
   - Deprecated and removed VP9 codec and WebM container to resolve mobile encoding stability issues.
   - Standardized video pipelines to pure H.264 & H.265 (MP4, MKV, MOV) and audio to AAC, MP3, WAV.
   - Streamlined CPU encoding presets in Settings.
   - Thoroughly cleaned up unused code and expanded 64-bit modern SoC & GPU detection.
 
-- **v1.3.0 (Build 16):**
+- **v1.3.0:**
   - Integrated real-time conversion telemetry dashboard (CPU %, RAM RSS Linux `/proc/self/status`, Storage I/O throughput).
   - Added 320 kbps audio quality and 4096 MB RAM buffer with hardware OOM protection.
 
-- **v1.2.0 (Build 15):**
+- **v1.2.0:**
   - Added dedicated Audio Extractor feature (MP3, M4A, WAV).
   - Implemented orientation-aware resolution classification for portrait and landscape videos.
   - Integrated comprehensive hardware specifications display in Settings.
 
-- **v1.1.0 (Build 14):**
+- **v1.1.0:**
   - Integrated Android Foreground Service and CPU Wakelock for background persistence and screen-off execution.
 
 ---
