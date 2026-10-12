@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/video_info.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
+import 'app_glass_card.dart';
 
 class VideoInfoCard extends StatelessWidget {
   final VideoInfo videoInfo;
@@ -14,79 +15,76 @@ class VideoInfoCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = SettingsService().l10n;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row: Media icon + filename + badges
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(24),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.movie_outlined,
-                    color: theme.colorScheme.primary,
-                    size: 24,
-                  ),
+    return AppGlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row: Media icon + filename + badges
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withAlpha(24),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        videoInfo.fileName,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface,
-                          letterSpacing: -0.2,
+                child: Icon(
+                  Icons.movie_outlined,
+                  color: theme.colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      videoInfo.fileName,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        _StatusBadge(
+                          label: videoInfo.resolution,
+                          color: theme.colorScheme.primary,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          _StatusBadge(
-                            label: videoInfo.resolution,
-                            color: theme.colorScheme.primary,
-                          ),
-                          _StatusBadge(
-                            label: videoInfo.codec.toUpperCase(),
-                            color: theme.colorScheme.secondary,
-                          ),
-                          _StatusBadge(
-                            label: videoInfo.formattedFileSize,
-                            color: theme.colorScheme.onSurface.withAlpha(180),
-                            isNeutral: true,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        _StatusBadge(
+                          label: videoInfo.codec.toUpperCase(),
+                          color: theme.colorScheme.secondary,
+                        ),
+                        _StatusBadge(
+                          label: videoInfo.formattedFileSize,
+                          color: theme.colorScheme.onSurface.withAlpha(180),
+                          isNeutral: true,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 16),
-            Divider(height: 1, color: theme.dividerColor),
-            const SizedBox(height: 14),
+          const SizedBox(height: 16),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 14),
 
-            // Metadata spec grid: 4 columns or 2x2
-            _buildSpecsGrid(l10n, theme),
-          ],
-        ),
+          // Metadata spec grid: 4 columns or 2x2
+          _buildSpecsGrid(l10n, theme),
+        ],
       ),
     );
   }

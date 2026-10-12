@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
 import '../services/localization_service.dart';
+import 'app_glass_card.dart';
 
 class ConversionOptionsCard extends StatefulWidget {
   final VideoInfo sourceVideo;
@@ -39,10 +40,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
         .clamp(1, 30);
-    final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+    final sourceFps = (widget.sourceVideo.fps > 0
+        ? widget.sourceVideo.fps.round()
+        : 60);
     final maxFps = sourceFps.clamp(15, 120);
     final currentFps = widget.encodingOptions.targetFps;
-    if (currentFps > 0 && currentFps != 24 && currentFps != 30 && currentFps != 60) {
+    if (currentFps > 0 &&
+        currentFps != 24 &&
+        currentFps != 30 &&
+        currentFps != 60) {
       _isCustomFps = true;
       _customFps = currentFps.clamp(10, maxFps);
     } else {
@@ -55,7 +61,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   void didUpdateWidget(ConversionOptionsCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.sourceVideo != widget.sourceVideo) {
-      final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+      final sourceFps = (widget.sourceVideo.fps > 0
+          ? widget.sourceVideo.fps.round()
+          : 60);
       final maxFps = sourceFps.clamp(15, 120);
       if (_customFps > maxFps) {
         _customFps = maxFps;
@@ -68,298 +76,299 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
+    return AppGlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.tune_rounded,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                l10n.t('video_options'),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // 1. Resolution Selection
+          _buildSectionLabel(
+            icon: Icons.aspect_ratio_rounded,
+            title: l10n.t('target_resolution'),
+            theme: theme,
+          ),
+          const SizedBox(height: 10),
+          ...widget.resolutions.map((res) {
+            final isSelected = widget.selectedResolution?.label == res.label;
+            return _buildResolutionTile(
+              res: res,
+              isSelected: isSelected,
+              theme: theme,
+            );
+          }),
+
+          const SizedBox(height: 16),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 16),
+
+          // 2. Rate Control Selection (CRF vs Bitrate)
+          _buildSectionLabel(
+            icon: Icons.speed_rounded,
+            title: l10n.t('rate_control'),
+            theme: theme,
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 6,
+              runSpacing: 6,
+              children: RateControlMode.values.map((mode) {
+                final isSelected =
+                    widget.encodingOptions.rateControlMode == mode;
+                return _buildChoiceChip(
+                  label: mode.displayName,
+                  isSelected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(rateControlMode: mode),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Builder(
+            builder: (context) {
+              final infoText =
+                  widget.encodingOptions.rateControlMode == RateControlMode.crf
+                  ? l10n.t('desc_crf')
+                  : l10n.t('desc_bitrate');
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(
+                    80,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 15,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        infoText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withAlpha(160),
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          if (widget.encodingOptions.rateControlMode == RateControlMode.crf)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.t('crf_label'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface.withAlpha(140),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        value: widget.encodingOptions.crfValue.toDouble(),
+                        min: 16,
+                        max: 28,
+                        divisions: 12,
+                        label: widget.encodingOptions.crfValue.toString(),
+                        onChanged: (val) {
+                          widget.onOptionsChanged(
+                            widget.encodingOptions.copyWith(
+                              crfValue: val.round(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Container(
+                      width: 44,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(25),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${widget.encodingOptions.crfValue}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          if (widget.encodingOptions.rateControlMode ==
+              RateControlMode.bitrate) ...[
+            Text(
+              l10n.t('bitrate_label'),
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
+            ),
             Row(
               children: [
-                Icon(
-                  Icons.tune_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 20,
+                Expanded(
+                  child: Slider(
+                    value: _customBitrateMbps.toDouble(),
+                    min: 1,
+                    max: 20,
+                    divisions: 19,
+                    label: '$_customBitrateMbps Mbps',
+                    onChanged: (val) {
+                      setState(() {
+                        _customBitrateMbps = val.round();
+                      });
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          customBitrateKbps: _customBitrateMbps * 1000,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                const SizedBox(width: 10),
-                Text(
-                  l10n.t('video_options'),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                    letterSpacing: -0.2,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$_customBitrateMbps Mbps',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 18),
-
-            // 1. Resolution Selection
-            _buildSectionLabel(
-              icon: Icons.aspect_ratio_rounded,
-              title: l10n.t('target_resolution'),
-              theme: theme,
-            ),
-            const SizedBox(height: 10),
-            ...widget.resolutions.map((res) {
-              final isSelected = widget.selectedResolution?.label == res.label;
-              return _buildResolutionTile(
-                res: res,
-                isSelected: isSelected,
-                theme: theme,
-              );
-            }),
-
-            const SizedBox(height: 16),
-            Divider(height: 1, color: theme.dividerColor),
-            const SizedBox(height: 16),
-
-            // 2. Rate Control Selection (CRF vs Bitrate)
-            _buildSectionLabel(
-              icon: Icons.speed_rounded,
-              title: l10n.t('rate_control'),
-              theme: theme,
-            ),
-            const SizedBox(height: 10),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 6,
-                runSpacing: 6,
-                children: RateControlMode.values.map((mode) {
-                  final isSelected =
-                      widget.encodingOptions.rateControlMode == mode;
-                  return _buildChoiceChip(
-                    label: mode.displayName,
-                    isSelected: isSelected,
-                    onSelected: (selected) {
-                      if (selected) {
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            rateControlMode: mode,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Builder(
-              builder: (context) {
-                final infoText =
-                    widget.encodingOptions.rateControlMode == RateControlMode.crf
-                        ? l10n.t('desc_crf')
-                        : l10n.t('desc_bitrate');
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline_rounded,
-                        size: 15,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          infoText,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface.withAlpha(160),
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-            if (widget.encodingOptions.rateControlMode == RateControlMode.crf)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.t('crf_label'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: theme.colorScheme.onSurface.withAlpha(140),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Slider(
-                              value: widget.encodingOptions.crfValue.toDouble(),
-                              min: 16,
-                              max: 28,
-                              divisions: 12,
-                              label: widget.encodingOptions.crfValue.toString(),
-                              onChanged: (val) {
-                                widget.onOptionsChanged(
-                                  widget.encodingOptions.copyWith(
-                                    crfValue: val.round(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: 44,
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withAlpha(25),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${widget.encodingOptions.crfValue}',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-            if (widget.encodingOptions.rateControlMode == RateControlMode.bitrate) ...[
-              Text(
-                l10n.t('bitrate_label'),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: theme.colorScheme.onSurface.withAlpha(140),
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      value: _customBitrateMbps.toDouble(),
-                      min: 1,
-                      max: 20,
-                      divisions: 19,
-                      label: '$_customBitrateMbps Mbps',
-                      onChanged: (val) {
-                        setState(() {
-                          _customBitrateMbps = val.round();
-                        });
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            customBitrateKbps: _customBitrateMbps * 1000,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '$_customBitrateMbps Mbps',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-
-            // Estimated Size display
-            const SizedBox(height: 12),
-            _buildSizeEstimator(theme),
-
-            const SizedBox(height: 16),
-            Divider(height: 1, color: theme.dividerColor),
-            const SizedBox(height: 16),
-
-            // 3. Format / Container Selection
-            _buildSectionLabel(
-              icon: Icons.video_file_outlined,
-              title: l10n.t('container_format'),
-              theme: theme,
-            ),
-            const SizedBox(height: 10),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 6,
-                runSpacing: 6,
-                children: VideoContainer.values.map((format) {
-                  final isSelected = widget.encodingOptions.container == format;
-                  return _buildChoiceChip(
-                    label: '${format.displayName} (.${format.extension})',
-                    isSelected: isSelected,
-                    onSelected: (selected) {
-                      if (selected) {
-                        widget.onOptionsChanged(
-                          widget.encodingOptions.copyWith(
-                            container: format,
-                            codec: VideoCodec.h264,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 15,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.t('desc_${widget.encodingOptions.container.name}'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withAlpha(160),
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // 4. FPS Selector
-            _buildFpsSelector(theme, l10n),
           ],
-        ),
+
+          // Estimated Size display
+          const SizedBox(height: 12),
+          _buildSizeEstimator(theme),
+
+          const SizedBox(height: 16),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 16),
+
+          // 3. Format / Container Selection
+          _buildSectionLabel(
+            icon: Icons.video_file_outlined,
+            title: l10n.t('container_format'),
+            theme: theme,
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 6,
+              runSpacing: 6,
+              children: VideoContainer.values.map((format) {
+                final isSelected = widget.encodingOptions.container == format;
+                return _buildChoiceChip(
+                  label: '${format.displayName} (.${format.extension})',
+                  isSelected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          container: format,
+                          codec: VideoCodec.h264,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 15,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.t('desc_${widget.encodingOptions.container.name}'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withAlpha(160),
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 4. FPS Selector
+          _buildFpsSelector(theme, l10n),
+        ],
       ),
     );
   }
@@ -494,15 +503,16 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       Builder(
                         builder: (context) {
                           final isPortrait =
-                              widget.sourceVideo.height > widget.sourceVideo.width;
+                              widget.sourceVideo.height >
+                              widget.sourceVideo.width;
                           final displayW =
                               isPortrait && !res.label.startsWith('Original')
-                                  ? res.height
-                                  : res.width;
+                              ? res.height
+                              : res.width;
                           final displayH =
                               isPortrait && !res.label.startsWith('Original')
-                                  ? res.width
-                                  : res.height;
+                              ? res.width
+                              : res.height;
                           return Text(
                             '$displayW × $displayH',
                             style: TextStyle(
@@ -510,7 +520,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                               color: isSelected
                                   ? (isDark
                                         ? Colors.white.withAlpha(190)
-                                        : theme.colorScheme.primary.withAlpha(200))
+                                        : theme.colorScheme.primary.withAlpha(
+                                            200,
+                                          ))
                                   : theme.colorScheme.onSurface.withAlpha(120),
                             ),
                           );
@@ -529,7 +541,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   }
 
   Widget _buildFpsSelector(ThemeData theme, AppLocalizations l10n) {
-    final sourceFps = (widget.sourceVideo.fps > 0 ? widget.sourceVideo.fps.round() : 60);
+    final sourceFps = (widget.sourceVideo.fps > 0
+        ? widget.sourceVideo.fps.round()
+        : 60);
     final maxFps = sourceFps.clamp(15, 120);
     final minFps = (10 < maxFps) ? 10 : 1;
     final targetFps = widget.encodingOptions.targetFps;
@@ -672,11 +686,18 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 3,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 14,
+                    ),
                   ),
                   child: Slider(
-                    value: _customFps.toDouble().clamp(minFps.toDouble(), maxFps.toDouble()),
+                    value: _customFps.toDouble().clamp(
+                      minFps.toDouble(),
+                      maxFps.toDouble(),
+                    ),
                     min: minFps.toDouble(),
                     max: maxFps.toDouble(),
                     divisions: (maxFps - minFps) > 0 ? (maxFps - minFps) : 1,
@@ -807,7 +828,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             style: TextStyle(
               fontSize: 10.5,
               height: 1.35,
-              color: theme.colorScheme.onSurface.withAlpha(isActive ? 220 : 150),
+              color: theme.colorScheme.onSurface.withAlpha(
+                isActive ? 220 : 150,
+              ),
             ),
           ),
         ),

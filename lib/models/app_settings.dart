@@ -31,6 +31,12 @@ class AppSettings {
   /// Custom output directory path for extracted audio files. If empty, defaults to Music folder.
   final String audioOutputDirectory;
 
+  /// True if the hidden AMOLED Sakura easter egg theme has been unlocked.
+  final bool isEasterEggUnlocked;
+
+  /// Card surface opacity factor between 0.50 (50%) and 1.00 (100%).
+  final double cardOpacity;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -42,6 +48,8 @@ class AppSettings {
     this.isFirstLaunch = true,
     this.outputDirectory = '',
     this.audioOutputDirectory = '',
+    this.isEasterEggUnlocked = false,
+    this.cardOpacity = 1.0,
   });
 
   /// Detected hardware core count of the phone.
@@ -58,10 +66,14 @@ class AppSettings {
     bool? isFirstLaunch,
     String? outputDirectory,
     String? audioOutputDirectory,
+    bool? isEasterEggUnlocked,
+    double? cardOpacity,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
-      ramBufferMb: ramBufferMb ?? this.ramBufferMb,
+      ramBufferMb: ramBufferMb != null
+          ? (ramBufferMb > 2048 ? 2048 : ramBufferMb)
+          : this.ramBufferMb,
       cpuPreset: cpuPreset ?? this.cpuPreset,
       audioBitrateKbps: audioBitrateKbps ?? this.audioBitrateKbps,
       languageCode: languageCode ?? this.languageCode,
@@ -70,6 +82,10 @@ class AppSettings {
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
       outputDirectory: outputDirectory ?? this.outputDirectory,
       audioOutputDirectory: audioOutputDirectory ?? this.audioOutputDirectory,
+      isEasterEggUnlocked: isEasterEggUnlocked ?? this.isEasterEggUnlocked,
+      cardOpacity: cardOpacity != null
+          ? cardOpacity.clamp(0.5, 1.0)
+          : this.cardOpacity,
     );
   }
 
@@ -85,6 +101,8 @@ class AppSettings {
       'isFirstLaunch': isFirstLaunch,
       'outputDirectory': outputDirectory,
       'audioOutputDirectory': audioOutputDirectory,
+      'isEasterEggUnlocked': isEasterEggUnlocked,
+      'cardOpacity': cardOpacity,
     };
   }
 
@@ -103,7 +121,9 @@ class AppSettings {
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
       cpuThreads: json['cpuThreads'] as int? ?? 0,
-      ramBufferMb: json['ramBufferMb'] as int? ?? 512,
+      ramBufferMb: ((json['ramBufferMb'] as int? ?? 512) > 2048)
+          ? 2048
+          : (json['ramBufferMb'] as int? ?? 512),
       cpuPreset: sanitizePreset(json['cpuPreset'] as String?),
       audioBitrateKbps: json['audioBitrateKbps'] as int? ?? 128,
       languageCode: json['languageCode'] as String? ?? 'id',
@@ -112,6 +132,11 @@ class AppSettings {
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
       outputDirectory: json['outputDirectory'] as String? ?? '',
       audioOutputDirectory: json['audioOutputDirectory'] as String? ?? '',
+      isEasterEggUnlocked:
+          json['isEasterEggUnlocked'] as bool? ??
+          (json['themeMode'] == 'sakura'),
+      cardOpacity:
+          (json['cardOpacity'] as num?)?.toDouble().clamp(0.5, 1.0) ?? 1.0,
     );
   }
 }

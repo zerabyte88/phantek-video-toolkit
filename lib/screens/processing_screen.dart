@@ -16,6 +16,7 @@ import '../services/device_spec_helper.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/foreground_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/app_glass_card.dart';
 import '../widgets/theme_animated_background.dart';
 
 class ProcessingScreen extends StatefulWidget {
@@ -312,12 +313,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         speed = parts[1].replaceAll('Speed:', '').trim();
         if (_latestOutputBytes <= 0) {
           if (size.contains('MB')) {
-            final val =
-                double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
+            final val = double.tryParse(size.replaceAll('MB', '').trim()) ?? 0;
             _latestOutputBytes = (val * 1024 * 1024).round();
           } else if (size.contains('KB')) {
-            final val =
-                double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
+            final val = double.tryParse(size.replaceAll('KB', '').trim()) ?? 0;
             _latestOutputBytes = (val * 1024).round();
           }
         }
@@ -883,117 +882,115 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   }
 
   Widget _buildTimeTelemetryCard(ThemeData theme, l10n) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildMetricTile(
-                    theme: theme,
-                    icon: Icons.timer_outlined,
-                    label: l10n.t('proc_elapsed_time'),
-                    value: _formatDuration(
-                      _isProcessing
-                          ? _elapsedDuration
-                          : (_totalDuration ?? _elapsedDuration),
-                    ),
+    return AppGlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricTile(
+                  theme: theme,
+                  icon: Icons.timer_outlined,
+                  label: l10n.t('proc_elapsed_time'),
+                  value: _formatDuration(
+                    _isProcessing
+                        ? _elapsedDuration
+                        : (_totalDuration ?? _elapsedDuration),
                   ),
                 ),
-                Container(
-                  width: 1,
-                  height: 36,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  color: theme.colorScheme.outline,
+              ),
+              Container(
+                width: 1,
+                height: 36,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                color: theme.colorScheme.outline,
+              ),
+              Expanded(
+                child: _buildMetricTile(
+                  theme: theme,
+                  icon: Icons.hourglass_bottom_outlined,
+                  label: l10n.t('proc_remaining_time'),
+                  value: _isProcessing
+                      ? (_estimatedRemaining != null
+                            ? '~${_formatDuration(_estimatedRemaining!)}'
+                            : l10n.t('proc_calculating'))
+                      : (_isSuccess ? l10n.t('proc_completed') : '-'),
                 ),
-                Expanded(
-                  child: _buildMetricTile(
-                    theme: theme,
-                    icon: Icons.hourglass_bottom_outlined,
-                    label: l10n.t('proc_remaining_time'),
-                    value: _isProcessing
-                        ? (_estimatedRemaining != null
-                              ? '~${_formatDuration(_estimatedRemaining!)}'
-                              : l10n.t('proc_calculating'))
-                        : (_isSuccess ? l10n.t('proc_completed') : '-'),
+              ),
+            ],
+          ),
+          if (_isProcessing &&
+              (_speedText.isNotEmpty || _currentSizeText.isNotEmpty)) ...[
+            Divider(height: 20, color: theme.colorScheme.outline),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                if (_speedText.isNotEmpty)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.speed_outlined,
+                        size: 15,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${l10n.t('fps')}: $_speedText',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withAlpha(180),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (_currentSizeText.isNotEmpty)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.storage_outlined,
+                        size: 15,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${l10n.t('file_size')}: $_currentSizeText',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface.withAlpha(180),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+          if (!_isProcessing && _totalDuration != null && _isSuccess) ...[
+            Divider(height: 18, color: theme.colorScheme.outline),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 16,
+                  color: Color(0xFF10B981),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.t(
+                    'proc_total_time',
+                    args: {'time': _formatDuration(_totalDuration!)},
+                  ),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF10B981),
                   ),
                 ),
               ],
             ),
-            if (_isProcessing &&
-                (_speedText.isNotEmpty || _currentSizeText.isNotEmpty)) ...[
-              Divider(height: 20, color: theme.colorScheme.outline),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  if (_speedText.isNotEmpty)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.speed_outlined,
-                          size: 15,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${l10n.t('fps')}: $_speedText',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface.withAlpha(180),
-                          ),
-                        ),
-                      ],
-                    ),
-                  if (_currentSizeText.isNotEmpty)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.storage_outlined,
-                          size: 15,
-                          color: theme.colorScheme.secondary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${l10n.t('file_size')}: $_currentSizeText',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface.withAlpha(180),
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ],
-            if (!_isProcessing && _totalDuration != null && _isSuccess) ...[
-              Divider(height: 18, color: theme.colorScheme.outline),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline_rounded,
-                    size: 16,
-                    color: Color(0xFF10B981),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.t(
-                      'proc_total_time',
-                      args: {'time': _formatDuration(_totalDuration!)},
-                    ),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF10B981),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -1060,95 +1057,28 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           : '${widget.encodingOptions.audioExtractBitrateKbps} kbps';
       final srcAudio = widget.videoInfo.audioCodec?.toUpperCase() ?? 'Audio';
 
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildInfoRow(
-                theme,
-                l10n.t('proc_source'),
-                widget.videoInfo.fileName,
-                srcAudio,
-              ),
-              Divider(height: 20, color: theme.colorScheme.outline),
-              _buildInfoRow(
-                theme,
-                l10n.t('proc_target'),
-                '$audioFmt ${l10n.t('category_audio')}',
-                bitrate,
-              ),
-              Divider(height: 20, color: theme.colorScheme.outline),
-              _buildInfoRow(
-                theme,
-                l10n.t('container_format'),
-                audioFmt,
-                l10n.t('audio_track'),
-              ),
-              if (_isSuccess && _outputPath != null) ...[
-                Divider(height: 20, color: theme.colorScheme.outline),
-                FutureBuilder<int>(
-                  future: File(_outputPath!).length(),
-                  builder: (context, snapshot) {
-                    final size = snapshot.data ?? 0;
-                    String sizeStr;
-                    if (size >= 1073741824) {
-                      sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
-                    } else if (size >= 1048576) {
-                      sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
-                    } else {
-                      sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
-                    }
-                    return _buildInfoRow(
-                      theme,
-                      l10n.t('proc_output_size'),
-                      sizeStr,
-                      l10n.t('audio_extracted'),
-                    );
-                  },
-                ),
-                Divider(height: 20, color: theme.colorScheme.outline),
-                _buildInfoRow(
-                  theme,
-                  l10n.t('proc_saved_location'),
-                  widget.appSettings.audioOutputDirectory.isNotEmpty
-                      ? widget.appSettings.audioOutputDirectory
-                      : l10n.t('settings_audio_folder_default'),
-                  _outputPath?.split(Platform.pathSeparator).last ?? '',
-                ),
-              ],
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      return AppGlassCard(
         child: Column(
           children: [
             _buildInfoRow(
               theme,
               l10n.t('proc_source'),
-              widget.videoInfo.resolution,
-              '${widget.videoInfo.width}×${widget.videoInfo.height}',
+              widget.videoInfo.fileName,
+              srcAudio,
             ),
             Divider(height: 20, color: theme.colorScheme.outline),
             _buildInfoRow(
               theme,
               l10n.t('proc_target'),
-              widget.targetResolution.label.startsWith('Original')
-                  ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
-                  : widget.targetResolution.label,
-              '${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.height : widget.targetResolution.width}×${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.width : widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
+              '$audioFmt ${l10n.t('category_audio')}',
+              bitrate,
             ),
             Divider(height: 20, color: theme.colorScheme.outline),
             _buildInfoRow(
               theme,
               l10n.t('container_format'),
-              widget.encodingOptions.container.displayName,
-              widget.encodingOptions.codec.displayName,
+              audioFmt,
+              l10n.t('audio_track'),
             ),
             if (_isSuccess && _outputPath != null) ...[
               Divider(height: 20, color: theme.colorScheme.outline),
@@ -1164,24 +1094,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   } else {
                     sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
                   }
-                  final isBigger = size > widget.videoInfo.fileSizeBytes;
-                  final diffPercent = widget.videoInfo.fileSizeBytes > 0
-                      ? ((size - widget.videoInfo.fileSizeBytes).abs() /
-                                widget.videoInfo.fileSizeBytes *
-                                100)
-                            .toStringAsFixed(0)
-                      : '0';
-                  final savingsBadge = isBigger
-                      ? l10n.t(
-                          'proc_size_increase',
-                          args: {'percent': diffPercent},
-                        )
-                      : l10n.t('proc_savings', args: {'percent': diffPercent});
                   return _buildInfoRow(
                     theme,
                     l10n.t('proc_output_size'),
                     sizeStr,
-                    savingsBadge,
+                    l10n.t('audio_extracted'),
                   );
                 },
               ),
@@ -1189,12 +1106,86 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               _buildInfoRow(
                 theme,
                 l10n.t('proc_saved_location'),
-                l10n.t('proc_saved_path'),
+                widget.appSettings.audioOutputDirectory.isNotEmpty
+                    ? widget.appSettings.audioOutputDirectory
+                    : l10n.t('settings_audio_folder_default'),
                 _outputPath?.split(Platform.pathSeparator).last ?? '',
               ),
             ],
           ],
         ),
+      );
+    }
+
+    return AppGlassCard(
+      child: Column(
+        children: [
+          _buildInfoRow(
+            theme,
+            l10n.t('proc_source'),
+            widget.videoInfo.resolution,
+            '${widget.videoInfo.width}×${widget.videoInfo.height}',
+          ),
+          Divider(height: 20, color: theme.colorScheme.outline),
+          _buildInfoRow(
+            theme,
+            l10n.t('proc_target'),
+            widget.targetResolution.label.startsWith('Original')
+                ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
+                : widget.targetResolution.label,
+            '${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.height : widget.targetResolution.width}×${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.width : widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
+          ),
+          Divider(height: 20, color: theme.colorScheme.outline),
+          _buildInfoRow(
+            theme,
+            l10n.t('container_format'),
+            widget.encodingOptions.container.displayName,
+            widget.encodingOptions.codec.displayName,
+          ),
+          if (_isSuccess && _outputPath != null) ...[
+            Divider(height: 20, color: theme.colorScheme.outline),
+            FutureBuilder<int>(
+              future: File(_outputPath!).length(),
+              builder: (context, snapshot) {
+                final size = snapshot.data ?? 0;
+                String sizeStr;
+                if (size >= 1073741824) {
+                  sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
+                } else if (size >= 1048576) {
+                  sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
+                } else {
+                  sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
+                }
+                final isBigger = size > widget.videoInfo.fileSizeBytes;
+                final diffPercent = widget.videoInfo.fileSizeBytes > 0
+                    ? ((size - widget.videoInfo.fileSizeBytes).abs() /
+                              widget.videoInfo.fileSizeBytes *
+                              100)
+                          .toStringAsFixed(0)
+                    : '0';
+                final savingsBadge = isBigger
+                    ? l10n.t(
+                        'proc_size_increase',
+                        args: {'percent': diffPercent},
+                      )
+                    : l10n.t('proc_savings', args: {'percent': diffPercent});
+                return _buildInfoRow(
+                  theme,
+                  l10n.t('proc_output_size'),
+                  sizeStr,
+                  savingsBadge,
+                );
+              },
+            ),
+            Divider(height: 20, color: theme.colorScheme.outline),
+            _buildInfoRow(
+              theme,
+              l10n.t('proc_saved_location'),
+              l10n.t('proc_saved_path'),
+              _outputPath?.split(Platform.pathSeparator).last ?? '',
+            ),
+          ],
+        ],
       ),
     );
   }

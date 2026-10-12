@@ -7,6 +7,7 @@ import '../models/app_settings.dart';
 import '../services/device_spec_helper.dart';
 import '../services/localization_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/app_glass_card.dart';
 import '../widgets/theme_animated_background.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -19,8 +20,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v3.3.0';
-  String _buildNumber = '29';
+  String _appVersion = 'v3.4.0';
+  String _buildNumber = '31';
 
   @override
   void initState() {
@@ -37,14 +38,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '29';
+              : '31';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v3.3.0';
-          _buildNumber = '29';
+          _appVersion = 'v3.4.0';
+          _buildNumber = '31';
         });
       }
     }
@@ -65,9 +66,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = _settingsService.settings;
     final l10n = _settingsService.l10n;
     final deviceCores = AppSettings.deviceCoreCount;
-    final totalRamMb = DeviceSpecHelper.getTotalRamMb();
-    final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(totalRamMb);
-    final is4GbDisabled = marketedRamGb <= 4 || totalRamMb <= 4096;
 
     return Scaffold(
       appBar: AppBar(
@@ -126,8 +124,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 10),
 
-                    // 4-Grid Theme Selector
-                    _buildThemeGrid(theme, settings.themeMode, l10n),
+                    // Theme Selector
+                    _buildThemeGrid(theme, settings, l10n),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(
+                        height: 1,
+                        color: theme.colorScheme.outline.withAlpha(25),
+                      ),
+                    ),
+
+                    // Card Opacity Slider
+                    _buildCardOpacitySlider(theme, settings, l10n),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -169,12 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
 
                     // RAM Buffer Setting
-                    _buildRamBufferSection(
-                      theme,
-                      settings,
-                      is4GbDisabled,
-                      l10n,
-                    ),
+                    _buildRamBufferSection(theme, settings, l10n),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -450,30 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required ThemeData theme,
     EdgeInsetsGeometry padding = const EdgeInsets.all(16),
   }) {
-    final isDark = theme.brightness == Brightness.dark;
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: isDark
-            ? theme.colorScheme.surface.withAlpha(170)
-            : theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withAlpha(isDark ? 35 : 55),
-          width: 1.0,
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withAlpha(8),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-      ),
-      child: child,
-    );
+    return AppGlassCard(padding: padding, child: child);
   }
 
   // ── Language Selector Tile & Bottom Sheet ──────────────────────────────────
@@ -651,7 +632,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     itemBuilder: (_, index) {
                       final item = AppLocalizations.supportedLanguages[index];
                       final code = item['code']!;
-                      final isSelected = settings.languageCode == code ||
+                      final isSelected =
+                          settings.languageCode == code ||
                           (settings.languageCode == 'zh' && code == 'zh_CN');
 
                       return Padding(
@@ -754,7 +736,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildThemeGrid(
     ThemeData theme,
-    String currentTheme,
+    AppSettings settings,
     AppLocalizations l10n,
   ) {
     final themes = [
@@ -762,9 +744,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'id': 'dark',
         'title': l10n.t('theme_dark'),
         'desc': l10n.t('theme_dark_desc'),
-        'icon': Icons.dark_mode_rounded,
+        'icon': Icons.ac_unit_rounded,
         'accent': const Color(0xFF38BDF8),
-        'badge': null,
+        'badge': 'DARK',
       },
       {
         'id': 'oled',
@@ -774,21 +756,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'accent': const Color(0xFFA78BFA),
         'badge': 'AMOLED',
       },
-      {
-        'id': 'sakura',
-        'title': l10n.t('theme_sakura'),
-        'desc': l10n.t('theme_sakura_desc'),
-        'icon': Icons.local_florist_rounded,
-        'accent': const Color(0xFFF472B6),
-        'badge': 'AMOLED',
-      },
+      if (settings.isEasterEggUnlocked)
+        {
+          'id': 'sakura',
+          'title': l10n.t('theme_sakura'),
+          'desc': l10n.t('theme_sakura_desc'),
+          'icon': Icons.local_florist_rounded,
+          'accent': const Color(0xFFF472B6),
+          'badge': 'AMOLED',
+        },
       {
         'id': 'light',
         'title': l10n.t('theme_light'),
         'desc': l10n.t('theme_light_desc'),
         'icon': Icons.light_mode_rounded,
         'accent': const Color(0xFFFBBF24),
-        'badge': null,
+        'badge': 'LIGHT',
       },
     ];
 
@@ -799,13 +782,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 68,
+        mainAxisExtent: 74,
       ),
       itemCount: themes.length,
       itemBuilder: (context, index) {
         final item = themes[index];
         final id = item['id'] as String;
-        final isSelected = currentTheme == id;
+        final isSelected = settings.themeMode == id;
         final accent = item['accent'] as Color;
         final badge = item['badge'] as String?;
 
@@ -831,73 +814,215 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: isSelected ? 1.6 : 1.0,
                 ),
               ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 2),
+                      child: Icon(
+                        item['icon'] as IconData,
+                        size: 18,
+                        color: isSelected
+                            ? accent
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          item['icon'] as IconData,
-                          size: 17,
-                          color: isSelected
-                              ? accent
-                              : theme.colorScheme.onSurface,
-                        ),
-                        const SizedBox(width: 7),
-                        Flexible(
-                          child: Text(
-                            item['title'] as String,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w600,
-                              color: isSelected
-                                  ? accent
-                                  : theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (badge != null) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: accent.withAlpha(20),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          badge,
+                        Text(
+                          item['title'] as String,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: accent,
+                            fontSize: 13,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                            color: isSelected
+                                ? accent
+                                : theme.colorScheme.onSurface,
                           ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
+                        if (badge != null) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 1.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accent.withAlpha(20),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: accent.withAlpha(120),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Text(
+                              badge,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                color: accent,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  // ── Card Opacity Slider ───────────────────────────────────────────────────
+
+  Widget _buildCardOpacitySlider(
+    ThemeData theme,
+    AppSettings settings,
+    AppLocalizations l10n,
+  ) {
+    final opacity = settings.cardOpacity.clamp(0.5, 1.0);
+    final percentage = (opacity * 100).round();
+    final isNotDefault = (opacity - 1.0).abs() > 0.01;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withAlpha(20),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.opacity_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.t('settings_card_opacity'),
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.t('settings_card_opacity_desc'),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withAlpha(130),
+                      height: 1.25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Percentage Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withAlpha(20),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withAlpha(60),
+                ),
+              ),
+              child: Text(
+                '$percentage%',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+            if (isNotDefault) ...[
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.restart_alt_rounded, size: 18),
+                tooltip: 'Reset 100%',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                color: theme.colorScheme.primary,
+                onPressed: () {
+                  _settingsService.setCardOpacity(1.0);
+                },
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 8),
+        SliderTheme(
+          data: theme.sliderTheme.copyWith(
+            trackHeight: 4,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+          ),
+          child: Slider(
+            value: opacity,
+            min: 0.50,
+            max: 1.00,
+            divisions: 10,
+            label: '$percentage%',
+            onChanged: (val) {
+              final rounded = (val * 20).round() / 20.0;
+              _settingsService.setCardOpacity(rounded);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '50%',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurface.withAlpha(120),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '100% (Default)',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurface.withAlpha(120),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1060,7 +1185,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildRamBufferSection(
     ThemeData theme,
     AppSettings settings,
-    bool is4GbDisabled,
     AppLocalizations l10n,
   ) {
     return Column(
@@ -1116,8 +1240,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Center(
           child: Wrap(
             alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 6,
+            spacing: 10,
+            runSpacing: 8,
             children: [
               _buildChoiceChip(
                 theme: theme,
@@ -1155,32 +1279,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   setState(() {});
                 },
               ),
-              _buildChoiceChip(
-                theme: theme,
-                label: '4096 MB',
-                selected: settings.ramBufferMb == 4096,
-                enabled: !is4GbDisabled,
-                onSelected: !is4GbDisabled
-                    ? () async {
-                        await _settingsService.setRamBuffer(4096);
-                        setState(() {});
-                      }
-                    : null,
-              ),
             ],
           ),
         ),
-        if (is4GbDisabled) ...[
-          const SizedBox(height: 6),
-          Text(
-            l10n.t('settings_ram_4gb_disabled_hint'),
-            style: TextStyle(
-              fontSize: 10.5,
-              color: theme.colorScheme.onSurface.withAlpha(110),
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -1629,9 +1730,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () async {
-                    final uri = Uri.parse(
-                      'https://github.com/zerabyte88',
-                    );
+                    final uri = Uri.parse('https://github.com/zerabyte88');
                     try {
                       await launchUrl(
                         uri,

@@ -36,8 +36,11 @@ class VideoDownscalerApp extends StatelessWidget {
     return ListenableBuilder(
       listenable: SettingsService(),
       builder: (context, child) {
-        final themeMode = SettingsService().settings.themeMode;
-        final theme = AppTheme.getTheme(themeMode);
+        final settings = SettingsService().settings;
+        final theme = AppTheme.getTheme(
+          settings.themeMode,
+          cardOpacity: settings.cardOpacity,
+        );
 
         // Sync system nav bar color with active theme
         final navBarColor = theme.scaffoldBackgroundColor;
