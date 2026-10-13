@@ -1,4 +1,4 @@
-# Phantek - Video Toolkit
+# Phantek Video Toolkit
 
 <p align="center">
   <img src="assets/icon/app_icon.jpg" alt="Phantek Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
@@ -14,7 +14,7 @@
 
 <br/>
 
-**Phantek (Phantek - Video Toolkit)** is an offline, on-device mobile video transcoding, resolution downscaling, file compression, and audio extraction toolkit built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). It runs 100% locally on Android devices without requiring network connectivity, user accounts, or external cloud infrastructure.
+**Phantek Video Toolkit** is an offline, on-device mobile video transcoding, resolution downscaling, file compression, and audio extraction toolkit built with Flutter and FFmpeg (`ffmpeg_kit_flutter_new`). It runs 100% locally on Android devices without requiring network connectivity, user accounts, or external cloud infrastructure.
 
 ---
 
