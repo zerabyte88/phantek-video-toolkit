@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -73,6 +74,10 @@ class SettingsService extends ChangeNotifier {
   Future<void> _applyWakelock(bool enable) async {
     try {
       await WakelockPlus.toggle(enable: enable);
+    } on PlatformException catch (e) {
+      if (e.code != 'channel-error') {
+        debugPrint('Error toggling wakelock: $e');
+      }
     } catch (e) {
       debugPrint('Error toggling wakelock: $e');
     }
