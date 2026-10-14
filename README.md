@@ -126,5 +126,5 @@ This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. 
     <img src="https://github.com/zerabyte88.png" width="48" height="48" style="border-radius: 50%;" alt="zerabyte88" />
   </a>
   <br/>
-  <sub>Developed with ❤️ by <a href="https://github.com/zerabyte88">zerabyte88</a> (Creator & Maintainer)</sub>
+  <sub>Developed with ❤️ by <a href="https://github.com/zerabyte88">zerabyte88</a></sub>
 </div>
