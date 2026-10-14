@@ -1350,8 +1350,11 @@ void main() {
         expect(sliderWidget.max, 30.0);
         expect(sliderWidget.min, 10.0);
 
-        // FPS guide card is visible without emojis
-        expect(find.text('Panduan Target FPS'), findsOneWidget);
+        // Dynamic FPS explanation is visible without emojis
+        expect(
+          find.text(const AppLocalizations('id').t('fps_desc_custom')),
+          findsOneWidget,
+        );
       },
     );
 
@@ -1420,5 +1423,81 @@ void main() {
         expect(sliderWidget.min, 10.0);
       },
     );
+
+    testWidgets(
+      'Explanation texts in ConversionOptionsCard render fully on compact screens without overflow or truncation',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        const video = VideoInfo(
+          filePath: '/test/video.mp4',
+          fileName: 'video.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 10.0,
+          bitrate: 5000000,
+          fps: 30.0,
+          codec: 'h264',
+          fileSizeBytes: 2000000,
+        );
+
+        EncodingOptions options = const EncodingOptions(
+          speedPreset: SpeedPreset.max,
+          rateControlMode: RateControlMode.crf,
+          crfValue: 18,
+          container: VideoContainer.mp4,
+          targetFps: 30,
+        );
+
+        const l10n = AppLocalizations('id');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('dark'),
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ConversionOptionsCard(
+                  sourceVideo: video,
+                  resolutions: VideoResolution.standardResolutions,
+                  selectedResolution: VideoResolution.standardResolutions[2],
+                  encodingOptions: options,
+                  onResolutionChanged: (_) {},
+                  onOptionsChanged: (_) {},
+                  l10n: l10n,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Ensure key explanations are present and rendered fully without truncation
+        expect(find.text(l10n.t('preset_slow_desc')), findsOneWidget);
+        expect(find.text(l10n.t('desc_crf')), findsOneWidget);
+        expect(find.text(l10n.t('desc_mp4')), findsOneWidget);
+        expect(find.text(l10n.t('fps_desc_30')), findsOneWidget);
+        expect(find.text(l10n.t('crf_label')), findsOneWidget);
+
+        // Verify no RenderParagraph in the tree has TextOverflow.ellipsis for descriptions
+        final textWidgets = tester.widgetList<Text>(find.byType(Text));
+        for (final text in textWidgets) {
+          final str = text.data ?? text.textSpan?.toPlainText() ?? '';
+          if (str.contains('CRF') ||
+              str.contains('Preset') ||
+              str.contains('FPS') ||
+              str.contains('Format')) {
+            expect(
+              text.overflow,
+              isNot(equals(TextOverflow.ellipsis)),
+              reason: 'Text "$str" should not have TextOverflow.ellipsis',
+            );
+          }
+        }
+      },
+    );
   });
 }
+

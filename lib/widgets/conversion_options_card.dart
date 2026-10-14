@@ -89,13 +89,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
-                l10n.t('video_options'),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
-                  letterSpacing: -0.2,
+              Expanded(
+                child: Text(
+                  l10n.t('video_options'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
@@ -181,12 +183,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       color: Colors.amber,
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      l10n.t('preset_badge_max'),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.amber,
+                    Flexible(
+                      child: Text(
+                        l10n.t('preset_badge_max'),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.amber,
+                        ),
                       ),
                     ),
                   ],
@@ -194,41 +198,20 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               ),
             ),
           ],
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  widget.encodingOptions.speedPreset == SpeedPreset.fast
-                      ? Icons.bolt_rounded
-                      : (widget.encodingOptions.speedPreset == SpeedPreset.max
-                          ? Icons.diamond_outlined
-                          : Icons.balance_rounded),
-                  size: 15,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.encodingOptions.speedPreset == SpeedPreset.fast
-                        ? l10n.t('preset_fast_desc')
-                        : (widget.encodingOptions.speedPreset == SpeedPreset.max
-                            ? l10n.t('preset_slow_desc')
-                            : l10n.t('preset_normal_desc')),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withAlpha(160),
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              widget.encodingOptions.speedPreset == SpeedPreset.fast
+                  ? l10n.t('preset_fast_desc')
+                  : (widget.encodingOptions.speedPreset == SpeedPreset.max
+                      ? l10n.t('preset_slow_desc')
+                      : l10n.t('preset_normal_desc')),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.35,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
             ),
           ),
 
@@ -265,47 +248,19 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 10),
-          Builder(
-            builder: (context) {
-              final infoText =
-                  widget.encodingOptions.rateControlMode == RateControlMode.crf
-                      ? l10n.t('desc_crf')
-                      : l10n.t('desc_bitrate');
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withAlpha(
-                    80,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 15,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        infoText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: theme.colorScheme.onSurface.withAlpha(160),
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              widget.encodingOptions.rateControlMode == RateControlMode.crf
+                  ? l10n.t('desc_crf')
+                  : l10n.t('desc_bitrate'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.35,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           if (widget.encodingOptions.rateControlMode == RateControlMode.crf)
@@ -316,22 +271,21 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Row(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 4,
                         children: [
-                          Flexible(
-                            child: Text(
-                              l10n.t('crf_label'),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color:
-                                    theme.colorScheme.onSurface.withAlpha(140),
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                          Text(
+                            l10n.t('crf_label'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color:
+                                  theme.colorScheme.onSurface.withAlpha(140),
                             ),
                           ),
                           if (widget.encodingOptions.crfValue !=
-                              widget.encodingOptions.speedPreset.defaultCrf) ...[
-                            const SizedBox(width: 6),
+                              widget.encodingOptions.speedPreset.defaultCrf)
                             Container(
                               key: const Key('crf_custom_badge'),
                               padding: const EdgeInsets.symmetric(
@@ -352,12 +306,12 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                                 ),
                               ),
                             ),
-                          ],
                         ],
                       ),
                     ),
                     if (widget.encodingOptions.crfValue !=
-                        widget.encodingOptions.speedPreset.defaultCrf)
+                        widget.encodingOptions.speedPreset.defaultCrf) ...[
+                      const SizedBox(width: 8),
                       InkWell(
                         key: const Key('crf_reset_button'),
                         onTap: () {
@@ -395,6 +349,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                           ),
                         ),
                       ),
+                    ],
                   ],
                 ),
                 Row(
@@ -440,18 +395,24 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        l10n.t('crf_hint_sharp'),
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          color: theme.colorScheme.onSurface.withAlpha(120),
+                      Expanded(
+                        child: Text(
+                          l10n.t('crf_hint_sharp'),
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            color: theme.colorScheme.onSurface.withAlpha(120),
+                          ),
                         ),
                       ),
-                      Text(
-                        l10n.t('crf_hint_small'),
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          color: theme.colorScheme.onSurface.withAlpha(120),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.t('crf_hint_small'),
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            color: theme.colorScheme.onSurface.withAlpha(120),
+                          ),
                         ),
                       ),
                     ],
@@ -587,32 +548,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.info_outline_rounded,
-                  size: 15,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l10n.t('desc_${widget.encodingOptions.container.name}'),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withAlpha(160),
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
+          Center(
+            child: Text(
+              l10n.t('desc_${widget.encodingOptions.container.name}'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.35,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
             ),
           ),
 
@@ -632,12 +576,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       children: [
         Icon(icon, size: 16, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface.withAlpha(200),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface.withAlpha(200),
+            ),
           ),
         ),
       ],
@@ -968,124 +914,40 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           ),
         ],
 
-        // Explanations Card (Strictly without emojis)
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withAlpha(
-              theme.brightness == Brightness.dark ? 30 : 50,
+        const SizedBox(height: 8),
+        Center(
+          child: Text(
+            _getFpsDescription(targetFps, _isCustomFps, l10n),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11.5,
+              height: 1.35,
+              color: theme.colorScheme.onSurface.withAlpha(140),
             ),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: theme.dividerColor.withAlpha(40),
-              width: 0.8,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 14,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.t('fps_info_title'),
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildFpsInfoRow(
-                theme: theme,
-                title: l10n.t('fps_original'),
-                desc: l10n.t('fps_desc_original'),
-                isActive: !_isCustomFps && targetFps == 0,
-              ),
-              if (maxFps >= 50) ...[
-                const SizedBox(height: 6),
-                _buildFpsInfoRow(
-                  theme: theme,
-                  title: '60 FPS',
-                  desc: l10n.t('fps_desc_60'),
-                  isActive: !_isCustomFps && targetFps == 60,
-                ),
-              ],
-              if (maxFps >= 30) ...[
-                const SizedBox(height: 6),
-                _buildFpsInfoRow(
-                  theme: theme,
-                  title: '30 FPS',
-                  desc: l10n.t('fps_desc_30'),
-                  isActive: !_isCustomFps && targetFps == 30,
-                ),
-              ],
-              const SizedBox(height: 6),
-              _buildFpsInfoRow(
-                theme: theme,
-                title: '24 FPS',
-                desc: l10n.t('fps_desc_24'),
-                isActive: !_isCustomFps && targetFps == 24,
-              ),
-              const SizedBox(height: 6),
-              _buildFpsInfoRow(
-                theme: theme,
-                title: l10n.t('fps_custom'),
-                desc: l10n.t('fps_desc_custom'),
-                isActive: _isCustomFps,
-              ),
-            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFpsInfoRow({
-    required ThemeData theme,
-    required String title,
-    required String desc,
-    required bool isActive,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 72,
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              color: isActive
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withAlpha(200),
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            desc,
-            style: TextStyle(
-              fontSize: 10.5,
-              height: 1.35,
-              color: theme.colorScheme.onSurface.withAlpha(
-                isActive ? 220 : 150,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+  String _getFpsDescription(
+    int targetFps,
+    bool isCustomFps,
+    AppLocalizations l10n,
+  ) {
+    if (isCustomFps) return l10n.t('fps_desc_custom');
+    switch (targetFps) {
+      case 0:
+        return l10n.t('fps_desc_original');
+      case 60:
+        return l10n.t('fps_desc_60');
+      case 30:
+        return l10n.t('fps_desc_30');
+      case 24:
+        return l10n.t('fps_desc_24');
+      default:
+        return l10n.t('fps_desc_custom');
+    }
   }
 
   Widget _buildSizeEstimator(ThemeData theme) {

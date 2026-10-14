@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.cygnus.albireo&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.5.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.5.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -25,6 +25,7 @@ The home screen provides clean segmented navigation divided into two primary cat
 - **Video Processing:**
   - **Convert:** Preserves the original video resolution while converting containers, tuning encoding presets, adjusting CRF or target bitrates, setting target frame rates, and configuring audio tracks.
   - **Downscale:** Dynamically inspects the source video resolution and lists only smaller valid targets (1080p, 720p, 480p, 360p), calculating exact proportional aspect ratios without image stretching or letterboxing.
+  - **Harmonized Mode Descriptions:** Clear, synchronized option descriptions and helper texts under both modes across all 22 supported languages.
 - **Audio Extraction:**
   - **Audio Extractor:** Extracts the audio track directly from any video into standalone audio files (MP3, M4A, or WAV) with instant stream copy or customizable bitrates.
 
@@ -55,13 +56,17 @@ The home screen provides clean segmented navigation divided into two primary cat
 - **High-Speed Stream Copy:** Automatically bypasses re-encoding (`-c:a copy`) when extracting to matching formats (e.g. AAC to M4A, MP3 to MP3, PCM to WAV) for instant extraction.
 - **Configurable Bitrate Options:** Selectable audio bitrates from 64 kbps up to 320 kbps (Studio Quality).
 
-### 4. Real-Time Telemetry & Performance Monitoring
-- **Live Telemetry Dashboard:** Displays real-time waveform monitoring cards during encoding:
+### 4. Unified Processing Screen & Real-Time Telemetry
+- **Viewport-Fitted Single-Screen Layout:** Designed to fit modern smartphone screens seamlessly without awkward micro-scrolling:
+  - **Unified Telemetry & Media Card:** Integrates live time counters (Elapsed & Remaining ETA) with compact media specifications (Source ➔ Target resolution, container, codec, bitrate, and output size badge) inside a single streamlined glass container.
+  - **Horizontal Action Buttons:** Symmetrical side-by-side action buttons (*Back* & *Open File*, or *Back* & *Retry*) saving ~50 px of vertical space.
+  - **Constrained Error Inspector:** Constrained scrollable error log with internal scrolling to prevent interface shifts when unexpected encoding issues occur.
+- **Dual-Ring Progress Indicator:** Prominent 190×190 px dual-ring circular progress bar with animated radial center pulse and state-adaptive color accents.
+- **Live System Telemetry Dashboard:**
   - **CPU Workload (%):** Live multi-threaded processor utilization during encoding.
   - **Memory Allocation (RAM RSS):** High-precision physical process resident memory (VmRSS) read directly from Linux `/proc/self/status`.
   - **Disk Write Throughput (MB/s):** Real-time measurement of encoder output write velocity to local storage.
-- **Accurate Progress Estimator:** Real-time percentage indicator, encoding speed multiplier (e.g. 1.8×), elapsed time, calculated remaining time (ETA), and output file size tracking.
-- **Live FFmpeg Console:** Collapsible real-time encoding log stream for deep inspection and diagnostic analysis.
+- **Zero Text Truncation Guarantee:** All metric tiles, labels, and spec descriptions utilize adaptive typography and flexible layout containers to completely prevent awkward ellipsis truncation (`...`) across all supported languages and display densities.
 
 ### 5. Background Persistence & Screen-Off Execution
 - **Android Foreground Service:** Operates under Android's official `mediaProcessing` foreground service type to prevent operating system process termination when the app is minimized or backgrounded.
@@ -137,7 +142,7 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.5.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.5.1.apk`
 
 ---
 
