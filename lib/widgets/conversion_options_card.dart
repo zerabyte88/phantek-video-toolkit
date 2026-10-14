@@ -122,9 +122,123 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 2. Rate Control Selection (CRF vs Bitrate)
+          // 2. Speed / Quality Preset (Cepat / Normal / Maksimal)
           _buildSectionLabel(
             icon: Icons.speed_rounded,
+            title: l10n.t('settings_cpu_preset'),
+            theme: theme,
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 6,
+              children: SpeedPreset.values.map((preset) {
+                final isSelected = widget.encodingOptions.speedPreset == preset;
+                final label = preset == SpeedPreset.fast
+                    ? l10n.t('preset_fast_title')
+                    : (preset == SpeedPreset.normal
+                        ? l10n.t('preset_normal_title')
+                        : l10n.t('preset_slow_title'));
+                return _buildChoiceChip(
+                  label: label,
+                  isSelected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(
+                          speedPreset: preset,
+                          crfValue: preset.defaultCrf,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          if (widget.encodingOptions.speedPreset == SpeedPreset.max) ...[
+            const SizedBox(height: 6),
+            Center(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withAlpha(35),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.amber.withAlpha(120),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.bolt_rounded,
+                      size: 13,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.t('preset_badge_max'),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  widget.encodingOptions.speedPreset == SpeedPreset.fast
+                      ? Icons.bolt_rounded
+                      : (widget.encodingOptions.speedPreset == SpeedPreset.max
+                          ? Icons.diamond_outlined
+                          : Icons.balance_rounded),
+                  size: 15,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.encodingOptions.speedPreset == SpeedPreset.fast
+                        ? l10n.t('preset_fast_desc')
+                        : (widget.encodingOptions.speedPreset == SpeedPreset.max
+                            ? l10n.t('preset_slow_desc')
+                            : l10n.t('preset_normal_desc')),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withAlpha(160),
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+          Divider(height: 1, color: theme.dividerColor),
+          const SizedBox(height: 16),
+
+          // 3. Rate Control Selection (CRF vs Bitrate)
+          _buildSectionLabel(
+            icon: Icons.tune_rounded,
             title: l10n.t('rate_control'),
             theme: theme,
           ),
@@ -156,8 +270,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             builder: (context) {
               final infoText =
                   widget.encodingOptions.rateControlMode == RateControlMode.crf
-                  ? l10n.t('desc_crf')
-                  : l10n.t('desc_bitrate');
+                      ? l10n.t('desc_crf')
+                      : l10n.t('desc_bitrate');
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -198,12 +312,90 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.t('crf_label'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurface.withAlpha(140),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              l10n.t('crf_label'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    theme.colorScheme.onSurface.withAlpha(140),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (widget.encodingOptions.crfValue !=
+                              widget.encodingOptions.speedPreset.defaultCrf) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              key: const Key('crf_custom_badge'),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.colorScheme.secondary.withAlpha(30),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                l10n.t('crf_custom'),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.secondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (widget.encodingOptions.crfValue !=
+                        widget.encodingOptions.speedPreset.defaultCrf)
+                      InkWell(
+                        key: const Key('crf_reset_button'),
+                        onTap: () {
+                          widget.onOptionsChanged(
+                            widget.encodingOptions.copyWith(
+                              crfValue:
+                                  widget.encodingOptions.speedPreset.defaultCrf,
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.refresh_rounded,
+                                size: 12,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                l10n.t('crf_reset'),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 Row(
                   children: [
@@ -242,6 +434,64 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ],
                 ),
+                // Slider direction guide
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.t('crf_hint_sharp'),
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
+                      ),
+                      Text(
+                        l10n.t('crf_hint_small'),
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (widget.encodingOptions.crfValue <= 17) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withAlpha(25),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: Colors.amber.withAlpha(90),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 14,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            l10n.t('crf_warning_low'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.amber,
+                              height: 1.25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           if (widget.encodingOptions.rateControlMode ==

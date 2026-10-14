@@ -1,14 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../services/settings_service.dart';
 
-/// Performance-optimized Glassmorphism Card for Phantek.
+/// Performance-optimized Glassmorphism / Translucent Card for Phantek.
 ///
-/// Bypasses [BackdropFilter] completely when [cardOpacity] == 1.0 to guarantee
-/// rock-solid 60 FPS performance without GPU overhead. When opacity < 1.0, applies
-/// a lightweight [ImageFilter.blur] strictly clipped to the card boundaries.
+/// Uses zero-cost GPU alpha tinting based on [cardOpacity] to guarantee
+/// rock-solid 60–120 FPS performance without [BackdropFilter] or offscreen buffer overhead.
 class AppGlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -78,20 +75,7 @@ class AppGlassCard extends StatelessWidget {
       );
     }
 
-    // ── 60 FPS Optimization: Bypass BackdropFilter when 100% opaque ──────────
-    if (opacity < 1.0) {
-      return Padding(
-        padding: margin,
-        child: ClipRRect(
-          borderRadius: radius,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: cardBody,
-          ),
-        ),
-      );
-    }
-
+    // ── 60-120 FPS Optimization: Pure alpha compositing without GPU blur ────
     return Padding(padding: margin, child: cardBody);
   }
 }

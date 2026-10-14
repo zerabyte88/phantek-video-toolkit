@@ -20,8 +20,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v3.4.0';
-  String _buildNumber = '31';
+  String _appVersion = 'v3.5.0';
+  String _buildNumber = '32';
 
   @override
   void initState() {
@@ -38,14 +38,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '31';
+              : '32';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v3.4.0';
-          _buildNumber = '31';
+          _appVersion = 'v3.5.0';
+          _buildNumber = '32';
         });
       }
     }

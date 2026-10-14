@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.cygnus.albireo&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.4.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.5.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -22,14 +22,22 @@
 
 ### 1. Video Processing (Convert & Downscale)
 - **Resolution Downscaling:** Reduces high-resolution videos (4K, 2K) to standard targets (1080p, 720p, 480p, 360p) while preserving original aspect ratios (landscape or portrait) without stretching or letterboxing.
+- **Single-Pass Rescaling Pipeline:** Pre-calculates exact even output dimensions (`width` & `height`) directly on the Dart layer, completely eliminating duplicate rescale and padding filters to minimize CPU cycles and memory copying.
 - **Format & Codec Conversion:** Supports container formats **MP4** (with the `+faststart` flag for instant streaming playback), **MKV**, and **MOV**.
 - **Video Codec Standard:**
   - **H.264 / AVC (`libx264`):** Universal high-throughput compatibility across all Android hardware decoders, desktop media players (VLC, Windows Media Player, QuickTime), and social media platforms.
-- **Rate Control Modes:**
-  - **CRF (Constant Rate Factor):** Ensures consistent, natural visual fidelity throughout the video.
-  - **Target Bitrate:** Enforces custom bitrates tailored to targeted file size constraints.
-- **Target Frame Rate (FPS):** Option to convert to a target frame rate or retain the original source FPS.
-- **Audio Track Management:** Configurable AAC audio bitrate or mute mode (`-an`) to strip audio tracks for even leaner file sizes.
+- **3-Tier Mobile Encoding Ladder (`SpeedPreset`):**
+  - **Fast / Cepat (`area` + `veryfast` + CRF 24):** Anti-aliasing downsampling using 2×2 pixel area averaging to eliminate moiré artifacts while cutting mobile CPU temperature and execution time.
+  - **Normal / Seimbang (`bicubic` + `faster` + CRF 22):** The proven mobile sweet spot balancing sharp details and rapid H.264 compression.
+  - **Maximum / Maksimal (`lanczos` + `fast` + CRF 20):** High-precision Lanczos sinc interpolation paired with `accurate_rnd` and `full_chroma_int` flags for studio-grade line sharpness, accurate chroma reconstruction, and higher compression density.
+- **Interactive CRF Slider & Tuning:**
+  - Automatically jumps to the preset's recommended CRF (24 / 22 / 20) upon chip selection.
+  - Allows fine-tuning CRF with a live "Custom" indicator badge without overriding the selected scaler or CPU preset.
+  - One-tap quick reset button to restore the preset default CRF at any time.
+  - Safety warning banner triggers when CRF $\le 17$ to warn against exponential output file sizes and severe thermal loads.
+- **Dual-Trigger High-Load Protection Dialog:** Proactively intercepts conversions when targeting 4K resolution or files with duration $\ge 30$ minutes under the Maximum preset, offering a 1-tap "Gunakan Normal" option to safeguard battery life and prevent thermal throttling.
+- **Smart Audio Passthrough (4-Rule Passthrough):** Zero-re-encoding direct stream copy (`-c:a copy`) when source is AAC, container is MP4, stream channels $\le 2$, and source audio bitrate is within $110\%$ of the target bitrate. Otherwise, falls back to clean AAC stereo re-encoding or mute mode (`-an`) if no audio stream is detected.
+- **Target Frame Rate (FPS):** Option to convert to a target frame rate (24, 30, 60 FPS) or retain the original source FPS.
 
 ### 2. Dedicated Audio Extractor
 - Extracts audio tracks directly from videos into popular audio formats:
@@ -69,7 +77,7 @@
   - **Midnight:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency (Badge: `AMOLED`).
   - **Daylight:** Warm morning sunbeams and fresh airy breeze ☀️ (Badge: `LIGHT`).
   - **Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸 (Badge: `AMOLED`).
-- **Card Opacity & Glassmorphism Engine:** Adjustable card surface transparency from 100% solid down to 50% with an interactive live percentage slider (5% steps) and one-tap quick reset in Settings. When opacity < 100%, cards render a sleek frosted glassmorphism effect (`BackdropFilter` sigma 5.0). At 100% opacity, the blur shader is completely bypassed to guarantee zero GPU compositing overhead and butter-smooth rendering.
+- **Card Opacity & Translucent UI:** Adjustable card surface transparency from 100% solid down to 50% with an interactive live percentage slider (5% steps) and one-tap quick reset in Settings. Utilizes zero-cost GPU alpha tinting to guarantee rock-solid 60–120 FPS UI performance without `BackdropFilter` offscreen render-pass overhead.
 - **Theme-Adaptive Header Title:** Animated glowing border and iconography dynamically matching the active theme mode (*Snowfall Crystal*, *Moonlight Starlight*, *Sunburst Gold*, or *Sakura Blossom*).
 - **Easter Egg Theme (Sakura):** Unlocked by tapping the **"Phantek"** header title 10 times consecutively (revealing the Sakura theme option in Settings; subsequent 10 taps indicate that the easter egg is already active without re-triggering).
 - **Dictionary Coverage across 22 Languages (Alphabetical Latin A–Z then Non-Latin):**
@@ -122,7 +130,7 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.4.0.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.5.0.apk`
 
 ---
 

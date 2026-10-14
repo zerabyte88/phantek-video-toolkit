@@ -87,12 +87,74 @@ enum AudioFormat {
   );
 }
 
+enum SpeedPreset {
+  fast(
+    'Cepat',
+    'area',
+    'veryfast',
+    24,
+    'Kecepatan maksimal & anti-moiré, interpolasi area',
+  ),
+  normal(
+    'Normal',
+    'bicubic',
+    'faster',
+    22,
+    'Keseimbangan ideal kecepatan dan kualitas visual',
+  ),
+  max(
+    'Maksimal',
+    'lanczos+accurate_rnd+full_chroma_int',
+    'fast',
+    20,
+    'Detail & warna paling tajam, kompresi efisien',
+  );
+
+  final String displayName;
+  final String scaler;
+  final String x264Preset;
+  final int defaultCrf;
+  final String description;
+
+  const SpeedPreset(
+    this.displayName,
+    this.scaler,
+    this.x264Preset,
+    this.defaultCrf,
+    this.description,
+  );
+
+  static SpeedPreset fromCpuPreset(String? preset) {
+    switch (preset) {
+      case 'fast':
+        return SpeedPreset.fast;
+      case 'slow':
+        return SpeedPreset.max;
+      case 'medium':
+      default:
+        return SpeedPreset.normal;
+    }
+  }
+
+  String toCpuPreset() {
+    switch (this) {
+      case SpeedPreset.fast:
+        return 'fast';
+      case SpeedPreset.max:
+        return 'slow';
+      case SpeedPreset.normal:
+        return 'medium';
+    }
+  }
+}
+
 class EncodingOptions {
   final VideoCodec codec;
   final VideoContainer container;
 
   // Rate control
   final RateControlMode rateControlMode;
+  final SpeedPreset speedPreset;
   final int crfValue;
   final int customBitrateKbps;
 
@@ -111,7 +173,8 @@ class EncodingOptions {
     this.codec = VideoCodec.h264,
     this.container = VideoContainer.mp4,
     this.rateControlMode = RateControlMode.crf,
-    this.crfValue = 23, // Default for x264 software encoding
+    this.speedPreset = SpeedPreset.normal,
+    this.crfValue = 22, // Default for x264 software encoding (Normal)
     this.customBitrateKbps = 6000,
     this.targetFps = 0,
     this.audioFormat = AudioFormat.mp3,
@@ -122,6 +185,7 @@ class EncodingOptions {
     VideoCodec? codec,
     VideoContainer? container,
     RateControlMode? rateControlMode,
+    SpeedPreset? speedPreset,
     int? crfValue,
     int? customBitrateKbps,
     int? targetFps,
@@ -132,6 +196,7 @@ class EncodingOptions {
       codec: codec ?? this.codec,
       container: container ?? this.container,
       rateControlMode: rateControlMode ?? this.rateControlMode,
+      speedPreset: speedPreset ?? this.speedPreset,
       crfValue: crfValue ?? this.crfValue,
       customBitrateKbps: customBitrateKbps ?? this.customBitrateKbps,
       targetFps: targetFps ?? this.targetFps,

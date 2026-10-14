@@ -472,13 +472,28 @@ void main() {
     });
 
     test(
-      'EncodingOptions default crfValue is 23 and crf getter alias matches',
+      'EncodingOptions default crfValue is 22 (Normal preset) and crf getter alias matches',
       () {
         const opts = EncodingOptions();
-        expect(opts.crfValue, equals(23));
-        expect(opts.crf, equals(23));
+        expect(opts.crfValue, equals(22));
+        expect(opts.crf, equals(22));
+        expect(opts.speedPreset, equals(SpeedPreset.normal));
       },
     );
+
+    test('SpeedPreset ladder configuration matches mobile optimized specifications', () {
+      expect(SpeedPreset.fast.scaler, equals('area'));
+      expect(SpeedPreset.fast.x264Preset, equals('veryfast'));
+      expect(SpeedPreset.fast.defaultCrf, equals(24));
+
+      expect(SpeedPreset.normal.scaler, equals('bicubic'));
+      expect(SpeedPreset.normal.x264Preset, equals('faster'));
+      expect(SpeedPreset.normal.defaultCrf, equals(22));
+
+      expect(SpeedPreset.max.scaler, equals('lanczos+accurate_rnd+full_chroma_int'));
+      expect(SpeedPreset.max.x264Preset, equals('fast'));
+      expect(SpeedPreset.max.defaultCrf, equals(20));
+    });
 
     test('Smart Stream Copy condition correctly evaluates eligibility for lossless passthrough', () {
       const sourceVideo = VideoInfo(
@@ -513,19 +528,7 @@ void main() {
       expect(isStreamCopyDownscale, isFalse);
     });
 
-    test('Software filter chain enforces centered even padding and yuv420p format', () {
-      const targetW = 1920;
-      const targetH = 1080;
-      const fpsFilter = 'fps=fps=30,';
-      final vf =
-          '-vf "${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease:flags=bilinear,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p"';
-
-      expect(vf, contains('force_original_aspect_ratio=decrease'));
-      expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
-      expect(vf, contains('format=yuv420p'));
-    });
-
-    test('FFmpegService.buildVideoArguments swaps portrait dimensions and applies libx264 with -crf in CRF mode', () {
+    test('FFmpegService.buildVideoArguments swaps portrait dimensions and uses single-pass scale filter', () {
       const portraitSource = VideoInfo(
         filePath: '/storage/emulated/0/DCIM/portrait_video.mp4',
         fileName: 'portrait_video.mp4',
@@ -536,6 +539,10 @@ void main() {
         fps: 30.0,
         codec: 'h264',
         fileSizeBytes: 75200000,
+        hasAudio: true,
+        audioCodec: 'aac',
+        audioChannels: 2,
+        audioBitrateKbps: 128,
       );
 
       const target1080p = VideoResolution(
@@ -546,10 +553,11 @@ void main() {
 
       const encodingOpts = EncodingOptions(
         rateControlMode: RateControlMode.crf,
+        speedPreset: SpeedPreset.normal,
         crfValue: 20,
       );
 
-      const appSettings = AppSettings();
+      const appSettings = AppSettings(audioBitrateKbps: 128);
 
       final args = FFmpegService.buildVideoArguments(
         sourceVideo: portraitSource,
@@ -572,22 +580,154 @@ void main() {
       expect(args.contains('-maxrate'), isFalse);
       expect(args.contains('-bufsize'), isFalse);
 
-      // Verify portrait dimensions swapped: scale target is 1080x1920
+      // Verify single-pass scale with bicubic flag for normal preset
       final vfIdx = args.indexOf('-vf');
       expect(vfIdx, isNot(-1));
       final vf = args[vfIdx + 1];
-      expect(
-        vf,
-        contains('scale=w=1080:h=1920:force_original_aspect_ratio=decrease'),
-      );
-      expect(vf, contains('pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2'));
+      expect(vf, contains('scale=1080:1920:flags=bicubic'));
       expect(vf, contains('format=yuv420p'));
+
+      // Verify smart audio copy since source is AAC <= 2ch and <= 128k
+      final caIdx = args.indexOf('-c:a');
+      expect(caIdx, isNot(-1));
+      expect(args[caIdx + 1], equals('copy'));
 
       // Verify compatibility flags
       expect(args, contains('-pix_fmt'));
       expect(args[args.indexOf('-pix_fmt') + 1], equals('yuv420p'));
       expect(args, contains('-movflags'));
       expect(args[args.indexOf('-movflags') + 1], equals('+faststart'));
+    });
+
+    test('FFmpegService smart audio passthrough enforces 4 strict rules', () {
+      const baseVideo = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+        hasAudio: true,
+        audioCodec: 'aac',
+        audioChannels: 2,
+        audioBitrateKbps: 128,
+      );
+
+      const target720p = VideoResolution(label: '720p', width: 1280, height: 720);
+      const appSettings128 = AppSettings(audioBitrateKbps: 128);
+
+      // 1. Valid: AAC + MP4 + <= 2ch + bitrate <= 128k*1.1 -> copy
+      final argsPass = FFmpegService.buildVideoArguments(
+        sourceVideo: baseVideo,
+        targetResolution: target720p,
+        encodingOptions: const EncodingOptions(),
+        appSettings: appSettings128,
+        outputPath: '/out.mp4',
+      );
+      expect(argsPass[argsPass.indexOf('-c:a') + 1], equals('copy'));
+
+      // 2. Multichannel (5.1ch) -> must downmix to stereo
+      const multichannelVideo = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+        hasAudio: true,
+        audioCodec: 'aac',
+        audioChannels: 6,
+        audioBitrateKbps: 128,
+      );
+      final argsMulti = FFmpegService.buildVideoArguments(
+        sourceVideo: multichannelVideo,
+        targetResolution: target720p,
+        encodingOptions: const EncodingOptions(),
+        appSettings: appSettings128,
+        outputPath: '/out.mp4',
+      );
+      expect(argsMulti[argsMulti.indexOf('-c:a') + 1], equals('aac'));
+      expect(argsMulti, contains('-ac'));
+      expect(argsMulti[argsMulti.indexOf('-ac') + 1], equals('2'));
+
+      // 3. Higher bitrate (320k vs target 128k) -> must re-encode to respect user target
+      const highBitrateAudio = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+        hasAudio: true,
+        audioCodec: 'aac',
+        audioChannels: 2,
+        audioBitrateKbps: 320,
+      );
+      final argsHigh = FFmpegService.buildVideoArguments(
+        sourceVideo: highBitrateAudio,
+        targetResolution: target720p,
+        encodingOptions: const EncodingOptions(),
+        appSettings: appSettings128,
+        outputPath: '/out.mp4',
+      );
+      expect(argsHigh[argsHigh.indexOf('-c:a') + 1], equals('aac'));
+
+      // 4. Non-AAC audio codec (e.g. ac3 or opus) -> must re-encode
+      const ac3Audio = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+        hasAudio: true,
+        audioCodec: 'ac3',
+        audioChannels: 2,
+        audioBitrateKbps: 128,
+      );
+      final argsAc3 = FFmpegService.buildVideoArguments(
+        sourceVideo: ac3Audio,
+        targetResolution: target720p,
+        encodingOptions: const EncodingOptions(),
+        appSettings: appSettings128,
+        outputPath: '/out.mp4',
+      );
+      expect(argsAc3[argsAc3.indexOf('-c:a') + 1], equals('aac'));
+
+      // 5. Silent / No audio -> must use -an
+      const silentAudio = VideoInfo(
+        filePath: '/test.mp4',
+        fileName: 'test.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+        hasAudio: false,
+      );
+      final argsSilent = FFmpegService.buildVideoArguments(
+        sourceVideo: silentAudio,
+        targetResolution: target720p,
+        encodingOptions: const EncodingOptions(),
+        appSettings: appSettings128,
+        outputPath: '/out.mp4',
+      );
+      expect(argsSilent, contains('-an'));
+      expect(argsSilent, isNot(contains('-c:a')));
     });
 
     test('FFmpegService.buildVideoArguments respects custom bitrate in Bitrate mode', () {
