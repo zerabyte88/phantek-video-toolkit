@@ -75,7 +75,7 @@ The home screen provides clean segmented navigation divided into two primary cat
 
 ### 6. Modern Settings & Hardware Management
 - **4-Container Surface Architecture:** Clean Material 3 surface grouping Appearance & Language, Performance & Hardware, Storage & Cache, and Device Specs & About.
-- **2x2 Grid Theme Selector:** Visual cards with contextual color accents, category badges (`DARK`, `AMOLED`, `LIGHT`), and theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`).
+- **2x2 Grid Theme Selector:** Visual cards with contextual color accents, category badges (`AMOLED`, `LIGHT`), and theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`).
 - **Card Opacity & Translucent UI:** Adjustable card surface transparency from 100% solid down to 50% with an interactive live percentage slider (5% steps) and one-tap quick reset in Settings. Utilizes zero-cost GPU alpha tinting to guarantee rock-solid 60–120 FPS UI performance without `BackdropFilter` offscreen render-pass overhead.
 - **Comprehensive Hardware Recognition:** Automatically inspects and displays Device Name, Model Code, Processor / SoC (Qualcomm Snapdragon, MediaTek Dimensity/Helio, Samsung Exynos, Google Tensor, Unisoc), Graphics Processor (GPU Adreno, Mali, Xclipse), Physical RAM, and Available Storage.
 - **CPU Thread Allocation:** Customize encoding thread count or choose automatic multi-core allocation.
@@ -86,7 +86,7 @@ The home screen provides clean segmented navigation divided into two primary cat
 
 ### 7. Dynamic Visual Engine & 22-Language Localization
 - **Continuous Looping Background Animations:** Battery-friendly, mathematically seamless animated canvas tailored to each active theme:
-  - **Snowfall:** Winter village night landscape with snow-covered wooden cabins, warm golden window glow, chimney smoke puffs, snow-dusted pine trees, and drifting `#CFF0FF` crystalline snowflakes ❄️ (Badge: `DARK`).
+  - **Snowfall:** Winter village night landscape with snow-covered wooden cabins, warm golden window glow, chimney smoke puffs, snow-dusted pine trees, and drifting `#CFF0FF` crystalline snowflakes ❄️ on pitch-black AMOLED (Badge: `AMOLED`).
   - **Midnight:** Glowing lunar crescent, twinkling starry sky, and shooting meteor trails 🌙 on true `#000000` pitch black for zero-watt AMOLED pixel efficiency (Badge: `AMOLED`).
   - **Daylight:** Warm morning sunbeams and fresh airy breeze ☀️ (Badge: `LIGHT`).
   - **Sakura:** Fluttering cherry blossom petals drifting over blooming sakura tree silhouettes and corner branches 🌸 (Badge: `AMOLED`).

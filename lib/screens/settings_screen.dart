@@ -752,7 +752,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'desc': l10n.t('theme_dark_desc'),
         'icon': Icons.ac_unit_rounded,
         'accent': const Color(0xFF38BDF8),
-        'badge': 'DARK',
+        'badge': 'AMOLED',
       },
       {
         'id': 'oled',
