@@ -287,7 +287,7 @@ void main() {
       expect(settings.ramBufferMb, equals(512));
       expect(settings.cpuPreset, equals('medium'));
       expect(settings.audioBitrateKbps, equals(128));
-      expect(settings.languageCode, equals('id'));
+      expect(settings.languageCode, equals('en'));
       expect(settings.themeMode, equals('dark'));
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
