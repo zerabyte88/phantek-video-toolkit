@@ -122,13 +122,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _resetOptions() {
     setState(() {
-      _encodingOptions = const EncodingOptions();
-      if (_selectedMode != _AppMode.convert) {
-        _encodingOptions = _encodingOptions.copyWith(
-          codec: VideoCodec.h264,
-          container: VideoContainer.mp4,
-        );
-      }
+      final defaultPreset =
+          SpeedPreset.fromCpuPreset(_settingsService.settings.cpuPreset);
+      _encodingOptions = EncodingOptions(
+        speedPreset: defaultPreset,
+        crfValue: defaultPreset.defaultCrf,
+        codec: VideoCodec.h264,
+        container: VideoContainer.mp4,
+      );
       if (_videoInfo != null) {
         final resolutions = _getResolutionsForMode(_selectedMode, _videoInfo);
         if (resolutions.isNotEmpty) {
@@ -225,9 +226,61 @@ class _HomeScreenState extends State<HomeScreen> {
           height: _videoInfo!.height,
         );
 
-    final options = _selectedMode == _AppMode.convert
+    EncodingOptions options = _selectedMode == _AppMode.convert
         ? _encodingOptions
         : _encodingOptions.copyWith(codec: VideoCodec.h264);
+
+    // Dual-trigger confirmation dialog for heavy processing (Q5)
+    if (_selectedMode != _AppMode.extractor &&
+        options.speedPreset == SpeedPreset.max &&
+        _videoInfo!.isHeavyProcessing) {
+      final l10n = _settingsService.l10n;
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.amber),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.t('heavy_process_title'),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              l10n.t('heavy_process_desc'),
+              style: const TextStyle(fontSize: 13, height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Switch to Normal preset as fast alternative
+                  options = options.copyWith(
+                    speedPreset: SpeedPreset.normal,
+                    crfValue: SpeedPreset.normal.defaultCrf,
+                  );
+                  Navigator.of(ctx).pop(true);
+                },
+                child: Text(l10n.t('heavy_process_use_normal')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(l10n.t('heavy_process_continue')),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (proceed != true) return;
+    }
+
+    if (!mounted) return;
+
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => ProcessingScreen(
@@ -409,42 +462,25 @@ class _HomeScreenState extends State<HomeScreen> {
   // ─── Empty / Landing State ───────────────────────────────────────────────
 
   Widget _buildEmptyState(ThemeData theme, AppLocalizations l10n) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight > 40
-                  ? constraints.maxHeight - 40
-                  : 0,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ── Mode Segmented Control ───────────────────────────────
-                  _buildSegmentedModeBar(theme, l10n),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Mode Segmented Control ───────────────────────────────
+          _buildSegmentedModeBar(theme, l10n),
 
-                  const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-                  // ── Clean Media Import Box ───────────────────────────────
-                  _buildImportCard(theme, l10n),
+          // ── Clean Media Import Box ───────────────────────────────
+          _buildImportCard(theme, l10n),
 
-                  const SizedBox(height: 28),
+          const SizedBox(height: 28),
 
-                  // ── Feature Checklist (Human & Clean) ────────────────────
-                  _buildFeatureHighlights(theme, l10n),
-
-                  const Spacer(),
-                  const SizedBox(height: 24),
-                  _buildMadeWithLoveFooter(theme, l10n),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+          // ── Feature Checklist (Human & Clean) ────────────────────
+          _buildFeatureHighlights(theme, l10n),
+        ],
+      ),
     );
   }
 
@@ -808,53 +844,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: Text(l10n.t('change_video')),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 13),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _buildMadeWithLoveFooter(theme, l10n),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMadeWithLoveFooter(ThemeData theme, AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${l10n.t('made_with_love')} ',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: theme.colorScheme.onSurface.withAlpha(150),
-                ),
-              ),
-              const Icon(
-                Icons.favorite_rounded,
-                size: 15,
-                color: Color(0xFFEF4444),
-              ),
-              Text(
-                ' ${l10n.t('by_developer')}',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface.withAlpha(220),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.t('app_footer_tagline'),
-            style: TextStyle(
-              fontSize: 11,
-              color: theme.colorScheme.onSurface.withAlpha(100),
             ),
           ),
         ],

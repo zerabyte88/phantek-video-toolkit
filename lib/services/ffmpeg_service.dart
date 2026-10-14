@@ -70,6 +70,22 @@ class FFmpegService {
           .toList();
       final hasAudio = audioStreams.isNotEmpty;
       final audioCodec = hasAudio ? audioStreams.first.getCodec() : null;
+      int? audioChannels;
+      int? audioBitrateKbps;
+      if (hasAudio) {
+        final aStream = audioStreams.first;
+        final rawChannels = aStream.getNumberProperty('channels') ??
+            num.tryParse(aStream.getStringProperty('channels') ?? '');
+        audioChannels = rawChannels?.toInt();
+
+        final rawBitrate = aStream.getBitrate();
+        if (rawBitrate != null) {
+          final bps = int.tryParse(rawBitrate);
+          if (bps != null && bps > 0) {
+            audioBitrateKbps = (bps / 1000).round();
+          }
+        }
+      }
 
       // Get file size
       final file = File(filePath);
@@ -87,6 +103,8 @@ class FFmpegService {
         fileSizeBytes: fileSize,
         hasAudio: hasAudio,
         audioCodec: audioCodec,
+        audioChannels: audioChannels,
+        audioBitrateKbps: audioBitrateKbps,
       );
     } catch (e) {
       return null;
@@ -287,30 +305,49 @@ class FFmpegService {
 
     String vfFilter = '';
     List<String> codecArgs = [];
-    List<String> audioArgs = [];
+
+    // ─── Smart Audio Passthrough Rules (Q3) ──────────────────────────────────
+    final List<String> audioArgs;
+    if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
+      audioArgs = ['-an'];
+    } else {
+      final isSourceAac =
+          sourceVideo.audioCodec?.toLowerCase().contains('aac') ?? false;
+      final isTargetMp4 = encodingOptions.container == VideoContainer.mp4;
+      final isTargetMkv = encodingOptions.container == VideoContainer.mkv;
+      final channelCount = sourceVideo.audioChannels ?? 2;
+      final sourceAudioBitrate = sourceVideo.audioBitrateKbps;
+      final maxAllowedBitrate = (appSettings.audioBitrateKbps * 1.1).round();
+
+      // Smart passthrough rules (Q3):
+      // - Output MP4: only copy if AAC, channels <= 2, and source bitrate <= target * 1.1
+      // - Output MKV in stream copy: copy passthrough
+      final canCopyAudio = (isTargetMp4 &&
+              isSourceAac &&
+              channelCount <= 2 &&
+              (sourceAudioBitrate == null ||
+                  sourceAudioBitrate <= maxAllowedBitrate)) ||
+          (isStreamCopy && isTargetMkv);
+
+      if (canCopyAudio) {
+        audioArgs = ['-c:a', 'copy'];
+      } else {
+        audioArgs = [
+          '-c:a',
+          'aac',
+          '-b:a',
+          '${appSettings.audioBitrateKbps}k',
+          '-ac',
+          '2',
+        ];
+      }
+    }
 
     if (isStreamCopy) {
       // ─── Smart Stream Copy Pipeline (Lossless Passthrough) ────────────────
       codecArgs = ['-c:v', 'copy'];
-
-      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
-        audioArgs = ['-an'];
-      } else {
-        final isSourceAac =
-            sourceVideo.audioCodec?.toLowerCase().contains('aac') ?? false;
-        if (isSourceAac || encodingOptions.container == VideoContainer.mkv) {
-          audioArgs = ['-c:a', 'copy'];
-        } else {
-          audioArgs = [
-            '-c:a',
-            'aac',
-            '-b:a',
-            '${appSettings.audioBitrateKbps}k',
-          ];
-        }
-      }
     } else {
-      // ─── Software Encoding Pipeline (libx264 CPU) ──────────────────────────
+      // ─── Software Encoding Pipeline (libx264 CPU with SpeedPreset) ────────
       final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
         targetWidth: targetW,
         targetHeight: targetH,
@@ -319,21 +356,9 @@ class FFmpegService {
         sourceBitrateBps: sourceVideo.bitrate,
       );
 
-      final String x264Preset;
-      String? x264Tune;
-      switch (appSettings.cpuPreset) {
-        case 'fast':
-          x264Preset = 'ultrafast';
-          x264Tune = 'fastdecode';
-          break;
-        case 'slow':
-          x264Preset = 'faster';
-          break;
-        case 'medium':
-        default:
-          x264Preset = 'veryfast';
-          break;
-      }
+      final speedPreset = encodingOptions.speedPreset;
+      final scaleFlag = speedPreset.scaler;
+      final x264Preset = speedPreset.x264Preset;
 
       final List<String> rateControlArgs;
       if (encodingOptions.rateControlMode == RateControlMode.crf) {
@@ -343,14 +368,20 @@ class FFmpegService {
       }
 
       if (isOriginalResolution) {
-        vfFilter =
-            '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+        final needsPad =
+            sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
+        if (needsPad) {
+          vfFilter =
+              '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+        } else if (fpsFilter.isNotEmpty) {
+          vfFilter = '${fpsFilter}format=yuv420p';
+        } else {
+          vfFilter = 'format=yuv420p';
+        }
       } else {
-        final scaleFlag = appSettings.cpuPreset == 'slow'
-            ? 'bicubic'
-            : 'bilinear';
+        // targetW and targetH are already guaranteed even numbers computed by Dart
         vfFilter =
-            '${fpsFilter}scale=w=$targetW:h=$targetH:force_original_aspect_ratio=decrease:flags=$scaleFlag,pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
 
       codecArgs = [
@@ -358,7 +389,6 @@ class FFmpegService {
         'libx264',
         '-preset',
         x264Preset,
-        if (x264Tune != null) ...['-tune', x264Tune],
         '-profile:v',
         'high',
         '-level:v',
@@ -367,12 +397,6 @@ class FFmpegService {
         '-pix_fmt',
         'yuv420p',
       ];
-
-      if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
-        audioArgs = ['-an'];
-      } else {
-        audioArgs = ['-c:a', 'aac', '-b:a', '${appSettings.audioBitrateKbps}k'];
-      }
     }
 
     // Container specific flags
