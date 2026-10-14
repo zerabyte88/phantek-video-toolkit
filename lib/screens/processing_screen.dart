@@ -594,23 +594,21 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
+                  horizontal: 16,
+                  vertical: 8,
                 ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
                     _buildProgressSection(theme, l10n),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     _buildLiveSystemTelemetry(theme, l10n),
-                    const SizedBox(height: 16),
-                    _buildTimeTelemetryCard(theme, l10n),
-                    const SizedBox(height: 16),
-                    _buildInfoSection(theme, l10n),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 10),
+                    _buildUnifiedCard(theme, l10n),
+                    const SizedBox(height: 14),
                     if (!_isProcessing) _buildActionButtons(theme, l10n),
                     if (_isProcessing) _buildCancelButton(theme, l10n),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -711,12 +709,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Text(
           _statusText,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
           ),
@@ -803,10 +801,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     final borderColor = theme.colorScheme.outline.withAlpha(50);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Column(
@@ -815,26 +813,26 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           Row(
             children: [
               Container(
-                width: 6,
-                height: 6,
+                width: 5,
+                height: 5,
                 decoration: BoxDecoration(
                   color: iconColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: iconColor.withAlpha(120),
-                      blurRadius: 4,
+                      blurRadius: 3,
                       spreadRadius: 1,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 5),
               Expanded(
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontSize: 10.5,
+                    fontSize: 10,
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface.withAlpha(150),
                     letterSpacing: -0.2,
@@ -845,7 +843,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -856,7 +854,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface,
                     letterSpacing: -0.3,
@@ -866,7 +864,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                   Text(
                     subValue,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 9.5,
                       fontWeight: FontWeight.w500,
                       color: theme.colorScheme.onSurface.withAlpha(110),
                     ),
@@ -874,18 +872,19 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           visualizer,
         ],
       ),
     );
   }
 
-  Widget _buildTimeTelemetryCard(ThemeData theme, l10n) {
+  Widget _buildUnifiedCard(ThemeData theme, l10n) {
     return AppGlassCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Column(
         children: [
+          // Row 1: Time telemetry (Elapsed & Remaining)
           Row(
             children: [
               Expanded(
@@ -902,9 +901,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               ),
               Container(
                 width: 1,
-                height: 36,
+                height: 32,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
-                color: theme.colorScheme.outline,
+                color: theme.colorScheme.outline.withAlpha(50),
               ),
               Expanded(
                 child: _buildMetricTile(
@@ -922,7 +921,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ),
           if (_isProcessing &&
               (_speedText.isNotEmpty || _currentSizeText.isNotEmpty)) ...[
-            Divider(height: 20, color: theme.colorScheme.outline),
+            Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -931,14 +930,14 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     children: [
                       Icon(
                         Icons.speed_outlined,
-                        size: 15,
+                        size: 14,
                         color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Text(
                         '${l10n.t('fps')}: $_speedText',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: theme.colorScheme.onSurface.withAlpha(180),
                         ),
                       ),
@@ -949,14 +948,14 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                     children: [
                       Icon(
                         Icons.storage_outlined,
-                        size: 15,
+                        size: 14,
                         color: theme.colorScheme.secondary,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Text(
                         '${l10n.t('file_size')}: $_currentSizeText',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: theme.colorScheme.onSurface.withAlpha(180),
                         ),
                       ),
@@ -966,29 +965,37 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             ),
           ],
           if (!_isProcessing && _totalDuration != null && _isSuccess) ...[
-            Divider(height: 18, color: theme.colorScheme.outline),
+            Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
                   Icons.check_circle_outline_rounded,
-                  size: 16,
+                  size: 15,
                   color: Color(0xFF10B981),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Text(
                   l10n.t(
                     'proc_total_time',
                     args: {'time': _formatDuration(_totalDuration!)},
                   ),
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF10B981),
                   ),
                 ),
               ],
             ),
+          ],
+          Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
+          // Row 2: Compact media specifications
+          _buildCompactMediaSpecs(theme, l10n),
+          // Row 3 (if finished): Output size & location
+          if (_isSuccess && _outputPath != null) ...[
+            Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
+            _buildOutputSummary(theme, l10n),
           ],
         ],
       ),
@@ -1004,12 +1011,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(7),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withAlpha(20),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 18, color: theme.colorScheme.primary),
+          child: Icon(icon, size: 16, color: theme.colorScheme.primary),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1020,26 +1027,23 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 10.5,
                   color: theme.colorScheme.onSurface.withAlpha(130),
                   height: 1.15,
                 ),
-                maxLines: 2,
                 softWrap: true,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 1),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
                   value,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13.5,
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface,
                   ),
-                  maxLines: 1,
                 ),
               ),
             ],
@@ -1049,7 +1053,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
-  Widget _buildInfoSection(ThemeData theme, l10n) {
+  Widget _buildCompactMediaSpecs(ThemeData theme, l10n) {
     if (widget.isAudioExtraction) {
       final audioFmt = widget.encodingOptions.audioFormat.name.toUpperCase();
       final bitrate = widget.encodingOptions.audioExtractBitrateKbps <= 0
@@ -1057,199 +1061,286 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           : '${widget.encodingOptions.audioExtractBitrateKbps} kbps';
       final srcAudio = widget.videoInfo.audioCodec?.toUpperCase() ?? 'Audio';
 
-      return AppGlassCard(
-        child: Column(
-          children: [
-            _buildInfoRow(
-              theme,
-              l10n.t('proc_source'),
-              widget.videoInfo.fileName,
-              srcAudio,
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${l10n.t('proc_source')} ➔ ${l10n.t('proc_target')}',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: theme.colorScheme.onSurface.withAlpha(130),
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  '$srcAudio ➔ $audioFmt',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
-            Divider(height: 20, color: theme.colorScheme.outline),
-            _buildInfoRow(
-              theme,
-              l10n.t('proc_target'),
-              '$audioFmt ${l10n.t('category_audio')}',
-              bitrate,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  l10n.t('audio_format'),
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: theme.colorScheme.onSurface.withAlpha(130),
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  '$audioFmt • $bitrate',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
-            Divider(height: 20, color: theme.colorScheme.outline),
-            _buildInfoRow(
-              theme,
-              l10n.t('container_format'),
-              audioFmt,
-              l10n.t('audio_track'),
-            ),
-            if (_isSuccess && _outputPath != null) ...[
-              Divider(height: 20, color: theme.colorScheme.outline),
-              FutureBuilder<int>(
-                future: File(_outputPath!).length(),
-                builder: (context, snapshot) {
-                  final size = snapshot.data ?? 0;
-                  String sizeStr;
-                  if (size >= 1073741824) {
-                    sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
-                  } else if (size >= 1048576) {
-                    sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
-                  } else {
-                    sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
-                  }
-                  return _buildInfoRow(
-                    theme,
-                    l10n.t('proc_output_size'),
-                    sizeStr,
-                    l10n.t('audio_extracted'),
-                  );
-                },
-              ),
-              Divider(height: 20, color: theme.colorScheme.outline),
-              _buildInfoRow(
-                theme,
-                l10n.t('proc_saved_location'),
-                widget.appSettings.audioOutputDirectory.isNotEmpty
-                    ? widget.appSettings.audioOutputDirectory
-                    : l10n.t('settings_audio_folder_default'),
-                _outputPath?.split(Platform.pathSeparator).last ?? '',
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       );
     }
 
-    return AppGlassCard(
-      child: Column(
-        children: [
-          _buildInfoRow(
-            theme,
-            l10n.t('proc_source'),
-            widget.videoInfo.resolution,
-            '${widget.videoInfo.width}×${widget.videoInfo.height}',
-          ),
-          Divider(height: 20, color: theme.colorScheme.outline),
-          _buildInfoRow(
-            theme,
-            l10n.t('proc_target'),
-            widget.targetResolution.label.startsWith('Original')
-                ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
-                : widget.targetResolution.label,
-            '${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.height : widget.targetResolution.width}×${(widget.videoInfo.height > widget.videoInfo.width && !widget.targetResolution.label.startsWith('Original')) ? widget.targetResolution.width : widget.targetResolution.height} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
-          ),
-          Divider(height: 20, color: theme.colorScheme.outline),
-          _buildInfoRow(
-            theme,
-            l10n.t('container_format'),
-            widget.encodingOptions.container.displayName,
-            widget.encodingOptions.codec.displayName,
-          ),
-          if (_isSuccess && _outputPath != null) ...[
-            Divider(height: 20, color: theme.colorScheme.outline),
-            FutureBuilder<int>(
-              future: File(_outputPath!).length(),
-              builder: (context, snapshot) {
-                final size = snapshot.data ?? 0;
-                String sizeStr;
-                if (size >= 1073741824) {
-                  sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
-                } else if (size >= 1048576) {
-                  sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
-                } else {
-                  sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
-                }
-                final isBigger = size > widget.videoInfo.fileSizeBytes;
-                final diffPercent = widget.videoInfo.fileSizeBytes > 0
-                    ? ((size - widget.videoInfo.fileSizeBytes).abs() /
-                              widget.videoInfo.fileSizeBytes *
-                              100)
-                          .toStringAsFixed(0)
-                    : '0';
-                final savingsBadge = isBigger
-                    ? l10n.t(
-                        'proc_size_increase',
-                        args: {'percent': diffPercent},
-                      )
-                    : l10n.t('proc_savings', args: {'percent': diffPercent});
-                return _buildInfoRow(
-                  theme,
-                  l10n.t('proc_output_size'),
-                  sizeStr,
-                  savingsBadge,
-                );
-              },
-            ),
-            Divider(height: 20, color: theme.colorScheme.outline),
-            _buildInfoRow(
-              theme,
-              l10n.t('proc_saved_location'),
-              l10n.t('proc_saved_path'),
-              _outputPath?.split(Platform.pathSeparator).last ?? '',
-            ),
-          ],
-        ],
-      ),
-    );
-  }
+    final targetResLabel = widget.targetResolution.label.startsWith('Original')
+        ? '${l10n.t('res_original')} (${widget.targetResolution.label.substring(widget.targetResolution.label.indexOf('(') + 1)}'
+        : widget.targetResolution.label;
+    final isPortrait = widget.videoInfo.height > widget.videoInfo.width;
+    final targetW =
+        (isPortrait && !widget.targetResolution.label.startsWith('Original'))
+            ? widget.targetResolution.height
+            : widget.targetResolution.width;
+    final targetH =
+        (isPortrait && !widget.targetResolution.label.startsWith('Original'))
+            ? widget.targetResolution.width
+            : widget.targetResolution.height;
 
-  Widget _buildInfoRow(
-    ThemeData theme,
-    String label,
-    String value,
-    String subtitle,
-  ) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface.withAlpha(140),
-              fontSize: 13,
-            ),
+          flex: 6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${l10n.t('proc_source')} ➔ ${l10n.t('proc_target')}',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                '${widget.videoInfo.resolution} ➔ $targetResLabel',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                '${widget.videoInfo.width}×${widget.videoInfo.height} ➔ $targetW×$targetH',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: theme.colorScheme.onSurface.withAlpha(115),
+                ),
+              ),
+            ],
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: theme.colorScheme.onSurface,
+        const SizedBox(width: 8),
+        Expanded(
+          flex: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                l10n.t('container_format'),
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
               ),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(
-                color: theme.colorScheme.onSurface.withAlpha(110),
-                fontSize: 11,
+              const SizedBox(height: 1),
+              Text(
+                '${widget.encodingOptions.container.displayName.toUpperCase()} • ${widget.encodingOptions.codec.displayName.split(' ').first}',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.end,
               ),
-            ),
-          ],
+              Text(
+                widget.encodingOptions.codec.displayName,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: theme.colorScheme.onSurface.withAlpha(115),
+                ),
+                textAlign: TextAlign.end,
+                softWrap: true,
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
+  Widget _buildOutputSummary(ThemeData theme, l10n) {
+    return FutureBuilder<int>(
+      future: File(_outputPath!).length(),
+      builder: (context, snapshot) {
+        final size = snapshot.data ?? 0;
+        String sizeStr;
+        if (size >= 1073741824) {
+          sizeStr = '${(size / 1073741824).toStringAsFixed(2)} GB';
+        } else if (size >= 1048576) {
+          sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
+        } else {
+          sizeStr = '${(size / 1024).toStringAsFixed(0)} KB';
+        }
+
+        final fileName = _outputPath?.split(Platform.pathSeparator).last ?? '';
+        final isBigger = size > widget.videoInfo.fileSizeBytes;
+        final diffPercent = widget.videoInfo.fileSizeBytes > 0
+            ? ((size - widget.videoInfo.fileSizeBytes).abs() /
+                      widget.videoInfo.fileSizeBytes *
+                      100)
+                  .toStringAsFixed(0)
+            : '0';
+
+        final badgeText = widget.isAudioExtraction
+            ? l10n.t('audio_extracted')
+            : (isBigger
+                ? l10n.t('proc_size_increase', args: {'percent': diffPercent})
+                : l10n.t('proc_savings', args: {'percent': diffPercent}));
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.t('proc_output_size'),
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: theme.colorScheme.onSurface.withAlpha(130),
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Row(
+                    children: [
+                      Text(
+                        sizeStr,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 1.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isBigger && !widget.isAudioExtraction
+                                ? Colors.orange.withAlpha(30)
+                                : const Color(0xFF10B981).withAlpha(30),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            badgeText,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w600,
+                              color: isBigger && !widget.isAudioExtraction
+                                  ? Colors.orange
+                                  : const Color(0xFF10B981),
+                            ),
+                            softWrap: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    l10n.t('proc_saved_location'),
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: theme.colorScheme.onSurface.withAlpha(130),
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    fileName,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.end,
+                    softWrap: true,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildActionButtons(ThemeData theme, l10n) {
     if (_isSuccess) {
-      return Column(
+      return Row(
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _openOutputFile,
-              icon: const Icon(Icons.folder_open_outlined, size: 20),
-              label: Text(l10n.t('proc_open_file')),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
+          Expanded(
             child: OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back_rounded, size: 18),
               label: Text(l10n.t('proc_back')),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: _openOutputFile,
+              icon: const Icon(Icons.folder_open_outlined, size: 18),
+              label: Text(l10n.t('proc_open_file')),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
         ],
@@ -1260,8 +1351,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 color: Colors.red.withAlpha(20),
                 borderRadius: BorderRadius.circular(10),
@@ -1275,28 +1366,28 @@ class _ProcessingScreenState extends State<ProcessingScreen>
                       const Icon(
                         Icons.error_outline_rounded,
                         color: Colors.redAccent,
-                        size: 18,
+                        size: 16,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
                         l10n.t('error_details'),
                         style: const TextStyle(
                           color: Colors.redAccent,
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 120),
+                  const SizedBox(height: 4),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 100),
                     child: SingleChildScrollView(
                       child: Text(
                         _errorMessage!,
                         style: TextStyle(
                           fontFamily: 'monospace',
-                          fontSize: 10,
+                          fontSize: 9.5,
                           color: theme.colorScheme.onSurface.withAlpha(180),
                         ),
                       ),
@@ -1306,32 +1397,40 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               ),
             ),
           ],
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  _isProcessing = true;
-                  _progress = 0;
-                  _statusText = l10n.t('proc_preparing');
-                  _speedText = '';
-                  _currentSizeText = '';
-                  _errorMessage = null;
-                });
-                _startProcessing();
-              },
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(l10n.t('proc_retry')),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back_rounded),
-              label: Text(l10n.t('proc_back')),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                  label: Text(l10n.t('proc_back')),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _isProcessing = true;
+                      _progress = 0;
+                      _statusText = l10n.t('proc_preparing');
+                      _speedText = '';
+                      _currentSizeText = '';
+                      _errorMessage = null;
+                    });
+                    _startProcessing();
+                  },
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(l10n.t('proc_retry')),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       );
@@ -1376,6 +1475,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         },
         icon: const Icon(Icons.cancel_outlined, size: 18),
         label: Text(l10n.t('proc_cancel_btn')),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 11),
+        ),
       ),
     );
   }

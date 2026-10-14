@@ -31,7 +31,8 @@ class AppLocalizations {
   static const Map<String, Map<String, String>> _localizedValues = {
     'id': {
       'settings_card_opacity': 'Opasitas Kartu',
-      'settings_card_opacity_desc': 'Atur transparansi kartu dan efek kaca',
+      'settings_card_opacity_desc':
+          'Atur transparansi kartu dan efek kaca\n(Kurangi opasitas untuk performa lebih ringan)',
       'about_phantek_subtitle': 'Transcoder Video & Ekstraktor Audio Offline',
       'active_language_badge': 'Aktif',
       'app_footer_tagline': 'Dibuat untuk performa tinggi & privasi offline',
@@ -75,14 +76,18 @@ class AppLocalizations {
       'desc_audio_mp3':
           'Universal (Kompatibel dengan semua perangkat dan pemutar)',
       'desc_audio_wav': 'Lossless Uncompressed (Kualitas Audio Studio Mentah)',
-      'desc_bitrate': 'Memaksa video untuk mencapai ukuran target MB yang pasti, kualitas visual akan menyesuaikan.',
-      'desc_crf': 'Mempertahankan kualitas visual yang konsisten tanpa memedulikan ukuran akhir file. Semakin kecil angkanya, semakin tinggi kualitasnya namun ukurannya semakin besar. Sangat direkomendasikan.',
+      'desc_bitrate':
+          'Membatasi laju bit untuk target ukuran file pasti\n(Kualitas visual menyesuaikan batas ukuran)',
+      'desc_crf':
+          'Menjaga konsistensi kualitas visual video\n(Ukuran file menyesuaikan kerumitan gambar)',
       'desc_h264': 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.',
       'desc_hevc': 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.',
-      'desc_mkv': 'Banyak audio & subtitle dalam 1 file. Menyimpan Film, Anime, Seri TV.',
-      'desc_mov': 'Kualitas visual mentah (tinggi). Editing Video Profesional (Premiere/FCPX).',
+      'desc_mkv':
+          'Format fleksibel multi-audio & subtitle\n(Direkomendasikan untuk koleksi film & anime)',
+      'desc_mov':
+          'Kontainer standar Apple dengan kualitas mentah tinggi\n(Ideal untuk editing video lanjutan / NLE)',
       'desc_mp4':
-          'Ringan dan universal. Media Sosial, Rekaman HP, Berbagi video.',
+          'Format universal dengan kompatibilitas terbaik\n(Ideal untuk media sosial, web & berbagi file)',
       'developer_name': 'Zerabyte88',
       'developer_role': 'Pembuat & Pengelola',
       'developer_title': 'Pengembang',
@@ -125,12 +130,15 @@ class AppLocalizations {
       'fps_custom': 'Kustom',
       'fps_info_title': 'Panduan Target FPS',
       'fps_desc_original':
-          'Mempertahankan frame rate rekaman awal video tanpa modifikasi.',
+          'Mempertahankan frame rate rekaman asli video\n(Kecepatan gerakan asli tanpa modifikasi)',
       'fps_desc_60':
-          'Gerakan ultra mulus, ideal untuk gameplay dan rekaman aksi cepat.',
-      'fps_desc_30': 'Standar video digital umum, seimbang antara fluiditas dan ukuran file.',
-      'fps_desc_24': 'Standar sinematik film layar lebar, nuansa sinema klasik dan hemat ukuran.',
-      'fps_desc_custom': 'Frame rate kustom manual, dibatasi maksimal sesuai FPS video sumber.',
+          'Gerakan ultra mulus untuk rekaman dinamis\n(Sangat cocok untuk gameplay & aksi cepat)',
+      'fps_desc_30':
+          'Standar umum video digital modern\n(Keseimbangan kelancaran gerakan & ukuran file)',
+      'fps_desc_24':
+          'Standar sinematik film layar lebar\n(Memberikan nuansa sinema klasik & hemat ukuran)',
+      'fps_desc_custom':
+          'Batas frame rate manual sesuai preferensi\n(Maksimal dibatasi sesuai FPS video sumber)',
       'fps_max': 'Maksimal',
       'hardware_accel': 'Akselerator Grafis Perangkat Keras',
       'license_gpl': 'Lisensi GPLv3 Terbuka',
@@ -217,15 +225,19 @@ class AppLocalizations {
       'settings_clear_cache': 'Bersihkan Cache Sekarang',
       'settings_clear_cache_success':
           'Cache berhasil dibersihkan! {size} ruang dibebaskan.',
+      'settings_audio_mute_desc':
+          'Menonaktifkan audio pada hasil konversi\n(Ukuran file video jauh lebih hemat)',
+      'settings_audio_bitrate_desc':
+          'Bitrate audio AAC {kbps} kbps\n(Kualitas suara jernih dan seimbang)',
       'preset_fast_title': 'Cepat',
       'preset_normal_title': 'Normal',
       'preset_slow_title': 'Maksimal',
       'preset_fast_desc':
-          'Scaler Area • x264 veryfast (CRF 24). Anti-moiré, proses paling cepat & hemat daya baterai.',
+          'Scaler Area • x264 veryfast (CRF 24)\n(Proses paling cepat & hemat daya baterai)',
       'preset_normal_desc':
-          'Scaler Bicubic • x264 faster (CRF 22). Keseimbangan optimal kecepatan, ketajaman, dan ukuran file.',
+          'Scaler Bicubic • x264 faster (CRF 22)\n(Keseimbangan kecepatan, ketajaman & ukuran)',
       'preset_slow_desc':
-          'Scaler Lanczos • x264 fast (CRF 20). Rekonstruksi garis dan warna paling tajam dengan kompresi efisien.',
+          'Scaler Lanczos • x264 fast (CRF 20)\n(Rekonstruksi garis dan warna paling tajam)',
       'preset_badge_max': 'Lebih lama & daya CPU tinggi',
       'crf_custom': 'Kustom',
       'crf_reset': 'Reset',
@@ -242,16 +254,25 @@ class AppLocalizations {
       'settings_cpu_preset_desc': 'Pilih Fast untuk proses lebih cepat, Normal untuk seimbang, atau Slow untuk kualitas detail maksimal.',
       'settings_cpu_threads': 'Penggunaan Core CPU / Thread',
       'settings_cpu_threads_desc': 'Tentukan jumlah thread encoding. Semakin banyak core, semakin cepat proses konversi.',
+      'settings_cpu_threads_auto_desc':
+          'Otomatis menggunakan seluruh core prosesor\n(Kecepatan encoding maksimal)',
+      'settings_cpu_threads_manual_desc':
+          'Menggunakan {count} core untuk encoding video\n(Multitasking aplikasi lain tetap lancar)',
       'settings_detected_cores': 'Terdeteksi {count} Core pada perangkat ini',
       'settings_folder_changed': 'Lokasi penyimpanan video berhasil diubah',
       'settings_folder_default': 'Default (Movies)',
       'settings_hardware': 'Perangkat Keras & Performa',
       'settings_language': 'Bahasa / Language',
-      'settings_language_desc': 'Pilih bahasa tampilan antarmuka aplikasi.',
+      'settings_language_desc':
+          'Pilih bahasa antarmuka aplikasi\n(Diterapkan langsung ke seluruh menu)',
       'settings_output_folder': 'Folder Penyimpanan Video',
       'settings_output_folder_desc': 'Pilih lokasi folder penyimpanan video hasil konversi pada perangkat Anda.',
       'settings_ram_buffer': 'Batas RAM & Buffer Memori',
       'settings_ram_buffer_desc': 'Mengatur batas alokasi buffer caching FFmpeg untuk mencegah force close (OOM).',
+      'settings_ram_low_desc':
+          'Alokasi buffer memori hemat dan seimbang\n(Rekomendasi untuk sebagian besar video)',
+      'settings_ram_high_desc':
+          'Alokasi buffer memori tinggi\n(Ideal untuk video 4K atau durasi panjang)',
       'settings_ram_high': '1024 MB (Performa Tinggi)',
       'settings_ram_low': '256 MB (Hemat Memori)',
       'settings_ram_max': '2048 MB (Maksimum)',
@@ -267,7 +288,8 @@ class AppLocalizations {
       'settings_theme_desc': 'Pilih antara Mode Gelap standar, Mode Gelap OLED hemat daya untuk layar AMOLED, atau Mode Terang.',
       'settings_title': 'Pengaturan',
       'settings_wakelock': 'Cegah Layar Mati',
-      'settings_wakelock_desc': 'Menjaga layar tetap aktif selama pemrosesan video. Fitur ini dapat mempercepat konsumsi baterai.',
+      'settings_wakelock_desc':
+          'Menjaga layar tetap aktif selama konversi\n(Konsumsi daya baterai akan meningkat)',
       'share': 'Bagikan',
       'source_video': 'Video Sumber',
       'start_audio_extraction': 'Mulai Ekstrak Audio',
@@ -301,7 +323,7 @@ class AppLocalizations {
     'en': {
       'settings_card_opacity': 'Card Opacity',
       'settings_card_opacity_desc':
-          'Adjust card surface transparency & glass effect',
+          'Adjust card transparency and glass effect\n(Lower opacity for smoother performance)',
       'about_phantek_subtitle': 'Offline Video Transcoder & Audio Extractor',
       'active_language_badge': 'Active',
       'app_footer_tagline': 'Crafted for high performance & offline privacy',
@@ -345,14 +367,18 @@ class AppLocalizations {
           'Universal (Compatible with all devices and media players)',
       'desc_audio_wav':
           'Lossless Uncompressed (Studio-grade raw audio quality)',
-      'desc_bitrate': 'Forces the video to meet an exact target MB size, visual quality will adjust accordingly.',
-      'desc_crf': 'Maintains consistent visual quality regardless of final file size. Lower value means better quality but larger size. Highly recommended.',
+      'desc_bitrate':
+          'Enforces fixed bitrate for predictable file size\n(Visual fidelity adjusts to size target)',
+      'desc_crf':
+          'Maintains consistent visual video quality\n(File size adapts to visual complexity)',
       'desc_h264': 'Live Streaming, Web Video, Standard Phone recordings. Excellent Compatibility.',
       'desc_hevc': '4K Streaming, High Quality Movies. Very High Compression Efficiency.',
       'desc_mkv':
-          'Multiple audio & subtitles in 1 file. Movies, Anime, TV Series.',
-      'desc_mov': 'High visual raw quality. Professional Video Editing (Premiere/FCPX).',
-      'desc_mp4': 'Lightweight and universal. Social Media, Phone Recordings, Video sharing.',
+          'Flexible container for multi-audio & subtitles\n(Recommended for movies & media archives)',
+      'desc_mov':
+          'Apple standard container with raw visual fidelity\n(Ideal for post-production & video editing)',
+      'desc_mp4':
+          'Universal container with widest compatibility\n(Ideal for social media, web & file sharing)',
       'developer_name': 'Zerabyte88',
       'developer_role': 'Creator & Maintainer',
       'developer_title': 'Developer',
@@ -397,15 +423,15 @@ class AppLocalizations {
       'fps_custom': 'Custom',
       'fps_info_title': 'Target FPS Guide',
       'fps_desc_original':
-          'Keeps original recording frame rate without re-sampling.',
+          'Preserves the original recording frame rate\n(Natural native motion without alteration)',
       'fps_desc_60':
-          'Ultra smooth motion, ideal for gameplay and high-action video.',
+          'Ultra-smooth fluid motion for dynamic scenes\n(Best suited for gameplay & high-action video)',
       'fps_desc_30':
-          'Standard digital video, balanced fluid motion and file size.',
+          'Standard frame rate for modern digital video\n(Optimal balance of smoothness & file size)',
       'fps_desc_24':
-          'Cinematic film standard, classic motion and compact file size.',
+          'Classic cinematic motion picture standard\n(Authentic film aesthetic & compact size)',
       'fps_desc_custom':
-          'Manual custom frame rate, capped at source video frame rate.',
+          'Custom manual frame rate limit\n(Capped at maximum source video FPS)',
       'fps_max': 'Max',
       'hardware_accel': 'Hardware Graphics Accelerator',
       'license_gpl': 'Open Source GPLv3 License',
@@ -492,15 +518,19 @@ class AppLocalizations {
       'settings_clear_cache': 'Clear Cache Now',
       'settings_clear_cache_success':
           'Cache cleared successfully! {size} freed.',
+      'settings_audio_mute_desc':
+          'Mutes audio track in converted video\n(Significantly reduces file size)',
+      'settings_audio_bitrate_desc':
+          'AAC audio bitrate at {kbps} kbps\n(Clear and balanced audio reproduction)',
       'preset_fast_title': 'Fast',
       'preset_normal_title': 'Normal',
       'preset_slow_title': 'Maximum',
       'preset_fast_desc':
-          'Area Scaler • x264 veryfast (CRF 24). Anti-moiré, fastest processing & battery friendly.',
+          'Area Scaler • x264 veryfast (CRF 24)\n(Fastest processing & battery-friendly)',
       'preset_normal_desc':
-          'Bicubic Scaler • x264 faster (CRF 22). Optimal balance between speed, sharpness, and file size.',
+          'Bicubic Scaler • x264 faster (CRF 22)\n(Optimal balance of speed, clarity & size)',
       'preset_slow_desc':
-          'Lanczos Scaler • x264 fast (CRF 20). Sharpest lines and chroma reconstruction with efficient compression.',
+          'Lanczos Scaler • x264 fast (CRF 20)\n(Sharpest detail & highest visual fidelity)',
       'preset_badge_max': 'Slower & high CPU usage',
       'crf_custom': 'Custom',
       'crf_reset': 'Reset',
@@ -517,17 +547,25 @@ class AppLocalizations {
       'settings_cpu_preset_desc': 'Choose Fast for speed, Normal for balanced performance, or Slow for maximum detail quality.',
       'settings_cpu_threads': 'CPU Cores / Threads',
       'settings_cpu_threads_desc': 'Configure encoding thread count. More cores increase conversion speed.',
+      'settings_cpu_threads_auto_desc':
+          'Automatically utilizes all CPU cores\n(Maximum encoding throughput)',
+      'settings_cpu_threads_manual_desc':
+          'Uses {count} cores for video encoding\n(Keeps background multitasking smooth)',
       'settings_detected_cores': 'Detected {count} Cores on this device',
       'settings_folder_changed': 'Video storage location changed successfully',
       'settings_folder_default': 'Default (Movies)',
       'settings_hardware': 'Hardware & Performance',
       'settings_language': 'Language',
       'settings_language_desc':
-          'Select your preferred user interface language.',
+          'Select interface display language\n(Applied immediately across all menus)',
       'settings_output_folder': 'Video Storage Folder',
       'settings_output_folder_desc': 'Choose the folder location where converted videos will be saved on your device.',
       'settings_ram_buffer': 'RAM & Memory Buffer Limit',
       'settings_ram_buffer_desc': 'Controls FFmpeg memory caching buffer size to prevent out-of-memory crashes.',
+      'settings_ram_low_desc':
+          'Memory-efficient caching buffer\n(Recommended for general video tasks)',
+      'settings_ram_high_desc':
+          'High-capacity caching buffer\n(Ideal for 4K and long-duration videos)',
       'settings_ram_high': '1024 MB (High Performance)',
       'settings_ram_low': '256 MB (Low Memory)',
       'settings_ram_max': '2048 MB (Maximum)',
@@ -544,7 +582,8 @@ class AppLocalizations {
       'settings_theme_desc': 'Choose between Standard Dark mode, battery-saving OLED Dark mode for AMOLED screens, or Light mode.',
       'settings_title': 'Settings',
       'settings_wakelock': 'Keep Screen Awake',
-      'settings_wakelock_desc': 'Keeps the screen active during video processing. This feature may increase battery consumption.',
+      'settings_wakelock_desc':
+          'Keeps screen active during video processing\n(Increases battery power consumption)',
       'share': 'Share',
       'source_video': 'Source Video',
       'start_audio_extraction': 'Start Audio Extraction',

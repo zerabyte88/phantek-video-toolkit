@@ -66,13 +66,15 @@ class AudioExtractorCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
-                l10n.t('audio_options'),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
-                  letterSpacing: -0.2,
+              Expanded(
+                child: Text(
+                  l10n.t('audio_options'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
