@@ -1107,39 +1107,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.memory_rounded,
-                  size: 16,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.t('settings_cpu_threads'),
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.memory_rounded,
+                    size: 16,
+                    color: theme.colorScheme.primary,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.t('settings_cpu_threads'),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withAlpha(20),
+                color: theme.colorScheme.primary.withAlpha(20),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                l10n.t(
-                  'settings_detected_cores',
-                  args: {'count': deviceCores.toString()},
-                ),
-                style: const TextStyle(
+                '$deviceCores ${l10n.t('unit_core')}',
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF10B981),
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -1211,24 +1213,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.dns_outlined,
-                  size: 16,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.t('settings_ram_buffer'),
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.dns_outlined,
+                    size: 16,
+                    color: theme.colorScheme.primary,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.t('settings_ram_buffer'),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
               decoration: BoxDecoration(
