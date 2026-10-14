@@ -186,11 +186,11 @@ class AppTheme {
   /// Modern Slate Dark theme getter
   static ThemeData get darkTheme => buildDarkTheme();
 
-  /// Modern Slate Dark theme builder (Clean Slate 900 / Slate 800)
+  /// AMOLED Snowfall theme builder (Pitch Black with Deep Frost Slate Accents)
   static ThemeData buildDarkTheme({double cardOpacity = 1.0}) {
-    const scaffoldBg = Color(0xFF0F172A); // Slate 900
-    const surfaceBg = Color(0xFF1E293B); // Slate 800
-    const outlineColor = Color(0xFF334155); // Slate 700
+    const scaffoldBg = Colors.black; // Pitch Black AMOLED
+    const surfaceBg = Color(0xFF0C1322); // Deep Frost Night
+    const outlineColor = Color(0xFF1E293B); // Crystalline Frost Slate
     const textPrimary = Color(0xFFF8FAFC); // Slate 50
     const textSecondary = Color(0xFF94A3B8); // Slate 400
 
@@ -261,7 +261,7 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: const Color(0xFF0C1322),
         selectedColor: _primaryColor,
         labelStyle: const TextStyle(
           color: textPrimary,
@@ -294,8 +294,8 @@ class AppTheme {
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: _primaryColor,
-        circularTrackColor: Color(0xFF334155),
-        linearTrackColor: Color(0xFF334155),
+        circularTrackColor: Color(0xFF1E293B),
+        linearTrackColor: Color(0xFF1E293B),
       ),
       dividerTheme: const DividerThemeData(color: outlineColor, thickness: 1),
       switchTheme: SwitchThemeData(
@@ -307,11 +307,11 @@ class AppTheme {
         trackColor: WidgetStateProperty.resolveWith(
           (s) => s.contains(WidgetState.selected)
               ? _primaryColor
-              : const Color(0xFF334155),
+              : const Color(0xFF1E293B),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: const Color(0xFF0C1322),
         contentTextStyle: const TextStyle(color: textPrimary, fontSize: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

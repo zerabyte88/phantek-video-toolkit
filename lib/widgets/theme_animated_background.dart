@@ -178,8 +178,8 @@ class _ThemeBackgroundPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          const Color(0xFF1E293B).withAlpha(120),
-          const Color(0xFF0F172A).withAlpha(190),
+          const Color(0xFF0F172A).withAlpha(120),
+          Colors.black.withAlpha(240),
         ],
       ).createShader(Offset.zero & size);
     canvas.drawPath(backHillPath, backHillPaint);
@@ -226,8 +226,8 @@ class _ThemeBackgroundPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          const Color(0xFF1E293B).withAlpha(220),
-          const Color(0xFF0F172A).withAlpha(255),
+          const Color(0xFF0C1322).withAlpha(220),
+          Colors.black,
         ],
       ).createShader(Offset.zero & size);
     canvas.drawPath(hillPath, hillPaint);
