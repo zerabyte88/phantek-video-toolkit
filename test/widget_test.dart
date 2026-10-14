@@ -13,7 +13,7 @@ void main() {
     await tester.pumpWidget(const VideoDownscalerApp());
 
     expect(find.text('Phantek'), findsOneWidget);
-    expect(find.text('Pilih Video'), findsWidgets);
+    expect(find.text('Select Video'), findsWidgets);
     expect(find.byType(HomeScreen), findsOneWidget);
   });
 
