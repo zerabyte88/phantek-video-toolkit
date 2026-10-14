@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_downscaler/models/app_settings.dart';
 import 'package:video_downscaler/models/encoding_options.dart';
@@ -269,6 +270,17 @@ void main() {
   // Encoding tests removed due to refactor
 
   group('AppSettings tests', () {
+    setUpAll(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMessageHandler(
+        'dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle',
+        (ByteData? message) async {
+          return const StandardMessageCodec().encodeMessage(<Object?>[null]);
+        },
+      );
+    });
+
     test('Default values are correct', () {
       const settings = AppSettings();
       expect(settings.cpuThreads, equals(0)); // Auto
