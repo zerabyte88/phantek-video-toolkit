@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.cygnus.albireo&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v3.5.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.5.2&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPLv3&color=475569&style=for-the-badge&logo=gnu&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -28,6 +28,7 @@ The home screen provides clean segmented navigation divided into two primary cat
   - **Harmonized Mode Descriptions:** Clear, synchronized option descriptions and helper texts under both modes across all 22 supported languages.
 - **Audio Extraction:**
   - **Audio Extractor:** Extracts the audio track directly from any video into standalone audio files (MP3, M4A, or WAV) with instant stream copy or customizable bitrates.
+- **Minimalist & Distraction-Free Landing Screen:** Directly focuses on segmented mode switching and media importing without intrusive promotional banners.
 
 ### 2. Video Processing (Convert & Downscale)
 - **Single-Pass Rescaling Pipeline:** Pre-calculates exact even output dimensions (`width` and `height`) directly on the Dart layer, completely eliminating redundant rescale passes and padding filters in FFmpeg to minimize CPU cycles, memory copying, and thermal load.
@@ -74,13 +75,13 @@ The home screen provides clean segmented navigation divided into two primary cat
 - **System Notification Updates:** Real-time conversion progress and completion status are displayed directly in the Android notification shade.
 
 ### 6. Modern Settings & Hardware Management
-- **4-Container Surface Architecture:** Clean Material 3 surface grouping Appearance & Language, Performance & Hardware, Storage & Cache, and Device Specs & About.
-- **2x2 Grid Theme Selector:** Visual cards with contextual color accents, category badges (`AMOLED`, `LIGHT`), and theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`).
+- **4-Container Surface Architecture:** Clean Material 3 surface grouping Appearance & Language, Performance & Hardware, Storage & Cache, and Device Specs & About App.
+- **2x2 Grid Theme Selector:** Visual cards with contextual color accents, category badges (3 `AMOLED` themes and 1 `LIGHT` theme), and theme branding (`Snowfall`, `Midnight`, `Sakura`, `Daylight`).
 - **Card Opacity & Translucent UI:** Adjustable card surface transparency from 100% solid down to 50% with an interactive live percentage slider (5% steps) and one-tap quick reset in Settings. Utilizes zero-cost GPU alpha tinting to guarantee rock-solid 60–120 FPS UI performance without `BackdropFilter` offscreen render-pass overhead.
 - **Comprehensive Hardware Recognition:** Automatically inspects and displays Device Name, Model Code, Processor / SoC (Qualcomm Snapdragon, MediaTek Dimensity/Helio, Samsung Exynos, Google Tensor, Unisoc), Graphics Processor (GPU Adreno, Mali, Xclipse), Physical RAM, and Available Storage.
 - **CPU Thread Allocation:** Customize encoding thread count or choose automatic multi-core allocation.
 - **RAM Buffer Boundaries:** Configurable memory cache buffer limits (256 MB to 2048 MB) for optimized FFmpeg mobile memory caching.
-- **Dedicated Video & Audio Output Directories:** Custom folder pickers with one-tap reset defaults.
+- **Dedicated Video & Audio Output Directories & Video Audio Quality:** Custom folder pickers with one-tap reset defaults and dedicated Video Audio Quality bitrate settings (High 192 kbps, Medium 128 kbps, Compact 96 kbps, or direct Passthrough Copy) with responsive anti-overflow layout.
 - **Non-Destructive File Naming:** Automatically detects filename collisions and appends incremental identifiers (`-2`, `-3`) to avoid overwriting existing media.
 - **Automated Cache Purge:** Cleans up temporary file picker caches with live size feedback to keep device storage clean.
 
@@ -142,7 +143,7 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
 The compiled release APK will be generated at:
-`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v3.5.1.apk`
+`build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v2.5.2.apk`
 
 ---
 

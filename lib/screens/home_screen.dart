@@ -475,10 +475,6 @@ class _HomeScreenState extends State<HomeScreen> {
           // ── Clean Media Import Box ───────────────────────────────
           _buildImportCard(theme, l10n),
 
-          const SizedBox(height: 28),
-
-          // ── Feature Checklist (Human & Clean) ────────────────────
-          _buildFeatureHighlights(theme, l10n),
         ],
       ),
     );
@@ -703,73 +699,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Clean, professional feature highlights row
-  Widget _buildFeatureHighlights(ThemeData theme, AppLocalizations l10n) {
-    final features = [
-      (
-        Icons.bolt_rounded,
-        l10n.t('feature_offline_fast'),
-        l10n.t('feature_offline_fast_desc'),
-      ),
-      (
-        Icons.tune_rounded,
-        l10n.t('feature_crf_bitrate'),
-        l10n.t('feature_crf_bitrate_desc'),
-      ),
-      (
-        Icons.security_rounded,
-        l10n.t('feature_privacy'),
-        l10n.t('feature_privacy_desc'),
-      ),
-    ];
 
-    return Column(
-      children: features.map((f) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: theme.colorScheme.outline),
-                ),
-                child: Icon(f.$1, size: 16, color: theme.colorScheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      f.$2,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      f.$3,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withAlpha(130),
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
 
   // ─── Content State (Video Loaded) ─────────────────────────────────────────
 
