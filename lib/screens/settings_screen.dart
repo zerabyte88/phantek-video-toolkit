@@ -21,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.7.0';
-  String _buildNumber = '36';
+  String _appVersion = 'v2.7.1';
+  String _buildNumber = '37';
 
   @override
   void initState() {
@@ -39,14 +39,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '36';
+              : '37';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.7.0';
-          _buildNumber = '36';
+          _appVersion = 'v2.7.1';
+          _buildNumber = '37';
         });
       }
     }
@@ -1290,10 +1290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Text(
             settings.cpuThreads == 0
                 ? l10n.t('settings_cpu_threads_auto_desc')
-                : l10n.t(
-                    'settings_cpu_threads_manual_desc',
-                    args: {'count': settings.cpuThreads.toString()},
-                  ),
+                : _getCpuThreadsDesc(settings.cpuThreads, l10n),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.5,
@@ -1304,6 +1301,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  String _getCpuThreadsDesc(int threads, AppLocalizations l10n) {
+    switch (threads) {
+      case 1:
+        return l10n.t('settings_cpu_threads_1_desc');
+      case 2:
+        return l10n.t('settings_cpu_threads_2_desc');
+      case 4:
+        return l10n.t('settings_cpu_threads_4_desc');
+      case 6:
+        return l10n.t('settings_cpu_threads_6_desc');
+      case 8:
+        return l10n.t('settings_cpu_threads_8_desc');
+      default:
+        return l10n.t(
+          'settings_cpu_threads_manual_desc',
+          args: {'count': threads.toString()},
+        );
+    }
   }
 
   // ── RAM Buffer Section ────────────────────────────────────────────────────
@@ -1598,12 +1615,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 8),
         Center(
           child: Text(
-            settings.audioBitrateKbps == 0
-                ? l10n.t('settings_audio_mute_desc')
-                : l10n.t(
-                    'settings_audio_bitrate_desc',
-                    args: {'kbps': settings.audioBitrateKbps.toString()},
-                  ),
+            _getAudioBitrateDesc(settings.audioBitrateKbps, l10n),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.5,
@@ -1614,6 +1626,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  String _getAudioBitrateDesc(int kbps, AppLocalizations l10n) {
+    switch (kbps) {
+      case 0:
+        return l10n.t('settings_audio_mute_desc');
+      case 64:
+        return l10n.t('settings_audio_bitrate_64_desc');
+      case 128:
+        return l10n.t('settings_audio_bitrate_128_desc');
+      case 192:
+        return l10n.t('settings_audio_bitrate_192_desc');
+      case 256:
+        return l10n.t('settings_audio_bitrate_256_desc');
+      case 320:
+        return l10n.t('settings_audio_bitrate_320_desc');
+      default:
+        return l10n.t(
+          'settings_audio_bitrate_desc',
+          args: {'kbps': kbps.toString()},
+        );
+    }
   }
 
   // ── Storage Folder Tile ───────────────────────────────────────────────────

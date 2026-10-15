@@ -181,98 +181,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 2. Speed / Quality Preset (Cepat / Normal / Maksimal)
-          _buildSectionLabel(
-            icon: Icons.speed_rounded,
-            title: l10n.t('settings_cpu_preset'),
-            theme: theme,
-          ),
-          const SizedBox(height: 10),
-          Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 6,
-              children: SpeedPreset.values.map((preset) {
-                final isSelected = widget.encodingOptions.speedPreset == preset;
-                final label = preset == SpeedPreset.fast
-                    ? l10n.t('preset_fast_title')
-                    : (preset == SpeedPreset.normal
-                          ? l10n.t('preset_normal_title')
-                          : l10n.t('preset_slow_title'));
-                return _buildChoiceChip(
-                  label: label,
-                  isSelected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(
-                          speedPreset: preset,
-                          crfValue: preset.defaultCrf,
-                        ),
-                      );
-                    }
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-          if (widget.encodingOptions.speedPreset == SpeedPreset.max) ...[
-            const SizedBox(height: 6),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withAlpha(35),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.amber.withAlpha(120),
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.bolt_rounded,
-                      size: 13,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        l10n.t('preset_badge_max'),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 8),
-          Center(
-            child: Text(
-              widget.encodingOptions.speedPreset == SpeedPreset.fast
-                  ? l10n.t('preset_fast_desc')
-                  : (widget.encodingOptions.speedPreset == SpeedPreset.max
-                        ? l10n.t('preset_slow_desc')
-                        : l10n.t('preset_normal_desc')),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11.5,
-                height: 1.35,
-                color: theme.colorScheme.onSurface.withAlpha(140),
-              ),
-            ),
-          ),
+          // 2. Active Speed Preset (managed globally in Settings)
+          _buildActivePresetIndicator(theme, l10n),
 
           const SizedBox(height: 16),
           Divider(height: 1, color: theme.dividerColor),
@@ -326,51 +236,32 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          Text(
-                            l10n.t('crf_label'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: theme.colorScheme.onSurface.withAlpha(140),
-                            ),
+                if (widget.encodingOptions.crfValue !=
+                    widget.encodingOptions.speedPreset.defaultCrf) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        key: const Key('crf_custom_badge'),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondary.withAlpha(
+                            30,
                           ),
-                          if (widget.encodingOptions.crfValue !=
-                              widget.encodingOptions.speedPreset.defaultCrf)
-                            Container(
-                              key: const Key('crf_custom_badge'),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 1.5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.secondary.withAlpha(
-                                  30,
-                                ),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                l10n.t('crf_custom'),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.secondary,
-                                ),
-                              ),
-                            ),
-                        ],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          l10n.t('crf_custom'),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        ),
                       ),
-                    ),
-                    if (widget.encodingOptions.crfValue !=
-                        widget.encodingOptions.speedPreset.defaultCrf) ...[
-                      const SizedBox(width: 8),
                       InkWell(
                         key: const Key('crf_reset_button'),
                         onTap: () {
@@ -409,8 +300,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         ),
                       ),
                     ],
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                ],
                 Row(
                   children: [
                     Expanded(
@@ -1103,6 +995,65 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           fontWeight: FontWeight.w600,
           color: theme.colorScheme.onSurface.withAlpha(180),
         ),
+      ),
+    );
+  }
+
+  Widget _buildActivePresetIndicator(ThemeData theme, AppLocalizations l10n) {
+    final preset = widget.encodingOptions.speedPreset;
+    final presetLabel = preset == SpeedPreset.fast
+        ? l10n.t('preset_fast_title')
+        : (preset == SpeedPreset.max
+              ? l10n.t('preset_slow_title')
+              : l10n.t('preset_normal_title'));
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withAlpha(15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: theme.colorScheme.primary.withAlpha(50),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.speed_rounded,
+            size: 16,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                text: '${l10n.t('settings_cpu_preset')}: ',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface.withAlpha(160),
+                ),
+                children: [
+                  TextSpan(
+                    text: presetLabel,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' (${preset.scaler} · ${preset.x264Preset})',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withAlpha(120),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

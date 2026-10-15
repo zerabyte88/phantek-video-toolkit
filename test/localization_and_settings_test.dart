@@ -1525,12 +1525,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Ensure key explanations are present and rendered fully without truncation
-        expect(find.text(l10n.t('preset_slow_desc')), findsOneWidget);
+        // Ensure active preset indicator and key explanations are present and rendered fully without truncation
+        expect(find.byIcon(Icons.speed_rounded), findsOneWidget);
         expect(find.text(l10n.t('desc_crf')), findsOneWidget);
         expect(find.text(l10n.t('desc_mp4')), findsOneWidget);
         expect(find.text(l10n.t('fps_desc_30')), findsOneWidget);
-        expect(find.text(l10n.t('crf_label')), findsOneWidget);
+        expect(find.text(l10n.t('crf_label')), findsNothing);
 
         // Verify no RenderParagraph in the tree has TextOverflow.ellipsis for descriptions
         final textWidgets = tester.widgetList<Text>(find.byType(Text));
@@ -3064,6 +3064,67 @@ void main() {
         equals('Adreno 405'),
       );
       expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: sd615), isTrue);
+    });
+
+    test('All 22 languages have distinct CPU thread descriptions and clean preset titles without x264/x265', () {
+      final threadKeys = [
+        'settings_cpu_threads_1_desc',
+        'settings_cpu_threads_2_desc',
+        'settings_cpu_threads_4_desc',
+        'settings_cpu_threads_6_desc',
+        'settings_cpu_threads_8_desc',
+      ];
+
+      final audioKeys = [
+        'settings_audio_bitrate_64_desc',
+        'settings_audio_bitrate_128_desc',
+        'settings_audio_bitrate_192_desc',
+        'settings_audio_bitrate_256_desc',
+        'settings_audio_bitrate_320_desc',
+      ];
+
+      for (final lang in AppLocalizations.supportedLanguages) {
+        final code = lang['code']!;
+        final l10n = AppLocalizations(code);
+
+        // Check preset label has no x264/x265
+        final presetTitle = l10n.t('settings_cpu_preset');
+        expect(
+          presetTitle.contains('x264/x265'),
+          isFalse,
+          reason: 'Language $code still contains x264/x265 in settings_cpu_preset',
+        );
+
+        // Check all 5 CPU thread descriptions exist and are non-empty
+        final threadTexts = <String>{};
+        for (final key in threadKeys) {
+          final text = l10n.t(key);
+          expect(text, isNotEmpty, reason: 'Key $key empty in $code');
+          expect(text, isNot(equals(key)), reason: 'Key $key untranslated in $code');
+          threadTexts.add(text);
+        }
+        // Ensure all 5 CPU thread descriptions are distinct from each other
+        expect(
+          threadTexts.length,
+          equals(5),
+          reason: 'Language $code has duplicate descriptions for CPU threads',
+        );
+
+        // Check all 5 Audio bitrate descriptions exist and are non-empty
+        final audioTexts = <String>{};
+        for (final key in audioKeys) {
+          final text = l10n.t(key);
+          expect(text, isNotEmpty, reason: 'Key $key empty in $code');
+          expect(text, isNot(equals(key)), reason: 'Key $key untranslated in $code');
+          audioTexts.add(text);
+        }
+        // Ensure all 5 audio descriptions are distinct from each other
+        expect(
+          audioTexts.length,
+          equals(5),
+          reason: 'Language $code has duplicate descriptions for audio bitrates',
+        );
+      }
     });
   });
 }
