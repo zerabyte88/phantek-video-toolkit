@@ -1124,12 +1124,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     final isPortrait = widget.videoInfo.height > widget.videoInfo.width;
     final targetW =
         (isPortrait && !widget.targetResolution.label.startsWith('Original'))
-            ? widget.targetResolution.height
-            : widget.targetResolution.width;
+        ? widget.targetResolution.height
+        : widget.targetResolution.width;
     final targetH =
         (isPortrait && !widget.targetResolution.label.startsWith('Original'))
-            ? widget.targetResolution.width
-            : widget.targetResolution.height;
+        ? widget.targetResolution.width
+        : widget.targetResolution.height;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1230,8 +1230,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         final badgeText = widget.isAudioExtraction
             ? l10n.t('audio_extracted')
             : (isBigger
-                ? l10n.t('proc_size_increase', args: {'percent': diffPercent})
-                : l10n.t('proc_savings', args: {'percent': diffPercent}));
+                  ? l10n.t('proc_size_increase', args: {'percent': diffPercent})
+                  : l10n.t('proc_savings', args: {'percent': diffPercent}));
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,

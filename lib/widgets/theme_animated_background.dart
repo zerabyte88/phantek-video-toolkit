@@ -46,7 +46,8 @@ class _ThemeAnimatedBackgroundState extends State<ThemeAnimatedBackground>
     }
 
     final initialTheme = SettingsService().settings.themeMode;
-    final isStatic = initialTheme == 'oled_pure' || initialTheme == 'light_clean';
+    final isStatic =
+        initialTheme == 'oled_pure' || initialTheme == 'light_clean';
 
     _controller = AnimationController(
       vsync: this,
@@ -248,10 +249,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          const Color(0xFF0C1322).withAlpha(220),
-          Colors.black,
-        ],
+        colors: [const Color(0xFF0C1322).withAlpha(220), Colors.black],
       ).createShader(Offset.zero & size);
     canvas.drawPath(hillPath, hillPaint);
 

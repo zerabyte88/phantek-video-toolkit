@@ -75,9 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
       if (info == null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.t('error_read_video'))),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.t('error_read_video'))));
       }
     } catch (e) {
       if (mounted) {
@@ -151,10 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           content: Text(
-            l10n.t(
-              'recovery_desc',
-              args: {'cores': reducedThreads.toString()},
-            ),
+            l10n.t('recovery_desc', args: {'cores': reducedThreads.toString()}),
             style: const TextStyle(fontSize: 13, height: 1.4),
           ),
           actions: [
@@ -243,8 +239,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _resetOptions() {
     setState(() {
-      final defaultPreset =
-          SpeedPreset.fromCpuPreset(_settingsService.settings.cpuPreset);
+      final defaultPreset = SpeedPreset.fromCpuPreset(
+        _settingsService.settings.cpuPreset,
+      );
       _encodingOptions = EncodingOptions(
         speedPreset: defaultPreset,
         crfValue: defaultPreset.defaultCrf,
@@ -595,7 +592,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // ── Clean Media Import Box ───────────────────────────────
           _buildImportCard(theme, l10n),
-
         ],
       ),
     );
@@ -819,8 +815,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 
   // ─── Content State (Video Loaded) ─────────────────────────────────────────
 

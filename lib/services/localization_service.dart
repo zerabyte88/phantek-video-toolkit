@@ -36,10 +36,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Latar Terang Minimalis Tanpa Animasi',
       'badge_static': 'STATIS',
 
-      'settings_cpu_auto_subtitle': 'Disesuaikan otomatis untuk video resolusi tinggi',
+      'settings_cpu_auto_subtitle':
+          'Disesuaikan otomatis untuk video resolusi tinggi',
       'chip_recommended': 'Disarankan',
       'warn_risky_cores': 'RAM {ram} GB: Memilih {cores} Core berisiko force close saat memori penuh',
-      'auto_runtime_4k': 'Auto: {count} Core (Video 4K, dihemat demi stabilitas)',
+      'auto_runtime_4k':
+          'Auto: {count} Core (Video 4K, dihemat demi stabilitas)',
       'auto_runtime_normal': 'Auto: {count} Core',
       'recovery_title': 'Proses Sebelumnya Terhenti',
       'recovery_desc': 'Proses konversi sebelumnya terhenti tiba-tiba, kemungkinan karena memori penuh. Ingin coba lagi dengan alokasi core lebih hemat ({cores} Core)?',
@@ -52,8 +54,7 @@ class AppLocalizations {
       'cores_detected': 'Core Terdeteksi',
       'badge_auto': 'Auto',
       'settings_card_opacity': 'Opasitas Kartu',
-      'settings_card_opacity_desc':
-          'Atur transparansi kartu dan efek kaca\nKurangi opasitas untuk performa lebih ringan',
+      'settings_card_opacity_desc': 'Atur transparansi kartu dan efek kaca\nKurangi opasitas untuk performa lebih ringan',
       'about_phantek_subtitle': 'Transcoder Video & Ekstraktor Audio Offline',
       'active_language_badge': 'Aktif',
       'app_footer_tagline': 'Dibuat untuk performa tinggi & privasi offline',
@@ -97,18 +98,13 @@ class AppLocalizations {
       'desc_audio_mp3':
           'Universal — Kompatibel dengan semua perangkat dan pemutar',
       'desc_audio_wav': 'Lossless Uncompressed — Kualitas Audio Studio Mentah',
-      'desc_bitrate':
-          'Membatasi laju bit untuk target ukuran file pasti\nKualitas visual menyesuaikan batas ukuran',
-      'desc_crf':
-          'Menjaga konsistensi kualitas visual video\nUkuran file menyesuaikan kerumitan gambar',
+      'desc_bitrate': 'Membatasi laju bit untuk target ukuran file pasti\nKualitas visual menyesuaikan batas ukuran',
+      'desc_crf': 'Menjaga konsistensi kualitas visual video\nUkuran file menyesuaikan kerumitan gambar',
       'desc_h264': 'Live Streaming, Video Web, Rekaman HP standar. Kompatibilitas Luar Biasa.',
       'desc_hevc': 'Streaming 4K, Film Kualitas Tinggi. Efisiensi Kompresi Sangat Tinggi.',
-      'desc_mkv':
-          'Format fleksibel multi-audio & subtitle\nDirekomendasikan untuk koleksi film & anime',
-      'desc_mov':
-          'Kontainer standar Apple dengan kualitas mentah tinggi\nIdeal untuk editing video lanjutan / NLE',
-      'desc_mp4':
-          'Format universal dengan kompatibilitas terbaik\nIdeal untuk media sosial, web & berbagi file',
+      'desc_mkv': 'Format fleksibel multi-audio & subtitle\nDirekomendasikan untuk koleksi film & anime',
+      'desc_mov': 'Kontainer standar Apple dengan kualitas mentah tinggi\nIdeal untuk editing video lanjutan / NLE',
+      'desc_mp4': 'Format universal dengan kompatibilitas terbaik\nIdeal untuk media sosial, web & berbagi file',
       'developer_name': 'Zerabyte88',
       'developer_role': 'Pembuat & Pengelola',
       'developer_title': 'Pengembang',
@@ -150,16 +146,11 @@ class AppLocalizations {
       'fps_original': 'Asli',
       'fps_custom': 'Kustom',
       'fps_info_title': 'Panduan Target FPS',
-      'fps_desc_original':
-          'Mempertahankan frame rate rekaman asli video\nKecepatan gerakan asli tanpa modifikasi',
-      'fps_desc_60':
-          'Gerakan ultra mulus untuk rekaman dinamis\nSangat cocok untuk gameplay & aksi cepat',
-      'fps_desc_30':
-          'Standar umum video digital modern\nKeseimbangan kelancaran gerakan & ukuran file',
-      'fps_desc_24':
-          'Standar sinematik film layar lebar\nMemberikan nuansa sinema klasik & hemat ukuran',
-      'fps_desc_custom':
-          'Batas frame rate manual sesuai preferensi\nMaksimal dibatasi sesuai FPS video sumber',
+      'fps_desc_original': 'Mempertahankan frame rate rekaman asli video\nKecepatan gerakan asli tanpa modifikasi',
+      'fps_desc_60': 'Gerakan ultra mulus untuk rekaman dinamis\nSangat cocok untuk gameplay & aksi cepat',
+      'fps_desc_30': 'Standar umum video digital modern\nKeseimbangan kelancaran gerakan & ukuran file',
+      'fps_desc_24': 'Standar sinematik film layar lebar\nMemberikan nuansa sinema klasik & hemat ukuran',
+      'fps_desc_custom': 'Batas frame rate manual sesuai preferensi\nMaksimal dibatasi sesuai FPS video sumber',
       'fps_max': 'Maksimal',
       'hardware_accel': 'Akselerator Grafis Perangkat Keras',
       'license_gpl': 'Lisensi GPLv3 Terbuka',
@@ -246,54 +237,43 @@ class AppLocalizations {
       'settings_clear_cache': 'Bersihkan Cache Sekarang',
       'settings_clear_cache_success':
           'Cache berhasil dibersihkan! {size} ruang dibebaskan.',
-      'settings_audio_mute_desc':
-          'Menonaktifkan audio pada hasil konversi\nUkuran file video jauh lebih hemat',
+      'settings_audio_mute_desc': 'Menonaktifkan audio pada hasil konversi\nUkuran file video jauh lebih hemat',
       'settings_audio_bitrate_desc':
           'Bitrate audio AAC {kbps} kbps\nKualitas suara jernih dan seimbang',
       'preset_fast_title': 'Cepat',
       'preset_normal_title': 'Normal',
       'preset_slow_title': 'Maksimal',
-      'preset_fast_desc':
-          'Scaler Area • x264 veryfast • CRF 24\nProses paling cepat & hemat daya baterai',
-      'preset_normal_desc':
-          'Scaler Bicubic • x264 faster • CRF 22\nKeseimbangan kecepatan, ketajaman & ukuran',
-      'preset_slow_desc':
-          'Scaler Lanczos • x264 fast • CRF 20\nRekonstruksi garis dan warna paling tajam',
+      'preset_fast_desc': 'Scaler Area • x264 veryfast • CRF 24\nProses paling cepat & hemat daya baterai',
+      'preset_normal_desc': 'Scaler Bicubic • x264 faster • CRF 22\nKeseimbangan kecepatan, ketajaman & ukuran',
+      'preset_slow_desc': 'Scaler Lanczos • x264 fast • CRF 20\nRekonstruksi garis dan warna paling tajam',
       'preset_badge_max': 'Lebih lama & daya CPU tinggi',
       'crf_custom': 'Kustom',
       'crf_reset': 'Reset',
       'crf_hint_sharp': '← Lebih tajam, file besar',
       'crf_hint_small': 'File kecil, kualitas turun →',
-      'crf_warning_low':
-          'Peringatan: Pada CRF ≤ 17, ukuran file berpotensi lebih besar dari sumber.',
+      'crf_warning_low': 'Peringatan: Pada CRF ≤ 17, ukuran file berpotensi lebih besar dari sumber.',
       'heavy_process_title': 'Proses Video Berat',
-      'heavy_process_desc':
-          'Video ini beresolusi tinggi (4K) atau berdurasi panjang dengan preset Maksimal. Proses ini akan memakan waktu lebih lama dan menggunakan daya CPU tinggi. Disarankan menyambungkan pengisi daya (charger).',
+      'heavy_process_desc': 'Video ini beresolusi tinggi (4K) atau berdurasi panjang dengan preset Maksimal. Proses ini akan memakan waktu lebih lama dan menggunakan daya CPU tinggi. Disarankan menyambungkan pengisi daya (charger).',
       'heavy_process_use_normal': 'Gunakan Normal',
       'heavy_process_continue': 'Tetap Lanjutkan',
       'settings_cpu_preset': 'Preset Kecepatan CPU · Preset',
       'settings_cpu_preset_desc': 'Pilih Fast untuk proses lebih cepat, Normal untuk seimbang, atau Slow untuk kualitas detail maksimal.',
       'settings_cpu_threads': 'Penggunaan Core CPU / Thread',
       'settings_cpu_threads_desc': 'Tentukan jumlah thread encoding. Semakin banyak core, semakin cepat proses konversi.',
-      'settings_cpu_threads_auto_desc':
-          'Otomatis menggunakan seluruh core prosesor\nKecepatan encoding maksimal',
-      'settings_cpu_threads_manual_desc':
-          'Menggunakan {count} core untuk encoding video\nMultitasking aplikasi lain tetap lancar',
+      'settings_cpu_threads_auto_desc': 'Otomatis menggunakan seluruh core prosesor\nKecepatan encoding maksimal',
+      'settings_cpu_threads_manual_desc': 'Menggunakan {count} core untuk encoding video\nMultitasking aplikasi lain tetap lancar',
       'settings_detected_cores': 'Terdeteksi {count} Core pada perangkat ini',
       'settings_folder_changed': 'Lokasi penyimpanan video berhasil diubah',
       'settings_folder_default': 'Default · Movies',
       'settings_hardware': 'Perangkat Keras & Performa',
       'settings_language': 'Bahasa / Language',
-      'settings_language_desc':
-          'Pilih bahasa antarmuka aplikasi\nDiterapkan langsung ke seluruh menu',
+      'settings_language_desc': 'Pilih bahasa antarmuka aplikasi\nDiterapkan langsung ke seluruh menu',
       'settings_output_folder': 'Folder Penyimpanan Video',
       'settings_output_folder_desc': 'Pilih lokasi folder penyimpanan video hasil konversi pada perangkat Anda.',
       'settings_ram_buffer': 'Batas RAM & Buffer Memori',
       'settings_ram_buffer_desc': 'Mengatur batas alokasi buffer caching FFmpeg untuk mencegah force close (OOM).',
-      'settings_ram_low_desc':
-          'Alokasi buffer memori hemat dan seimbang\nRekomendasi untuk sebagian besar video',
-      'settings_ram_high_desc':
-          'Alokasi buffer memori tinggi\nIdeal untuk video 4K atau durasi panjang',
+      'settings_ram_low_desc': 'Alokasi buffer memori hemat dan seimbang\nRekomendasi untuk sebagian besar video',
+      'settings_ram_high_desc': 'Alokasi buffer memori tinggi\nIdeal untuk video 4K atau durasi panjang',
       'settings_ram_high': '1024 MB · Performa Tinggi',
       'settings_ram_low': '256 MB · Hemat Memori',
       'settings_ram_max': '2048 MB · Maksimum',
@@ -309,8 +289,7 @@ class AppLocalizations {
       'settings_theme_desc': 'Pilih tema malam AMOLED hemat daya (Snowfall, Midnight) atau tema siang Daylight.',
       'settings_title': 'Pengaturan',
       'settings_wakelock': 'Cegah Layar Mati',
-      'settings_wakelock_desc':
-          'Menjaga layar tetap aktif selama konversi\nKonsumsi daya baterai akan meningkat',
+      'settings_wakelock_desc': 'Menjaga layar tetap aktif selama konversi\nKonsumsi daya baterai akan meningkat',
       'share': 'Bagikan',
       'source_video': 'Video Sumber',
       'start_audio_extraction': 'Mulai Ekstrak Audio',
@@ -343,15 +322,19 @@ class AppLocalizations {
     },
     'en': {
       'theme_oled_pure': 'Pure AMOLED',
-      'theme_oled_pure_desc': 'Static Pitch-Black Background Without Animations',
+      'theme_oled_pure_desc':
+          'Static Pitch-Black Background Without Animations',
       'theme_light_clean': 'Clean Light',
-      'theme_light_clean_desc': 'Minimalist Clean Light Background Without Animations',
+      'theme_light_clean_desc':
+          'Minimalist Clean Light Background Without Animations',
       'badge_static': 'STATIC',
 
-      'settings_cpu_auto_subtitle': 'Automatically optimized for high-resolution videos',
+      'settings_cpu_auto_subtitle':
+          'Automatically optimized for high-resolution videos',
       'chip_recommended': 'Recommended',
       'warn_risky_cores': 'RAM {ram} GB: Selecting {cores} Cores may cause app crashes if memory runs out',
-      'auto_runtime_4k': 'Auto: {count} Cores (4K video, reduced for stability)',
+      'auto_runtime_4k':
+          'Auto: {count} Cores (4K video, reduced for stability)',
       'auto_runtime_normal': 'Auto: {count} Cores',
       'recovery_title': 'Previous Process Interrupted',
       'recovery_desc': 'The previous conversion stopped unexpectedly, likely due to memory limits. Would you like to retry using fewer cores ({cores} Cores)?',
@@ -364,8 +347,7 @@ class AppLocalizations {
       'cores_detected': 'Detected Cores',
       'badge_auto': 'Auto',
       'settings_card_opacity': 'Card Opacity',
-      'settings_card_opacity_desc':
-          'Adjust card transparency and glass effect\nLower opacity for smoother performance',
+      'settings_card_opacity_desc': 'Adjust card transparency and glass effect\nLower opacity for smoother performance',
       'about_phantek_subtitle': 'Offline Video Transcoder & Audio Extractor',
       'active_language_badge': 'Active',
       'app_footer_tagline': 'Crafted for high performance & offline privacy',
@@ -409,18 +391,13 @@ class AppLocalizations {
           'Universal — Compatible with all devices and media players',
       'desc_audio_wav':
           'Lossless Uncompressed — Studio-grade raw audio quality',
-      'desc_bitrate':
-          'Enforces fixed bitrate for predictable file size\nVisual fidelity adjusts to size target',
-      'desc_crf':
-          'Maintains consistent visual video quality\nFile size adapts to visual complexity',
+      'desc_bitrate': 'Enforces fixed bitrate for predictable file size\nVisual fidelity adjusts to size target',
+      'desc_crf': 'Maintains consistent visual video quality\nFile size adapts to visual complexity',
       'desc_h264': 'Live Streaming, Web Video, Standard Phone recordings. Excellent Compatibility.',
       'desc_hevc': '4K Streaming, High Quality Movies. Very High Compression Efficiency.',
-      'desc_mkv':
-          'Flexible container for multi-audio & subtitles\nRecommended for movies & media archives',
-      'desc_mov':
-          'Apple standard container with raw visual fidelity\nIdeal for post-production & video editing',
-      'desc_mp4':
-          'Universal container with widest compatibility\nIdeal for social media, web & file sharing',
+      'desc_mkv': 'Flexible container for multi-audio & subtitles\nRecommended for movies & media archives',
+      'desc_mov': 'Apple standard container with raw visual fidelity\nIdeal for post-production & video editing',
+      'desc_mp4': 'Universal container with widest compatibility\nIdeal for social media, web & file sharing',
       'developer_name': 'Zerabyte88',
       'developer_role': 'Creator & Maintainer',
       'developer_title': 'Developer',
@@ -464,14 +441,10 @@ class AppLocalizations {
       'fps_original': 'Original',
       'fps_custom': 'Custom',
       'fps_info_title': 'Target FPS Guide',
-      'fps_desc_original':
-          'Preserves the original recording frame rate\nNatural native motion without alteration',
-      'fps_desc_60':
-          'Ultra-smooth fluid motion for dynamic scenes\nBest suited for gameplay & high-action video',
-      'fps_desc_30':
-          'Standard frame rate for modern digital video\nOptimal balance of smoothness & file size',
-      'fps_desc_24':
-          'Classic cinematic motion picture standard\nAuthentic film aesthetic & compact size',
+      'fps_desc_original': 'Preserves the original recording frame rate\nNatural native motion without alteration',
+      'fps_desc_60': 'Ultra-smooth fluid motion for dynamic scenes\nBest suited for gameplay & high-action video',
+      'fps_desc_30': 'Standard frame rate for modern digital video\nOptimal balance of smoothness & file size',
+      'fps_desc_24': 'Classic cinematic motion picture standard\nAuthentic film aesthetic & compact size',
       'fps_desc_custom':
           'Custom manual frame rate limit\nCapped at maximum source video FPS',
       'fps_max': 'Max',
@@ -560,29 +533,22 @@ class AppLocalizations {
       'settings_clear_cache': 'Clear Cache Now',
       'settings_clear_cache_success':
           'Cache cleared successfully! {size} freed.',
-      'settings_audio_mute_desc':
-          'Mutes audio track in converted video\nSignificantly reduces file size',
-      'settings_audio_bitrate_desc':
-          'AAC audio bitrate at {kbps} kbps\nClear and balanced audio reproduction',
+      'settings_audio_mute_desc': 'Mutes audio track in converted video\nSignificantly reduces file size',
+      'settings_audio_bitrate_desc': 'AAC audio bitrate at {kbps} kbps\nClear and balanced audio reproduction',
       'preset_fast_title': 'Fast',
       'preset_normal_title': 'Normal',
       'preset_slow_title': 'Maximum',
-      'preset_fast_desc':
-          'Area Scaler • x264 veryfast • CRF 24\nFastest processing & battery-friendly',
-      'preset_normal_desc':
-          'Bicubic Scaler • x264 faster • CRF 22\nOptimal balance of speed, clarity & size',
-      'preset_slow_desc':
-          'Lanczos Scaler • x264 fast • CRF 20\nSharpest detail & highest visual fidelity',
+      'preset_fast_desc': 'Area Scaler • x264 veryfast • CRF 24\nFastest processing & battery-friendly',
+      'preset_normal_desc': 'Bicubic Scaler • x264 faster • CRF 22\nOptimal balance of speed, clarity & size',
+      'preset_slow_desc': 'Lanczos Scaler • x264 fast • CRF 20\nSharpest detail & highest visual fidelity',
       'preset_badge_max': 'Slower & high CPU usage',
       'crf_custom': 'Custom',
       'crf_reset': 'Reset',
       'crf_hint_sharp': '← Sharp, larger file',
       'crf_hint_small': 'Smaller file, lower quality →',
-      'crf_warning_low':
-          'Warning: At CRF ≤ 17, the output file may be larger than the source.',
+      'crf_warning_low': 'Warning: At CRF ≤ 17, the output file may be larger than the source.',
       'heavy_process_title': 'Heavy Video Processing',
-      'heavy_process_desc':
-          'This video has high resolution (4K) or a long duration with Maximum preset. It will take longer and consume higher CPU power. Connecting a charger is recommended.',
+      'heavy_process_desc': 'This video has high resolution (4K) or a long duration with Maximum preset. It will take longer and consume higher CPU power. Connecting a charger is recommended.',
       'heavy_process_use_normal': 'Use Normal',
       'heavy_process_continue': 'Continue Anyway',
       'settings_cpu_preset': 'Encoding Speed Preset · x264/x265',
@@ -591,21 +557,18 @@ class AppLocalizations {
       'settings_cpu_threads_desc': 'Configure encoding thread count. More cores increase conversion speed.',
       'settings_cpu_threads_auto_desc':
           'Automatically utilizes all CPU cores\nMaximum encoding throughput',
-      'settings_cpu_threads_manual_desc':
-          'Uses {count} cores for video encoding\nKeeps background multitasking smooth',
+      'settings_cpu_threads_manual_desc': 'Uses {count} cores for video encoding\nKeeps background multitasking smooth',
       'settings_detected_cores': 'Detected {count} Cores on this device',
       'settings_folder_changed': 'Video storage location changed successfully',
       'settings_folder_default': 'Default · Movies',
       'settings_hardware': 'Hardware & Performance',
       'settings_language': 'Language',
-      'settings_language_desc':
-          'Select interface display language\nApplied immediately across all menus',
+      'settings_language_desc': 'Select interface display language\nApplied immediately across all menus',
       'settings_output_folder': 'Video Storage Folder',
       'settings_output_folder_desc': 'Choose the folder location where converted videos will be saved on your device.',
       'settings_ram_buffer': 'RAM & Memory Buffer Limit',
       'settings_ram_buffer_desc': 'Controls FFmpeg memory caching buffer size to prevent out-of-memory crashes.',
-      'settings_ram_low_desc':
-          'Memory-efficient caching buffer\nRecommended for general video tasks',
+      'settings_ram_low_desc': 'Memory-efficient caching buffer\nRecommended for general video tasks',
       'settings_ram_high_desc':
           'High-capacity caching buffer\nIdeal for 4K and long-duration videos',
       'settings_ram_high': '1024 MB · High Performance',
@@ -624,8 +587,7 @@ class AppLocalizations {
       'settings_theme_desc': 'Choose between battery-saving AMOLED night themes (Snowfall, Midnight) or Daylight mode.',
       'settings_title': 'Settings',
       'settings_wakelock': 'Keep Screen Awake',
-      'settings_wakelock_desc':
-          'Keeps screen active during video processing\nIncreases battery power consumption',
+      'settings_wakelock_desc': 'Keeps screen active during video processing\nIncreases battery power consumption',
       'share': 'Share',
       'source_video': 'Source Video',
       'start_audio_extraction': 'Start Audio Extraction',
@@ -837,7 +799,8 @@ class AppLocalizations {
       'settings_audio_output_folder': '音频保存目录',
       'settings_audio_output_folder_desc': '选择提取后音频文件在设备中的保存路径。',
       'settings_audio_quality': '视频音频质量',
-      'settings_audio_quality_desc': '设置转码/缩放后视频的 AAC 音频码率。选择静音可移除音轨以进一步减小视频体积。',
+      'settings_audio_quality_desc':
+          '设置转码/缩放后视频的 AAC 音频码率。选择静音可移除音轨以进一步减小视频体积。',
       'settings_audio_reset_folder': '恢复为 Music',
       'settings_auto_cores': '自动 · 调用全部核心',
       'settings_cache_info': '自动清理已启用',
@@ -1098,7 +1061,8 @@ class AppLocalizations {
       'settings_audio_output_folder': '音频保存目录',
       'settings_audio_output_folder_desc': '选择提取后音频文件在设备中的保存路径。',
       'settings_audio_quality': '视频音频质量',
-      'settings_audio_quality_desc': '設定轉檔/縮小解析度後影片的 AAC 音訊位元率。選取靜音可移除音軌以進一步縮小影片大小。',
+      'settings_audio_quality_desc':
+          '設定轉檔/縮小解析度後影片的 AAC 音訊位元率。選取靜音可移除音軌以進一步縮小影片大小。',
       'settings_audio_reset_folder': '恢复为 Music',
       'settings_auto_cores': '自动 · 调用全部核心',
       'settings_cache_info': '自动清理已启用',
@@ -1359,7 +1323,8 @@ class AppLocalizations {
       'settings_audio_output_folder': '音訊儲存目錄',
       'settings_audio_output_folder_desc': '選取擷取後音訊檔案在裝置中的儲存路徑。',
       'settings_audio_quality': '影片音訊品質',
-      'settings_audio_quality_desc': '設定轉檔/縮小解析度後影片的 AAC 音訊位元率。選取靜音可移除音軌以進一步縮小影片大小。',
+      'settings_audio_quality_desc':
+          '設定轉檔/縮小解析度後影片的 AAC 音訊位元率。選取靜音可移除音軌以進一步縮小影片大小。',
       'settings_audio_reset_folder': '恢復為 Music',
       'settings_auto_cores': '自動 · 調用全部核心',
       'settings_cache_info': '自動清理已啟用',
@@ -1439,10 +1404,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Fondo claro minimalista sin animaciones',
       'badge_static': 'ESTÁTICO',
 
-      'settings_cpu_auto_subtitle': 'Optimizado automáticamente para videos de alta resolución',
+      'settings_cpu_auto_subtitle':
+          'Optimizado automáticamente para videos de alta resolución',
       'chip_recommended': 'Recomendado',
       'warn_risky_cores': 'RAM {ram} GB: Seleccionar {cores} núcleos puede causar cierre forzado si se agota la memoria',
-      'auto_runtime_4k': 'Auto: {count} Núcleos (Video 4K, reducido por estabilidad)',
+      'auto_runtime_4k':
+          'Auto: {count} Núcleos (Video 4K, reducido por estabilidad)',
       'auto_runtime_normal': 'Auto: {count} Núcleos',
       'recovery_title': 'Proceso anterior interrumpido',
       'recovery_desc': 'La conversión anterior se detuvo inesperadamente, probablemente por falta de memoria. ¿Desea reintentar con menos núcleos ({cores} núcleos)?',
@@ -1727,10 +1694,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Fundo claro minimalista sem animações',
       'badge_static': 'ESTÁTICO',
 
-      'settings_cpu_auto_subtitle': 'Otimizado automaticamente para vídeos de alta resolução',
+      'settings_cpu_auto_subtitle':
+          'Otimizado automaticamente para vídeos de alta resolução',
       'chip_recommended': 'Recomendado',
       'warn_risky_cores': 'RAM {ram} GB: Selecionar {cores} núcleos pode causar fechamento forçado se faltar memória',
-      'auto_runtime_4k': 'Auto: {count} Núcleos (Vídeo 4K, reduzido por estabilidade)',
+      'auto_runtime_4k':
+          'Auto: {count} Núcleos (Vídeo 4K, reduzido por estabilidade)',
       'auto_runtime_normal': 'Auto: {count} Núcleos',
       'recovery_title': 'Processo anterior interrompido',
       'recovery_desc': 'A conversão anterior parou inesperadamente, provavelmente por limite de memória. Deseja tentar novamente com menos núcleos ({cores} núcleos)?',
@@ -2012,11 +1981,13 @@ class AppLocalizations {
 
       'settings_cpu_auto_subtitle': '高解像度動画向けに自動最適化',
       'chip_recommended': '推奨',
-      'warn_risky_cores': 'RAM {ram} GB: メモリ不足時に {cores} コアを選択すると強制終了するリスクがあります',
+      'warn_risky_cores':
+          'RAM {ram} GB: メモリ不足時に {cores} コアを選択すると強制終了するリスクがあります',
       'auto_runtime_4k': '自動: {count} コア（4K動画のため安定性優先で調整）',
       'auto_runtime_normal': '自動: {count} コア',
       'recovery_title': '前回の処理が中断されました',
-      'recovery_desc': '前回の動画変換はメモリ制限により予期せず停止した可能性があります。コア数を減らして（{cores} コア）再試行しますか？',
+      'recovery_desc':
+          '前回の動画変換はメモリ制限により予期せず停止した可能性があります。コア数を減らして（{cores} コア）再試行しますか？',
       'recovery_retry': '{cores} コアで再試行',
       'recovery_dismiss': '閉じる',
       'device_cpu_generic': 'プロセッサ',
@@ -2280,7 +2251,8 @@ class AppLocalizations {
 
       'settings_cpu_auto_subtitle': '고해상도 동영상에 맞게 자동 최적화됨',
       'chip_recommended': '추천',
-      'warn_risky_cores': 'RAM {ram} GB: 메모리 부족 시 {cores} 코어를 선택하면 강제 종료될 수 있습니다',
+      'warn_risky_cores':
+          'RAM {ram} GB: 메모리 부족 시 {cores} 코어를 선택하면 강제 종료될 수 있습니다',
       'auto_runtime_4k': '자동: {count} 코어 (4K 영상 안정성을 위해 코어 절감)',
       'auto_runtime_normal': '자동: {count} 코어',
       'recovery_title': '이전 작업 중단됨',
@@ -2504,8 +2476,7 @@ class AppLocalizations {
       'settings_storage': '저장 공간 및 캐시',
       'settings_storage_desc': '임시 캐시 파일을 관리하여 저장 공간 낭비를 방지합니다.',
       'settings_theme': '화면 테마',
-      'settings_theme_desc':
-          '배터리를 절약하는 AMOLED 야간 테마(Snowfall, Midnight) 또는 Daylight 모드 중에서 선택하세요.',
+      'settings_theme_desc': '배터리를 절약하는 AMOLED 야간 테마(Snowfall, Midnight) 또는 Daylight 모드 중에서 선택하세요.',
       'settings_title': '설정',
       'settings_wakelock': '화면 켜짐 유지',
       'settings_wakelock_desc': '동영상 인코딩 중이나 앱 사용 중에 화면이 꺼지거나 절전 모드로 들어가는 것을 방지합니다. 경고: 배터리가 더 빠르게 소모될 수 있습니다.',
@@ -2544,7 +2515,8 @@ class AppLocalizations {
       'theme_light_clean_desc': 'बिना एनिमेशन की न्यूनतम साफ हल्की पृष्ठभूमि',
       'badge_static': 'स्थिर',
 
-      'settings_cpu_auto_subtitle': 'उच्च रिज़ॉल्यूशन वीडियो के लिए स्वचालित रूप से अनुकूलित',
+      'settings_cpu_auto_subtitle':
+          'उच्च रिज़ॉल्यूशन वीडियो के लिए स्वचालित रूप से अनुकूलित',
       'chip_recommended': 'अनुशंसित',
       'warn_risky_cores': 'RAM {ram} GB: मेमोरी समाप्त होने पर {cores} कोर चुनने से ऐप क्रैश हो सकता है',
       'auto_runtime_4k': 'ऑटो: {count} कोर (4K वीडियो, स्थिरता हेतु कम)',
@@ -2823,10 +2795,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'خلفية فاتحة بسيطة ثابتة بدون رسوم متحركة',
       'badge_static': 'ثابت',
 
-      'settings_cpu_auto_subtitle': 'مُحسَّن تلقائيًا لمقاطع الفيديو عالية الدقة',
+      'settings_cpu_auto_subtitle':
+          'مُحسَّن تلقائيًا لمقاطع الفيديو عالية الدقة',
       'chip_recommended': 'موصى به',
       'warn_risky_cores': 'الذاكرة {ram} غ.ب: اختيار {cores} أنوية قد يسبب إغلاق التطبيق إذا نفدت الذاكرة',
-      'auto_runtime_4k': 'تلقائي: {count} أنوية (فيديو 4K، تم تقليله للاستقرار)',
+      'auto_runtime_4k':
+          'تلقائي: {count} أنوية (فيديو 4K، تم تقليله للاستقرار)',
       'auto_runtime_normal': 'تلقائي: {count} أنوية',
       'recovery_title': 'تمت مقاطعة العملية السابقة',
       'recovery_desc': 'توقفت عملية التحويل السابقة فجأة بسبب نفاد الذاكرة. هل ترغب في إعادة المحاولة بأنوية أقل ({cores} أنوية)؟',
@@ -3018,8 +2992,7 @@ class AppLocalizations {
       'settings_audio_output_folder_desc':
           'اختر المجلد الذي سيتم حفظ الملفات الصوتية المستخرجة فيه على جهازك.',
       'settings_audio_quality': 'جودة صوت الفيديو',
-      'settings_audio_quality_desc':
-          'اضبط معدل بت صوت AAC لمقاطع الفيديو المحولة أو اختر كتم الصوت لتصغير حجم الفيديو.',
+      'settings_audio_quality_desc': 'اضبط معدل بت صوت AAC لمقاطع الفيديو المحولة أو اختر كتم الصوت لتصغير حجم الفيديو.',
       'settings_audio_reset_folder': 'إعادة التعيين إلى Music',
       'settings_auto_cores': 'تلقائي · جميع الأنوية',
       'settings_cache_info': 'التنظيف التلقائي مفعّل',
@@ -3101,15 +3074,19 @@ class AppLocalizations {
     },
     'fr': {
       'theme_oled_pure': 'AMOLED Pur',
-      'theme_oled_pure_desc': 'Arrière-plan noir absolu statique sans animations',
+      'theme_oled_pure_desc':
+          'Arrière-plan noir absolu statique sans animations',
       'theme_light_clean': 'Clair Épuré',
-      'theme_light_clean_desc': 'Arrière-plan clair minimaliste sans animations',
+      'theme_light_clean_desc':
+          'Arrière-plan clair minimaliste sans animations',
       'badge_static': 'STATIQUE',
 
-      'settings_cpu_auto_subtitle': 'Optimisé automatiquement pour les vidéos haute résolution',
+      'settings_cpu_auto_subtitle':
+          'Optimisé automatiquement pour les vidéos haute résolution',
       'chip_recommended': 'Recommandé',
       'warn_risky_cores': 'RAM {ram} Go : Sélectionner {cores} cœurs peut provoquer une fermeture forcée si la mémoire est saturée',
-      'auto_runtime_4k': 'Auto : {count} Cœurs (Vidéo 4K, réduit pour la stabilité)',
+      'auto_runtime_4k':
+          'Auto : {count} Cœurs (Vidéo 4K, réduit pour la stabilité)',
       'auto_runtime_normal': 'Auto : {count} Cœurs',
       'recovery_title': 'Processus précédent interrompu',
       'recovery_desc': 'La conversion précédente s’est arrêtée inopinément, probablement par manque de mémoire. Voulez-vous réessayer avec moins de cœurs ({cores} cœurs) ?',
@@ -3390,10 +3367,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Минималистичный светлый фон без анимаций',
       'badge_static': 'СТАТИКА',
 
-      'settings_cpu_auto_subtitle': 'Автоматически оптимизировано для видео высокого разрешения',
+      'settings_cpu_auto_subtitle':
+          'Автоматически оптимизировано для видео высокого разрешения',
       'chip_recommended': 'Рекомендуется',
       'warn_risky_cores': 'ОЗУ {ram} ГБ: Выбор {cores} ядер может привести к вылету приложения при нехватке памяти',
-      'auto_runtime_4k': 'Авто: {count} ядер (видео 4K, снижено для стабильности)',
+      'auto_runtime_4k':
+          'Авто: {count} ядер (видео 4K, снижено для стабильности)',
       'auto_runtime_normal': 'Авто: {count} ядер',
       'recovery_title': 'Предыдущий процесс был прерван',
       'recovery_desc': 'Предыдущая конвертация неожиданно завершилась, вероятно, из-за нехватки памяти. Повторить попытку с меньшим количеством ядер ({cores} ядер)?',
@@ -3666,15 +3645,19 @@ class AppLocalizations {
     },
     'de': {
       'theme_oled_pure': 'Reines AMOLED',
-      'theme_oled_pure_desc': 'Statischer tiefschwarzer Hintergrund ohne Animationen',
+      'theme_oled_pure_desc':
+          'Statischer tiefschwarzer Hintergrund ohne Animationen',
       'theme_light_clean': 'Klares Hell',
-      'theme_light_clean_desc': 'Minimalistischer heller Hintergrund ohne Animationen',
+      'theme_light_clean_desc':
+          'Minimalistischer heller Hintergrund ohne Animationen',
       'badge_static': 'STATISCH',
 
-      'settings_cpu_auto_subtitle': 'Automatisch für hochauflösende Videos optimiert',
+      'settings_cpu_auto_subtitle':
+          'Automatisch für hochauflösende Videos optimiert',
       'chip_recommended': 'Empfohlen',
       'warn_risky_cores': 'RAM {ram} GB: Die Auswahl von {cores} Kernen kann bei Speichermangel zum Absturz führen',
-      'auto_runtime_4k': 'Auto: {count} Kerne (4K-Video, reduziert für Stabilität)',
+      'auto_runtime_4k':
+          'Auto: {count} Kerne (4K-Video, reduziert für Stabilität)',
       'auto_runtime_normal': 'Auto: {count} Kerne',
       'recovery_title': 'Vorheriger Vorgang unterbrochen',
       'recovery_desc': 'Die vorherige Konvertierung wurde unerwartet beendet, wahrscheinlich aufgrund von Speichermangel. Mit weniger Kernen ({cores} Kerne) erneut versuchen?',
@@ -3959,7 +3942,8 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Sfondo chiaro minimalista senza animazioni',
       'badge_static': 'STATICO',
 
-      'settings_cpu_auto_subtitle': 'Ottimizzato automaticamente per video ad alta risoluzione',
+      'settings_cpu_auto_subtitle':
+          'Ottimizzato automaticamente per video ad alta risoluzione',
       'chip_recommended': 'Consigliato',
       'warn_risky_cores': 'RAM {ram} GB: Selezionare {cores} core può causare crash se la memoria si esaurisce',
       'auto_runtime_4k': 'Auto: {count} Core (Video 4K, ridotto per stabilità)',
@@ -4239,15 +4223,19 @@ class AppLocalizations {
     },
     'nl': {
       'theme_oled_pure': 'Puur AMOLED',
-      'theme_oled_pure_desc': 'Statische diepzwarte achtergrond zonder animaties',
+      'theme_oled_pure_desc':
+          'Statische diepzwarte achtergrond zonder animaties',
       'theme_light_clean': 'Helder Schoon',
-      'theme_light_clean_desc': 'Minimalistische lichte achtergrond zonder animaties',
+      'theme_light_clean_desc':
+          'Minimalistische lichte achtergrond zonder animaties',
       'badge_static': 'STATISCH',
 
-      'settings_cpu_auto_subtitle': 'Automatisch geoptimaliseerd voor video\'s met hoge resolutie',
+      'settings_cpu_auto_subtitle':
+          'Automatisch geoptimaliseerd voor video\'s met hoge resolutie',
       'chip_recommended': 'Aanbevolen',
       'warn_risky_cores': 'RAM {ram} GB: Het selecteren van {cores} kernen kan leiden tot vastlopen bij geheugentekort',
-      'auto_runtime_4k': 'Auto: {count} Kernen (4K-video, verlaagd voor stabiliteit)',
+      'auto_runtime_4k':
+          'Auto: {count} Kernen (4K-video, verlaagd voor stabiliteit)',
       'auto_runtime_normal': 'Auto: {count} Kernen',
       'recovery_title': 'Vorig proces onderbroken',
       'recovery_desc': 'De vorige conversie is onverwachts gestopt, waarschijnlijk door geheugengebrek. Opnieuw proberen met minder kernen ({cores} kernen)?',
@@ -4525,10 +4513,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Minimalistisk lys baggrund uden animationer',
       'badge_static': 'STATISK',
 
-      'settings_cpu_auto_subtitle': 'Automatisk optimeret til videoer med høj opløsning',
+      'settings_cpu_auto_subtitle':
+          'Automatisk optimeret til videoer med høj opløsning',
       'chip_recommended': 'Anbefalet',
       'warn_risky_cores': 'RAM {ram} GB: Valg af {cores} kerner kan få appen til at gå ned ved hukommelsesmangel',
-      'auto_runtime_4k': 'Auto: {count} Kerner (4K-video, reduceret af hensyn til stabilitet)',
+      'auto_runtime_4k':
+          'Auto: {count} Kerner (4K-video, reduceret af hensyn til stabilitet)',
       'auto_runtime_normal': 'Auto: {count} Kerner',
       'recovery_title': 'Tidligere proces afbrudt',
       'recovery_desc': 'Den forrige konvertering stoppede uventet, sandsynligvis pga. hukommelsesmangel. Vil du prøve igen med færre kerner ({cores} kerner)?',
@@ -4798,13 +4788,16 @@ class AppLocalizations {
       'theme_oled_pure': 'Puhdas AMOLED',
       'theme_oled_pure_desc': 'Staattinen pikimusta tausta ilman animaatioita',
       'theme_light_clean': 'Puhdas Vaalea',
-      'theme_light_clean_desc': 'Minimalistinen vaalea tausta ilman animaatioita',
+      'theme_light_clean_desc':
+          'Minimalistinen vaalea tausta ilman animaatioita',
       'badge_static': 'STAATTINEN',
 
-      'settings_cpu_auto_subtitle': 'Optimoitu automaattisesti korkean resoluution videoille',
+      'settings_cpu_auto_subtitle':
+          'Optimoitu automaattisesti korkean resoluution videoille',
       'chip_recommended': 'Suositeltu',
       'warn_risky_cores': 'RAM {ram} Gt: Valitsemalla {cores} ydintä sovellus voi kaatua muistin loppuessa',
-      'auto_runtime_4k': 'Auto: {count} Ydintä (4K-video, vähennetty vakauden vuoksi)',
+      'auto_runtime_4k':
+          'Auto: {count} Ydintä (4K-video, vähennetty vakauden vuoksi)',
       'auto_runtime_normal': 'Auto: {count} Ydintä',
       'recovery_title': 'Edellinen prosessi keskeytyi',
       'recovery_desc': 'Edellinen muunnos keskeytyi odottamatta, todennäköisesti muistin loppumisen vuoksi. Haluatko yrittää uudelleen vähemmillä ytimillä ({cores} ydintä)?',
@@ -5075,15 +5068,18 @@ class AppLocalizations {
     },
     'no': {
       'theme_oled_pure': 'Ren AMOLED',
-      'theme_oled_pure_desc': 'Statisk stummende svart bakgrunn uten animasjoner',
+      'theme_oled_pure_desc':
+          'Statisk stummende svart bakgrunn uten animasjoner',
       'theme_light_clean': 'Rent Lys',
       'theme_light_clean_desc': 'Minimalistisk lys bakgrunn uten animasjoner',
       'badge_static': 'STATISK',
 
-      'settings_cpu_auto_subtitle': 'Automatisk optimalisert for videoer med høy oppløsning',
+      'settings_cpu_auto_subtitle':
+          'Automatisk optimalisert for videoer med høy oppløsning',
       'chip_recommended': 'Anbefalt',
       'warn_risky_cores': 'RAM {ram} GB: Å velge {cores} kjerner kan føre til at appen krasjer ved minnemangel',
-      'auto_runtime_4k': 'Auto: {count} Kjerner (4K-video, redusert for stabilitet)',
+      'auto_runtime_4k':
+          'Auto: {count} Kjerner (4K-video, redusert for stabilitet)',
       'auto_runtime_normal': 'Auto: {count} Kjerner',
       'recovery_title': 'Forrige prosess avbrutt',
       'recovery_desc': 'Forrige konvertering stoppet uventet, sannsynligvis pga. minnemangel. Vil du prøve igjen med færre kjerner ({cores} kjerner)?',
@@ -5353,10 +5349,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Minimalistisk ljus bakgrund utan animationer',
       'badge_static': 'STATISK',
 
-      'settings_cpu_auto_subtitle': 'Automatiskt optimerad för högupplösta videor',
+      'settings_cpu_auto_subtitle':
+          'Automatiskt optimerad för högupplösta videor',
       'chip_recommended': 'Rekommenderas',
       'warn_risky_cores': 'RAM {ram} GB: Att välja {cores} kärnor kan få appen att krascha vid minnesbrist',
-      'auto_runtime_4k': 'Auto: {count} Kärnor (4K-video, minskat för stabilitet)',
+      'auto_runtime_4k':
+          'Auto: {count} Kärnor (4K-video, minskat för stabilitet)',
       'auto_runtime_normal': 'Auto: {count} Kärnor',
       'recovery_title': 'Föregående process avbröts',
       'recovery_desc': 'Den tidigare konverteringen avbröts oväntat, troligen p.g.a. minnesbrist. Vill du försöka igen med färre kärnor ({cores} kärnor)?',
@@ -5632,10 +5630,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Latar Cerah Minimalis Tanpa Animasi',
       'badge_static': 'STATIK',
 
-      'settings_cpu_auto_subtitle': 'Dioptimumkan secara automatik untuk video resolusi tinggi',
+      'settings_cpu_auto_subtitle':
+          'Dioptimumkan secara automatik untuk video resolusi tinggi',
       'chip_recommended': 'Disyorkan',
       'warn_risky_cores': 'RAM {ram} GB: Memilih {cores} Teras berisiko tutup paksa jika memori kehabisan',
-      'auto_runtime_4k': 'Auto: {count} Teras (Video 4K, dikurangkan demi kestabilan)',
+      'auto_runtime_4k':
+          'Auto: {count} Teras (Video 4K, dikurangkan demi kestabilan)',
       'auto_runtime_normal': 'Auto: {count} Teras',
       'recovery_title': 'Proses Terdahulu Terhenti',
       'recovery_desc': 'Penukaran terdahulu terhenti secara tiba-tiba, berkemungkinan kerana memori penuh. Adakah anda ingin mencuba semula dengan teras lebih sedikit ({cores} Teras)?',
@@ -5911,7 +5911,8 @@ class AppLocalizations {
       'theme_light_clean_desc': 'Nền sáng tối giản tĩnh không hoạt ảnh',
       'badge_static': 'TĨNH',
 
-      'settings_cpu_auto_subtitle': 'Tự động tối ưu hóa cho video độ phân giải cao',
+      'settings_cpu_auto_subtitle':
+          'Tự động tối ưu hóa cho video độ phân giải cao',
       'chip_recommended': 'Được đề xuất',
       'warn_risky_cores': 'RAM {ram} GB: Chọn {cores} nhân có thể gây văng ứng dụng khi hết bộ nhớ',
       'auto_runtime_4k': 'Tự động: {count} Nhân (Video 4K, giảm để ổn định)',
@@ -6196,10 +6197,12 @@ class AppLocalizations {
       'theme_light_clean_desc': 'พื้นหลังสว่างเรียบง่ายแบบนิ่งไร้อนิเมชัน',
       'badge_static': 'คงที่',
 
-      'settings_cpu_auto_subtitle': 'ปรับให้เหมาะสมอัตโนมัติสำหรับวิดีโอความละเอียดสูง',
+      'settings_cpu_auto_subtitle':
+          'ปรับให้เหมาะสมอัตโนมัติสำหรับวิดีโอความละเอียดสูง',
       'chip_recommended': 'แนะนำ',
       'warn_risky_cores': 'RAM {ram} GB: การเลือก {cores} คอร์อาจทำให้แอปปิดตัวเองหากหน่วยความจำไม่พอ',
-      'auto_runtime_4k': 'อัตโนมัติ: {count} คอร์ (วิดีโอ 4K ปรับลดเพื่อความเสถียร)',
+      'auto_runtime_4k':
+          'อัตโนมัติ: {count} คอร์ (วิดีโอ 4K ปรับลดเพื่อความเสถียร)',
       'auto_runtime_normal': 'อัตโนมัติ: {count} คอร์',
       'recovery_title': 'กระบวนการก่อนหน้าถูกขัดจังหวะ',
       'recovery_desc': 'การแปลงไฟล์ก่อนหน้าหยุดลงกะทันหัน อาจเกิดจากหน่วยความจำเต็ม ต้องการลองใหม่โดยใช้คอร์น้อยลง ({cores} คอร์) หรือไม่?',

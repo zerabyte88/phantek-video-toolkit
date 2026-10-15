@@ -53,7 +53,8 @@ class VideoInfo {
   });
 
   /// True if video is 4K or duration is 30 minutes (1800s) or longer.
-  bool get isHeavyProcessing => shortDimension >= 2160 || durationSeconds >= 1800;
+  bool get isHeavyProcessing =>
+      shortDimension >= 2160 || durationSeconds >= 1800;
 
   /// Dimension used for resolution classification (shorter edge, consistent across landscape and portrait).
   int get shortDimension => width < height ? width : height;
