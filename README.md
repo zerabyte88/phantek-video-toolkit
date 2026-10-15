@@ -61,10 +61,10 @@
 ### 5. Interface & Customization
 * **Theme Selection:**
   * **Dynamic Themes:**
-    * *Snowfall AMOLED*: Deep pure black AMOLED canvas with drifting snowflakes, 7 medieval kingdom cottages with glowing warm lantern windows, and lush evergreen pines.
-    * *Midnight AMOLED*: Pure black AMOLED canvas with glowing celestial moon, twinkling stars, and shooting meteors.
-    * *Sakura AMOLED*: Deep dark AMOLED canvas with falling cherry blossom petals.
-    * *Daylight LIGHT*: Bright daytime theme with floating sunlight particle dynamics.
+    * *Snowfall*: Deep pure black AMOLED canvas with drifting snowflakes, 7 medieval kingdom cottages with glowing warm lantern windows, and lush evergreen pines.
+    * *Midnight*: Pure black AMOLED canvas with glowing celestial moon, twinkling stars, and shooting meteors.
+    * *Sakura*: Deep dark AMOLED canvas with falling cherry blossom petals.
+    * *Daylight*: Bright daytime theme with floating sunlight particle dynamics.
   * **Static Themes:**
     * *Pure AMOLED*: Solid pitch black AMOLED canvas with animation ticker disabled for maximum battery conservation.
     * *Clean Light*: Minimalist light canvas without background animations.
