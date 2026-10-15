@@ -47,10 +47,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         : 60);
     final maxFps = sourceFps.clamp(15, 120);
     final currentFps = widget.encodingOptions.targetFps;
-    if (currentFps > 0 &&
-        currentFps != 24 &&
-        currentFps != 30 &&
-        currentFps != 60) {
+    const standardFps = [0, 60, 50, 48, 30, 25, 24];
+    if (currentFps > 0 && !standardFps.contains(currentFps)) {
       _isCustomFps = true;
       _customFps = currentFps.clamp(10, maxFps);
     } else {
@@ -658,19 +656,26 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     required bool isSelected,
     required ValueChanged<bool>? onSelected,
     double fontSize = 12,
+    bool isEnabled = true,
+    String? tooltip,
   }) {
     final theme = Theme.of(context);
-    return ChoiceChip(
+    final isDark = theme.brightness == Brightness.dark;
+    final chip = ChoiceChip(
       showCheckmark: false,
       visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
       selectedColor: theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: isDark
+          ? theme.colorScheme.surfaceContainerHighest.withAlpha(40)
+          : theme.colorScheme.surface,
       side: BorderSide(
-        color: isSelected
-            ? theme.colorScheme.primary
-            : theme.colorScheme.outline,
+        color: !isEnabled
+            ? theme.colorScheme.outline.withAlpha(40)
+            : (isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline),
         width: isSelected ? 1.2 : 1.0,
       ),
       label: Text(
@@ -678,12 +683,23 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+          color: !isEnabled
+              ? theme.colorScheme.onSurface.withAlpha(80)
+              : (isSelected ? Colors.white : theme.colorScheme.onSurface),
         ),
       ),
-      selected: isSelected,
-      onSelected: onSelected,
+      selected: isEnabled && isSelected,
+      onSelected: isEnabled ? onSelected : null,
     );
+
+    if (tooltip != null && tooltip.isNotEmpty) {
+      return Tooltip(
+        message: tooltip,
+        triggerMode: TooltipTriggerMode.tap,
+        child: chip,
+      );
+    }
+    return chip;
   }
 
   Widget _buildResolutionTile({
@@ -806,6 +822,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final maxFps = sourceFps.clamp(15, 120);
     final minFps = (10 < maxFps) ? 10 : 1;
     final targetFps = widget.encodingOptions.targetFps;
+    final tooltipExceeds =
+        l10n.t('fps_exceeds_source', args: {'fps': '$sourceFps'});
+    const standardFpsOptions = [60, 50, 48, 30, 25, 24];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -839,61 +858,38 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   }
                 },
               ),
-              if (maxFps >= 50)
-                _buildChoiceChip(
-                  label: '60 FPS',
-                  isSelected: !_isCustomFps && targetFps == 60,
+              ...standardFpsOptions.map((fps) {
+                final isAllowed = fps <= maxFps;
+                return _buildChoiceChip(
+                  label: '$fps FPS',
+                  isSelected: !_isCustomFps && targetFps == fps,
+                  isEnabled: isAllowed,
+                  tooltip: isAllowed ? null : tooltipExceeds,
                   onSelected: (val) {
-                    if (val) {
+                    if (val && isAllowed) {
                       setState(() {
                         _isCustomFps = false;
                       });
                       widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(targetFps: 60),
+                        widget.encodingOptions.copyWith(targetFps: fps),
                       );
                     }
                   },
-                ),
-              if (maxFps >= 30)
-                _buildChoiceChip(
-                  label: '30 FPS',
-                  isSelected: !_isCustomFps && targetFps == 30,
-                  onSelected: (val) {
-                    if (val) {
-                      setState(() {
-                        _isCustomFps = false;
-                      });
-                      widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(targetFps: 30),
-                      );
-                    }
-                  },
-                ),
-              _buildChoiceChip(
-                label: '24 FPS',
-                isSelected: !_isCustomFps && targetFps == 24,
-                onSelected: (val) {
-                  if (val) {
-                    setState(() {
-                      _isCustomFps = false;
-                    });
-                    widget.onOptionsChanged(
-                      widget.encodingOptions.copyWith(targetFps: 24),
-                    );
-                  }
-                },
-              ),
+                );
+              }),
               _buildChoiceChip(
                 label: l10n.t('fps_custom'),
                 isSelected: _isCustomFps,
                 onSelected: (val) {
                   if (val) {
+                    final initialCustom = (targetFps > 0 ? targetFps : maxFps)
+                        .clamp(minFps, maxFps);
                     setState(() {
                       _isCustomFps = true;
-                      if (_customFps > maxFps) _customFps = maxFps;
+                      _customFps = initialCustom;
                     });
                     widget.onOptionsChanged(
-                      widget.encodingOptions.copyWith(targetFps: _customFps),
+                      widget.encodingOptions.copyWith(targetFps: initialCustom),
                     );
                   }
                 },
@@ -1004,8 +1000,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         return l10n.t('fps_desc_original');
       case 60:
         return l10n.t('fps_desc_60');
+      case 50:
+        return l10n.t('fps_desc_50');
+      case 48:
+        return l10n.t('fps_desc_48');
       case 30:
         return l10n.t('fps_desc_30');
+      case 25:
+        return l10n.t('fps_desc_25');
       case 24:
         return l10n.t('fps_desc_24');
       default:

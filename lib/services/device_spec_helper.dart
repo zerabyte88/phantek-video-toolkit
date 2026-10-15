@@ -2017,6 +2017,17 @@ class DeviceSpecHelper {
       return false;
     }
 
+    // 3. Modern Snapdragon 4-series (4 Gen 1, 4 Gen 2, 4s Gen 2, 4 Gen 4, 4 Gen 5, 480, 480+, SM4375, SM4450, SM4635, SM4350)
+    if (combined.contains('4 gen') ||
+        combined.contains('4s gen') ||
+        combined.contains('480') ||
+        combined.contains('sm4375') ||
+        combined.contains('sm4450') ||
+        combined.contains('sm4635') ||
+        combined.contains('sm4350')) {
+      return false;
+    }
+
     // Samsung Exynos entry & legacy (5433, 7410, 7420, 7570, 7580, 7870, 7872, 7880, 7884, 7885, 7904, 850, 9609, 9610, 9611)
     if (combined.contains('exynos 5433') ||
         combined.contains('exynos 7410') ||
@@ -2081,18 +2092,28 @@ class DeviceSpecHelper {
       return true;
     }
 
-    // Snapdragon 215 & Snapdragon 4-series (all, including 410, 412, 415, 425, 427, 429, 430, 435, 439, 450, 460)
+    // Legacy Snapdragon 4-series (410, 412, 415, 425, 427, 429, 430, 435, 439, 450, 460) & Snapdragon 215
     if (combined.contains('snapdragon 215') ||
         combined.contains('qm215') ||
-        combined.contains('snapdragon 4') ||
         combined.contains('sdm4') ||
-        combined.contains('sm4') ||
+        combined.contains('sm4250') ||
         combined.contains('msm8916') ||
         combined.contains('msm8917') ||
         combined.contains('msm8920') ||
         combined.contains('msm8929') ||
         combined.contains('msm8937') ||
-        combined.contains('msm8940')) {
+        combined.contains('msm8940') ||
+        combined.contains('410') ||
+        combined.contains('412') ||
+        combined.contains('415') ||
+        combined.contains('425') ||
+        combined.contains('427') ||
+        combined.contains('429') ||
+        combined.contains('430') ||
+        combined.contains('435') ||
+        combined.contains('439') ||
+        combined.contains('450') ||
+        combined.contains('460')) {
       return true;
     }
 
