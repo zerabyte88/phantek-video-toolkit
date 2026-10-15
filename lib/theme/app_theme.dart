@@ -13,8 +13,12 @@ class AppTheme {
       case 'sakura':
       case 'oled_sakura':
         return buildSakuraTheme(cardOpacity: cardOpacity);
+      case 'oled_pure':
+      case 'pure_oled':
       case 'oled':
         return buildOledTheme(cardOpacity: cardOpacity);
+      case 'light_clean':
+      case 'clean_light':
       case 'light':
         return buildLightTheme(cardOpacity: cardOpacity);
       case 'dark':

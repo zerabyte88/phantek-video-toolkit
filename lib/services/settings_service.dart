@@ -159,4 +159,54 @@ class SettingsService extends ChangeNotifier {
     await _saveSettings();
     await _applyWakelock(_settings.keepScreenAwake);
   }
+
+  // ── Active Conversion Job Marker (LMK Crash Recovery) ──────────────────────
+
+  static const _jobMarkerKey = 'active_conversion_job_marker';
+
+  Future<void> saveJobMarker({
+    required String inputPath,
+    required String outputPath,
+    required int allocatedThreads,
+    required bool is4K,
+    int retryCount = 0,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final data = {
+        'inputPath': inputPath,
+        'outputPath': outputPath,
+        'allocatedThreads': allocatedThreads,
+        'is4K': is4K,
+        'retryCount': retryCount,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      await prefs.setString(_jobMarkerKey, jsonEncode(data));
+    } catch (e) {
+      debugPrint('Error saving job marker: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> getJobMarker() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final str = prefs.getString(_jobMarkerKey);
+      if (str != null) {
+        return jsonDecode(str) as Map<String, dynamic>?;
+      }
+    } catch (e) {
+      debugPrint('Error reading job marker: $e');
+    }
+    return null;
+  }
+
+  Future<void> clearJobMarker() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_jobMarkerKey);
+    } catch (e) {
+      debugPrint('Error clearing job marker: $e');
+    }
+  }
 }
+
