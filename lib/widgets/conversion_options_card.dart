@@ -32,6 +32,7 @@ class ConversionOptionsCard extends StatefulWidget {
 }
 
 class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
+  int _crfValue = 22;
   int _customBitrateMbps = 4;
   bool _isCustomFps = false;
   late int _customFps;
@@ -39,6 +40,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void initState() {
     super.initState();
+    _crfValue = widget.encodingOptions.crfValue;
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
         .clamp(1, 30);
@@ -60,6 +62,24 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void didUpdateWidget(ConversionOptionsCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.encodingOptions.crfValue != widget.encodingOptions.crfValue) {
+      _crfValue = widget.encodingOptions.crfValue;
+    }
+    if (oldWidget.encodingOptions.customBitrateKbps !=
+        widget.encodingOptions.customBitrateKbps) {
+      _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
+          .round()
+          .clamp(1, 30);
+    }
+    if (oldWidget.encodingOptions.targetFps !=
+        widget.encodingOptions.targetFps) {
+      final currentFps = widget.encodingOptions.targetFps;
+      const standardFps = [0, 60, 50, 48, 30, 25, 24];
+      if (currentFps > 0 && !standardFps.contains(currentFps)) {
+        _isCustomFps = true;
+        _customFps = currentFps;
+      }
+    }
     if (oldWidget.sourceVideo != widget.sourceVideo) {
       final sourceFps = (widget.sourceVideo.fps > 0
           ? widget.sourceVideo.fps.round()
@@ -236,86 +256,33 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.encodingOptions.crfValue !=
-                    widget.encodingOptions.speedPreset.defaultCrf) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        key: const Key('crf_custom_badge'),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.secondary.withAlpha(
-                            30,
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          l10n.t('crf_custom'),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.secondary,
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        key: const Key('crf_reset_button'),
-                        onTap: () {
-                          widget.onOptionsChanged(
-                            widget.encodingOptions.copyWith(
-                              crfValue:
-                                  widget.encodingOptions.speedPreset.defaultCrf,
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(4),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.refresh_rounded,
-                                size: 12,
-                                color: theme.colorScheme.primary,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                l10n.t('crf_reset'),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                ],
                 Row(
                   children: [
                     Expanded(
                       child: Slider(
-                        value: widget.encodingOptions.crfValue.toDouble(),
+                        value: _crfValue.toDouble(),
                         min: 16,
                         max: 28,
                         divisions: 12,
-                        label: widget.encodingOptions.crfValue.toString(),
+                        label: '$_crfValue',
                         onChanged: (val) {
+                          final newCrf = val.round();
+                          if (newCrf != _crfValue) {
+                            setState(() {
+                              _crfValue = newCrf;
+                            });
+                            widget.onOptionsChanged(
+                              widget.encodingOptions.copyWith(
+                                crfValue: newCrf,
+                              ),
+                            );
+                          }
+                        },
+                        onChangeEnd: (val) {
+                          final newCrf = val.round();
                           widget.onOptionsChanged(
                             widget.encodingOptions.copyWith(
-                              crfValue: val.round(),
+                              crfValue: newCrf,
                             ),
                           );
                         },
@@ -329,7 +296,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${widget.encodingOptions.crfValue}',
+                        '$_crfValue',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -369,6 +336,78 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ],
                   ),
                 ),
+                // Custom badge and reset button placed below slider to eliminate layout shift during drag
+                if (_crfValue !=
+                    widget.encodingOptions.speedPreset.defaultCrf) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        key: const Key('crf_custom_badge'),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondary.withAlpha(
+                            30,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          l10n.t('crf_custom'),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        key: const Key('crf_reset_button'),
+                        onTap: () {
+                          final defaultCrf =
+                              widget.encodingOptions.speedPreset.defaultCrf;
+                          setState(() {
+                            _crfValue = defaultCrf;
+                          });
+                          widget.onOptionsChanged(
+                            widget.encodingOptions.copyWith(
+                              crfValue: defaultCrf,
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.refresh_rounded,
+                                size: 12,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                l10n.t('crf_reset'),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (widget.encodingOptions.crfValue <= 17) ...[
                   const SizedBox(height: 8),
                   Container(
@@ -427,12 +466,23 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     divisions: 19,
                     label: '$_customBitrateMbps Mbps',
                     onChanged: (val) {
-                      setState(() {
-                        _customBitrateMbps = val.round();
-                      });
+                      final newBitrate = val.round();
+                      if (newBitrate != _customBitrateMbps) {
+                        setState(() {
+                          _customBitrateMbps = newBitrate;
+                        });
+                        widget.onOptionsChanged(
+                          widget.encodingOptions.copyWith(
+                            customBitrateKbps: newBitrate * 1000,
+                          ),
+                        );
+                      }
+                    },
+                    onChangeEnd: (val) {
+                      final newBitrate = val.round();
                       widget.onOptionsChanged(
                         widget.encodingOptions.copyWith(
-                          customBitrateKbps: _customBitrateMbps * 1000,
+                          customBitrateKbps: newBitrate * 1000,
                         ),
                       );
                     },
@@ -851,9 +901,17 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     label: '$_customFps FPS',
                     onChanged: (val) {
                       final newFps = val.round();
-                      setState(() {
-                        _customFps = newFps;
-                      });
+                      if (newFps != _customFps) {
+                        setState(() {
+                          _customFps = newFps;
+                        });
+                        widget.onOptionsChanged(
+                          widget.encodingOptions.copyWith(targetFps: newFps),
+                        );
+                      }
+                    },
+                    onChangeEnd: (val) {
+                      final newFps = val.round();
                       widget.onOptionsChanged(
                         widget.encodingOptions.copyWith(targetFps: newFps),
                       );
@@ -1006,6 +1064,11 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         : (preset == SpeedPreset.max
               ? l10n.t('preset_slow_title')
               : l10n.t('preset_normal_title'));
+    final presetDesc = preset == SpeedPreset.fast
+        ? l10n.t('preset_fast_desc')
+        : (preset == SpeedPreset.max
+              ? l10n.t('preset_slow_desc')
+              : l10n.t('preset_normal_desc'));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1018,39 +1081,51 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.speed_rounded,
-            size: 16,
-            color: theme.colorScheme.primary,
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.speed_rounded,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text.rich(
-              TextSpan(
-                text: '${l10n.t('settings_cpu_preset')}: ',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: theme.colorScheme.onSurface.withAlpha(160),
-                ),
-                children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text.rich(
                   TextSpan(
-                    text: presetLabel,
+                    text: '${l10n.t('settings_cpu_preset')}: ',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary,
+                      color: theme.colorScheme.onSurface.withAlpha(160),
                     ),
+                    children: [
+                      TextSpan(
+                        text: presetLabel,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextSpan(
-                    text: ' (${preset.scaler} · ${preset.x264Preset})',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurface.withAlpha(120),
-                    ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  presetDesc,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    height: 1.3,
+                    color: theme.colorScheme.onSurface.withAlpha(140),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

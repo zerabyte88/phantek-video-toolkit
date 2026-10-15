@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, dynamic>? _hardwareInfo;
   String _appVersion = 'v2.7.1';
   String _buildNumber = '37';
+  double? _dragCardOpacity;
 
   @override
   void initState() {
@@ -817,7 +818,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 74,
+        mainAxisExtent: 80,
       ),
       itemCount: themes.length,
       itemBuilder: (context, index) {
@@ -849,49 +850,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: isSelected ? 1.6 : 1.0,
                 ),
               ),
-              child: Stack(
-                alignment: Alignment.center,
+              child: Row(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 2),
-                      child: Icon(
-                        item['icon'] as IconData,
-                        size: 18,
-                        color: isSelected
-                            ? accent
-                            : theme.colorScheme.onSurface,
-                      ),
-                    ),
+                  Icon(
+                    item['icon'] as IconData,
+                    size: 20,
+                    color: isSelected
+                        ? accent
+                        : theme.colorScheme.onSurface,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          item['title'] as String,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w600,
-                            color: isSelected
-                                ? accent
-                                : theme.colorScheme.onSurface,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item['title'] as String,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                              color: isSelected
+                                  ? accent
+                                  : theme.colorScheme.onSurface,
+                            ),
                           ),
                         ),
                         if (badge != null) ...[
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
+                              horizontal: 6,
                               vertical: 1.5,
                             ),
                             decoration: BoxDecoration(
@@ -933,9 +929,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
-    final opacity = settings.cardOpacity.clamp(0.5, 1.0);
+    final effectiveOpacity = _dragCardOpacity ?? settings.cardOpacity;
+    final opacity = effectiveOpacity.clamp(0.5, 1.0);
     final percentage = (opacity * 100).round();
-    final isNotDefault = (opacity - 1.0).abs() > 0.01;
+    final isNotDefault = (settings.cardOpacity - 1.0).abs() > 0.01;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -994,6 +991,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 color: theme.colorScheme.primary,
                 onPressed: () {
+                  setState(() {
+                    _dragCardOpacity = null;
+                  });
                   _settingsService.setCardOpacity(1.0);
                 },
               ),
@@ -1027,6 +1027,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             label: '$percentage%',
             onChanged: (val) {
               final rounded = (val * 20).round() / 20.0;
+              if (_dragCardOpacity != rounded) {
+                setState(() {
+                  _dragCardOpacity = rounded;
+                });
+                _settingsService.setCardOpacityFast(rounded);
+              }
+            },
+            onChangeEnd: (val) {
+              final rounded = (val * 20).round() / 20.0;
+              setState(() {
+                _dragCardOpacity = null;
+              });
               _settingsService.setCardOpacity(rounded);
             },
           ),

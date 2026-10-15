@@ -124,6 +124,17 @@ enum SpeedPreset {
     this.description,
   );
 
+  String get cleanScaler {
+    switch (this) {
+      case SpeedPreset.fast:
+        return 'Area';
+      case SpeedPreset.normal:
+        return 'Bicubic';
+      case SpeedPreset.max:
+        return 'Lanczos';
+    }
+  }
+
   static SpeedPreset fromCpuPreset(String? preset) {
     switch (preset) {
       case 'fast':
