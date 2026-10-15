@@ -20,7 +20,7 @@
 
 ## Overview
 
-**Phantek Video Toolkit** is an offline Android utility designed for video transcoding, downscaling, compression, and audio extraction. Built with Flutter and native FFmpeg libraries, it processes all media locally on the device without requiring network access, accounts, or background telemetry.
+**Phantek** is an offline Android utility designed for video transcoding, downscaling, compression, and audio extraction. Built with Flutter and native FFmpeg libraries, it processes all media locally on the device without requiring network access, accounts, or background telemetry.
 
 ---
 
