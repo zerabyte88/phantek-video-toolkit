@@ -68,30 +68,17 @@ void main() {
         ),
       );
 
-      // Verify Speed preset chips are present
-      expect(find.text('Cepat'), findsOneWidget);
-      expect(find.text('Normal'), findsOneWidget);
-      expect(find.text('Maksimal'), findsOneWidget);
+      // Verify Active Speed Preset indicator is rendered
+      expect(find.byIcon(Icons.speed_rounded), findsOneWidget);
+      expect(find.textContaining('Normal'), findsOneWidget);
 
       // Initial state: Normal preset -> default CRF 22, no custom indicator, no reset button
       expect(find.text('22'), findsOneWidget);
       expect(find.byKey(const Key('crf_reset_button')), findsNothing);
       expect(find.byKey(const Key('crf_custom_badge')), findsNothing);
 
-      // Tap "Cepat" preset -> updates to fast and default CRF 24
-      await tester.tap(find.text('Cepat'));
-      await tester.pumpAndSettle();
-      expect(currentOpts.speedPreset, equals(SpeedPreset.fast));
-      expect(currentOpts.crfValue, equals(24));
-      expect(find.text('24'), findsOneWidget);
-
-      // Tap "Maksimal" preset -> shows orange warning badge and default CRF 20
-      await tester.tap(find.text('Maksimal'));
-      await tester.pumpAndSettle();
-      expect(currentOpts.speedPreset, equals(SpeedPreset.max));
-      expect(currentOpts.crfValue, equals(20));
-      expect(find.text('20'), findsOneWidget);
-      expect(find.text('Lebih lama & daya CPU tinggi'), findsOneWidget);
+      // Verify CRF label text is removed from ConversionOptionsCard
+      expect(find.text(l10n.t('crf_label')), findsNothing);
 
       // Simulate custom low CRF (16) on Normal preset -> triggers custom tag, reset button, and low CRF warning
       currentOpts = currentOpts.copyWith(

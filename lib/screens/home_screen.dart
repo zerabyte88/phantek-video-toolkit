@@ -46,10 +46,37 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    final defaultPreset = SpeedPreset.fromCpuPreset(
+      _settingsService.settings.cpuPreset,
+    );
+    _encodingOptions = EncodingOptions(
+      speedPreset: defaultPreset,
+      crfValue: defaultPreset.defaultCrf,
+    );
+    _settingsService.addListener(_onSettingsChanged);
     CacheManagerService().clearAllCache();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkCrashedJob();
     });
+  }
+
+  @override
+  void dispose() {
+    _settingsService.removeListener(_onSettingsChanged);
+    super.dispose();
+  }
+
+  void _onSettingsChanged() {
+    if (!mounted) return;
+    final preset = SpeedPreset.fromCpuPreset(_settingsService.settings.cpuPreset);
+    if (_encodingOptions.speedPreset != preset) {
+      setState(() {
+        _encodingOptions = _encodingOptions.copyWith(
+          speedPreset: preset,
+          crfValue: preset.defaultCrf,
+        );
+      });
+    }
   }
 
   Future<void> _loadVideoFromPath(String path) async {
