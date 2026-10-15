@@ -360,11 +360,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         context: context,
                         theme: theme,
                         l10n: l10n,
-                        soc: _hardwareInfo!['socDescription'] as SocDescription?,
-                        fallbackText: _hardwareInfo!['cpu'] as String? ??
+                        soc:
+                            _hardwareInfo!['socDescription'] as SocDescription?,
+                        fallbackText:
+                            _hardwareInfo!['cpu'] as String? ??
                             _hardwareInfo!['hardware'] as String? ??
                             'Standard Processor',
-                        cores: _hardwareInfo!['cores'] as int? ??
+                        cores:
+                            _hardwareInfo!['cores'] as int? ??
                             AppSettings.deviceCoreCount,
                       ),
                       const SizedBox(height: 6),
@@ -516,7 +519,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withAlpha(18),
                     borderRadius: BorderRadius.circular(20),
@@ -1126,8 +1132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ) {
     final ramMb =
         _hardwareInfo?['ramMb'] as int? ?? DeviceSpecHelper.getTotalRamMb();
-    final autoBaseline =
-        DeviceSpecHelper.resolveThreadCount(requestedThreads: 0);
+    final autoBaseline = DeviceSpecHelper.resolveThreadCount(
+      requestedThreads: 0,
+    );
     final safeLimit = DeviceSpecHelper.maxSafeThreadCount(ramMb);
     final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(ramMb);
     final isRisky = settings.cpuThreads > safeLimit;
@@ -1213,25 +1220,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   setState(() {});
                 },
               ),
-              ...[1, 2, 4, 6, 8]
-                  .where((c) => c <= (deviceCores > 0 ? deviceCores : 8))
-                  .map(
-                    (c) {
-                      final isRec = (c == autoBaseline);
-                      final label = isRec
-                          ? '$c ${l10n.t('unit_core')} (${l10n.t('chip_recommended')})'
-                          : '$c ${l10n.t('unit_core')}';
-                      return _buildChoiceChip(
-                        theme: theme,
-                        label: label,
-                        selected: settings.cpuThreads == c,
-                        onSelected: () async {
-                          await _settingsService.setCpuThreads(c);
-                          setState(() {});
-                        },
-                      );
-                    },
-                  ),
+              ...[
+                1,
+                2,
+                4,
+                6,
+                8,
+              ].where((c) => c <= (deviceCores > 0 ? deviceCores : 8)).map((c) {
+                final isRec = (c == autoBaseline);
+                final label = isRec
+                    ? '$c ${l10n.t('unit_core')} (${l10n.t('chip_recommended')})'
+                    : '$c ${l10n.t('unit_core')}';
+                return _buildChoiceChip(
+                  theme: theme,
+                  label: label,
+                  selected: settings.cpuThreads == c,
+                  onSelected: () async {
+                    await _settingsService.setCpuThreads(c);
+                    setState(() {});
+                  },
+                );
+              }),
             ],
           ),
         ),
@@ -1485,8 +1494,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             settings.cpuPreset == 'fast'
                 ? l10n.t('preset_fast_desc')
                 : (settings.cpuPreset == 'slow'
-                    ? l10n.t('preset_slow_desc')
-                    : l10n.t('preset_normal_desc')),
+                      ? l10n.t('preset_slow_desc')
+                      : l10n.t('preset_normal_desc')),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.5,
@@ -1945,7 +1954,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else if (soc != null && soc.displayName.isNotEmpty) {
       cpuDisplay = '${soc.displayName} · $cores ${l10n.t('unit_core')}';
     } else {
-      cpuDisplay = '${l10n.t('device_cpu_generic')} · $cores ${l10n.t('unit_core')}';
+      cpuDisplay =
+          '${l10n.t('device_cpu_generic')} · $cores ${l10n.t('unit_core')}';
     }
 
     return Semantics(
@@ -2035,7 +2045,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (soc?.manufacturer != null && soc!.manufacturer!.isNotEmpty) {
       details.add(MapEntry('Manufacturer', soc.manufacturer!));
     }
-    details.add(MapEntry(l10n.t('cores_detected'), '$cores ${l10n.t('unit_core')}'));
+    details.add(
+      MapEntry(l10n.t('cores_detected'), '$cores ${l10n.t('unit_core')}'),
+    );
 
     showModalBottomSheet(
       context: context,
@@ -2092,7 +2104,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(60),
+                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(
+                      60,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withAlpha(30),
@@ -2122,7 +2136,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   e.key,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: theme.colorScheme.onSurface.withAlpha(150),
+                                    color: theme.colorScheme.onSurface
+                                        .withAlpha(150),
                                   ),
                                 ),
                               ),
@@ -2156,7 +2171,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       }
                       sb.writeln('Raw: $rawName');
                       try {
-                        await Clipboard.setData(ClipboardData(text: sb.toString().trim()));
+                        await Clipboard.setData(
+                          ClipboardData(text: sb.toString().trim()),
+                        );
                       } catch (_) {}
                       if (context.mounted) {
                         Navigator.of(ctx).pop();

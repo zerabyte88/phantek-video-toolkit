@@ -471,15 +471,12 @@ void main() {
       expect(vbvArgs, equals('-maxrate 8000k -bufsize 16000k'));
     });
 
-    test(
-      'EncodingOptions default crfValue is 22 (Normal preset) and crf getter alias matches',
-      () {
-        const opts = EncodingOptions();
-        expect(opts.crfValue, equals(22));
-        expect(opts.crf, equals(22));
-        expect(opts.speedPreset, equals(SpeedPreset.normal));
-      },
-    );
+    test('EncodingOptions default crfValue is 22 (Normal preset) and crf getter alias matches', () {
+      const opts = EncodingOptions();
+      expect(opts.crfValue, equals(22));
+      expect(opts.crf, equals(22));
+      expect(opts.speedPreset, equals(SpeedPreset.normal));
+    });
 
     test('SpeedPreset ladder configuration matches mobile optimized specifications', () {
       expect(SpeedPreset.fast.scaler, equals('area'));
@@ -490,7 +487,10 @@ void main() {
       expect(SpeedPreset.normal.x264Preset, equals('faster'));
       expect(SpeedPreset.normal.defaultCrf, equals(22));
 
-      expect(SpeedPreset.max.scaler, equals('lanczos+accurate_rnd+full_chroma_int'));
+      expect(
+        SpeedPreset.max.scaler,
+        equals('lanczos+accurate_rnd+full_chroma_int'),
+      );
       expect(SpeedPreset.max.x264Preset, equals('fast'));
       expect(SpeedPreset.max.defaultCrf, equals(20));
     });
@@ -616,7 +616,11 @@ void main() {
         audioBitrateKbps: 128,
       );
 
-      const target720p = VideoResolution(label: '720p', width: 1280, height: 720);
+      const target720p = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
       const appSettings128 = AppSettings(audioBitrateKbps: 128);
 
       // 1. Valid: AAC + MP4 + <= 2ch + bitrate <= 128k*1.1 -> copy

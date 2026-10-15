@@ -209,4 +209,3 @@ class SettingsService extends ChangeNotifier {
     }
   }
 }
-

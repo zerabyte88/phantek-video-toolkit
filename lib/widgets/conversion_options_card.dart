@@ -82,7 +82,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       video: widget.sourceVideo,
       requestedThreads: appSettings.cpuThreads,
     );
-    final is4K = widget.sourceVideo.width >= 3840 ||
+    final is4K =
+        widget.sourceVideo.width >= 3840 ||
         widget.sourceVideo.height >= 2160 ||
         (widget.sourceVideo.width >= 2160 && widget.sourceVideo.height >= 3840);
 
@@ -111,8 +112,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withAlpha(20),
                   borderRadius: BorderRadius.circular(6),
@@ -200,8 +200,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 final label = preset == SpeedPreset.fast
                     ? l10n.t('preset_fast_title')
                     : (preset == SpeedPreset.normal
-                        ? l10n.t('preset_normal_title')
-                        : l10n.t('preset_slow_title'));
+                          ? l10n.t('preset_normal_title')
+                          : l10n.t('preset_slow_title'));
                 return _buildChoiceChip(
                   label: label,
                   isSelected: isSelected,
@@ -223,8 +223,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             const SizedBox(height: 6),
             Center(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.amber.withAlpha(35),
                   borderRadius: BorderRadius.circular(12),
@@ -263,8 +265,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               widget.encodingOptions.speedPreset == SpeedPreset.fast
                   ? l10n.t('preset_fast_desc')
                   : (widget.encodingOptions.speedPreset == SpeedPreset.max
-                      ? l10n.t('preset_slow_desc')
-                      : l10n.t('preset_normal_desc')),
+                        ? l10n.t('preset_slow_desc')
+                        : l10n.t('preset_normal_desc')),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.5,
@@ -339,8 +341,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                             l10n.t('crf_label'),
                             style: TextStyle(
                               fontSize: 12,
-                              color:
-                                  theme.colorScheme.onSurface.withAlpha(140),
+                              color: theme.colorScheme.onSurface.withAlpha(140),
                             ),
                           ),
                           if (widget.encodingOptions.crfValue !=
@@ -352,8 +353,9 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                                 vertical: 1.5,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    theme.colorScheme.secondary.withAlpha(30),
+                                color: theme.colorScheme.secondary.withAlpha(
+                                  30,
+                                ),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -480,8 +482,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                 if (widget.encodingOptions.crfValue <= 17) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.amber.withAlpha(25),
                       borderRadius: BorderRadius.circular(6),

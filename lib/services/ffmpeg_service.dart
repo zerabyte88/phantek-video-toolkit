@@ -76,7 +76,8 @@ class FFmpegService {
       int? audioBitrateKbps;
       if (hasAudio) {
         final aStream = audioStreams.first;
-        final rawChannels = aStream.getNumberProperty('channels') ??
+        final rawChannels =
+            aStream.getNumberProperty('channels') ??
             num.tryParse(aStream.getStringProperty('channels') ?? '');
         audioChannels = rawChannels?.toInt();
 
@@ -322,7 +323,8 @@ class FFmpegService {
       // Smart passthrough rules (Q3):
       // - Output MP4: only copy if AAC, channels <= 2, and source bitrate <= target * 1.1
       // - Output MKV in stream copy: copy passthrough
-      final canCopyAudio = (isTargetMp4 &&
+      final canCopyAudio =
+          (isTargetMp4 &&
               isSourceAac &&
               channelCount <= 2 &&
               (sourceAudioBitrate == null ||
@@ -453,7 +455,8 @@ class FFmpegService {
       video: sourceVideo,
       requestedThreads: appSettings.cpuThreads,
     );
-    final is4K = sourceVideo.width >= 3840 ||
+    final is4K =
+        sourceVideo.width >= 3840 ||
         sourceVideo.height >= 2160 ||
         (sourceVideo.width >= 2160 && sourceVideo.height >= 3840);
 
