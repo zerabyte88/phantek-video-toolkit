@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -45,6 +47,146 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     CacheManagerService().clearAllCache();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkCrashedJob();
+    });
+  }
+
+  Future<void> _loadVideoFromPath(String path) async {
+    final l10n = _settingsService.l10n;
+    setState(() {
+      _isLoading = true;
+      _loadingMessage = l10n.t('loading_analyzing');
+      _videoInfo = null;
+      _selectedResolution = null;
+    });
+
+    try {
+      final info = await FFmpegService.getVideoInfo(path);
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _videoInfo = info;
+        if (info != null) {
+          final resolutions = _getResolutionsForMode(_selectedMode, info);
+          if (resolutions.isNotEmpty) {
+            _selectedResolution = resolutions.first;
+          }
+        }
+      });
+      if (info == null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.t('error_read_video'))),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.t('error_read_video')}: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _checkCrashedJob() async {
+    final marker = await _settingsService.getJobMarker();
+    if (marker == null || !mounted) return;
+
+    final inputPath = marker['inputPath'] as String?;
+    final outputPath = marker['outputPath'] as String?;
+    final allocatedThreads = marker['allocatedThreads'] as int? ?? 4;
+    final retryCount = marker['retryCount'] as int? ?? 0;
+    final timestamp = marker['timestamp'] as int? ?? 0;
+
+    // If marker is stale (> 24 hours), clear and return
+    final age = DateTime.now().millisecondsSinceEpoch - timestamp;
+    if (age > 24 * 60 * 60 * 1000) {
+      await _settingsService.clearJobMarker();
+      return;
+    }
+
+    // Clean partial file if left over
+    if (outputPath != null && outputPath.isNotEmpty) {
+      try {
+        final f = File(outputPath);
+        if (await f.exists()) {
+          await f.delete();
+        }
+      } catch (_) {}
+    }
+
+    if (retryCount >= 2 || allocatedThreads <= 1) {
+      await _settingsService.clearJobMarker();
+      return;
+    }
+
+    final reducedThreads = (allocatedThreads - 1).clamp(1, 8);
+    final l10n = _settingsService.l10n;
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.amber,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.t('recovery_title'),
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            l10n.t(
+              'recovery_desc',
+              args: {'cores': reducedThreads.toString()},
+            ),
+            style: const TextStyle(fontSize: 13, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await _settingsService.clearJobMarker();
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+              child: Text(l10n.t('recovery_dismiss')),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _settingsService.setCpuThreads(reducedThreads);
+                await _settingsService.clearJobMarker();
+                if (ctx.mounted) Navigator.of(ctx).pop();
+
+                // If input file still exists, auto-load it
+                if (inputPath != null && File(inputPath).existsSync()) {
+                  _loadVideoFromPath(inputPath);
+                }
+              },
+              child: Text(
+                l10n.t(
+                  'recovery_retry',
+                  args: {'cores': reducedThreads.toString()},
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // ─── Video Picking ───────────────────────────────────────────────────────
@@ -75,28 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return;
         }
 
-        setState(() => _loadingMessage = l10n.t('loading_analyzing'));
-
-        final info = await FFmpegService.getVideoInfo(file.path!);
-
-        if (!mounted) return;
-
-        setState(() {
-          _isLoading = false;
-          _videoInfo = info;
-          if (info != null) {
-            final resolutions = _getResolutionsForMode(_selectedMode, info);
-            if (resolutions.isNotEmpty) {
-              _selectedResolution = resolutions.first;
-            }
-          }
-        });
-
-        if (info == null && mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(l10n.t('error_read_video'))));
-        }
+        await _loadVideoFromPath(file.path!);
       } else {
         setState(() => _isLoading = false);
       }

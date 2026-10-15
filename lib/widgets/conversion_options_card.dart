@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
+import '../services/device_spec_helper.dart';
 import '../services/localization_service.dart';
+import '../services/settings_service.dart';
 import 'app_glass_card.dart';
 
 class ConversionOptionsCard extends StatefulWidget {
@@ -75,6 +77,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
+    final appSettings = SettingsService().settings;
+    final resolvedThreads = DeviceSpecHelper.resolveThreadCount(
+      video: widget.sourceVideo,
+      requestedThreads: appSettings.cpuThreads,
+    );
+    final is4K = widget.sourceVideo.width >= 3840 ||
+        widget.sourceVideo.height >= 2160 ||
+        (widget.sourceVideo.width >= 2160 && widget.sourceVideo.height >= 3840);
 
     return AppGlassCard(
       child: Column(
@@ -100,8 +110,57 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   ),
                 ),
               ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.memory_rounded,
+                      size: 13,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      appSettings.cpuThreads == 0
+                          ? l10n.t(
+                              'auto_runtime_normal',
+                              args: {'count': resolvedThreads.toString()},
+                            )
+                          : '$resolvedThreads ${l10n.t('unit_core')}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
+          if (appSettings.cpuThreads == 0 && is4K) ...[
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                l10n.t(
+                  'auto_runtime_4k',
+                  args: {'count': resolvedThreads.toString()},
+                ),
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.primary.withAlpha(190),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 18),
 
           // 1. Resolution Selection

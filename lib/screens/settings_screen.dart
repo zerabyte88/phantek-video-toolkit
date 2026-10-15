@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.6.0';
-  String _buildNumber = '35';
+  String _appVersion = 'v2.7.0';
+  String _buildNumber = '36';
 
   @override
   void initState() {
@@ -38,14 +39,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '35';
+              : '36';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.6.0';
-          _buildNumber = '35';
+          _appVersion = 'v2.7.0';
+          _buildNumber = '36';
         });
       }
     }
@@ -355,10 +356,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             l10n.t('unknown'),
                       ),
                       const SizedBox(height: 6),
-                      _buildSpecRow(
-                        theme,
-                        l10n.t('device_cpu'),
-                        '${_hardwareInfo!['cpu'] ?? _hardwareInfo!['hardware']} (${_hardwareInfo!['cores']} ${l10n.t('unit_core')})',
+                      _buildCpuSpecRow(
+                        context: context,
+                        theme: theme,
+                        l10n: l10n,
+                        soc: _hardwareInfo!['socDescription'] as SocDescription?,
+                        fallbackText: _hardwareInfo!['cpu'] as String? ??
+                            _hardwareInfo!['hardware'] as String? ??
+                            'Standard Processor',
+                        cores: _hardwareInfo!['cores'] as int? ??
+                            AppSettings.deviceCoreCount,
                       ),
                       const SizedBox(height: 6),
                       _buildSpecRow(
@@ -755,6 +762,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'badge': 'AMOLED',
       },
       {
+        'id': 'light',
+        'title': l10n.t('theme_light'),
+        'desc': l10n.t('theme_light_desc'),
+        'icon': Icons.light_mode_rounded,
+        'accent': const Color(0xFFFBBF24),
+        'badge': 'LIGHT',
+      },
+      {
         'id': 'oled',
         'title': l10n.t('theme_oled'),
         'desc': l10n.t('theme_oled_desc'),
@@ -772,12 +787,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'badge': 'AMOLED',
         },
       {
-        'id': 'light',
-        'title': l10n.t('theme_light'),
-        'desc': l10n.t('theme_light_desc'),
-        'icon': Icons.light_mode_rounded,
-        'accent': const Color(0xFFFBBF24),
-        'badge': 'LIGHT',
+        'id': 'oled_pure',
+        'title': l10n.t('theme_oled_pure'),
+        'desc': l10n.t('theme_oled_pure_desc'),
+        'icon': Icons.brightness_2_outlined,
+        'accent': const Color(0xFF60A5FA),
+        'badge': l10n.t('badge_static'),
+      },
+      {
+        'id': 'light_clean',
+        'title': l10n.t('theme_light_clean'),
+        'desc': l10n.t('theme_light_clean_desc'),
+        'icon': Icons.wb_sunny_outlined,
+        'accent': const Color(0xFF0EA5E9),
+        'badge': l10n.t('badge_static'),
       },
     ];
 
@@ -1101,11 +1124,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     int deviceCores,
     AppLocalizations l10n,
   ) {
+    final ramMb =
+        _hardwareInfo?['ramMb'] as int? ?? DeviceSpecHelper.getTotalRamMb();
+    final autoBaseline =
+        DeviceSpecHelper.resolveThreadCount(requestedThreads: 0);
+    final safeLimit = DeviceSpecHelper.maxSafeThreadCount(ramMb);
+    final marketedRamGb = DeviceSpecHelper.getMarketedRamGb(ramMb);
+    final isRisky = settings.cpuThreads > safeLimit;
+
+    final badgeText = settings.cpuThreads == 0
+        ? '${l10n.t('badge_auto')} ($autoBaseline ${l10n.t('unit_core')})'
+        : '${settings.cpuThreads} ${l10n.t('unit_core')}';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Row(
@@ -1137,7 +1173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                '$deviceCores ${l10n.t('unit_core')}',
+                badgeText,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -1147,6 +1183,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
+        if (settings.cpuThreads == 0) ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              l10n.t('settings_cpu_auto_subtitle'),
+              style: TextStyle(
+                fontSize: 10.5,
+                fontStyle: FontStyle.italic,
+                color: theme.colorScheme.primary.withAlpha(190),
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: 10),
         Center(
           child: Wrap(
@@ -1156,7 +1206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildChoiceChip(
                 theme: theme,
-                label: l10n.t('settings_auto_cores'),
+                label: l10n.t('badge_auto'),
                 selected: settings.cpuThreads == 0,
                 onSelected: () async {
                   await _settingsService.setCpuThreads(0);
@@ -1164,21 +1214,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               ...[1, 2, 4, 6, 8]
-                  .where((c) => c <= (deviceCores > 0 ? (deviceCores + 2) : 8))
+                  .where((c) => c <= (deviceCores > 0 ? deviceCores : 8))
                   .map(
-                    (c) => _buildChoiceChip(
-                      theme: theme,
-                      label: '$c ${l10n.t('unit_core')}',
-                      selected: settings.cpuThreads == c,
-                      onSelected: () async {
-                        await _settingsService.setCpuThreads(c);
-                        setState(() {});
-                      },
-                    ),
+                    (c) {
+                      final isRec = (c == autoBaseline);
+                      final label = isRec
+                          ? '$c ${l10n.t('unit_core')} (${l10n.t('chip_recommended')})'
+                          : '$c ${l10n.t('unit_core')}';
+                      return _buildChoiceChip(
+                        theme: theme,
+                        label: label,
+                        selected: settings.cpuThreads == c,
+                        onSelected: () async {
+                          await _settingsService.setCpuThreads(c);
+                          setState(() {});
+                        },
+                      );
+                    },
                   ),
             ],
           ),
         ),
+        if (isRisky) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.amber.withAlpha(25),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.amber.withAlpha(120),
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: Colors.amber,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.t(
+                      'warn_risky_cores',
+                      args: {
+                        'ram': marketedRamGb.toString(),
+                        'cores': settings.cpuThreads.toString(),
+                      },
+                    ),
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.amber,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 8),
         Center(
           child: Text(
@@ -1833,6 +1930,262 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildCpuSpecRow({
+    required BuildContext context,
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required SocDescription? soc,
+    required String fallbackText,
+    required int cores,
+  }) {
+    final String cpuDisplay;
+    final String rawName = soc?.rawName ?? fallbackText;
+    if (soc != null && soc.isPrecise) {
+      cpuDisplay = soc.displayName;
+    } else if (soc != null && soc.displayName.isNotEmpty) {
+      cpuDisplay = '${soc.displayName} · $cores ${l10n.t('unit_core')}';
+    } else {
+      cpuDisplay = '${l10n.t('device_cpu_generic')} · $cores ${l10n.t('unit_core')}';
+    }
+
+    return Semantics(
+      label: '${l10n.t('device_cpu_detail_title')}, tap to open',
+      button: true,
+      child: Tooltip(
+        message: rawName,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: () => _showCpuDetailBottomSheet(
+              context: context,
+              theme: theme,
+              l10n: l10n,
+              soc: soc,
+              displayCpu: cpuDisplay,
+              cores: cores,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 105,
+                    child: Text(
+                      l10n.t('device_cpu'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      cpuDisplay,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 14,
+                    color: theme.colorScheme.primary.withAlpha(150),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCpuDetailBottomSheet({
+    required BuildContext context,
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required SocDescription? soc,
+    required String displayCpu,
+    required int cores,
+  }) {
+    final rawName = soc?.rawName ?? displayCpu;
+    final details = <MapEntry<String, String>>[];
+
+    details.add(MapEntry(l10n.t('device_cpu'), displayCpu));
+    if (soc?.socModel != null && soc!.socModel!.isNotEmpty) {
+      details.add(MapEntry('SoC Model', soc.socModel!));
+    }
+    if (soc?.hardware != null && soc!.hardware!.isNotEmpty) {
+      details.add(MapEntry('Hardware', soc.hardware!));
+    }
+    if (soc?.board != null && soc!.board!.isNotEmpty) {
+      details.add(MapEntry('Board', soc.board!));
+    }
+    if (soc?.brand != null && soc!.brand!.isNotEmpty) {
+      details.add(MapEntry('Brand', soc.brand!));
+    }
+    if (soc?.manufacturer != null && soc!.manufacturer!.isNotEmpty) {
+      details.add(MapEntry('Manufacturer', soc.manufacturer!));
+    }
+    details.add(MapEntry(l10n.t('cores_detected'), '$cores ${l10n.t('unit_core')}'));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withAlpha(50),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.memory_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.t('device_cpu_detail_title'),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(60),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withAlpha(30),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        rawName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...details.map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 110,
+                                child: Text(
+                                  e.key,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.colorScheme.onSurface.withAlpha(150),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  e.value,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final sb = StringBuffer();
+                      sb.writeln('=== CPU / SoC Specifications ===');
+                      for (final e in details) {
+                        sb.writeln('${e.key}: ${e.value}');
+                      }
+                      sb.writeln('Raw: $rawName');
+                      try {
+                        await Clipboard.setData(ClipboardData(text: sb.toString().trim()));
+                      } catch (_) {}
+                      if (context.mounted) {
+                        Navigator.of(ctx).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.t('specs_copied')),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    label: Text(l10n.t('copy_specs')),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildSpecRow(ThemeData theme, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1851,6 +2204,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Expanded(
           child: Text(
             value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

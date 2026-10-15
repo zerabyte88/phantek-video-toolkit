@@ -12,6 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import '../models/app_settings.dart';
 import '../models/encoding_options.dart';
 import '../models/video_info.dart';
+import 'device_spec_helper.dart';
+import 'settings_service.dart';
 
 class FFmpegService {
   /// Probe a video file and return its info.
@@ -277,13 +279,11 @@ class FFmpegService {
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Threads argument (calibrated for mobile ARM big.LITTLE processors to prevent thermal throttling)
-    final totalCores = Platform.numberOfProcessors > 0
-        ? Platform.numberOfProcessors
-        : 8;
-    final effectiveThreads = appSettings.cpuThreads > 0
-        ? appSettings.cpuThreads
-        : (totalCores > 4 ? totalCores - 2 : totalCores).clamp(1, 6);
+    // Threads argument (calibrated dynamically for hardware, RAM, and video resolution)
+    final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
+      video: sourceVideo,
+      requestedThreads: appSettings.cpuThreads,
+    );
 
     // FPS filter
     String fpsFilter = '';
@@ -449,6 +449,22 @@ class FFmpegService {
       container: encodingOptions.container,
     );
 
+    final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
+      video: sourceVideo,
+      requestedThreads: appSettings.cpuThreads,
+    );
+    final is4K = sourceVideo.width >= 3840 ||
+        sourceVideo.height >= 2160 ||
+        (sourceVideo.width >= 2160 && sourceVideo.height >= 3840);
+
+    // Save job marker for LMK crash recovery
+    await SettingsService().saveJobMarker(
+      inputPath: sourceVideo.filePath,
+      outputPath: outputPath,
+      allocatedThreads: effectiveThreads,
+      is4K: is4K,
+    );
+
     // Calculate target dimensions for logging and metadata
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
@@ -531,6 +547,9 @@ class FFmpegService {
     final session = await completer.future;
     final returnCode = await session.getReturnCode();
 
+    // Clear job marker upon normal execution finish
+    await SettingsService().clearJobMarker();
+
     if (ReturnCode.isSuccess(returnCode)) {
       onLog('\nEncoding completed successfully!');
       return outputPath;
@@ -607,13 +626,24 @@ class FFmpegService {
       }
     }
 
+    final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
+      video: sourceVideo,
+      requestedThreads: appSettings.cpuThreads,
+    );
+
+    // Save job marker for LMK crash recovery
+    await SettingsService().saveJobMarker(
+      inputPath: sourceVideo.filePath,
+      outputPath: outputPath,
+      allocatedThreads: effectiveThreads,
+      is4K: false,
+    );
+
     final arguments = <String>[
       '-i',
       sourceVideo.filePath,
-      if (appSettings.cpuThreads > 0) ...[
-        '-threads',
-        '${appSettings.cpuThreads}',
-      ],
+      '-threads',
+      '$effectiveThreads',
       '-vn',
       '-sn',
       '-dn',
@@ -664,6 +694,9 @@ class FFmpegService {
     final session = await completer.future;
     final returnCode = await session.getReturnCode();
 
+    // Clear job marker upon finish
+    await SettingsService().clearJobMarker();
+
     if (ReturnCode.isSuccess(returnCode)) {
       onProgress(1.0, 'Completed');
       return outputPath;
@@ -687,6 +720,15 @@ class FFmpegService {
       }
       return null;
     }
+  }
+
+  /// Checks whether an FFmpeg log indicates an Out-Of-Memory (OOM) error.
+  static bool isOomLog(String log) {
+    final lower = log.toLowerCase();
+    return lower.contains('cannot allocate memory') ||
+        lower.contains('out of memory') ||
+        lower.contains('failed to allocate memory') ||
+        lower.contains('malloc of size');
   }
 
   /// Cancel any running FFmpeg execution.

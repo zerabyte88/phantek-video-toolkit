@@ -45,10 +45,16 @@ class _ThemeAnimatedBackgroundState extends State<ThemeAnimatedBackground>
       );
     }
 
+    final initialTheme = SettingsService().settings.themeMode;
+    final isStatic = initialTheme == 'oled_pure' || initialTheme == 'light_clean';
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 12),
-    )..repeat();
+    );
+    if (!isStatic) {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -65,22 +71,35 @@ class _ThemeAnimatedBackgroundState extends State<ThemeAnimatedBackground>
       listenable: Listenable.merge([_controller, settingsService]),
       builder: (context, _) {
         final themeMode = settingsService.settings.themeMode;
+        final isStatic = themeMode == 'oled_pure' || themeMode == 'light_clean';
+
+        if (isStatic) {
+          if (_controller.isAnimating) {
+            _controller.stop();
+          }
+        } else {
+          if (!_controller.isAnimating) {
+            _controller.repeat();
+          }
+        }
+
         final theme = Theme.of(context);
 
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Ambient animated custom canvas
-            RepaintBoundary(
-              child: CustomPaint(
-                painter: _ThemeBackgroundPainter(
-                  themeMode: themeMode,
-                  theme: theme,
-                  progress: _controller.value,
-                  particles: _particles,
+            // Ambient animated custom canvas (only active in dynamic/animated themes)
+            if (!isStatic)
+              RepaintBoundary(
+                child: CustomPaint(
+                  painter: _ThemeBackgroundPainter(
+                    themeMode: themeMode,
+                    theme: theme,
+                    progress: _controller.value,
+                    particles: _particles,
+                  ),
                 ),
               ),
-            ),
             // Screen content
             widget.child,
           ],
@@ -132,6 +151,10 @@ class _ThemeBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
+
+    if (themeMode == 'oled_pure' || themeMode == 'light_clean') {
+      return;
+    }
 
     final paint = Paint()..style = PaintingStyle.fill;
 

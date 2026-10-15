@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_downscaler/services/settings_service.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
 import 'package:video_downscaler/widgets/conversion_options_card.dart';
+import 'package:video_downscaler/widgets/theme_animated_background.dart';
 
 const supportedUiCodes = [
   'id',
@@ -68,6 +69,24 @@ const supportedCodes = [
 ];
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMessageHandler(
+      'dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle',
+      (ByteData? message) async {
+        return const StandardMessageCodec().encodeMessage(<Object?>[null]);
+      },
+    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall methodCall) async {
+        return null;
+      },
+    );
+  });
+
   group('Localization tests', () {
     test('All requested UI languages are available in supportedLanguages without duplicates', () {
       final codes = AppLocalizations.supportedLanguages
@@ -1511,5 +1530,769 @@ void main() {
       },
     );
   });
+
+  group('Adaptive CPU Thread Allocation & Crash Recovery tests', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    const video1080 = VideoInfo(
+      filePath: '/test/video1080.mp4',
+      fileName: 'video1080.mp4',
+      width: 1920,
+      height: 1080,
+      durationSeconds: 10.0,
+      bitrate: 4000000,
+      fps: 30.0,
+      codec: 'h264',
+      fileSizeBytes: 5000000,
+    );
+
+    const video4K = VideoInfo(
+      filePath: '/test/video4k.mp4',
+      fileName: 'video4k.mp4',
+      width: 3840,
+      height: 2160,
+      durationSeconds: 10.0,
+      bitrate: 15000000,
+      fps: 30.0,
+      codec: 'h264',
+      fileSizeBytes: 20000000,
+    );
+
+    test('DeviceSpecHelper.maxSafeThreadCount returns proper thresholds based on RAM', () {
+      expect(DeviceSpecHelper.maxSafeThreadCount(3072, 8), equals(4)); // 3GB -> 4
+      expect(DeviceSpecHelper.maxSafeThreadCount(4096, 8), equals(4)); // 4GB -> 4
+      expect(DeviceSpecHelper.maxSafeThreadCount(6144, 8), equals(6)); // 6GB -> 6
+      expect(DeviceSpecHelper.maxSafeThreadCount(8192, 8), equals(8)); // 8GB on 8 cores -> 8
+      expect(DeviceSpecHelper.maxSafeThreadCount(8192, 6), equals(6)); // 8GB on 6 cores -> 6
+    });
+
+    test('DeviceSpecHelper.isEntryOrLegacySoc distinguishes legacy chips from modern mid-range', () {
+      // Modern Mid-Range / Upper: should return false
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio G70'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio G85'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio G99'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio G100'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 660'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 662'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 665'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 675'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 680'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 695 5G'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 732G'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Dimensity 7050'), isFalse);
+
+      // Legacy Snapdragon / Helio entry / Unisoc: should return true
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 625'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 636'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 460'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio P35 / G35'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio G25'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Unisoc T606'), isTrue);
+    });
+
+    test('DeviceSpecHelper.resolveThreadCount allocates cores adaptively for RAM, SoC, and 4K resolution', () {
+      // 1. RAM <= 4GB: 4 cores baseline, discounted to 3 cores on 4K video
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 4096,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 680',
+        ),
+        equals(4),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video4K,
+          customRamMb: 4096,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 680',
+        ),
+        equals(3), // Discounted by 1 for 4K stability
+      );
+
+      // 2. RAM 4GB with mid-range SoC (e.g. SD 732G RAM 4GB): allocates 4 cores (RAM protection holds)
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 4096,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 732G',
+        ),
+        equals(4),
+      );
+
+      // 3. RAM 6GB Mid-Range (Helio G99, SD 665, Helio G85): 6 cores baseline, discounted to 5 cores on 4K
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'MediaTek Helio G99',
+        ),
+        equals(6),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 665',
+        ),
+        equals(6),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'MediaTek Helio G85',
+        ),
+        equals(6),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video4K,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'MediaTek Helio G99',
+        ),
+        equals(5),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video4K,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 665',
+        ),
+        equals(5),
+      );
+
+      // 4. RAM >= 8GB Flagship (Snapdragon 8 Gen 2): 8 cores baseline, discounted to 7 on 4K
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 8192,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 8 Gen 2',
+        ),
+        equals(8),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video4K,
+          customRamMb: 8192,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 8 Gen 2',
+        ),
+        equals(7),
+      );
+
+      // 5. Manual selection: always respected and never secretly discounted
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video4K,
+          requestedThreads: 6,
+          customRamMb: 4096,
+          customPhysicalCores: 8,
+        ),
+        equals(6), // Respected!
+      );
+
+      // 6. Manual selection clamped to physical cores
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          requestedThreads: 8,
+          customPhysicalCores: 6,
+        ),
+        equals(6), // Clamped to 6 physical cores
+      );
+    });
+
+    test('FFmpegService.isOomLog correctly identifies out-of-memory logs', () {
+      expect(FFmpegService.isOomLog('Error: Cannot allocate memory'), isTrue);
+      expect(FFmpegService.isOomLog('fatal: Out of memory in x264_frame_new'), isTrue);
+      expect(FFmpegService.isOomLog('av_malloc of size 10485760 failed'), isTrue);
+      expect(FFmpegService.isOomLog('libx264 failed to allocate memory for lookahead'), isTrue);
+      expect(FFmpegService.isOomLog('frame=  120 fps= 24 q=28.0 size=    1024kB time=00:00:05.00 bitrate=1677.7kbits/s speed=1.2x'), isFalse);
+    });
+
+    test('SettingsService job marker persists, retrieves, and clears correctly', () async {
+      final service = SettingsService();
+      await service.clearJobMarker();
+      expect(await service.getJobMarker(), isNull);
+
+      await service.saveJobMarker(
+        inputPath: '/test/source.mp4',
+        outputPath: '/test/out.mp4',
+        allocatedThreads: 4,
+        is4K: true,
+        retryCount: 0,
+      );
+
+      final marker = await service.getJobMarker();
+      expect(marker, isNotNull);
+      expect(marker!['inputPath'], equals('/test/source.mp4'));
+      expect(marker['outputPath'], equals('/test/out.mp4'));
+      expect(marker['allocatedThreads'], equals(4));
+      expect(marker['is4K'], isTrue);
+
+      await service.clearJobMarker();
+      expect(await service.getJobMarker(), isNull);
+    });
+
+    testWidgets('SettingsScreen displays Auto baseline badge and recommendations', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final service = SettingsService();
+      await service.init();
+      await service.setCpuThreads(0); // Auto mode
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.getTheme('dark'),
+          home: const SettingsScreen(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final l10n = service.l10n;
+      final autoBaseline = DeviceSpecHelper.resolveThreadCount(requestedThreads: 0);
+
+      // Verify header badge displays Auto (X Core)
+      expect(find.text('${l10n.t('badge_auto')} ($autoBaseline ${l10n.t('unit_core')})'), findsOneWidget);
+      // Verify subtitle is visible under badge
+      expect(find.text(l10n.t('settings_cpu_auto_subtitle')), findsOneWidget);
+      // Verify Auto chip is visible
+      expect(find.widgetWithText(ChoiceChip, l10n.t('badge_auto')), findsOneWidget);
+      // Verify recommended chip exists
+      expect(
+        find.widgetWithText(
+          ChoiceChip,
+          '$autoBaseline ${l10n.t('unit_core')} (${l10n.t('chip_recommended')})',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('ConversionOptionsCard displays 4K stability note when video is 4K in Auto mode', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final service = SettingsService();
+      await service.init();
+      await service.setCpuThreads(0); // Auto mode
+
+      final l10n = service.l10n;
+      final resolved = DeviceSpecHelper.resolveThreadCount(video: video4K, requestedThreads: 0);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.getTheme('dark'),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: video4K,
+                resolutions: VideoResolution.standardResolutions,
+                selectedResolution: VideoResolution.standardResolutions.first,
+                encodingOptions: const EncodingOptions(),
+                onResolutionChanged: (_) {},
+                onOptionsChanged: (_) {},
+                l10n: l10n,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify 4K stability note is rendered
+      expect(
+        find.text(l10n.t('auto_runtime_4k', args: {'count': resolved.toString()})),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('SoC Normalization, Description, and Device Specs UI tests', () {
+    test('DeviceSpecHelper.cleanSocDisplayName strips vendor prefixes and legal text cleanly', () {
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('Qualcomm Snapdragon 8 Elite'),
+        equals('Snapdragon 8 Elite'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('Qualcomm Technologies, Inc Snapdragon 8 Gen 3'),
+        equals('Snapdragon 8 Gen 3'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('MediaTek Dimensity 9400'),
+        equals('Dimensity 9400'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('MediaTek Helio G99 / G100'),
+        equals('Helio G99 / G100'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('Google Tensor G4'),
+        equals('Tensor G4'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('Samsung Exynos 2400 (TM)'),
+        equals('Exynos 2400'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('Unisoc T606'),
+        equals('T606'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName('mt6768'),
+        equals('mt6768'),
+      );
+      expect(
+        DeviceSpecHelper.cleanSocDisplayName(''),
+        equals(''),
+      );
+    });
+
+    test('DeviceSpecHelper.describeSoc returns structured SocDescription with accurate precision', () {
+      // 1. Precise SoC
+      final precise = DeviceSpecHelper.describeSoc(
+        socModel: 'sm8750',
+        hardware: 'qcom',
+        manufacturer: 'Xiaomi',
+        physicalCores: 8,
+      );
+      expect(precise.isPrecise, isTrue);
+      expect(precise.displayName, equals('Snapdragon 8 Elite'));
+      expect(precise.coreCount, equals(8));
+
+      // 2. Unmapped platform code
+      final platformCode = DeviceSpecHelper.describeSoc(
+        hardware: 'mt67999',
+        physicalCores: 8,
+      );
+      expect(platformCode.isPrecise, isFalse);
+      expect(platformCode.displayName, equals('mt67999'));
+      expect(platformCode.coreCount, equals(8));
+
+      // 3. Pure generic/non-informative
+      final generic = DeviceSpecHelper.describeSoc(
+        hardware: 'qcom',
+        physicalCores: 8,
+      );
+      expect(generic.isPrecise, isFalse);
+      expect(generic.displayName, isEmpty);
+      expect(generic.coreCount, equals(8));
+
+      // 4. Unknown/Empty
+      final empty = DeviceSpecHelper.describeSoc(
+        hardware: 'unknown',
+        physicalCores: 8,
+      );
+      expect(empty.isPrecise, isFalse);
+      expect(empty.displayName, isEmpty);
+    });
+
+    test('New CPU spec detail translations exist across all supported languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('device_cpu_generic').isNotEmpty, isTrue, reason: 'device_cpu_generic missing in $code');
+        expect(l10n.t('device_cpu_detail_title').isNotEmpty, isTrue, reason: 'device_cpu_detail_title missing in $code');
+        expect(l10n.t('copy_specs').isNotEmpty, isTrue, reason: 'copy_specs missing in $code');
+        expect(l10n.t('specs_copied').isNotEmpty, isTrue, reason: 'specs_copied missing in $code');
+        expect(l10n.t('cores_detected').isNotEmpty, isTrue, reason: 'cores_detected missing in $code');
+      }
+    });
+
+    testWidgets('SettingsScreen CPU row displays clean name without (X Core), opens bottom sheet on tap, and copies specs', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+      final l10n = service.l10n;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.getTheme('dark'),
+          home: const SettingsScreen(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 1. Verify CPU row exists and does not contain "(8 Core)" or similar
+      expect(find.text(l10n.t('device_cpu')), findsOneWidget);
+      expect(find.byIcon(Icons.info_outline_rounded), findsWidgets);
+
+      // 2. Tap on the CPU row to open bottom sheet
+      await tester.tap(find.text(l10n.t('device_cpu')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 3. Bottom sheet should be visible with title and Copy button
+      expect(find.text(l10n.t('device_cpu_detail_title')), findsOneWidget);
+      expect(find.text(l10n.t('copy_specs')), findsOneWidget);
+
+      // 4. Tap "Copy Details"
+      await tester.tap(find.text(l10n.t('copy_specs')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 5. SnackBar appears
+      expect(find.text(l10n.t('specs_copied')), findsOneWidget);
+    });
+
+    testWidgets('Device specs card and CPU row layout handles large text scaling and 360dp width without overflow', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+      final l10n = service.l10n;
+
+      final longSoc = DeviceSpecHelper.describeSoc(
+        socModel: 'MediaTek Dimensity 9600 Pro Extreme Ultimate Max Plus Edition',
+        hardware: 'mt6999',
+        manufacturer: 'MediaTek Technologies, Inc.',
+        brand: 'MediaTek',
+        physicalCores: 8,
+      );
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2.0)),
+          child: MaterialApp(
+            theme: AppTheme.getTheme('dark'),
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Builder(
+                  builder: (context) {
+                    final theme = Theme.of(context);
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // CPU Row with very long commercial SoC
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 105,
+                              child: Text(
+                                l10n.t('device_cpu'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.colorScheme.onSurface.withAlpha(140),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                longSoc.displayName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.info_outline_rounded,
+                              size: 14,
+                              color: theme.colorScheme.primary.withAlpha(150),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
+    });
+  });
+
+  group('Pure AMOLED and Clean Light Static Theme tests', () {
+    test('AppTheme generates valid themes for oled_pure and light_clean', () {
+      final oledPure = AppTheme.getTheme('oled_pure');
+      expect(oledPure.brightness, equals(Brightness.dark));
+      expect(oledPure.scaffoldBackgroundColor, equals(Colors.black));
+
+      final lightClean = AppTheme.getTheme('light_clean');
+      expect(lightClean.brightness, equals(Brightness.light));
+      expect(lightClean.scaffoldBackgroundColor, equals(const Color(0xFFF8FAFC)));
+    });
+
+    test('All 22 languages have valid translations for new static themes and badge', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('theme_oled_pure').isNotEmpty, isTrue, reason: 'theme_oled_pure missing in $code');
+        expect(l10n.t('theme_oled_pure_desc').isNotEmpty, isTrue, reason: 'theme_oled_pure_desc missing in $code');
+        expect(l10n.t('theme_light_clean').isNotEmpty, isTrue, reason: 'theme_light_clean missing in $code');
+        expect(l10n.t('theme_light_clean_desc').isNotEmpty, isTrue, reason: 'theme_light_clean_desc missing in $code');
+        expect(l10n.t('badge_static').isNotEmpty, isTrue, reason: 'badge_static missing in $code');
+      }
+    });
+
+    testWidgets('ThemeAnimatedBackground stops ticker and bypasses canvas for static themes', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+
+      // 1. Start on oled_pure (static)
+      await service.setThemeMode('oled_pure');
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.getTheme(service.settings.themeMode),
+          home: const ThemeAnimatedBackground(
+            child: Scaffold(
+              body: Center(child: Text('Content')),
+            ),
+          ),
+        ),
+      );
+      // Because oled_pure is static, pumpAndSettle completes without timing out!
+      await tester.pumpAndSettle();
+      expect(find.text('Content'), findsOneWidget);
+
+      // 2. Switch to light_clean (static)
+      await service.setThemeMode('light_clean');
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.getTheme(service.settings.themeMode),
+          home: const ThemeAnimatedBackground(
+            child: Scaffold(
+              body: Center(child: Text('Content')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Content'), findsOneWidget);
+
+      // 3. Reset back to dark
+      await service.setThemeMode('dark');
+    });
+  });
+
+  group('Comprehensive ARM 64-bit SoC & GPU Detection tests', () {
+    test('HiSilicon Kirin SoCs and Maleoon/Mali GPUs are accurately identified', () {
+      // Flagships
+      final k9020 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi36c0',
+        board: 'hi36c0',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k9020, equals('HiSilicon Kirin 9020'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi36c0', board: 'hi36c0', socName: k9020), equals('Maleoon 920'));
+
+      final k9010 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi36a0',
+        board: 'hi36a0',
+        manufacturer: 'HUAWEI',
+        socModel: 'hi36a0v121',
+      );
+      expect(k9010, equals('HiSilicon Kirin 9010'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi36a0', board: 'hi36a0', socName: k9010), equals('Maleoon 910'));
+
+      final k9000s = DeviceSpecHelper.detectSocName(
+        hardware: 'hi36a0',
+        board: 'hi36a0',
+        manufacturer: 'HUAWEI',
+        socModel: 'hi36a0v120 kirin9000s',
+      );
+      expect(k9000s, equals('HiSilicon Kirin 9000S'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi36a0', board: 'hi36a0', socName: k9000s), equals('Maleoon 910'));
+
+      final k9000 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi36a0',
+        board: 'hi36a0',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k9000, equals('HiSilicon Kirin 9000 / 9000E'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi36a0', board: 'hi36a0', socName: k9000), equals('Mali-G78 MP24'));
+
+      final k990 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi3690',
+        board: 'hi3690',
+        manufacturer: 'HUAWEI',
+        socModel: 'hi3690-5g',
+      );
+      expect(k990, equals('HiSilicon Kirin 990 5G'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi3690', board: 'hi3690', socName: k990), equals('Mali-G76 MP16'));
+
+      final k980 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi3680',
+        board: 'hi3680',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k980, equals('HiSilicon Kirin 980'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi3680', board: 'hi3680', socName: k980), equals('Mali-G76 MP10'));
+
+      // Mid-Range & Legacy 64-bit Kirin
+      final k8000 = DeviceSpecHelper.detectSocName(
+        hardware: 'kirin 8000',
+        board: 'kirin8000',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k8000, equals('HiSilicon Kirin 8000'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: '', board: '', socName: k8000), equals('Mali-G610'));
+
+      final k710 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi6260',
+        board: 'hi6260',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k710, equals('HiSilicon Kirin 710 / 710F'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi6260', board: 'hi6260', socName: k710), equals('Mali-G51 MP4'));
+
+      final k620 = DeviceSpecHelper.detectSocName(
+        hardware: 'hi6210',
+        board: 'hi6210',
+        manufacturer: 'HUAWEI',
+      );
+      expect(k620, equals('HiSilicon Kirin 620'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'hi6210', board: 'hi6210', socName: k620), equals('Mali-450 MP4'));
+    });
+
+    test('Xiaomi XRING and Surge in-house SoCs are accurately identified', () {
+      final xringO3 = DeviceSpecHelper.detectSocName(
+        hardware: 'xring o3',
+        board: 'xring_o3',
+        manufacturer: 'Xiaomi',
+      );
+      expect(xringO3, equals('Xiaomi XRING O3'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: '', board: '', socName: xringO3), equals('Immortalis-G925+'));
+
+      final xringO1 = DeviceSpecHelper.detectSocName(
+        hardware: 'xring o1',
+        board: 'xring_o1',
+        manufacturer: 'Xiaomi',
+      );
+      expect(xringO1, equals('Xiaomi XRING O1'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: '', board: '', socName: xringO1), equals('Immortalis-G925 MC16'));
+
+      final surge = DeviceSpecHelper.detectSocName(
+        hardware: 'v670',
+        board: 'pinecone',
+        manufacturer: 'Xiaomi',
+      );
+      expect(surge, equals('Xiaomi Surge S1'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'v670', board: 'pinecone', socName: surge), equals('Mali-T860 MP4'));
+    });
+
+    test('JLQ Technology (Poco C40) SoC is accurately identified', () {
+      final jlq = DeviceSpecHelper.detectSocName(
+        hardware: 'jr510',
+        board: 'jr510',
+        manufacturer: 'Xiaomi',
+        socModel: 'jlq jr510',
+      );
+      expect(jlq, equals('JLQ JR510'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'jr510', board: 'jr510', socName: jlq), equals('Mali-G57 MC1'));
+    });
+
+    test('Expanded 64-bit SoCs across Snapdragon, Dimensity, Helio, and Exynos are identified', () {
+      // Snapdragon 810 (MSM8994) & 410 (MSM8916)
+      final sd810 = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'msm8994',
+        manufacturer: 'Qualcomm',
+      );
+      expect(sd810, equals('Qualcomm Snapdragon 810'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: '', board: 'msm8994', socName: sd810), equals('Adreno 430'));
+
+      final sd410 = DeviceSpecHelper.detectSocName(
+        hardware: 'qcom',
+        board: 'msm8916',
+        manufacturer: 'Qualcomm',
+      );
+      expect(sd410, equals('Qualcomm Snapdragon 410'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: '', board: 'msm8916', socName: sd410), equals('Adreno 306'));
+
+      // Helio P60 (MT6771) & Helio X30 (MT6799)
+      final p60 = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6771',
+        board: 'mt6771',
+        manufacturer: 'MediaTek',
+      );
+      expect(p60, equals('MediaTek Helio P60 / P70'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'mt6771', board: 'mt6771', socName: p60), equals('Mali-G72 MP3'));
+
+      final x30 = DeviceSpecHelper.detectSocName(
+        hardware: 'mt6799',
+        board: 'mt6799',
+        manufacturer: 'MediaTek',
+      );
+      expect(x30, equals('MediaTek Helio X30'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'mt6799', board: 'mt6799', socName: x30), equals('PowerVR Series7XT Plus'));
+
+      // Exynos 8895 (Galaxy S8)
+      final ex8895 = DeviceSpecHelper.detectSocName(
+        hardware: 'universal8895',
+        board: 'universal8895',
+        manufacturer: 'Samsung',
+      );
+      expect(ex8895, equals('Samsung Exynos 8895'));
+      expect(DeviceSpecHelper.detectGpuName(hardware: 'universal8895', board: 'universal8895', socName: ex8895), equals('Mali-G71 MP20'));
+    });
+
+    test('cleanSocDisplayName strips HiSilicon, Xiaomi, and JLQ brand prefixes cleanly', () {
+      expect(DeviceSpecHelper.cleanSocDisplayName('HiSilicon Kirin 9010'), equals('Kirin 9010'));
+      expect(DeviceSpecHelper.cleanSocDisplayName('Huawei Kirin 9000S'), equals('Kirin 9000S'));
+      expect(DeviceSpecHelper.cleanSocDisplayName('Xiaomi XRING O1'), equals('XRING O1'));
+      expect(DeviceSpecHelper.cleanSocDisplayName('Xiaomi Surge S1'), equals('Surge S1'));
+      expect(DeviceSpecHelper.cleanSocDisplayName('JLQ Technology JR510'), equals('JR510'));
+      expect(DeviceSpecHelper.cleanSocDisplayName('JLQ JR510'), equals('JR510'));
+    });
+
+    test('isEntryOrLegacySoc categorizes entry chips to 4 threads and flagships to full threads', () {
+      // Entry & legacy chips -> true (capped at 4 threads)
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'HiSilicon Kirin 710'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'HiSilicon Kirin 620'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'JLQ JR510'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 410'), isTrue);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Helio P60'), isTrue);
+
+      // Flagships -> false (allowed up to 8 threads on 8GB+ RAM)
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'HiSilicon Kirin 9000S'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'HiSilicon Kirin 9010'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Xiaomi XRING O1'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'Qualcomm Snapdragon 8 Elite'), isFalse);
+      expect(DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Dimensity 9400'), isFalse);
+    });
+  });
 }
+
+
 

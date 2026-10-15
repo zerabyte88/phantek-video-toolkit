@@ -50,6 +50,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   bool _isSuccess = false;
   String? _outputPath;
   String? _errorMessage;
+  bool _isOom = false;
   late AnimationController _pulseController;
 
   DateTime? _startTime;
@@ -246,9 +247,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         final totalCores = Platform.numberOfProcessors > 0
             ? Platform.numberOfProcessors
             : 8;
-        final threads = widget.appSettings.cpuThreads > 0
-            ? widget.appSettings.cpuThreads
-            : totalCores;
+        final threads = DeviceSpecHelper.resolveThreadCount(
+          video: widget.videoInfo,
+          requestedThreads: widget.appSettings.cpuThreads,
+        );
 
         final realCpu = DeviceSpecHelper.getProcessCpuUsagePercent();
         int cpuPercent = 0;
@@ -353,6 +355,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     void handleLog(String log) {
       if (mounted) {
+        if (FFmpegService.isOomLog(log)) {
+          _isOom = true;
+        }
         if (log.contains('Encoding failed:') ||
             log.contains('Extraction failed:') ||
             log.toLowerCase().contains('error')) {
@@ -725,12 +730,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
   /// Live System Telemetry Cards: Processor Load (Left), RAM Allocation (Middle), and Disk Write (Right)
   Widget _buildLiveSystemTelemetry(ThemeData theme, l10n) {
-    final totalCores = Platform.numberOfProcessors > 0
-        ? Platform.numberOfProcessors
-        : 8;
-    final threads = widget.appSettings.cpuThreads > 0
-        ? widget.appSettings.cpuThreads
-        : totalCores;
+    final threads = DeviceSpecHelper.resolveThreadCount(
+      video: widget.videoInfo,
+      requestedThreads: widget.appSettings.cpuThreads,
+    );
 
     return Row(
       children: [
@@ -1346,8 +1349,53 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ],
       );
     } else {
+      final resolvedThreads = DeviceSpecHelper.resolveThreadCount(
+        video: widget.videoInfo,
+        requestedThreads: widget.appSettings.cpuThreads,
+      );
+      final retryThreads = (resolvedThreads - 1).clamp(1, 8);
+
       return Column(
         children: [
+          if (_isOom) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.amber.withAlpha(25),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.amber.withAlpha(120),
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.memory_rounded,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.t(
+                        'recovery_desc',
+                        args: {'cores': retryThreads.toString()},
+                      ),
+                      style: const TextStyle(
+                        color: Colors.amber,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
             Container(
               width: double.infinity,
@@ -1412,19 +1460,32 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _isProcessing = true;
-                      _progress = 0;
-                      _statusText = l10n.t('proc_preparing');
-                      _speedText = '';
-                      _currentSizeText = '';
-                      _errorMessage = null;
-                    });
-                    _startProcessing();
+                  onPressed: () async {
+                    if (_isOom) {
+                      await _settingsService.setCpuThreads(retryThreads);
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _isProcessing = true;
+                        _progress = 0;
+                        _statusText = l10n.t('proc_preparing');
+                        _speedText = '';
+                        _currentSizeText = '';
+                        _errorMessage = null;
+                        _isOom = false;
+                      });
+                      _startProcessing();
+                    }
                   },
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: Text(l10n.t('proc_retry')),
+                  label: Text(
+                    _isOom
+                        ? l10n.t(
+                            'recovery_retry',
+                            args: {'cores': retryThreads.toString()},
+                          )
+                        : l10n.t('proc_retry'),
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
