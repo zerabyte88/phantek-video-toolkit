@@ -32,7 +32,7 @@ class FFmpegService {
       int width = videoStream.getWidth() ?? 0;
       int height = videoStream.getHeight() ?? 0;
 
-      // Check for rotation in stream tags
+      // Rotation metadata
       final tags = videoStream.getAllProperties()?['tags'];
       if (tags != null && tags is Map) {
         final rotate = tags['rotate'];
@@ -43,15 +43,15 @@ class FFmpegService {
         }
       }
 
-      // Parse duration
+      // Duration
       final durationStr = info.getDuration();
       final duration = double.tryParse(durationStr ?? '0') ?? 0;
 
-      // Parse bitrate
+      // Bitrate
       final bitrateStr = info.getBitrate();
       final bitrate = int.tryParse(bitrateStr ?? '0') ?? 0;
 
-      // Parse FPS
+      // Framerate
       double fps = 30.0;
       final fpsStr = videoStream.getRealFrameRate();
       if (fpsStr != null && fpsStr.contains('/')) {
@@ -63,10 +63,10 @@ class FFmpegService {
         fps = double.tryParse(fpsStr) ?? 30.0;
       }
 
-      // Get codec
+      // Video codec
       final codec = videoStream.getCodec() ?? 'unknown';
 
-      // Parse audio stream info
+      // Audio stream
       final audioStreams = streams
           .where((s) => s.getType() == 'audio')
           .toList();
@@ -90,7 +90,7 @@ class FFmpegService {
         }
       }
 
-      // Get file size
+      // File size
       final file = File(filePath);
       final fileSize = await file.length();
 
@@ -129,7 +129,7 @@ class FFmpegService {
         }
         return customDir;
       } catch (_) {
-        // Fallback to default directory
+        // Default fallback directory
       }
     }
 
@@ -144,7 +144,7 @@ class FFmpegService {
         }
         return targetDir;
       } catch (e) {
-        // Fallback for devices with different mount points or restricted paths
+        // System fallback directory
         try {
           final extDirs = await getExternalStorageDirectories(
             type: isAudio ? StorageDirectory.music : StorageDirectory.movies,
@@ -179,8 +179,7 @@ class FFmpegService {
     }
   }
 
-  /// Generates a unique output file path in [outputDir] to avoid collisions.
-  /// If `base-res.ext` exists, appends an incremental number: `base-res-2.ext`, `base-res-3.ext`, etc.
+  /// Generates a unique, non-colliding output path in [outputDir].
   static Future<String> generateUniqueOutputPath({
     required Directory outputDir,
     required String fileName,
@@ -216,7 +215,7 @@ class FFmpegService {
     }
   }
 
-  /// Generates a unique output file path in [outputDir] for audio extraction.
+  /// Generates a unique audio output path in [outputDir].
   static Future<String> generateUniqueAudioOutputPath({
     required Directory outputDir,
     required String fileName,
@@ -245,8 +244,7 @@ class FFmpegService {
     }
   }
 
-  /// Construct tokenized FFmpeg CLI arguments for video transcoding/downscaling.
-  /// Pure method without side-effects, allowing deterministic unit testing.
+  /// Constructs tokenized FFmpeg CLI arguments.
   static List<String> buildVideoArguments({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
@@ -254,11 +252,11 @@ class FFmpegService {
     required AppSettings appSettings,
     required String outputPath,
   }) {
-    // Calculate target dimensions (must be even numbers)
+    // Target dimensions
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
 
-    // Handle portrait videos: if source is portrait, swap target dimensions
+    // Swap target dimensions for portrait source
     if (sourceVideo.height > sourceVideo.width) {
       targetW = targetResolution.height;
       targetH = targetResolution.width;
@@ -269,24 +267,22 @@ class FFmpegService {
     final targetAspect = targetW / (targetH > 0 ? targetH : 1);
 
     if (sourceAspect > targetAspect) {
-      // Source is wider, limit by width
       targetH = (targetW / sourceAspect).round();
     } else {
-      // Source is taller, limit by height
       targetW = (targetH * sourceAspect).round();
     }
 
-    // Ensure even dimensions for encoder requirements
+    // Ensure even dimensions
     targetW = (targetW ~/ 2) * 2;
     targetH = (targetH ~/ 2) * 2;
 
-    // Threads argument (calibrated dynamically for hardware, RAM, and video resolution)
+    // Thread count
     final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
       video: sourceVideo,
       requestedThreads: appSettings.cpuThreads,
     );
 
-    // FPS filter
+    // Framerate filter
     String fpsFilter = '';
     if (encodingOptions.targetFps > 0) {
       fpsFilter = 'fps=fps=${encodingOptions.targetFps},';
@@ -295,7 +291,7 @@ class FFmpegService {
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
 
-    // Check eligibility for Smart Stream Copy (Lossless Passthrough)
+    // Stream copy eligibility check
     final isSourceH264 =
         sourceVideo.codec.toLowerCase().contains('h264') ||
         sourceVideo.codec.toLowerCase().contains('avc');
@@ -307,7 +303,7 @@ class FFmpegService {
     String vfFilter = '';
     List<String> codecArgs = [];
 
-    // ─── Smart Audio Passthrough Rules (Q3) ──────────────────────────────────
+    // Audio passthrough rules
     final List<String> audioArgs;
     if (!sourceVideo.hasAudio || appSettings.audioBitrateKbps <= 0) {
       audioArgs = ['-an'];
@@ -320,9 +316,8 @@ class FFmpegService {
       final sourceAudioBitrate = sourceVideo.audioBitrateKbps;
       final maxAllowedBitrate = (appSettings.audioBitrateKbps * 1.1).round();
 
-      // Smart passthrough rules (Q3):
-      // - Output MP4: only copy if AAC, channels <= 2, and source bitrate <= target * 1.1
-      // - Output MKV in stream copy: copy passthrough
+      // Audio passthrough conditions:
+      // MP4: AAC, <= 2 channels, bitrate <= target * 1.1; MKV: direct passthrough
       final canCopyAudio =
           (isTargetMp4 &&
               isSourceAac &&
@@ -346,10 +341,10 @@ class FFmpegService {
     }
 
     if (isStreamCopy) {
-      // ─── Smart Stream Copy Pipeline (Lossless Passthrough) ────────────────
+      // Stream copy pipeline
       codecArgs = ['-c:v', 'copy'];
     } else {
-      // ─── Software Encoding Pipeline (libx264 CPU with SpeedPreset) ────────
+      // Transcoding pipeline
       final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
         targetWidth: targetW,
         targetHeight: targetH,
@@ -381,7 +376,6 @@ class FFmpegService {
           vfFilter = 'format=yuv420p';
         }
       } else {
-        // targetW and targetH are already guaranteed even numbers computed by Dart
         vfFilter =
             '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
@@ -401,7 +395,7 @@ class FFmpegService {
       ];
     }
 
-    // Container specific flags
+    // Container flags
     final List<String> containerFlags = [];
     if (encodingOptions.container == VideoContainer.mp4 ||
         encodingOptions.container == VideoContainer.mov) {
@@ -428,9 +422,7 @@ class FFmpegService {
     ];
   }
 
-  /// Transcode and downscale a video to a target resolution.
-  /// [onProgress] reports progress from 0.0 to 1.0.
-  /// Returns the output file path on success, null on failure.
+  /// Transcodes and downscales video to target resolution.
   static Future<String?> processVideo({
     required VideoInfo sourceVideo,
     required VideoResolution targetResolution,
@@ -460,7 +452,7 @@ class FFmpegService {
         sourceVideo.height >= 2160 ||
         (sourceVideo.width >= 2160 && sourceVideo.height >= 3840);
 
-    // Save job marker for LMK crash recovery
+    // Save job marker for recovery
     await SettingsService().saveJobMarker(
       inputPath: sourceVideo.filePath,
       outputPath: outputPath,
@@ -468,7 +460,7 @@ class FFmpegService {
       is4K: is4K,
     );
 
-    // Calculate target dimensions for logging and metadata
+    // Target dimensions for metadata
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
     if (sourceVideo.height > sourceVideo.width) {
@@ -550,7 +542,7 @@ class FFmpegService {
     final session = await completer.future;
     final returnCode = await session.getReturnCode();
 
-    // Clear job marker upon normal execution finish
+    // Clear job marker on completion
     await SettingsService().clearJobMarker();
 
     if (ReturnCode.isSuccess(returnCode)) {
@@ -578,8 +570,7 @@ class FFmpegService {
     }
   }
 
-  /// Extract audio from a video file into MP3, M4A, or WAV format.
-  /// If [audioBitrateKbps] is 0, uses stream copy where applicable or high-quality encode.
+  /// Extracts audio from a video file into MP3, M4A, or WAV format.
   static Future<String?> extractAudio({
     required VideoInfo sourceVideo,
     required AudioFormat audioFormat,
@@ -634,7 +625,7 @@ class FFmpegService {
       requestedThreads: appSettings.cpuThreads,
     );
 
-    // Save job marker for LMK crash recovery
+    // Save job marker for recovery
     await SettingsService().saveJobMarker(
       inputPath: sourceVideo.filePath,
       outputPath: outputPath,
@@ -697,7 +688,7 @@ class FFmpegService {
     final session = await completer.future;
     final returnCode = await session.getReturnCode();
 
-    // Clear job marker upon finish
+    // Clear job marker on completion
     await SettingsService().clearJobMarker();
 
     if (ReturnCode.isSuccess(returnCode)) {
@@ -725,7 +716,7 @@ class FFmpegService {
     }
   }
 
-  /// Checks whether an FFmpeg log indicates an Out-Of-Memory (OOM) error.
+  /// Checks whether an FFmpeg log indicates an OOM abort.
   static bool isOomLog(String log) {
     final lower = log.toLowerCase();
     return lower.contains('cannot allocate memory') ||
@@ -734,7 +725,7 @@ class FFmpegService {
         lower.contains('malloc of size');
   }
 
-  /// Cancel any running FFmpeg execution.
+  /// Cancels active FFmpeg execution.
   static Future<void> cancelAll() async {
     await FFmpegKit.cancel();
   }

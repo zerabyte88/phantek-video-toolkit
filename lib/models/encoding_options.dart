@@ -169,13 +169,12 @@ class EncodingOptions {
   final int crfValue;
   final int customBitrateKbps;
 
-  // Target FPS (0 means original)
+  // Target FPS (0: original)
   final int targetFps;
 
   // Audio extraction
   final AudioFormat audioFormat;
-  final int
-  audioExtractBitrateKbps; // 0 for copy original stream, or 128, 192, 256, 320
+  final int audioExtractBitrateKbps; // 0 for stream copy, or target kbps
 
   /// Convenience alias for [crfValue].
   int get crf => crfValue;
@@ -185,7 +184,7 @@ class EncodingOptions {
     this.container = VideoContainer.mp4,
     this.rateControlMode = RateControlMode.crf,
     this.speedPreset = SpeedPreset.normal,
-    this.crfValue = 22, // Default for x264 software encoding (Normal)
+    this.crfValue = 22,
     this.customBitrateKbps = 6000,
     this.targetFps = 0,
     this.audioFormat = AudioFormat.mp3,
@@ -217,8 +216,7 @@ class EncodingOptions {
     );
   }
 
-  /// Calculates target video bitrate in kbps based on target resolution, CRF/Bitrate mode,
-  /// and source video metadata.
+  /// Estimates target video bitrate in kbps.
   int calculateTargetBitrateKbps({
     required int targetWidth,
     required int targetHeight,
@@ -230,28 +228,27 @@ class EncodingOptions {
       return customBitrateKbps;
     }
 
-    // For CRF mode, calculate baseline bitrate based on target resolution
+    // Baseline bitrate by target resolution
     final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
-    double baseMbps = 4.5; // High-quality 1080p baseline (~4.5 Mbps)
+    double baseMbps = 4.5;
     if (maxDim >= 2560) {
-      baseMbps = 8.5; // 2K/1440p
+      baseMbps = 8.5;
     } else if (maxDim >= 1920) {
-      baseMbps = 4.5; // 1080p
+      baseMbps = 4.5;
     } else if (maxDim >= 1280) {
-      baseMbps = 2.5; // 720p
+      baseMbps = 2.5;
     } else if (maxDim >= 854) {
-      baseMbps = 1.3; // 480p
+      baseMbps = 1.3;
     } else {
-      baseMbps = 0.8; // 360p
+      baseMbps = 0.8;
     }
 
-    // Every +6 CRF roughly halves the bitrate; every -6 roughly doubles it
+    // Scale factor: ±6 CRF halves or doubles bitrate
     final diff = crfValue - 20;
     final factor = diff / 6.0;
     double estimatedBitrateMbps = baseMbps * math.pow(0.5, factor);
 
-    // If source video bitrate is known and lower than the calculated target,
-    // don't unnecessarily upscale the bitrate beyond the source
+    // Avoid upscaling bitrate beyond source video
     if (sourceBitrateBps > 0) {
       final sourceKbps = sourceBitrateBps ~/ 1000;
       if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {

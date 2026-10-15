@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/settings_service.dart';
 
-/// A sleek AppBar title widget wrapped in a dynamic animated border and themed icon
-/// that matches the selected app theme (Dark, OLED, Light, AMOLED Sakura).
+/// AppBar title widget
 class AnimatedFlameTitle extends StatefulWidget {
   final String title;
 
@@ -19,64 +18,64 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  // 1. Snowfall: Winter Village Night & Crystalline Snow
+  // Snowfall
   static const _darkColors = [
-    Color(0xFF38BDF8), // Ice Sky Blue
-    Color(0xFFCFF0FF), // Crystalline Snow
-    Color(0xFFBAE6FD), // Soft Glacial Blue
-    Color(0xFFFDE047), // Warm Cabin Glow
-    Color(0xFF0284C7), // Deep Winter Slate
-    Color(0xFF38BDF8), // Back to Ice Sky Blue
+    Color(0xFF38BDF8),
+    Color(0xFFCFF0FF),
+    Color(0xFFBAE6FD),
+    Color(0xFFFDE047),
+    Color(0xFF0284C7),
+    Color(0xFF38BDF8),
   ];
 
-  // 2. Dark OLED: Glowing Moon, Twinkling Stars & Shooting Meteors
+  // Midnight
   static const _oledColors = [
-    Color(0xFFE2E8F0), // Lunar Silver
-    Color(0xFF818CF8), // Cosmic Starlight Violet
-    Color(0xFF6366F1), // Deep Night Indigo
-    Color(0xFFFDE68A), // Pale Moonlight Gold
-    Color(0xFF38BDF8), // Electric Starlight Blue
-    Color(0xFFE2E8F0), // Back to Lunar Silver
+    Color(0xFFE2E8F0),
+    Color(0xFF818CF8),
+    Color(0xFF6366F1),
+    Color(0xFFFDE68A),
+    Color(0xFF38BDF8),
+    Color(0xFFE2E8F0),
   ];
 
-  // 3. Light Mode: Warm Sunbeams & Daylight Sky
+  // Daylight
   static const _lightColors = [
-    Color(0xFFF59E0B), // Warm Sun Amber
-    Color(0xFFFBBF24), // Bright Daylight Gold
-    Color(0xFF0284C7), // Sky Azure
-    Color(0xFF38BDF8), // Light Cyan Breeze
-    Color(0xFFEA580C), // Radiant Sunburst Orange
-    Color(0xFFF59E0B), // Back to Warm Sun Amber
+    Color(0xFFF59E0B),
+    Color(0xFFFBBF24),
+    Color(0xFF0284C7),
+    Color(0xFF38BDF8),
+    Color(0xFFEA580C),
+    Color(0xFFF59E0B),
   ];
 
-  // 4. AMOLED Sakura: Cherry Blossom & Blooming Branches
+  // Sakura
   static const _sakuraColors = [
-    Color(0xFFFF69B4), // Hot Pink
-    Color(0xFFFFB7C5), // Cherry Blossom Pink
-    Color(0xFFF472B6), // Pink 400
-    Color(0xFFFDA4AF), // Rose 300
-    Color(0xFFFF1493), // Deep Cherry Pink
-    Color(0xFFFF69B4), // Back to Hot Pink
+    Color(0xFFFF69B4),
+    Color(0xFFFFB7C5),
+    Color(0xFFF472B6),
+    Color(0xFFFDA4AF),
+    Color(0xFFFF1493),
+    Color(0xFFFF69B4),
   ];
 
-  // 5. Pure AMOLED: Pitch Black & Pure Sapphire Blue Accents
+  // Pure AMOLED
   static const _oledPureColors = [
-    Color(0xFF60A5FA), // Blue 400
-    Color(0xFF93C5FD), // Blue 300
-    Color(0xFF3B82F6), // Blue 500
-    Color(0xFFBFDBFE), // Pale Lunar Blue
-    Color(0xFF1D4ED8), // Deep Sapphire
-    Color(0xFF60A5FA), // Back to Blue 400
+    Color(0xFF60A5FA),
+    Color(0xFF93C5FD),
+    Color(0xFF3B82F6),
+    Color(0xFFBFDBFE),
+    Color(0xFF1D4ED8),
+    Color(0xFF60A5FA),
   ];
 
-  // 6. Clean Light: Crisp Azure & Fresh Daylight Sky
+  // Clean Light
   static const _lightCleanColors = [
-    Color(0xFF0EA5E9), // Sky 500
-    Color(0xFF38BDF8), // Sky 400
-    Color(0xFF7DD3FC), // Sky 300
-    Color(0xFFBAE6FD), // Sky 200
-    Color(0xFF0284C7), // Sky 600
-    Color(0xFF0EA5E9), // Back to Sky 500
+    Color(0xFF0EA5E9),
+    Color(0xFF38BDF8),
+    Color(0xFF7DD3FC),
+    Color(0xFFBAE6FD),
+    Color(0xFF0284C7),
+    Color(0xFF0EA5E9),
   ];
 
   @override
@@ -110,8 +109,8 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
         Color? iconColor;
 
         switch (mode) {
-          case 'sakura':
           case 'oled_sakura':
+          case 'sakura':
             activeColors = _sakuraColors;
             activeIcon = Icons.local_florist_rounded;
             iconColor = Color.lerp(
@@ -130,6 +129,7 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
+          case 'oled_midnight':
           case 'oled':
             activeColors = _oledColors;
             activeIcon = Icons.nightlight_round;
@@ -158,6 +158,7 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
+          case 'oled_snowfall':
           case 'dark':
           default:
             activeColors = _darkColors;
@@ -218,7 +219,7 @@ class _FlameBorderPainter extends CustomPainter {
     final rect = Offset.zero & size;
     final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(18));
 
-    // 1. Fiery outer glow
+    // Outer glow
     final glowPaint = Paint()
       ..shader = SweepGradient(
         colors: colors.map((c) => c.withAlpha(120)).toList(),
@@ -230,7 +231,7 @@ class _FlameBorderPainter extends CustomPainter {
 
     canvas.drawRRect(rrect, glowPaint);
 
-    // 2. Sharp vibrant fiery core border
+    // Core border
     final borderPaint = Paint()
       ..shader = SweepGradient(
         colors: colors,

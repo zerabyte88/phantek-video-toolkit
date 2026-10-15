@@ -1,39 +1,37 @@
 import 'package:flutter/material.dart';
 
-/// Professional, human-designed theme system for Phantek - Video Toolkit.
-/// Avoids stereotypical "AI-generated" neon purples and glowing borders,
-/// adhering to clean Material 3 and modern native platform aesthetics.
 class AppTheme {
-  // Sophisticated, trusted Tech Royal Blue / Indigo accent
-  static const _primaryColor = Color(0xFF2563EB); // Modern Cobalt Blue
-  static const _secondaryColor = Color(0xFF0284C7); // Sky Accent
+  static const _primaryColor = Color(0xFF2563EB);
+  static const _secondaryColor = Color(0xFF0284C7);
 
   static ThemeData getTheme(String mode, {double cardOpacity = 1.0}) {
     switch (mode) {
-      case 'sakura':
       case 'oled_sakura':
+      case 'sakura':
         return buildSakuraTheme(cardOpacity: cardOpacity);
       case 'oled_pure':
       case 'pure_oled':
+      case 'oled_midnight':
       case 'oled':
         return buildOledTheme(cardOpacity: cardOpacity);
       case 'light_clean':
       case 'clean_light':
       case 'light':
         return buildLightTheme(cardOpacity: cardOpacity);
+      case 'oled_snowfall':
       case 'dark':
       default:
         return buildDarkTheme(cardOpacity: cardOpacity);
     }
   }
 
-  /// AMOLED Sakura theme getter
+  /// Sakura theme getter
   static ThemeData get sakuraTheme => buildSakuraTheme();
 
-  /// AMOLED Sakura theme builder (Pitch Black with Cherry Blossom Pink Accents)
+  /// Sakura theme builder
   static ThemeData buildSakuraTheme({double cardOpacity = 1.0}) {
-    const sakuraPrimary = Color(0xFFF472B6); // Sakura Pink
-    const sakuraSecondary = Color(0xFFFDA4AF); // Rose Quartz / Cherry Accent
+    const sakuraPrimary = Color(0xFFF472B6);
+    const sakuraSecondary = Color(0xFFFDA4AF);
     const scaffoldBg = Colors.black;
     const surfaceBg = Color(0xFF140D13);
     const outlineColor = Color(0xFF381525);
@@ -187,16 +185,16 @@ class AppTheme {
     );
   }
 
-  /// Modern Slate Dark theme getter
+  /// Snowfall theme getter
   static ThemeData get darkTheme => buildDarkTheme();
 
-  /// AMOLED Snowfall theme builder (Pitch Black with Deep Frost Slate Accents)
+  /// Snowfall theme builder
   static ThemeData buildDarkTheme({double cardOpacity = 1.0}) {
-    const scaffoldBg = Colors.black; // Pitch Black AMOLED
-    const surfaceBg = Color(0xFF0C1322); // Deep Frost Night
-    const outlineColor = Color(0xFF1E293B); // Crystalline Frost Slate
-    const textPrimary = Color(0xFFF8FAFC); // Slate 50
-    const textSecondary = Color(0xFF94A3B8); // Slate 400
+    const scaffoldBg = Colors.black;
+    const surfaceBg = Color(0xFF0C1322);
+    const outlineColor = Color(0xFF1E293B);
+    const textPrimary = Color(0xFFF8FAFC);
+    const textSecondary = Color(0xFF94A3B8);
 
     final effectiveSurface = cardOpacity < 1.0
         ? surfaceBg.withAlpha(
@@ -345,14 +343,14 @@ class AppTheme {
     );
   }
 
-  /// Pure Pitch Black OLED theme getter
+  /// Pure OLED theme getter
   static ThemeData get oledTheme => buildOledTheme();
 
-  /// Pure Pitch Black OLED theme builder for AMOLED displays
+  /// Pure OLED theme builder
   static ThemeData buildOledTheme({double cardOpacity = 1.0}) {
     const scaffoldBg = Colors.black;
     const surfaceBg = Color(0xFF121214);
-    const outlineColor = Color(0xFF27272A); // Zinc 800
+    const outlineColor = Color(0xFF27272A);
     const textPrimary = Color(0xFFFAFAFA);
     const textSecondary = Color(0xFFA1A1AA);
 
@@ -503,16 +501,16 @@ class AppTheme {
     );
   }
 
-  /// Clean, crisp Light theme getter
+  /// Light theme getter
   static ThemeData get lightTheme => buildLightTheme();
 
-  /// Clean, crisp Light theme builder
+  /// Light theme builder
   static ThemeData buildLightTheme({double cardOpacity = 1.0}) {
-    const scaffoldBg = Color(0xFFF8FAFC); // Slate 50
-    const surfaceBg = Color(0xFFFFFFFF); // Pure White
-    const outlineColor = Color(0xFFE2E8F0); // Slate 200
-    const textPrimary = Color(0xFF0F172A); // Slate 900
-    const textSecondary = Color(0xFF475569); // Slate 600
+    const scaffoldBg = Color(0xFFF8FAFC);
+    const surfaceBg = Color(0xFFFFFFFF);
+    const outlineColor = Color(0xFFE2E8F0);
+    const textPrimary = Color(0xFF0F172A);
+    const textSecondary = Color(0xFF475569);
 
     final effectiveSurface = cardOpacity < 1.0
         ? surfaceBg.withAlpha(

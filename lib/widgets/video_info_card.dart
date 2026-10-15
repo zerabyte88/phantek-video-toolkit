@@ -19,7 +19,7 @@ class VideoInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row: Media icon + filename + badges
+          // Header
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -82,7 +82,7 @@ class VideoInfoCard extends StatelessWidget {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 14),
 
-          // Metadata spec grid: 4 columns or 2x2
+          // Metadata grid
           _buildSpecsGrid(l10n, theme),
         ],
       ),

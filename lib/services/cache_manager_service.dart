@@ -9,12 +9,12 @@ class CacheManagerService {
   factory CacheManagerService() => _instance;
   CacheManagerService._internal();
 
-  /// Calculates total temporary and picker cache size in bytes.
+  /// Total temporary cache size in bytes.
   Future<int> getCacheSizeBytes() async {
     int totalBytes = 0;
 
     try {
-      // 1. Temporary directory (context.cacheDir on Android)
+      // Internal cache
       final tempDir = await getTemporaryDirectory();
       if (await tempDir.exists()) {
         totalBytes += await _getDirSize(tempDir);
@@ -24,7 +24,7 @@ class CacheManagerService {
     }
 
     try {
-      // 2. External cache directories (if any on Android)
+      // External cache
       final extCacheDirs = await getExternalCacheDirectories();
       if (extCacheDirs != null) {
         for (final dir in extCacheDirs) {
@@ -58,7 +58,7 @@ class CacheManagerService {
     return size;
   }
 
-  /// Formats bytes into a human-readable string (e.g. 1.25 GB, 450 MB, 0 B).
+  /// Formats byte counts into human-readable strings.
   static String formatBytes(int bytes) {
     if (bytes <= 0) return '0 B';
     if (bytes >= 1073741824) {
@@ -73,11 +73,11 @@ class CacheManagerService {
     return '$bytes B';
   }
 
-  /// Cleans all temporary cache files, picker cache, and optionally a specific input file.
+  /// Cleans cache files and optionally a specific input file.
   Future<int> clearAllCache({String? specificInputPath}) async {
     int bytesFreed = 0;
 
-    // 1. Delete specific input file if it is in cache/temp
+    // Specific input file
     if (specificInputPath != null && isCachedPath(specificInputPath)) {
       try {
         final f = File(specificInputPath);
@@ -94,14 +94,14 @@ class CacheManagerService {
       }
     }
 
-    // 2. Clear native FilePicker temporary files
+    // Native FilePicker temp files
     try {
       await FilePicker.clearTemporaryFiles();
     } catch (e) {
       debugPrint('FilePicker.clearTemporaryFiles error: $e');
     }
 
-    // 3. Clear temporary directory contents
+    // Internal cache files
     try {
       final tempDir = await getTemporaryDirectory();
       if (await tempDir.exists()) {
@@ -125,7 +125,7 @@ class CacheManagerService {
       debugPrint('Error clearing tempDir: $e');
     }
 
-    // 4. Clear external cache directories
+    // External cache files
     try {
       final extCacheDirs = await getExternalCacheDirectories();
       if (extCacheDirs != null) {
@@ -155,7 +155,7 @@ class CacheManagerService {
     return bytesFreed;
   }
 
-  /// Checks if a file path is located inside cache, temporary, or file_picker directory.
+  /// Returns true if [filePath] resides in a cache or temp directory.
   bool isCachedPath(String path) {
     final lower = path.toLowerCase().replaceAll('\\', '/');
     return lower.contains('/cache/') ||

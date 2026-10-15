@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../services/settings_service.dart';
 
-/// Highly-optimized, battery-friendly ambient background animator
-/// that renders dynamic visuals matching the active app theme with
-/// 100% continuous, seamlessly looping particle & celestial dynamics.
 class ThemeAnimatedBackground extends StatefulWidget {
   final Widget child;
 
@@ -89,7 +86,7 @@ class _ThemeAnimatedBackgroundState extends State<ThemeAnimatedBackground>
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Ambient animated custom canvas (only active in dynamic/animated themes)
+            // Ambient animated custom canvas (only active in animated themes)
             if (!isStatic)
               RepaintBoundary(
                 child: CustomPaint(
@@ -164,12 +161,14 @@ class _ThemeBackgroundPainter extends CustomPainter {
       case 'oled_sakura':
         _paintSakuraWithBranches(canvas, size, paint);
         break;
+      case 'oled_midnight':
       case 'oled':
         _paintMoonMeteors(canvas, size, paint);
         break;
       case 'light':
         _paintLightDaylight(canvas, size, paint);
         break;
+      case 'oled_snowfall':
       case 'dark':
       default:
         _paintSnowfallVillage(canvas, size, paint);
@@ -177,11 +176,9 @@ class _ThemeBackgroundPainter extends CustomPainter {
     }
   }
 
-  // =========================================================================
-  // 1. SNOWFALL MODE: WINTER VILLAGE NIGHT & WARM CABIN GLOW
-  // =========================================================================
+  // Snowfall
   void _paintSnowfallVillage(Canvas canvas, Size size, Paint paint) {
-    // A. Distant Snow Hill (Background rolling slope)
+    // Distant hill
     final backHillPath = Path();
     final backHillBaseY = size.height * 0.83;
     backHillPath.moveTo(0, backHillBaseY + 14);
@@ -193,9 +190,12 @@ class _ThemeBackgroundPainter extends CustomPainter {
       size.width,
       backHillBaseY - 12,
     );
-    backHillPath.lineTo(size.width, size.height);
-    backHillPath.lineTo(0, size.height);
-    backHillPath.close();
+
+    // Fill path
+    final backHillFill = Path.from(backHillPath)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
 
     final backHillPaint = Paint()
       ..shader = LinearGradient(
@@ -206,30 +206,59 @@ class _ThemeBackgroundPainter extends CustomPainter {
           Colors.black.withAlpha(240),
         ],
       ).createShader(Offset.zero & size);
-    canvas.drawPath(backHillPath, backHillPaint);
+    canvas.drawPath(backHillFill, backHillPaint);
 
-    // Distant Snow Cap on back hill
+    // Snow cap
     final backHillSnowPaint = Paint()
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke
       ..color = const Color(0xFF94A3B8).withAlpha(55);
     canvas.drawPath(backHillPath, backHillSnowPaint);
 
-    // Pine trees on distant slope
+    // Distant pines
     _drawSnowyPine(
       canvas,
-      Offset(size.width * 0.08, backHillBaseY + 10),
+      Offset(size.width * 0.07, backHillBaseY + 10),
       22,
       38,
+      isDistant: true,
     );
     _drawSnowyPine(
       canvas,
-      Offset(size.width * 0.52, backHillBaseY + 16),
+      Offset(size.width * 0.40, backHillBaseY + 18),
+      20,
+      34,
+      isDistant: true,
+    );
+    _drawSnowyPine(
+      canvas,
+      Offset(size.width * 0.90, backHillBaseY - 14),
       24,
       40,
+      isDistant: true,
     );
 
-    // B. Foreground Village Hill (Main layer)
+    // Distant cabins
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.20, backHillBaseY + 6),
+      22.0,
+      20.0,
+      chimneyXOffset: 4,
+      hasChimney: true,
+      isDistant: true,
+    );
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.64, backHillBaseY + 18),
+      24.0,
+      22.0,
+      chimneyXOffset: -5,
+      hasChimney: true,
+      isDistant: true,
+    );
+
+    // Foreground hill
     final hillPath = Path();
     final hillBaseY = size.height * 0.88;
     hillPath.moveTo(0, hillBaseY - 10);
@@ -241,9 +270,12 @@ class _ThemeBackgroundPainter extends CustomPainter {
       size.width,
       hillBaseY + 8,
     );
-    hillPath.lineTo(size.width, size.height);
-    hillPath.lineTo(0, size.height);
-    hillPath.close();
+
+    // Fill path
+    final hillFill = Path.from(hillPath)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
 
     final hillPaint = Paint()
       ..shader = LinearGradient(
@@ -251,9 +283,9 @@ class _ThemeBackgroundPainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: [const Color(0xFF0C1322).withAlpha(220), Colors.black],
       ).createShader(Offset.zero & size);
-    canvas.drawPath(hillPath, hillPaint);
+    canvas.drawPath(hillFill, hillPaint);
 
-    // Crisp Snow Ridge Crest along main hill
+    // Snow ridge
     final snowRidgePaint = Paint()
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke
@@ -266,22 +298,44 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawPath(hillPath, snowRidgePaint);
 
-    // Pine trees on foreground slope
-    _drawSnowyPine(canvas, Offset(size.width * 0.38, hillBaseY + 12), 18, 30);
-    _drawSnowyPine(canvas, Offset(size.width * 0.92, hillBaseY - 4), 20, 34);
+    // Foreground pines
+    _drawSnowyPine(canvas, Offset(size.width * 0.04, hillBaseY - 8), 22, 36);
+    _drawSnowyPine(canvas, Offset(size.width * 0.34, hillBaseY + 14), 20, 32);
+    _drawSnowyPine(canvas, Offset(size.width * 0.60, hillBaseY - 14), 22, 35);
+    _drawSnowyPine(canvas, Offset(size.width * 0.95, hillBaseY - 2), 24, 38);
 
-    // C. Village Cabins with warm glowing windows & chimney smoke
-    // Cabin 1: Left slope (cozy cottage)
+    // Village cabins
+    // Cabin 1
     _drawSnowyCabin(
       canvas,
-      Offset(size.width * 0.22, hillBaseY + 6),
+      Offset(size.width * 0.16, hillBaseY + 6),
       34.0,
       30.0,
-      chimneyXOffset: 8,
+      chimneyXOffset: -7,
       hasChimney: true,
     );
 
-    // Cabin 2: Right slope (main village cabin)
+    // Cabin 2
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.25, hillBaseY + 12),
+      28.0,
+      25.0,
+      chimneyXOffset: 5,
+      hasChimney: true,
+    );
+
+    // Cabin 3
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.46, hillBaseY + 22),
+      32.0,
+      28.0,
+      chimneyXOffset: 6,
+      hasChimney: true,
+    );
+
+    // Cabin 4
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.74, hillBaseY - 18),
@@ -291,7 +345,17 @@ class _ThemeBackgroundPainter extends CustomPainter {
       hasChimney: true,
     );
 
-    // D. Falling Snowflakes in crystalline #CFF0FF
+    // Cabin 5
+    _drawSnowyCabin(
+      canvas,
+      Offset(size.width * 0.84, hillBaseY - 10),
+      30.0,
+      26.0,
+      chimneyXOffset: 5,
+      hasChimney: true,
+    );
+
+    // Snowflakes
     final snowBaseColor = const Color(0xFFCFF0FF);
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
@@ -307,7 +371,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       final alpha = ((50 + 190 * edgeFade) * edgeFade).toInt().clamp(0, 255);
 
       if (p.variant == 0) {
-        // Crystal cross snowflake for prominent flakes
         final rot = progress * 2 * math.pi * p.rotCycles + p.phase;
         canvas.save();
         canvas.translate(xPos, yPos);
@@ -326,13 +389,11 @@ class _ThemeBackgroundPainter extends CustomPainter {
         canvas.drawLine(Offset(-diag, diag), Offset(diag, -diag), flakePaint);
         canvas.restore();
       } else if (p.variant == 1) {
-        // Frosty soft snowflake with halo
         paint.color = snowBaseColor.withAlpha((alpha * 0.35).toInt());
         canvas.drawCircle(Offset(xPos, yPos), p.size * 0.9, paint);
         paint.color = snowBaseColor.withAlpha(alpha);
         canvas.drawCircle(Offset(xPos, yPos), p.size * 0.45, paint);
       } else {
-        // Crisp snow crystal dot
         paint.color = snowBaseColor.withAlpha(alpha);
         canvas.drawCircle(
           Offset(xPos, yPos),
@@ -343,7 +404,13 @@ class _ThemeBackgroundPainter extends CustomPainter {
     }
   }
 
-  void _drawSnowyPine(Canvas canvas, Offset base, double width, double height) {
+  void _drawSnowyPine(
+    Canvas canvas,
+    Offset base,
+    double width,
+    double height, {
+    bool isDistant = false,
+  }) {
     final trunkHeight = height * 0.22;
     final trunkWidth = width * 0.18;
     final trunkRect = Rect.fromCenter(
@@ -351,7 +418,27 @@ class _ThemeBackgroundPainter extends CustomPainter {
       width: trunkWidth,
       height: trunkHeight,
     );
-    canvas.drawRect(trunkRect, Paint()..color = const Color(0xFF1E293B));
+    // Trunk
+    canvas.drawRect(
+      trunkRect,
+      Paint()
+        ..color = isDistant
+            ? const Color(0xFF2C1E18).withAlpha(180)
+            : const Color(0xFF3E2723),
+    );
+
+    // Foliage layers
+    final tierColors = isDistant
+        ? [
+            const Color(0xFF0F291E).withAlpha(190),
+            const Color(0xFF143628).withAlpha(200),
+            const Color(0xFF194432).withAlpha(210),
+          ]
+        : [
+            const Color(0xFF143628), // Deep base pine
+            const Color(0xFF1B4332), // Rich evergreen green
+            const Color(0xFF22543D), // Vibrant pine crown
+          ];
 
     for (int tier = 0; tier < 3; tier++) {
       final tierBottom = base.dy - trunkHeight * 0.8 - (tier * height * 0.26);
@@ -364,11 +451,9 @@ class _ThemeBackgroundPainter extends CustomPainter {
       foliagePath.lineTo(base.dx - tierW / 2, tierBottom);
       foliagePath.close();
 
-      canvas.drawPath(
-        foliagePath,
-        Paint()..color = const Color(0xFF0F172A).withAlpha(240),
-      );
+      canvas.drawPath(foliagePath, Paint()..color = tierColors[tier]);
 
+      // Branch snow
       final snowPath = Path();
       snowPath.moveTo(base.dx - tierW / 2, tierBottom);
       snowPath.quadraticBezierTo(
@@ -380,9 +465,11 @@ class _ThemeBackgroundPainter extends CustomPainter {
       canvas.drawPath(
         snowPath,
         Paint()
-          ..strokeWidth = 2.0
+          ..strokeWidth = isDistant ? 1.4 : 2.0
           ..style = PaintingStyle.stroke
-          ..color = const Color(0xFFCFF0FF).withAlpha(180),
+          ..color = isDistant
+              ? const Color(0xFFCFF0FF).withAlpha(120)
+              : const Color(0xFFCFF0FF).withAlpha(190),
       );
     }
   }
@@ -394,6 +481,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
     double height, {
     required double chimneyXOffset,
     required bool hasChimney,
+    bool isDistant = false,
   }) {
     final bodyHeight = height * 0.58;
     final bodyRect = Rect.fromLTWH(
@@ -402,9 +490,29 @@ class _ThemeBackgroundPainter extends CustomPainter {
       width,
       bodyHeight,
     );
-    canvas.drawRect(bodyRect, Paint()..color = const Color(0xFF1E293B));
 
-    // Warm golden glowing window
+    // Cabin wall
+    final wallColor = isDistant
+        ? const Color(0xFF1A2230).withAlpha(190)
+        : const Color(0xFF27211D); // Warm dark medieval wood
+    canvas.drawRect(bodyRect, Paint()..color = wallColor);
+
+    // Timber frame
+    if (!isDistant && width >= 26) {
+      final timberPaint = Paint()
+        ..color = const Color(0xFF16120F)
+        ..strokeWidth = 1.2
+        ..style = PaintingStyle.stroke;
+
+      canvas.drawRect(bodyRect, timberPaint);
+      canvas.drawLine(
+        Offset(base.dx, base.dy - bodyHeight),
+        Offset(base.dx, base.dy),
+        timberPaint,
+      );
+    }
+
+    // Window glow
     final winW = width * 0.32;
     final winH = bodyHeight * 0.44;
     final winRect = Rect.fromCenter(
@@ -413,45 +521,51 @@ class _ThemeBackgroundPainter extends CustomPainter {
       height: winH,
     );
 
-    // Window warm ambient halo glow
     final windowGlowPulse =
         (math.sin(progress * 2 * math.pi + base.dx) + 1) / 2;
+    final haloRadius = isDistant ? winW * 1.3 : winW * 1.8;
+    final haloAlpha = isDistant
+        ? (55 + 20 * windowGlowPulse).toInt()
+        : (90 + 35 * windowGlowPulse).toInt();
+
     final haloPaint = Paint()
       ..shader =
           RadialGradient(
             colors: [
-              const Color(0xFFFDE047)
-                  .withAlpha((90 + 35 * windowGlowPulse).toInt()),
-              const Color(0xFFFEF08A).withAlpha(25),
+              const Color(0xFFFDE047).withAlpha(haloAlpha),
+              const Color(0xFFFEF08A).withAlpha(isDistant ? 12 : 25),
               Colors.transparent,
             ],
             stops: const [0.0, 0.55, 1.0],
           ).createShader(
-            Rect.fromCircle(center: winRect.center, radius: winW * 1.8),
+            Rect.fromCircle(center: winRect.center, radius: haloRadius),
           );
-    canvas.drawCircle(winRect.center, winW * 1.8, haloPaint);
+    canvas.drawCircle(winRect.center, haloRadius, haloPaint);
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(winRect, const Radius.circular(2)),
-      Paint()..color = const Color(0xFFFDE047).withAlpha(235),
+      Paint()..color = const Color(0xFFFDE047).withAlpha(isDistant ? 180 : 235),
     );
 
-    final framePaint = Paint()
-      ..color = const Color(0xFF0F172A)
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-      Offset(winRect.left, winRect.center.dy),
-      Offset(winRect.right, winRect.center.dy),
-      framePaint,
-    );
-    canvas.drawLine(
-      Offset(winRect.center.dx, winRect.top),
-      Offset(winRect.center.dx, winRect.bottom),
-      framePaint,
-    );
+    // Window frame
+    if (!isDistant) {
+      final framePaint = Paint()
+        ..color = const Color(0xFF16120F)
+        ..strokeWidth = 1.1
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(
+        Offset(winRect.left, winRect.center.dy),
+        Offset(winRect.right, winRect.center.dy),
+        framePaint,
+      );
+      canvas.drawLine(
+        Offset(winRect.center.dx, winRect.top),
+        Offset(winRect.center.dx, winRect.bottom),
+        framePaint,
+      );
+    }
 
-    // Chimney & rising smoke
+    // Chimney
     if (hasChimney) {
       final chW = width * 0.16;
       final chH = height * 0.34;
@@ -459,10 +573,9 @@ class _ThemeBackgroundPainter extends CustomPainter {
       final chY = base.dy - bodyHeight - height * 0.22;
       canvas.drawRect(
         Rect.fromLTWH(chX - chW / 2, chY, chW, chH),
-        Paint()..color = const Color(0xFF0F172A),
+        Paint()..color = const Color(0xFF1E293B), // Stone chimney
       );
 
-      // Chimney snow cap
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTWH(chX - chW * 0.65, chY - 2, chW * 1.3, 3),
@@ -471,16 +584,22 @@ class _ThemeBackgroundPainter extends CustomPainter {
         Paint()..color = const Color(0xFFCFF0FF),
       );
 
-      // Drifting chimney smoke puffs
+      // Smoke puffs
       for (int s = 0; s < 4; s++) {
         final smokeProgress = (progress + s * 0.25) % 1.0;
-        final smokeY = chY - smokeProgress * 42.0;
+        final smokeY = chY - smokeProgress * (isDistant ? 26.0 : 42.0);
         final smokeSway =
-            math.sin(smokeProgress * math.pi * 3 + s) * 6.0 +
-            (smokeProgress * 7.0);
+            math.sin(smokeProgress * math.pi * 3 + s) *
+                (isDistant ? 3.5 : 6.0) +
+            (smokeProgress * (isDistant ? 4.0 : 7.0));
         final smokeX = chX + smokeSway;
-        final smokeRadius = 2.4 + smokeProgress * 6.5;
-        final smokeAlpha = ((1.0 - smokeProgress) * 75).toInt().clamp(0, 255);
+        final smokeRadius =
+            (isDistant ? 1.6 : 2.4) + smokeProgress * (isDistant ? 3.8 : 6.5);
+        final maxAlpha = isDistant ? 45 : 75;
+        final smokeAlpha = ((1.0 - smokeProgress) * maxAlpha).toInt().clamp(
+          0,
+          255,
+        );
 
         canvas.drawCircle(
           Offset(smokeX, smokeY),
@@ -490,18 +609,25 @@ class _ThemeBackgroundPainter extends CustomPainter {
       }
     }
 
-    // Snow-covered gable roof
+    // Roof
     final roofPeak = Offset(base.dx, base.dy - height);
-    final roofLeft = Offset(base.dx - width * 0.64, base.dy - bodyHeight + 2);
-    final roofRight = Offset(base.dx + width * 0.64, base.dy - bodyHeight + 2);
+    final roofLeft = Offset(base.dx - width * 0.68, base.dy - bodyHeight + 2);
+    final roofRight = Offset(base.dx + width * 0.68, base.dy - bodyHeight + 2);
 
     final roofPath = Path();
     roofPath.moveTo(roofPeak.dx, roofPeak.dy);
     roofPath.lineTo(roofRight.dx, roofRight.dy);
     roofPath.lineTo(roofLeft.dx, roofLeft.dy);
     roofPath.close();
-    canvas.drawPath(roofPath, Paint()..color = const Color(0xFF0F172A));
+    canvas.drawPath(
+      roofPath,
+      Paint()
+        ..color = isDistant
+            ? const Color(0xFF0F172A).withAlpha(200)
+            : const Color(0xFF1E1712),
+    );
 
+    // Roof snow
     final snowRoofPath = Path();
     snowRoofPath.moveTo(roofPeak.dx, roofPeak.dy - 3);
     snowRoofPath.lineTo(roofRight.dx + 2, roofRight.dy - 1);
@@ -513,19 +639,19 @@ class _ThemeBackgroundPainter extends CustomPainter {
 
     canvas.drawPath(
       snowRoofPath,
-      Paint()..color = const Color(0xFFCFF0FF).withAlpha(240),
+      Paint()
+        ..color = isDistant
+            ? const Color(0xFFCFF0FF).withAlpha(180)
+            : const Color(0xFFCFF0FF).withAlpha(240),
     );
   }
 
-  // =========================================================================
-  // 2. DARK OLED: GLOWING MOON, TWINKLING STARS & SHOOTING METEORS
-  // =========================================================================
+  // Midnight
   void _paintMoonMeteors(Canvas canvas, Size size, Paint paint) {
-    // A. Glowing Moon in the upper celestial sky
+    // Moon
     final moonCenter = Offset(size.width * 0.83, 72.0);
     final moonPulse = (math.sin(progress * 2 * math.pi) + 1) / 2;
 
-    // Ethereal Moon Halo
     final haloRadius = 44.0 + moonPulse * 4.0;
     final haloPaint = Paint()
       ..shader = RadialGradient(
@@ -538,7 +664,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: moonCenter, radius: haloRadius));
     canvas.drawCircle(moonCenter, haloRadius, haloPaint);
 
-    // Crescent Moon Disc
     const moonRadius = 16.5;
     final moonDiscPaint = Paint()
       ..color = const Color(0xFFF8FAFC).withAlpha(245)
@@ -560,7 +685,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
     );
     canvas.drawPath(crescentPath, moonDiscPaint);
 
-    // Subtle golden moon aura rim
     final rimPaint = Paint()
       ..color = const Color(0xFFFDE68A)
           .withAlpha((140 + 70 * moonPulse).toInt())
@@ -568,7 +692,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ..strokeWidth = 0.9;
     canvas.drawPath(crescentPath, rimPaint);
 
-    // B. Twinkling Star Field
+    // Stars
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
       final xPos = (p.x * size.width);
@@ -588,7 +712,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       final r = (p.size * 0.32).clamp(0.8, 2.2);
       canvas.drawCircle(Offset(xPos, yPos), r, paint);
 
-      // Star flare on brightest stars
       if (p.size > 5.2 && twinkle > 0.6) {
         final flareLen = (twinkle - 0.6) * 11.0;
         final flarePaint = Paint()
@@ -608,7 +731,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       }
     }
 
-    // C. Falling Meteors / Shooting Stars Animation
+    // Meteors
     final meteors = [
       (
         start: 0.08,
@@ -653,7 +776,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
         final tailX = headX - tailOffset.dx;
         final tailY = headY - tailOffset.dy;
 
-        // Meteor Trail Shader
         final trailPaint = Paint()
           ..strokeWidth = 1.8 * envelope
           ..style = PaintingStyle.stroke
@@ -678,7 +800,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
 
         canvas.drawLine(Offset(tailX, tailY), Offset(headX, headY), trailPaint);
 
-        // Meteor Luminous Head
         paint.color = Colors.white.withAlpha(
           (255 * envelope).toInt().clamp(0, 255),
         );
@@ -687,11 +808,9 @@ class _ThemeBackgroundPainter extends CustomPainter {
     }
   }
 
-  // =========================================================================
-  // 3. LIGHT MODE: WARM SUNBEAMS & FRESH DAYLIGHT BREEZE
-  // =========================================================================
+  // Daylight
   void _paintLightDaylight(Canvas canvas, Size size, Paint paint) {
-    // A. Warm Sunlight Flare in top right corner
+    // Sunlight flare
     final sunCenter = Offset(size.width * 0.92, -10.0);
     final sunPulse = (math.sin(progress * 2 * math.pi) + 1) / 2;
     final sunRadius = size.width * 0.6;
@@ -707,7 +826,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: sunCenter, radius: sunRadius));
     canvas.drawCircle(sunCenter, sunRadius, sunGlowPaint);
 
-    // B. Upward drifting sunlight motes & warm breeze particles
+    // Floating particles
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
       final currentProgress = (1.0 - (p.y + progress * p.cycles) % 1.0);
@@ -736,13 +855,11 @@ class _ThemeBackgroundPainter extends CustomPainter {
     }
   }
 
-  // =========================================================================
-  // 4. AMOLED SAKURA: CHERRY BLOSSOM BRANCHES & FALLING PETALS
-  // =========================================================================
+  // Sakura
   void _paintSakuraWithBranches(Canvas canvas, Size size, Paint paint) {
     final windSway = math.sin(progress * 2 * math.pi) * 2.0;
 
-    // A. Tree Branches in top-right and top-left corners
+    // Branches
     final branchPaint = Paint()
       ..color =
           const Color(0xFF26141D) // Rich dark cherry wood bark
@@ -754,7 +871,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    // 1. Top-Right Branch
     final brPath = Path();
     brPath.moveTo(size.width + 12, -8);
     brPath.cubicTo(
@@ -770,7 +886,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
     branchDetailPaint.strokeWidth = 2.0;
     canvas.drawPath(brPath, branchDetailPaint);
 
-    // Sub-twigs Top-Right
     final twig1 = Path();
     twig1.moveTo(size.width * 0.78, 28 + windSway);
     twig1.quadraticBezierTo(
@@ -793,7 +908,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
     branchPaint.strokeWidth = 2.2;
     canvas.drawPath(twig2, branchPaint);
 
-    // 2. Top-Left Branch
     final blPath = Path();
     blPath.moveTo(-10, -6);
     blPath.cubicTo(
@@ -809,7 +923,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
     branchDetailPaint.strokeWidth = 1.8;
     canvas.drawPath(blPath, branchDetailPaint);
 
-    // Sub-twig Top-Left
     final blTwig = Path();
     blTwig.moveTo(size.width * 0.20, 29 - windSway);
     blTwig.quadraticBezierTo(
@@ -821,16 +934,14 @@ class _ThemeBackgroundPainter extends CustomPainter {
     branchPaint.strokeWidth = 2.2;
     canvas.drawPath(blTwig, branchPaint);
 
-    // B. Blooming Sakura Flower Clusters anchored to branches
+    // Flower clusters
     final flowers = [
-      // Top Right Cluster
       (x: size.width * 0.88, y: 15.0 + windSway, scale: 9.5),
       (x: size.width * 0.78, y: 30.0 + windSway, scale: 11.0),
       (x: size.width * 0.72, y: 44.0 + windSway, scale: 8.5),
       (x: size.width * 0.65, y: 69.0 + windSway, scale: 10.0),
       (x: size.width * 0.80, y: 55.0 + windSway, scale: 8.0),
       (x: size.width * 0.94, y: 32.0 + windSway, scale: 7.5),
-      // Top Left Cluster
       (x: size.width * 0.12, y: 18.0 - windSway, scale: 9.0),
       (x: size.width * 0.22, y: 33.0 - windSway, scale: 11.5),
       (x: size.width * 0.32, y: 47.0 - windSway, scale: 8.5),
@@ -842,7 +953,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
       _drawSakuraBlossom(canvas, Offset(f.x, f.y), f.scale);
     }
 
-    // C. Falling & Fluttering Cherry Blossom Petals
+    // Falling petals
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
       final currentProgress = (p.y + progress * p.cycles) % 1.0;
@@ -862,12 +973,10 @@ class _ThemeBackgroundPainter extends CustomPainter {
       canvas.rotate(rot);
 
       if (p.variant == 0) {
-        // Glowing pollen dust
         final alpha = (140 * edgeFade).toInt().clamp(0, 255);
         paint.color = const Color(0xFFFFB7C5).withAlpha(alpha);
         canvas.drawCircle(Offset.zero, 1.8, paint);
       } else {
-        // Falling Sakura Petal
         final baseAlpha = p.variant == 1 ? 165 : 135;
         final alpha = (baseAlpha * edgeFade).toInt().clamp(0, 255);
         paint.color =
@@ -901,7 +1010,7 @@ class _ThemeBackgroundPainter extends CustomPainter {
     }
   }
 
-  /// Helper to draw a blooming 5-petal sakura flower with stamen center
+  /// Draws a 5-petal sakura flower.
   void _drawSakuraBlossom(Canvas canvas, Offset center, double scale) {
     final petalPaint = Paint()
       ..color = const Color(0xFFFFB7C5).withAlpha(225)
@@ -911,7 +1020,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       ..color = const Color(0xFFBE185D).withAlpha(240)
       ..style = PaintingStyle.fill;
 
-    // Draw 5 overlapping petals
     for (int i = 0; i < 5; i++) {
       final angle = (i * 2 * math.pi / 5) - (math.pi / 2);
       final petalCenter = Offset(
@@ -947,7 +1055,6 @@ class _ThemeBackgroundPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // Flower stamen center
     canvas.drawCircle(center, scale * 0.22, centerPaint);
     final corePaint = Paint()
       ..color = const Color(0xFFFFD0E0).withAlpha(255)
