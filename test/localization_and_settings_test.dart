@@ -14,6 +14,7 @@ import 'package:video_downscaler/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_downscaler/services/settings_service.dart';
 import 'package:video_downscaler/theme/app_theme.dart';
+import 'package:video_downscaler/widgets/animated_flame_title.dart';
 import 'package:video_downscaler/widgets/conversion_options_card.dart';
 import 'package:video_downscaler/widgets/theme_animated_background.dart';
 
@@ -1361,11 +1362,27 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 60 FPS chip should NOT be present for 30 FPS video
-        expect(find.widgetWithText(ChoiceChip, '60 FPS'), findsNothing);
-        // 30 FPS, 24 FPS, Asli, and Kustom chips should be present
-        expect(find.widgetWithText(ChoiceChip, '30 FPS'), findsOneWidget);
-        expect(find.widgetWithText(ChoiceChip, '24 FPS'), findsOneWidget);
+        // 60, 50, 48 FPS chips should be disabled for 30 FPS video with tooltip
+        final chip60 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '60 FPS'));
+        expect(chip60.onSelected, isNull);
+        final chip50 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '50 FPS'));
+        expect(chip50.onSelected, isNull);
+        final chip48 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '48 FPS'));
+        expect(chip48.onSelected, isNull);
+
+        // 30, 25, 24 FPS, Asli, and Kustom chips should be present and enabled
+        final chip30 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '30 FPS'));
+        expect(chip30.onSelected, isNotNull);
+        final chip25 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '25 FPS'));
+        expect(chip25.onSelected, isNotNull);
+        final chip24 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '24 FPS'));
+        expect(chip24.onSelected, isNotNull);
         expect(find.widgetWithText(ChoiceChip, 'Asli'), findsOneWidget);
         expect(find.widgetWithText(ChoiceChip, 'Kustom'), findsOneWidget);
 
@@ -1438,8 +1455,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 60 FPS chip SHOULD be present for 60 FPS video
-        expect(find.widgetWithText(ChoiceChip, '60 FPS'), findsOneWidget);
+        // 60 FPS chip SHOULD be present and enabled for 60 FPS video
+        final chip60 =
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '60 FPS'));
+        expect(chip60.onSelected, isNotNull);
 
         // Tap Kustom chip
         await tester.tap(find.widgetWithText(ChoiceChip, 'Kustom'));
@@ -1638,6 +1657,28 @@ void main() {
         DeviceSpecHelper.isEntryOrLegacySoc(socName: 'MediaTek Dimensity 7050'),
         isFalse,
       );
+      expect(
+        DeviceSpecHelper.isEntryOrLegacySoc(
+          socName: 'Qualcomm Snapdragon 4 Gen 2',
+        ),
+        isFalse,
+      );
+      expect(
+        DeviceSpecHelper.isEntryOrLegacySoc(
+          socName: 'Qualcomm Snapdragon 4 Gen 1',
+        ),
+        isFalse,
+      );
+      expect(
+        DeviceSpecHelper.isEntryOrLegacySoc(
+          socName: 'Qualcomm Snapdragon 4s Gen 2',
+        ),
+        isFalse,
+      );
+      expect(
+        DeviceSpecHelper.isEntryOrLegacySoc(hardware: 'qcom', board: 'sm4450'),
+        isFalse,
+      );
 
       // Legacy Snapdragon / Helio entry / Unisoc: should return true
       expect(
@@ -1725,6 +1766,15 @@ void main() {
           customRamMb: 6144,
           customPhysicalCores: 8,
           customSoc: 'MediaTek Helio G85',
+        ),
+        equals(6),
+      );
+      expect(
+        DeviceSpecHelper.resolveThreadCount(
+          video: video1080,
+          customRamMb: 6144,
+          customPhysicalCores: 8,
+          customSoc: 'Qualcomm Snapdragon 4 Gen 2',
         ),
         equals(6),
       );
@@ -2265,6 +2315,73 @@ void main() {
         expect(find.text('Content'), findsOneWidget);
 
         // 3. Reset back to dark
+        await service.setThemeMode('dark');
+      },
+    );
+
+    testWidgets(
+      'AnimatedFlameTitle displays correct matching icons for all themes including oled_pure and light_clean',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final service = SettingsService();
+        await service.init();
+
+        // 1. oled_pure -> Icons.brightness_2_outlined
+        await service.setThemeMode('oled_pure');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme(service.settings.themeMode),
+            home: Scaffold(appBar: AppBar(title: const AnimatedFlameTitle())),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.byIcon(Icons.brightness_2_outlined), findsOneWidget);
+
+        // 2. light_clean -> Icons.wb_sunny_outlined
+        await service.setThemeMode('light_clean');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme(service.settings.themeMode),
+            home: Scaffold(appBar: AppBar(title: const AnimatedFlameTitle())),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.byIcon(Icons.wb_sunny_outlined), findsOneWidget);
+
+        // 3. dark (Snowfall) -> Icons.ac_unit_rounded
+        await service.setThemeMode('dark');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme(service.settings.themeMode),
+            home: Scaffold(appBar: AppBar(title: const AnimatedFlameTitle())),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.byIcon(Icons.ac_unit_rounded), findsOneWidget);
+
+        // 4. oled (Midnight) -> Icons.nightlight_round
+        await service.setThemeMode('oled');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme(service.settings.themeMode),
+            home: Scaffold(appBar: AppBar(title: const AnimatedFlameTitle())),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.byIcon(Icons.nightlight_round), findsOneWidget);
+
+        // 5. light (Daylight) -> Icons.wb_sunny_rounded
+        await service.setThemeMode('light');
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme(service.settings.themeMode),
+            home: Scaffold(appBar: AppBar(title: const AnimatedFlameTitle())),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.byIcon(Icons.wb_sunny_rounded), findsOneWidget);
+
+        // Reset
         await service.setThemeMode('dark');
       },
     );

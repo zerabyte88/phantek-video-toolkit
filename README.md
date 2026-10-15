@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Fast, offline, on-device mobile video transcoding, resolution downscaling, and audio extraction.</strong>
+  <strong>Offline on-device mobile video transcoding, resolution downscaling, and audio extraction.</strong>
 </p>
 
 <div align="center">
@@ -32,8 +32,8 @@
   * **Fast (`area` + `veryfast` + CRF 24):** Anti-aliased downsampling prioritizing speed, lower temperatures, and reduced battery use.
   * **Normal (`bicubic` + `faster` + CRF 22):** A balanced default for everyday conversions.
   * **Maximum (`lanczos` + `fast` + CRF 20):** Lanczos interpolation for high detail preservation.
-* **Rate Control:** Configurable Constant Rate Factor (CRF 16–32) with a single-tap reset to preset defaults, or custom target bitrate limits (500 kbps to 20,000 kbps).
-* **Framerate Selection:** Frame rate adjustments (60, 50, 48, 30, 25, 24 FPS) with source-rate clamping to avoid unnecessary frame interpolation.
+* **Rate Control:** Configurable Constant Rate Factor (CRF 16–28) with a single-tap reset to preset defaults, or custom target bitrate limits (1–20 Mbps).
+* **Framerate Selection:** Frame rate adjustments (60, 50, 48, 30, 25, 24 FPS, or custom) with source-rate clamping to avoid unnecessary frame interpolation.
 * **Audio Handling:** Stream copy (`-c:a copy`) when the source audio matches the target container, automatic AAC re-encoding when incompatible, or complete audio track removal (`-an`).
 * **Container Support:** MP4 (with `-movflags +faststart` for web playback), MKV, and MOV.
 

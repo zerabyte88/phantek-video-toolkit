@@ -59,6 +59,26 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
     Color(0xFFFF69B4), // Back to Hot Pink
   ];
 
+  // 5. Pure AMOLED: Pitch Black & Pure Sapphire Blue Accents
+  static const _oledPureColors = [
+    Color(0xFF60A5FA), // Blue 400
+    Color(0xFF93C5FD), // Blue 300
+    Color(0xFF3B82F6), // Blue 500
+    Color(0xFFBFDBFE), // Pale Lunar Blue
+    Color(0xFF1D4ED8), // Deep Sapphire
+    Color(0xFF60A5FA), // Back to Blue 400
+  ];
+
+  // 6. Clean Light: Crisp Azure & Fresh Daylight Sky
+  static const _lightCleanColors = [
+    Color(0xFF0EA5E9), // Sky 500
+    Color(0xFF38BDF8), // Sky 400
+    Color(0xFF7DD3FC), // Sky 300
+    Color(0xFFBAE6FD), // Sky 200
+    Color(0xFF0284C7), // Sky 600
+    Color(0xFF0EA5E9), // Back to Sky 500
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -100,12 +120,32 @@ class _AnimatedFlameTitleState extends State<AnimatedFlameTitle>
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
+          case 'oled_pure':
+          case 'pure_oled':
+            activeColors = _oledPureColors;
+            activeIcon = Icons.brightness_2_outlined;
+            iconColor = Color.lerp(
+              const Color(0xFF60A5FA),
+              const Color(0xFF93C5FD),
+              (math.sin(progress * 2 * math.pi) + 1) / 2,
+            );
+            break;
           case 'oled':
             activeColors = _oledColors;
             activeIcon = Icons.nightlight_round;
             iconColor = Color.lerp(
               const Color(0xFFFDE68A),
               const Color(0xFFE2E8F0),
+              (math.sin(progress * 2 * math.pi) + 1) / 2,
+            );
+            break;
+          case 'light_clean':
+          case 'clean_light':
+            activeColors = _lightCleanColors;
+            activeIcon = Icons.wb_sunny_outlined;
+            iconColor = Color.lerp(
+              const Color(0xFF0EA5E9),
+              const Color(0xFF38BDF8),
               (math.sin(progress * 2 * math.pi) + 1) / 2,
             );
             break;
