@@ -2166,7 +2166,7 @@ class DeviceSpecHelper {
   ///   Always respects the user's manual choice, clamped only to physical core count.
   /// - If [requestedThreads] == 0 (Auto Mode):
   ///   Intelligently allocates cores:
-  ///   * RAM <= 4 GB or legacy SoC: baseline 4 cores. If [video] >= 4K, reduced to 3 cores.
+  ///   * RAM <= 4 GB or legacy SoC: baseline 4 cores (including 4K).
   ///   * RAM 6 GB / Mid-Range: baseline 6 cores. If 4K, reduced to 5 cores.
   ///   * RAM >= 8 GB / Flagship: baseline 8 cores. If 4K, reduced to 7 cores.
   ///   * Clamped to physical processors and minimum 1 core.
@@ -2206,7 +2206,6 @@ class DeviceSpecHelper {
     int baseline;
     if (ramMb <= 4500 || isLegacy) {
       baseline = 4;
-      if (is4K) baseline = 3;
     } else if (ramMb <= 6500) {
       baseline = 6;
       if (is4K) baseline = 5;

@@ -1710,7 +1710,7 @@ void main() {
     });
 
     test('DeviceSpecHelper.resolveThreadCount allocates cores adaptively for RAM, SoC, and 4K resolution', () {
-      // 1. RAM <= 4GB: 4 cores baseline, discounted to 3 cores on 4K video
+      // 1. RAM <= 4GB: 4 cores baseline, remains 4 cores on 4K video (entry-level lock)
       expect(
         DeviceSpecHelper.resolveThreadCount(
           video: video1080,
@@ -1727,7 +1727,7 @@ void main() {
           customPhysicalCores: 8,
           customSoc: 'Qualcomm Snapdragon 680',
         ),
-        equals(3), // Discounted by 1 for 4K stability
+        equals(4), // Remains 4 cores on entry-level / RAM <= 4GB
       );
 
       // 2. RAM 4GB with mid-range SoC (e.g. SD 732G RAM 4GB): allocates 4 cores (RAM protection holds)
