@@ -3,34 +3,20 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
-/// Top-level callback required by flutter_foreground_task v11+.
-/// Must be annotated with @pragma('vm:entry-point') so the AOT compiler
-/// does not tree-shake it.
 @pragma('vm:entry-point')
 void _foregroundTaskCallback() {
   FlutterForegroundTask.setTaskHandler(_VideoProcessingTaskHandler());
 }
 
-/// Minimal TaskHandler that keeps the foreground service (and its wakelock)
-/// alive while encoding is in progress. All actual encoding work happens
-/// on the main isolate; this handler simply maintains the Android foreground
-/// notification so the OS does not kill the process.
 class _VideoProcessingTaskHandler extends TaskHandler {
   @override
-  Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
-    // Nothing to initialise – encoding runs on the main isolate.
-  }
+  Future<void> onStart(DateTime timestamp, TaskStarter starter) async {}
 
   @override
-  void onRepeatEvent(DateTime timestamp) {
-    // No-op: we use ForegroundTaskEventAction.nothing() so this is never
-    // called, but the override is required by the interface.
-  }
+  void onRepeatEvent(DateTime timestamp) {}
 
   @override
-  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
-    // Cleanup if needed.
-  }
+  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {}
 }
 
 class ForegroundServiceManager {
@@ -84,7 +70,7 @@ class ForegroundServiceManager {
         await FlutterForegroundTask.requestNotificationPermission();
       }
 
-      // Exempt from battery optimization so Doze mode never pauses encoding when screen is off
+      // Request battery optimization exemption for background processing
       if (Platform.isAndroid) {
         final isIgnoringBattery =
             await FlutterForegroundTask.isIgnoringBatteryOptimizations;

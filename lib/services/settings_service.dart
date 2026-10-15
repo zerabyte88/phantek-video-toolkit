@@ -38,12 +38,12 @@ class SettingsService extends ChangeNotifier {
         }
       }
 
-      // Hardware Auto-Detection on first launch
+      // Auto-detect hardware on first launch
       if (_settings.isFirstLaunch) {
         await _applyFirstLaunchDefaults();
       }
 
-      // Apply wakelock state
+      // Apply wakelock preference
       await _applyWakelock(_settings.keepScreenAwake);
     } catch (e) {
       debugPrint('Error loading settings: $e');
@@ -56,9 +56,7 @@ class SettingsService extends ChangeNotifier {
   Future<void> _applyFirstLaunchDefaults() async {
     final tier = DeviceSpecHelper.getDeviceTier();
 
-    // Tier 1: 1080p, medium (normal)
-    // Tier 2: 1080p, medium (normal)
-    // Tier 3: 720p, fast
+    // Hardware-based baseline defaults
     String preset = 'medium';
     if (tier == DeviceTier.highEnd) preset = 'medium';
     if (tier == DeviceTier.lowEnd) preset = 'fast';
@@ -109,7 +107,9 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> setThemeMode(String themeMode) async {
-    final unlock = themeMode == 'sakura' ? true : _settings.isEasterEggUnlocked;
+    final unlock = (themeMode == 'oled_sakura' || themeMode == 'sakura')
+        ? true
+        : _settings.isEasterEggUnlocked;
     await updateSettings(
       _settings.copyWith(themeMode: themeMode, isEasterEggUnlocked: unlock),
     );
@@ -168,7 +168,7 @@ class SettingsService extends ChangeNotifier {
     await _applyWakelock(_settings.keepScreenAwake);
   }
 
-  // ── Active Conversion Job Marker (LMK Crash Recovery) ──────────────────────
+  // Active job marker for crash recovery
 
   static const _jobMarkerKey = 'active_conversion_job_marker';
 

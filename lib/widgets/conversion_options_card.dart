@@ -181,7 +181,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           ],
           const SizedBox(height: 18),
 
-          // 1. Resolution Selection
+          // Resolution
           _buildSectionLabel(
             icon: Icons.aspect_ratio_rounded,
             title: l10n.t('target_resolution'),
@@ -201,14 +201,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 2. Active Speed Preset (managed globally in Settings)
+          // Active preset
           _buildActivePresetIndicator(theme, l10n),
 
           const SizedBox(height: 16),
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 3. Rate Control Selection (CRF vs Bitrate)
+          // Rate control mode
           _buildSectionLabel(
             icon: Icons.tune_rounded,
             title: l10n.t('rate_control'),
@@ -272,18 +272,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                               _crfValue = newCrf;
                             });
                             widget.onOptionsChanged(
-                              widget.encodingOptions.copyWith(
-                                crfValue: newCrf,
-                              ),
+                              widget.encodingOptions.copyWith(crfValue: newCrf),
                             );
                           }
                         },
                         onChangeEnd: (val) {
                           final newCrf = val.round();
                           widget.onOptionsChanged(
-                            widget.encodingOptions.copyWith(
-                              crfValue: newCrf,
-                            ),
+                            widget.encodingOptions.copyWith(crfValue: newCrf),
                           );
                         },
                       ),
@@ -307,7 +303,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ),
                   ],
                 ),
-                // Slider direction guide
+                // Slider guide
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Row(
@@ -336,7 +332,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ],
                   ),
                 ),
-                // Custom badge and reset button placed below slider to eliminate layout shift during drag
+                // Reset button
                 if (_crfValue !=
                     widget.encodingOptions.speedPreset.defaultCrf) ...[
                   const SizedBox(height: 8),
@@ -350,9 +346,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                           vertical: 1.5,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.secondary.withAlpha(
-                            30,
-                          ),
+                          color: theme.colorScheme.secondary.withAlpha(30),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -511,7 +505,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             ),
           ],
 
-          // Estimated Size display
+          // Estimated size
           const SizedBox(height: 12),
           _buildSizeEstimator(theme),
 
@@ -519,7 +513,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 3. Format / Container Selection
+          // Container format
           _buildSectionLabel(
             icon: Icons.video_file_outlined,
             title: l10n.t('container_format'),
@@ -563,7 +557,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             ),
           ),
 
-          // 4. FPS Selector
+          // Target FPS
           _buildFpsSelector(theme, l10n),
         ],
       ),
@@ -616,8 +610,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         color: !isEnabled
             ? theme.colorScheme.outline.withAlpha(40)
             : (isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline),
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline),
         width: isSelected ? 1.2 : 1.0,
       ),
       label: Text(
@@ -764,8 +758,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final maxFps = sourceFps.clamp(15, 120);
     final minFps = (10 < maxFps) ? 10 : 1;
     final targetFps = widget.encodingOptions.targetFps;
-    final tooltipExceeds =
-        l10n.t('fps_exceeds_source', args: {'fps': '$sourceFps'});
+    final tooltipExceeds = l10n.t(
+      'fps_exceeds_source',
+      args: {'fps': '$sourceFps'},
+    );
     const standardFpsOptions = [60, 50, 48, 30, 25, 24];
 
     return Column(
@@ -840,7 +836,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           ),
         ),
 
-        // Custom Slider Section (Shown when Custom is selected)
+        // Custom FPS slider
         if (_isCustomFps) ...[
           const SizedBox(height: 12),
           Container(

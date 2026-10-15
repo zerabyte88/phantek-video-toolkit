@@ -52,11 +52,11 @@ class VideoInfo {
     this.audioBitrateKbps,
   });
 
-  /// True if video is 2K (1440p) or duration is 10 minutes (600s) or longer.
+  /// True if video is 2K+ (1440p) or duration is 10 minutes or longer.
   bool get isHeavyProcessing =>
       shortDimension >= 1440 || durationSeconds >= 600;
 
-  /// Dimension used for resolution classification (shorter edge, consistent across landscape and portrait).
+  /// Shorter edge dimension used for resolution classification.
   int get shortDimension => width < height ? width : height;
 
   String get resolution {

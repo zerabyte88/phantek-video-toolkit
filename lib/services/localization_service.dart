@@ -317,16 +317,17 @@ class AppLocalizations {
       'telemetry_memory': 'Alokasi RAM',
       'telemetry_storage_io': 'Laju Tulis Disk',
       'theme_appearance': 'Tampilan & Tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc':
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
           'Malam Pedesaan Berselimut Salju & Cahaya Hangat Pondok',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Sinar Mentari Hangat & Hembusan Angin Segar',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Hitam Pekat AMOLED • Bulan Sabit, Bintang & Hujan Meteor',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
+          'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
       'unit_core': 'Core',
       'unknown': 'Tidak Diketahui',
       'video_already_low': 'Video sudah beresolusi rendah',
@@ -574,7 +575,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Optimal balance of performance & system smoothness\nKeeps multitasking responsive',
       'settings_cpu_threads_6_desc': 'High performance for fast video rendering\nLeaves cores available for system stability',
       'settings_cpu_threads_8_desc': 'Full utilization of all processor cores\nMaximum speed, device heat & power draw will increase',
-      'settings_audio_bitrate_64_desc': 'Standard speech/voice quality\nMaximum storage space savings',
+      'settings_audio_bitrate_64_desc':
+          'Standard speech/voice quality\nMaximum storage space savings',
       'settings_audio_bitrate_128_desc': 'Balanced standard quality (recommended)\nIdeal for most videos & casual music',
       'settings_audio_bitrate_192_desc': 'High quality with clear audio detail\nGreat for music & dynamic speech',
       'settings_audio_bitrate_256_desc': 'Very clear quality near source recording\nSuitable for high-fidelity audio content',
@@ -629,15 +631,15 @@ class AppLocalizations {
       'telemetry_memory': 'RAM Allocation',
       'telemetry_storage_io': 'Disk Write Rate',
       'theme_appearance': 'Appearance & Theme',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Snowy Village Night & Warm Cabin Glow',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Snowy Village Night & Warm Cabin Glow',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Warm Golden Sunbeams & Refreshing Day Breeze',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'AMOLED True Black • Crescent Moon, Stars & Meteor Shower',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED True Black • Blooming Branches & Sakura Petals',
       'unit_core': 'Core',
       'unknown': 'Unknown',
@@ -896,14 +898,14 @@ class AppLocalizations {
       'telemetry_memory': '内存分配',
       'telemetry_storage_io': '磁盘写入速率',
       'theme_appearance': '外观与主题',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': '雪落村落之夜与木屋温暖灯火',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': '雪落村落之夜与木屋温暖灯火',
       'theme_light': 'Daylight',
       'theme_light_desc': '温暖和煦阳光与清爽微风',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED 纯黑 • 弯月、闪烁繁星与流星雨',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'AMOLED 纯黑 • 盛开樱花枝桠与落樱',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'AMOLED 纯黑 • 弯月、闪烁繁星与流星雨',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'AMOLED 纯黑 • 盛开樱花枝桠与落樱',
       'unit_core': '核',
       'unknown': '未知',
       'video_already_low': '视频分辨率已经较低',
@@ -1168,14 +1170,14 @@ class AppLocalizations {
       'telemetry_memory': '内存分配',
       'telemetry_storage_io': '磁盘写入速率',
       'theme_appearance': '外观与主题',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': '雪落村落之夜与木屋温暖灯火',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': '雪落村落之夜与木屋温暖灯火',
       'theme_light': 'Daylight',
       'theme_light_desc': '温暖和煦阳光与清爽微风',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED 纯黑 • 弯月、闪烁繁星与流星雨',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'AMOLED 纯黑 • 盛开樱花枝桠与落樱',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'AMOLED 纯黑 • 弯月、闪烁繁星与流星雨',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'AMOLED 纯黑 • 盛开樱花枝桠与落樱',
       'unit_core': '核',
       'unknown': '未知',
       'video_already_low': '视频分辨率已经较低',
@@ -1440,14 +1442,14 @@ class AppLocalizations {
       'telemetry_memory': '記憶體配置',
       'telemetry_storage_io': '磁碟寫入速率',
       'theme_appearance': '外觀與主題',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': '雪落村落之夜與木屋溫暖燈火',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': '雪落村落之夜與木屋溫暖燈火',
       'theme_light': 'Daylight',
       'theme_light_desc': '溫暖和煦陽光與清爽微風',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED 純黑 • 彎月、閃爍繁星與流星雨',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'AMOLED 純黑 • 盛開櫻花枝椏與落櫻',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'AMOLED 純黑 • 彎月、閃爍繁星與流星雨',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'AMOLED 純黑 • 盛開櫻花枝椏與落櫻',
       'unit_core': '核心',
       'unknown': '未知',
       'video_already_low': '影片解析度已經較低',
@@ -1686,7 +1688,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Equilibrio óptimo de rendimiento y fluidez del sistema\nMantiene la multitarea fluida',
       'settings_cpu_threads_6_desc': 'Alto rendimiento para renderizado de video rápido\nDeja núcleos libres para estabilidad del sistema',
       'settings_cpu_threads_8_desc': 'Uso total de todos los núcleos del procesador\nMáxima velocidad, la temperatura y el consumo aumentarán',
-      'settings_audio_bitrate_64_desc': 'Calidad de voz/conversación estándar\nMáximo ahorro de espacio',
+      'settings_audio_bitrate_64_desc':
+          'Calidad de voz/conversación estándar\nMáximo ahorro de espacio',
       'settings_audio_bitrate_128_desc': 'Calidad estándar equilibrada (recomendada)\nIdeal para la mayoría de videos y música',
       'settings_audio_bitrate_192_desc': 'Alta calidad con detalles de audio nítidos\nExcelente para música y diálogos',
       'settings_audio_bitrate_256_desc': 'Calidad muy nítida cercana a la fuente original\nAdecuada para contenido de audio de alta fidelidad',
@@ -1738,15 +1741,16 @@ class AppLocalizations {
       'telemetry_memory': 'Asignación de RAM',
       'telemetry_storage_io': 'Velocidad de Escritura en Disco',
       'theme_appearance': 'Apariencia y Tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Noche de aldea nevada y cálido resplandor de cabaña',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'Noche de aldea nevada y cálido resplandor de cabaña',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Cálidos rayos de sol dorados y brisa fresca diurna',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Negro puro AMOLED • Luna creciente, estrellas y lluvia de meteoros',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Negro puro AMOLED • Ramas en flor y pétalos de sakura',
       'unit_core': 'Núcleo',
       'unknown': 'Desconocido',
@@ -1981,7 +1985,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Equilíbrio ideal entre desempenho e fluidez do sistema\nMantém a multitarefa responsiva',
       'settings_cpu_threads_6_desc': 'Alto desempenho para renderização rápida de vídeo\nDeixa núcleos disponíveis para estabilidade',
       'settings_cpu_threads_8_desc': 'Uso total de todos os núcleos do processador\nVelocidade máxima, temperatura e consumo aumentarão',
-      'settings_audio_bitrate_64_desc': 'Qualidade de voz/conversa padrão\nMáxima economia de armazenamento',
+      'settings_audio_bitrate_64_desc':
+          'Qualidade de voz/conversa padrão\nMáxima economia de armazenamento',
       'settings_audio_bitrate_128_desc': 'Qualidade padrão equilibrada (recomendada)\nIdeal para a maioria dos vídeos e músicas',
       'settings_audio_bitrate_192_desc': 'Alta qualidade com detalhes de áudio nítidos\nExcelente para música e diálogos',
       'settings_audio_bitrate_256_desc': 'Qualidade muito nítida próxima da gravação original\nAdequada para conteúdo de áudio de alta fidelidade',
@@ -2032,16 +2037,17 @@ class AppLocalizations {
       'telemetry_memory': 'Alocação de RAM',
       'telemetry_storage_io': 'Taxa de Gravação em Disco',
       'theme_appearance': 'Aparência e Tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Noite de vila nevada e brilho acolhedor da cabana',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'Noite de vila nevada e brilho acolhedor da cabana',
       'theme_light': 'Daylight',
       'theme_light_desc':
           'Raios de sol dourados acolhedores e brisa fresca do dia',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Preto absoluto AMOLED • Lua crescente, estrelas e chuva de meteoros',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Preto absoluto AMOLED • Galhos florescendo e pétalas de sakura',
       'unit_core': 'Núcleo',
       'unknown': 'Desconhecido',
@@ -2266,8 +2272,10 @@ class AppLocalizations {
       'settings_audio_bitrate_64_desc': '会話・音声向けの標準音質\nストレージ容量を大幅に節約',
       'settings_audio_bitrate_128_desc': 'バランスの取れた標準音質（推奨）\n一般的な動画や音楽に最適',
       'settings_audio_bitrate_192_desc': 'クリアな高音質と豊かなディテール\n音楽やダイナミックなセリフに最適',
-      'settings_audio_bitrate_256_desc': '原音に極めて近い非常にクリアな音質\nハイファイなオーディオコンテンツ向け',
-      'settings_audio_bitrate_320_desc': '最高峰のAACビットレート（スタジオ級）\n過度な圧縮のない最高のアコースティック再現度',
+      'settings_audio_bitrate_256_desc':
+          '原音に極めて近い非常にクリアな音質\nハイファイなオーディオコンテンツ向け',
+      'settings_audio_bitrate_320_desc':
+          '最高峰のAACビットレート（スタジオ級）\n過度な圧縮のない最高のアコースティック再現度',
       'settings_cpu_preset': 'エンコード速度プリセット',
       'settings_cpu_preset_desc':
           '速度重視ならFast、バランス重視ならNormal、画質重視ならSlowを選択してください。',
@@ -2315,14 +2323,14 @@ class AppLocalizations {
       'telemetry_memory': 'RAM割り当て',
       'telemetry_storage_io': 'ディスク書込速度',
       'theme_appearance': '外観とテーマ',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': '雪降る村の夜と山小屋の温かい灯火',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': '雪降る村の夜と山小屋の温かい灯火',
       'theme_light': 'Daylight',
       'theme_light_desc': '暖かな木漏れ日と爽やかな風',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED ピュアブラック • 三日月・満天の星・流星群',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'AMOLED ピュアブラック • 桜の枝と舞い散る花びら',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'AMOLED ピュアブラック • 三日月・満天の星・流星群',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'AMOLED ピュアブラック • 桜の枝と舞い散る花びら',
       'unit_core': 'コア',
       'unknown': '不明',
       'video_already_low': 'すでに低解像度の動画です',
@@ -2542,10 +2550,14 @@ class AppLocalizations {
       'settings_cpu_threads_6_desc': '빠른 비디오 렌더링을 위한 고성능\n시스템 안정성을 위한 코어 여유 확보',
       'settings_cpu_threads_8_desc': '모든 프로세서 코어 최대 가동\n최고 속도, 발열 및 배터리 소모 증가',
       'settings_audio_bitrate_64_desc': '표준 음성/대화 품질\n저장 공간을 최대한 절약',
-      'settings_audio_bitrate_128_desc': '균형 잡힌 표준 품질 (권장)\n대부분의 비디오 및 일상적인 음악에 이상적',
-      'settings_audio_bitrate_192_desc': '선명한 오디오 디테일의 고품질\n음악 및 다이내믹한 대화 영상에 적합',
-      'settings_audio_bitrate_256_desc': '원본 녹음에 가까운 매우 선명한 음질\n하이파이 오디오 콘텐츠에 적합',
-      'settings_audio_bitrate_320_desc': '최고의 AAC 오디오 비트레이트 (스튜디오급)\n과도한 압축 없는 최고의 음향 충실도',
+      'settings_audio_bitrate_128_desc':
+          '균형 잡힌 표준 품질 (권장)\n대부분의 비디오 및 일상적인 음악에 이상적',
+      'settings_audio_bitrate_192_desc':
+          '선명한 오디오 디테일의 고품질\n음악 및 다이내믹한 대화 영상에 적합',
+      'settings_audio_bitrate_256_desc':
+          '원본 녹음에 가까운 매우 선명한 음질\n하이파이 오디오 콘텐츠에 적합',
+      'settings_audio_bitrate_320_desc':
+          '최고의 AAC 오디오 비트레이트 (스튜디오급)\n과도한 압축 없는 최고의 음향 충실도',
       'settings_cpu_preset': '인코딩 속도 프리셋',
       'settings_cpu_preset_desc':
           '속도 중심은 Fast, 균형은 Normal, 최고 화질은 Slow를 선택하세요.',
@@ -2591,14 +2603,14 @@ class AppLocalizations {
       'telemetry_memory': 'RAM 할당량',
       'telemetry_storage_io': '디스크 쓰기 속도',
       'theme_appearance': '테마 및 모양',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': '눈 덮인 시골 마을의 밤과 따스한 오두막 불빛',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': '눈 덮인 시골 마을의 밤과 따스한 오두막 불빛',
       'theme_light': 'Daylight',
       'theme_light_desc': '따스한 햇살과 상쾌한 낮바람',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED 트루 블랙 • 초승달, 별빛 & 유성우',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'AMOLED 트루 블랙 • 벚꽃 나뭇가지와 흩날리는 꽃잎',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'AMOLED 트루 블랙 • 초승달, 별빛 & 유성우',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'AMOLED 트루 블랙 • 벚꽃 나뭇가지와 흩날리는 꽃잎',
       'unit_core': '코어',
       'unknown': '알 수 없음',
       'video_already_low': '이미 낮은 해상도의 동영상입니다',
@@ -2823,12 +2835,14 @@ class AppLocalizations {
       'preset_fast_desc': 'बायलिनियर स्केलर • सबसे तेज़ प्रसंस्करण, बैटरी बचत, CPU ठंडा, दृश्य स्पष्ट और तीखे।',
       'preset_normal_desc': 'बायलिनियर स्केलर • दैनिक उपयोग के लिए एन्कोडिंग गति और फ़ाइल आकार का इष्टतम संतुलन।',
       'preset_slow_desc': 'बाइक्यूबिक स्केलर (16-बिंदु) • उच्च माइक्रो-विवरण परिशुद्धता और अधिकतम संपीड़न, गुणवत्ता को प्राथमिकता।',
-      'settings_cpu_threads_1_desc': 'न्यूनतम बैटरी खपत और ठंडा तापमान\nसबसे धीमी एन्कोडिंग गति',
+      'settings_cpu_threads_1_desc':
+          'न्यूनतम बैटरी खपत और ठंडा तापमान\nसबसे धीमी एन्कोडिंग गति',
       'settings_cpu_threads_2_desc': 'बहुत हल्का और स्थिर सीपीयू लोड\nभारी मल्टीटास्किंग के लिए अधिकतम गुंजाइश',
       'settings_cpu_threads_4_desc': 'प्रदर्शन और सिस्टम तरलता का इष्टतम संतुलन\nमल्टीटास्किंग सुचारू रहती है',
       'settings_cpu_threads_6_desc': 'तेज़ वीडियो रेंडरिंग के लिए उच्च प्रदर्शन\nसिस्टम स्थिरता के लिए कोर सुरक्षित रखता है',
       'settings_cpu_threads_8_desc': 'सभी प्रोसेसर कोर का पूर्ण उपयोग\nअधिकतम गति, डिवाइस का तापमान और बैटरी खपत बढ़ेगी',
-      'settings_audio_bitrate_64_desc': 'मानक बातचीत/ध्वनि गुणवत्ता\nअधिकतम स्टोरेज बचत',
+      'settings_audio_bitrate_64_desc':
+          'मानक बातचीत/ध्वनि गुणवत्ता\nअधिकतम स्टोरेज बचत',
       'settings_audio_bitrate_128_desc': 'संतुलित मानक गुणवत्ता (अनुशंसित)\nअधिकांश वीडियो और सामान्य संगीत के लिए आदर्श',
       'settings_audio_bitrate_192_desc': 'स्पष्ट ऑडियो विवरण के साथ उच्च गुणवत्ता\nसंगीत और संवाद वीडियो के लिए बहुत बढ़िया',
       'settings_audio_bitrate_256_desc': 'मूल रिकॉर्डिंग के करीब बहुत स्पष्ट गुणवत्ता\nउच्च निष्ठा ऑडियो सामग्री के लिए उपयुक्त',
@@ -2879,15 +2893,16 @@ class AppLocalizations {
       'telemetry_memory': 'RAM आवंटन',
       'telemetry_storage_io': 'डिस्क राइट गति',
       'theme_appearance': 'दिखावट और थीम',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'बर्फ से ढकी गांव की रात और झोपड़ी की गर्म चमक',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'बर्फ से ढकी गांव की रात और झोपड़ी की गर्म चमक',
       'theme_light': 'Daylight',
       'theme_light_desc': 'सुनहरी धूप और ताज़ा दिन की हवा',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'गहरा काला AMOLED • अर्धचंद्र, चमकते सितारे और उल्कापात',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'गहरा काला AMOLED • खिलती हुई शाखाएं और सकुरा की पंखुड़ियां',
       'unit_core': 'कोर',
       'unknown': 'अज्ञात',
@@ -3117,15 +3132,20 @@ class AppLocalizations {
       'preset_fast_desc': 'معالج ثنائي الخطوط • أسرع معالجة، موفر للبطارية، يحافظ على حرارة المعالج منخفضة، جودة واضحة ونقية.',
       'preset_normal_desc': 'معالج ثنائي الخطوط • التوازن المثالي بين سرعة الترميز وحجم الملف للاستخدام اليومي.',
       'preset_slow_desc': 'معالج تكعيبي (16 نقطة) • دقة عالية للتفاصيل الدقيقة وأقصى قدر من الضغط، الأولوية للجودة على السرعة.',
-      'settings_cpu_threads_1_desc': 'أقل استهلاك للبطارية وحرارة منخفضة\nأبطأ سرعة ترميز',
-      'settings_cpu_threads_2_desc': 'حمولة معالج خفيفة جداً ومستقرة\nمساحة واسعة للمهام المتعددة الثقيلة',
+      'settings_cpu_threads_1_desc':
+          'أقل استهلاك للبطارية وحرارة منخفضة\nأبطأ سرعة ترميز',
+      'settings_cpu_threads_2_desc':
+          'حمولة معالج خفيفة جداً ومستقرة\nمساحة واسعة للمهام المتعددة الثقيلة',
       'settings_cpu_threads_4_desc': 'توازن مثالي بين الأداء وسلاسة النظام\nيحافظ على استجابة المهام المتعددة',
-      'settings_cpu_threads_6_desc': 'أداء عالٍ لمعالجة الفيديو بسرعة\nيترك نوى متاحة لاستقرار النظام',
+      'settings_cpu_threads_6_desc':
+          'أداء عالٍ لمعالجة الفيديو بسرعة\nيترك نوى متاحة لاستقرار النظام',
       'settings_cpu_threads_8_desc': 'استغلال كامل لجميع نوى المعالج\nأقصى سرعة، مع ارتفاع في الحرارة واستهلاك الطاقة',
-      'settings_audio_bitrate_64_desc': 'جودة محادثة وصوت قياسية\nتوفير أقصى مساحة تخزين',
+      'settings_audio_bitrate_64_desc':
+          'جودة محادثة وصوت قياسية\nتوفير أقصى مساحة تخزين',
       'settings_audio_bitrate_128_desc': 'جودة قياسية متوازنة (موصى بها)\nمثالية لمعظم مقاطع الفيديو والموسيقى',
       'settings_audio_bitrate_192_desc': 'جودة عالية بتفاصيل صوتية واضحة\nممتازة للموسيقى والحوارات الديناميكية',
-      'settings_audio_bitrate_256_desc': 'جودة واضحة جداً تقارب التسجيل الأصلي\nمناسبة لمحتوى صوتي عالي الدقة',
+      'settings_audio_bitrate_256_desc':
+          'جودة واضحة جداً تقارب التسجيل الأصلي\nمناسبة لمحتوى صوتي عالي الدقة',
       'settings_audio_bitrate_320_desc': 'أقصى معدل بت صوتي AAC (مستوى الاستوديو)\nأفضل دقة صوتية دون ضغط زائد',
       'settings_cpu_preset': 'الإعداد المسبق لسرعة الترميز',
       'settings_cpu_preset_desc':
@@ -3175,14 +3195,15 @@ class AppLocalizations {
       'telemetry_memory': 'تخصيص RAM',
       'telemetry_storage_io': 'معدل الكتابة على القرص',
       'theme_appearance': 'المظهر والسمة',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'ليلة قرية مثلجة ودفء أضواء الأكواخ',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'ليلة قرية مثلجة ودفء أضواء الأكواخ',
       'theme_light': 'Daylight',
       'theme_light_desc': 'أشعة شمس ذهبية دافئة ونسيم نهار منعش',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'سواد AMOLED حالك • هلال، نجوم متلألئة وزخات شهب',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'سواد AMOLED حالك • أغصان مزهرة وبتلات ساكورا',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
+          'سواد AMOLED حالك • هلال، نجوم متلألئة وزخات شهب',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc': 'سواد AMOLED حالك • أغصان مزهرة وبتلات ساكورا',
       'unit_core': 'نواة',
       'unknown': 'غير معروف',
       'video_already_low': 'الفيديو منخفض الدقة بالفعل',
@@ -3470,16 +3491,16 @@ class AppLocalizations {
       'telemetry_memory': 'Allocation RAM',
       'telemetry_storage_io': 'Débit d\'écriture disque',
       'theme_appearance': 'Apparence et Thème',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc':
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
           'Nuit de village enneigé et lueur chaleureuse du chalet',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Rayons de soleil dorés et brise fraîche de journée',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Noir pur AMOLED • Croissant de lune, étoiles et pluie de météores',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Noir pur AMOLED • Branches fleuries et pétales de cerisier',
       'unit_core': 'Cœur',
       'unknown': 'Inconnu',
@@ -3765,14 +3786,15 @@ class AppLocalizations {
       'telemetry_memory': 'Выделение ОЗУ',
       'telemetry_storage_io': 'Скорость записи на диск',
       'theme_appearance': 'Внешний вид и тема',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Снежная ночь в деревне и теплое сияние домика',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'Снежная ночь в деревне и теплое сияние домика',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Теплые солнечные лучи и свежий дневной бриз',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'Глубокий черный AMOLED • Полумесяц, мерцающие звезды и метеоритный дождь',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc': 'Глубокий черный AMOLED • Полумесяц, мерцающие звезды и метеоритный дождь',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Глубокий черный AMOLED • Цветущие ветви и лепестки сакуры',
       'unit_core': 'Ядро',
       'unknown': 'Неизвестно',
@@ -4014,7 +4036,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Optimale Balance aus Leistung & Systemflüssigkeit\nMultitasking bleibt flüssig',
       'settings_cpu_threads_6_desc': 'Hohe Leistung für schnelle Videoverarbeitung\nReserviert Kerne für Systemstabilität',
       'settings_cpu_threads_8_desc': 'Volle Auslastung aller Prozessorkerne\nMaximale Geschwindigkeit, Hitze & Akkuverbrauch steigen',
-      'settings_audio_bitrate_64_desc': 'Standard-Sprachqualität\nMaximale Speicherplatzeinsparung',
+      'settings_audio_bitrate_64_desc':
+          'Standard-Sprachqualität\nMaximale Speicherplatzeinsparung',
       'settings_audio_bitrate_128_desc': 'Ausgewogene Standardqualität (empfohlen)\nIdeal für die meisten Videos & Musik',
       'settings_audio_bitrate_192_desc': 'Hohe Qualität mit klaren Audiodetails\nSehr gut für Musik & dynamische Sprache',
       'settings_audio_bitrate_256_desc': 'Sehr klare Qualität nahe am Original\nIdeal für anspruchsvolle Audioinhalte',
@@ -4066,15 +4089,15 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-Belegung',
       'telemetry_storage_io': 'Schreibrate',
       'theme_appearance': 'Erscheinungsbild & Design',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Verschneite Dorfnacht & warmer Hüttenglanz',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Verschneite Dorfnacht & warmer Hüttenglanz',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Warme Sonnenstrahlen & erfrischende Tagesbrise',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'AMOLED-Tiefschwarz • Mondsichel, Sterne & Sternschnuppen',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED-Tiefschwarz • Blühende Zweige & Kirschblüten',
       'unit_core': 'Kern',
       'unknown': 'Unbekannt',
@@ -4361,16 +4384,16 @@ class AppLocalizations {
       'telemetry_memory': 'Allocazione RAM',
       'telemetry_storage_io': 'Velocità di scrittura',
       'theme_appearance': 'Aspetto e tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc':
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
           'Notte nel villaggio innevato e caldo bagliore della baita',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Raggi di sole dorati e brezza fresca',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Nero assoluto AMOLED • Mezzaluna, stelle e pioggia di meteoriti',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Nero assoluto AMOLED • Rami fioriti e petali di sakura',
       'unit_core': 'Core',
       'unknown': 'Sconosciuto',
@@ -4607,7 +4630,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Optimale balans tussen prestaties en systeemvloeiendheid\nHoudt multitasking soepel',
       'settings_cpu_threads_6_desc': 'Hoge prestaties voor snelle videoverwerking\nBehoudt kernen voor systeemstabiliteit',
       'settings_cpu_threads_8_desc': 'Volledige benutting van alle processorkernen\nMaximale snelheid, warmte en batterijverbruik nemen toe',
-      'settings_audio_bitrate_64_desc': 'Standaard spraak-/stemkwaliteit\nMaximale opslagbesparing',
+      'settings_audio_bitrate_64_desc':
+          'Standaard spraak-/stemkwaliteit\nMaximale opslagbesparing',
       'settings_audio_bitrate_128_desc': 'Gebalanceerde standaardkwaliteit (aanbevolen)\nIdeaal voor de meeste video\'s en muziek',
       'settings_audio_bitrate_192_desc': 'Hoge kwaliteit met duidelijke audiodetails\nGeweldig voor muziek en dynamische spraak',
       'settings_audio_bitrate_256_desc': 'Zeer heldere kwaliteit dicht bij de bronopname\nGeschikt voor hoogwaardige audio-inhoud',
@@ -4657,15 +4681,16 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-toewijzing',
       'telemetry_storage_io': 'Schrijfsnelheid schijf',
       'theme_appearance': 'Uiterlijk & Thema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Besneeuwde dorpsnacht & warme gloed van de hut',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'Besneeuwde dorpsnacht & warme gloed van de hut',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Warme zonnestralen & verfrissende dagbries',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'AMOLED diepzwart • Halve maan, sterren & meteorenregen',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED diepzwart • Bloeiende takken & kersenbloesem',
       'unit_core': 'Kern',
       'unknown': 'Onbekend',
@@ -4897,9 +4922,11 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Optimal balance mellem ydeevne og systemflyd\nHolder multitasking responsiv',
       'settings_cpu_threads_6_desc': 'Høj ydeevne til hurtig videobehandling\nEfterlader kerner til systemstabilitet',
       'settings_cpu_threads_8_desc': 'Fuld udnyttelse af alle processorkerner\nMaksimal hastighed, enhedstemperatur og strømforbrug stiger',
-      'settings_audio_bitrate_64_desc': 'Standard tale-/stemmekvalitet\nMaksimal pladsbesparelse',
+      'settings_audio_bitrate_64_desc':
+          'Standard tale-/stemmekvalitet\nMaksimal pladsbesparelse',
       'settings_audio_bitrate_128_desc': 'Balanceret standardkvalitet (anbefales)\nIdeel til de fleste videoer og musik',
-      'settings_audio_bitrate_192_desc': 'Høj kvalitet med klare lyddetaljer\nFremragende til musik og dialog',
+      'settings_audio_bitrate_192_desc':
+          'Høj kvalitet med klare lyddetaljer\nFremragende til musik og dialog',
       'settings_audio_bitrate_256_desc': 'Meget klar kvalitet tæt på kildelyden\nVelegnet til high-fidelity lyd',
       'settings_audio_bitrate_320_desc': 'Maksimal AAC-lydbitrate (studiokvalitet)\nBedste akustiske gengivelse uden overkomprimering',
       'settings_cpu_preset': 'Indkodningshastighed',
@@ -4946,14 +4973,15 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-allokering',
       'telemetry_storage_io': 'Diskskrivehastighed',
       'theme_appearance': 'Udseende og tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Sneklædt landsbynat og varm hytteglød',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Sneklædt landsbynat og varm hytteglød',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Varme gyldne solstråler og forfriskende dagbrise',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'AMOLED ægte sort • Halvmåne, stjerner og stjerneskud',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
+          'AMOLED ægte sort • Halvmåne, stjerner og stjerneskud',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED ægte sort • Blomstrende grene og sakura-kronblade',
       'unit_core': 'Kerne',
       'unknown': 'Ukendt',
@@ -5181,12 +5209,14 @@ class AppLocalizations {
       'settings_clear_cache': 'Tyhjennä välimuisti nyt',
       'settings_clear_cache_success':
           'Välimuisti tyhjennetty! {size} vapautettu.',
-      'settings_cpu_threads_1_desc': 'Pienin akunkulutus ja viileä laite\nHitain koodausnopeus',
+      'settings_cpu_threads_1_desc':
+          'Pienin akunkulutus ja viileä laite\nHitain koodausnopeus',
       'settings_cpu_threads_2_desc': 'Erittäin kevyt ja vakaa CPU-kuormitus\nEniten tilaa raskaalle moniajolle',
       'settings_cpu_threads_4_desc': 'Optimaalinen tasapaino suorituskyvyn ja sujuvuuden välillä\nMoniajo pysyy sujuvana',
       'settings_cpu_threads_6_desc': 'Korkea suorituskyky nopeaan videonkäsittelyyn\nJättää ytimiä järjestelmän vakaudelle',
       'settings_cpu_threads_8_desc': 'Kaikkien suoritinytimien täysi käyttö\nMaksimaalinen nopeus, lämpö ja virrankulutus kasvavat',
-      'settings_audio_bitrate_64_desc': 'Tavallinen puheäänen laatu\nMaksimaalinen tallennustilan säästö',
+      'settings_audio_bitrate_64_desc':
+          'Tavallinen puheäänen laatu\nMaksimaalinen tallennustilan säästö',
       'settings_audio_bitrate_128_desc': 'Tasapainoinen vakiolaatu (suositeltu)\nIhanteellinen useimmille videoille ja musiikille',
       'settings_audio_bitrate_192_desc': 'Korkea laatu ja selkeät ääniyksityiskohdat\nErinomainen musiikille ja puheelle',
       'settings_audio_bitrate_256_desc': 'Erittäin selkeä laatu lähellä alkuperäistä äänitystä\nSopii korkealaatuiselle äänelle',
@@ -5236,16 +5266,16 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-muistin käyttö',
       'telemetry_storage_io': 'Levyn kirjoitusnopeus',
       'theme_appearance': 'Ulkoasu ja teema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Luminen kyläyö ja lämmin mökin loiste',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Luminen kyläyö ja lämmin mökin loiste',
       'theme_light': 'Daylight',
       'theme_light_desc':
           'Lämpimät kultaiset auringonsäteet ja raikas päiväbriisi',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Täydellinen AMOLED-musta • Puolikuu, tähdet ja tähdenlennot',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Täydellinen AMOLED-musta • Kukkivat oksat ja kirsikankukat',
       'unit_core': 'Ydin',
       'unknown': 'Tuntematon',
@@ -5469,14 +5499,17 @@ class AppLocalizations {
       'settings_change_folder': 'Endre mappe',
       'settings_clear_cache': 'Tøm hurtigbuffer nå',
       'settings_clear_cache_success': 'Hurtigbuffer tømt! {size} frigjort.',
-      'settings_cpu_threads_1_desc': 'Lavest batteriforbruk og kjølig enhet\nTregeste kodingshastighet',
+      'settings_cpu_threads_1_desc':
+          'Lavest batteriforbruk og kjølig enhet\nTregeste kodingshastighet',
       'settings_cpu_threads_2_desc': 'Svært lett og stabil CPU-belastning\nMaksimalt rom for tung multitasking',
       'settings_cpu_threads_4_desc': 'Optimal balanse mellom ytelse og systemflyt\nHolder multitasking responsiv',
       'settings_cpu_threads_6_desc': 'Høy ytelse for rask videobehandling\nBeholder kjerner for systemstabilitet',
       'settings_cpu_threads_8_desc': 'Full utnyttelse av alle prosessorkjerner\nMaksimal hastighet, temperatur og strømforbruk øker',
-      'settings_audio_bitrate_64_desc': 'Standard tale-/talekvalitet\nMaksimal lagringsbesparelse',
+      'settings_audio_bitrate_64_desc':
+          'Standard tale-/talekvalitet\nMaksimal lagringsbesparelse',
       'settings_audio_bitrate_128_desc': 'Balansert standardkvalitet (anbefales)\nIdeell for de fleste videoer og musikk',
-      'settings_audio_bitrate_192_desc': 'Høy kvalitet med klare lyddetaljer\nUtmerket for musikk og dialog',
+      'settings_audio_bitrate_192_desc':
+          'Høy kvalitet med klare lyddetaljer\nUtmerket for musikk og dialog',
       'settings_audio_bitrate_256_desc': 'Svært klar kvalitet nær kildeopptaket\nEgnet for høykvalitets lydinnhold',
       'settings_audio_bitrate_320_desc': 'Maksimal AAC-lydbithastighet (studiokvalitet)\nBeste akustiske gjengivelse uten overkomprimering',
       'settings_cpu_preset': 'Kodingshastighet',
@@ -5523,15 +5556,15 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-tildeling',
       'telemetry_storage_io': 'Skrivehastighet for disk',
       'theme_appearance': 'Utseende og tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Snødekket landsbynatt og varm hytteglød',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Snødekket landsbynatt og varm hytteglød',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Varme gylne solstråler og forfriskende bris',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'AMOLED ekte sort • Halvmåne, stjerner og stjerneskudd',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED ekte sort • Blomstrende grener og sakura-kronblader',
       'unit_core': 'Kjerne',
       'unknown': 'Ukjent',
@@ -5765,9 +5798,11 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'Optimal balans mellan prestanda och systemflyt\nHåller multitasking responsiv',
       'settings_cpu_threads_6_desc': 'Hög prestanda för snabb videorendering\nLämnar kärnor lediga för systemstabilitet',
       'settings_cpu_threads_8_desc': 'Fullt utnyttjande av alla processorkärnor\nMaximal hastighet, temperatur och strömförbrukning ökar',
-      'settings_audio_bitrate_64_desc': 'Standard röst-/samtalskvalitet\nMaximal lagringsbesparing',
+      'settings_audio_bitrate_64_desc':
+          'Standard röst-/samtalskvalitet\nMaximal lagringsbesparing',
       'settings_audio_bitrate_128_desc': 'Balanserad standardkvalitet (rekommenderas)\nPerfekt för de flesta videor och musik',
-      'settings_audio_bitrate_192_desc': 'Hög kvalitet med tydliga ljuddetaljer\nUtmärkt för musik och dialog',
+      'settings_audio_bitrate_192_desc':
+          'Hög kvalitet med tydliga ljuddetaljer\nUtmärkt för musik och dialog',
       'settings_audio_bitrate_256_desc': 'Mycket tydlig kvalitet nära originalinspelningen\nLämplig för högkvalitativt ljud',
       'settings_audio_bitrate_320_desc': 'Maximal AAC-ljudbithastighet (studiokvalitet)\nBästa akustiska trohet utan överdriven komprimering',
       'settings_cpu_preset': 'Kodningshastighet',
@@ -5814,15 +5849,15 @@ class AppLocalizations {
       'telemetry_memory': 'RAM-allokering',
       'telemetry_storage_io': 'Diskskrivhastighet',
       'theme_appearance': 'Utseende och tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Snöig bynatt och varm stugglöd',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'Snöig bynatt och varm stugglöd',
       'theme_light': 'Daylight',
       'theme_light_desc': 'Varma gyllene solstrålar och uppfriskande dagsbris',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'AMOLED äkta svart • Halvmåne, stjärnor och stjärnfall',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'AMOLED äkta svart • Blommande grenar och sakura-kronblad',
       'unit_core': 'Kärna',
       'unknown': 'Okänd',
@@ -6103,17 +6138,17 @@ class AppLocalizations {
       'telemetry_memory': 'Peruntukan RAM',
       'telemetry_storage_io': 'Kelajuan Menulis Cakera',
       'theme_appearance': 'Rupa & Tema',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc':
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
           'Malam Pedalaman Berselimut Salji & Cahaya Hangat Pondok',
       'theme_light': 'Daylight',
       'theme_light_desc':
           'Sinaran matahari keemasan dan angin segar menyamankan',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Hitam mutlak AMOLED • Bulan sabit, bintang dan hujan meteor',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Hitam mutlak AMOLED • Dahan berbunga dan kelopak sakura',
       'unit_core': 'Teras',
       'unknown': 'Tidak diketahui',
@@ -6346,8 +6381,10 @@ class AppLocalizations {
       'settings_clear_cache': 'Xóa bộ đệm ngay',
       'settings_clear_cache_success':
           'Đã xóa bộ nhớ đệm thành công! Đã giải phóng {size}.',
-      'settings_cpu_threads_1_desc': 'Tiết kiệm pin nhất và nhiệt độ máy mát\nTốc độ mã hóa chậm nhất',
-      'settings_cpu_threads_2_desc': 'Tải CPU rất nhẹ và ổn định\nThoải mái chạy đa nhiệm nặng',
+      'settings_cpu_threads_1_desc':
+          'Tiết kiệm pin nhất và nhiệt độ máy mát\nTốc độ mã hóa chậm nhất',
+      'settings_cpu_threads_2_desc':
+          'Tải CPU rất nhẹ và ổn định\nThoải mái chạy đa nhiệm nặng',
       'settings_cpu_threads_4_desc': 'Cân bằng tối ưu giữa hiệu năng và độ mượt của hệ thống\nĐa nhiệm vẫn mượt mà',
       'settings_cpu_threads_6_desc': 'Hiệu năng cao để xử lý video nhanh chóng\nGiữ lại các lõi cho hệ thống ổn định',
       'settings_cpu_threads_8_desc': 'Khai thác tối đa toàn bộ lõi vi xử lý\nTốc độ tối đa, nhiệt độ máy và mức tiêu thụ pin sẽ tăng',
@@ -6400,16 +6437,17 @@ class AppLocalizations {
       'telemetry_memory': 'Phân bổ RAM',
       'telemetry_storage_io': 'Tốc độ ghi đĩa',
       'theme_appearance': 'Giao diện & Chủ đề',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'Đêm làng quê phủ tuyết & ánh đèn ấm áp từ mái nhà',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc':
+          'Đêm làng quê phủ tuyết & ánh đèn ấm áp từ mái nhà',
       'theme_light': 'Daylight',
       'theme_light_desc':
           'Những tia nắng vàng ấm áp & làn gió ban ngày mát rượi',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc':
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
           'Đen tuyệt đối AMOLED • Trăng lưỡi liềm, các vì sao & mưa sao băng',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc':
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
           'Đen tuyệt đối AMOLED • Cành hoa nở rộ & cánh hoa anh đào',
       'unit_core': 'Lõi',
       'unknown': 'Không xác định',
@@ -6647,7 +6685,8 @@ class AppLocalizations {
       'settings_cpu_threads_4_desc': 'ความสมดุลที่เหมาะสมระหว่างประสิทธิภาพและความลื่นไหลของระบบ\nสลับใช้งานแอปอื่นได้อย่างราบรื่น',
       'settings_cpu_threads_6_desc': 'ประสิทธิภาพสูงเพื่อการประมวลผลวิดีโอที่รวดเร็ว\nเหลือคอร์ไว้เพื่อความเสถียรของระบบ',
       'settings_cpu_threads_8_desc': 'ใช้งานทุกคอร์ของโปรเซสเซอร์อย่างเต็มที่\nความเร็วสูงสุด อุณหภูมิเครื่องและการใช้พลังงานจะเพิ่มขึ้น',
-      'settings_audio_bitrate_64_desc': 'คุณภาพเสียงสนทนามาตรฐาน\nประหยัดพื้นที่จัดเก็บสูงสุด',
+      'settings_audio_bitrate_64_desc':
+          'คุณภาพเสียงสนทนามาตรฐาน\nประหยัดพื้นที่จัดเก็บสูงสุด',
       'settings_audio_bitrate_128_desc': 'คุณภาพมาตรฐานที่สมดุล (แนะนำ)\nเหมาะสำหรับวิดีโอและเพลงทั่วไปส่วนใหญ่',
       'settings_audio_bitrate_192_desc': 'คุณภาพสูงพร้อมรายละเอียดเสียงที่คมชัด\nยอดเยี่ยมสำหรับดนตรีและบทสนทนา',
       'settings_audio_bitrate_256_desc': 'คุณภาพคมชัดสูงใกล้เคียงกับต้นฉบับ\nเหมาะสำหรับเนื้อหาเสียงที่มีความเที่ยงตรงสูง',
@@ -6696,14 +6735,16 @@ class AppLocalizations {
       'telemetry_memory': 'การใช้ RAM',
       'telemetry_storage_io': 'ความเร็วในการเขียนดิสก์',
       'theme_appearance': 'รูปลักษณ์และธีม',
-      'theme_dark': 'Snowfall',
-      'theme_dark_desc': 'ค่ำคืนหมู่บ้านกลางหิมะและแสงอุ่นจากกระท่อม',
+      'theme_oled_snowfall': 'Snowfall',
+      'theme_oled_snowfall_desc': 'ค่ำคืนหมู่บ้านกลางหิมะและแสงอุ่นจากกระท่อม',
       'theme_light': 'Daylight',
       'theme_light_desc': 'แสงแดดสีทองอบอุ่นและสายลมสดชื่นยามกลางวัน',
-      'theme_oled': 'Midnight',
-      'theme_oled_desc': 'สีดำสนิท AMOLED • พระจันทร์เสี้ยว ดวงดาว และฝนดาวตก',
-      'theme_sakura': 'Sakura',
-      'theme_sakura_desc': 'สีดำสนิท AMOLED • กิ่งไม้ผลิบานและกลีบดอกซากุระ',
+      'theme_oled_midnight': 'Midnight',
+      'theme_oled_midnight_desc':
+          'สีดำสนิท AMOLED • พระจันทร์เสี้ยว ดวงดาว และฝนดาวตก',
+      'theme_oled_sakura': 'Sakura',
+      'theme_oled_sakura_desc':
+          'สีดำสนิท AMOLED • กิ่งไม้ผลิบานและกลีบดอกซากุระ',
       'unit_core': 'คอร์',
       'unknown': 'ไม่ทราบ',
       'video_already_low': 'วิดีโอมีความละเอียดต่ำอยู่แล้ว',
@@ -6714,7 +6755,7 @@ class AppLocalizations {
   };
 
   String t(String key, {Map<String, String>? args}) {
-    // Fallback language resolution (support country codes like zh_CN/zh_TW falling back to zh)
+    // Fallback language resolution (e.g. zh_CN -> zh)
     final langValues =
         _localizedValues[languageCode] ??
         _localizedValues[languageCode.split('_').first] ??

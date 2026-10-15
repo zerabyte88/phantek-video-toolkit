@@ -305,7 +305,7 @@ class DeviceSpecHelper {
               final cores = Platform.numberOfProcessors > 0
                   ? Platform.numberOfProcessors
                   : 8;
-              // Linux USER_HZ is standard 100 ticks per second (1 tick = 10ms)
+              // Standard USER_HZ (100 ticks/sec)
               final cpuPercent =
                   (deltaTicks / ((deltaTimeMs / 10.0) * cores)) * 100.0;
               _prevProcessTicks = currentProcessTicks;
@@ -343,7 +343,7 @@ class DeviceSpecHelper {
 
     try {
       if (Platform.isAndroid) {
-        // Run df on user data partition
+        // Query storage via df
         final result = await Process.run('df', ['-k', '/data']);
         if (result.exitCode == 0) {
           final lines = (result.stdout as String).trim().split('\n');
@@ -363,7 +363,7 @@ class DeviceSpecHelper {
       }
     } catch (_) {}
 
-    // Categorize to marketed storage sizes (32, 64, 128, 256, 512, 1024 GB)
+    // Map to standard storage tiers
     int marketedGb;
     if (totalMb <= 0) {
       marketedGb = 256;
@@ -446,9 +446,7 @@ class DeviceSpecHelper {
     final isQcom = has('qcom') || has('qualcomm') || has('snapdragon');
     final effectiveClockGhz = maxClockGhz ?? getMaxCpuClockGhz();
 
-    // -------------------------------------------------------------
-    // 1. HiSilicon Kirin SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // HiSilicon Kirin
     if (has('hi36d0') || has('kirin 9050') || has('kirin9050')) {
       return 'HiSilicon Kirin 9050 Pro';
     }
@@ -546,9 +544,7 @@ class DeviceSpecHelper {
       return 'HiSilicon Kirin 620';
     }
 
-    // -------------------------------------------------------------
-    // 2. Xiaomi In-House SoCs (XRING & Surge, ARM 64-bit)
-    // -------------------------------------------------------------
+    // Xiaomi XRING & Surge
     if (has('xring o3') ||
         has('xring-o3') ||
         has('xring_o3') ||
@@ -566,16 +562,12 @@ class DeviceSpecHelper {
       return 'Xiaomi Surge S1';
     }
 
-    // -------------------------------------------------------------
-    // 3. JLQ Technology SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // JLQ Technology
     if (has('jr510') || has('jlq')) {
       return 'JLQ JR510';
     }
 
-    // -------------------------------------------------------------
-    // 4. Google Tensor SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // Google Tensor
     if (has('tensor g6')) return 'Google Tensor G6';
     if (has('laguna') || has('frankel') || has('tensor g5')) {
       return 'Google Tensor G5';
@@ -589,9 +581,7 @@ class DeviceSpecHelper {
       return 'Google Tensor';
     }
 
-    // -------------------------------------------------------------
-    // 5. Samsung Exynos SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // Samsung Exynos
     if (has('s5e9965') || has('exynos 2600') || has('erd9965')) {
       return 'Samsung Exynos 2600';
     }
@@ -677,9 +667,7 @@ class DeviceSpecHelper {
       return 'Samsung Exynos 5433';
     }
 
-    // -------------------------------------------------------------
-    // 6. MediaTek Dimensity & Helio SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // MediaTek Dimensity & Helio
     if (hasWord('mt6995') || has('dimensity 9600')) {
       if (has('pro')) return 'MediaTek Dimensity 9600 Pro';
       if (has('9600m')) return 'MediaTek Dimensity 9600M';
@@ -917,9 +905,7 @@ class DeviceSpecHelper {
     if (hasWord('mt6735')) return 'MediaTek MT6735';
     if (hasWord('mt6732')) return 'MediaTek MT6732';
 
-    // -------------------------------------------------------------
-    // 7. Unisoc SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // Unisoc
     if (hasWord('t9300') || has('unisoc t9300')) return 'Unisoc T9300';
     if (hasWord('t9100') || has('unisoc t9100')) return 'Unisoc T9100';
     if (hasWord('t8300') || has('unisoc t8300')) return 'Unisoc T8300';
@@ -953,9 +939,7 @@ class DeviceSpecHelper {
     if (has('ums9230')) return 'Unisoc T606 / T616';
     if (has('ums512')) return 'Unisoc T618 / T610';
 
-    // -------------------------------------------------------------
-    // 8. Qualcomm Snapdragon SoCs (ARM 64-bit)
-    // -------------------------------------------------------------
+    // Qualcomm Snapdragon
     if (has('8 elite extreme') || has('8 elite gen 6 pro')) {
       return 'Qualcomm Snapdragon 8 Elite Extreme Gen 6';
     }
@@ -1266,9 +1250,9 @@ class DeviceSpecHelper {
       return 'Qualcomm Snapdragon 215';
     }
 
-    // Android device sysfs / procfs fallback for unlisted chipsets
+    // Sysfs / procfs fallback
     if (Platform.isAndroid) {
-      // 1. Try reading /sys/devices/soc0/machine
+      // Try /sys/devices/soc0/machine
       try {
         final machineFile = File('/sys/devices/soc0/machine');
         if (machineFile.existsSync()) {
@@ -1280,7 +1264,7 @@ class DeviceSpecHelper {
         }
       } catch (_) {}
 
-      // 2. Try reading /proc/cpuinfo Hardware line
+      // Try /proc/cpuinfo Hardware line
       try {
         final lines = File('/proc/cpuinfo').readAsLinesSync();
         for (final line in lines) {
@@ -1333,7 +1317,7 @@ class DeviceSpecHelper {
     required String board,
     required String socName,
   }) {
-    // 1. Try reading Qualcomm kgsl sysfs on Android
+    // Query Qualcomm kgsl sysfs
     if (Platform.isAndroid) {
       try {
         final gpuFile = File('/sys/class/kgsl/kgsl-3d0/gpu_model');
@@ -1359,14 +1343,14 @@ class DeviceSpecHelper {
       } catch (_) {}
     }
 
-    // 2. Correlate with detected SoC / chipset
+    // Correlate with detected SoC
     final s = socName.toLowerCase();
     final h = hardware.toLowerCase();
     final b = board.toLowerCase();
     final c = '$s $h $b';
     bool has(String k) => c.contains(k);
 
-    // --- HiSilicon Kirin Family ---
+    // Kirin
     if (s.contains('kirin') ||
         h.contains('hi36') ||
         h.contains('hi62') ||
@@ -1404,7 +1388,7 @@ class DeviceSpecHelper {
       return 'ARM Mali / Maleoon GPU';
     }
 
-    // --- Xiaomi In-House (XRING & Surge) ---
+    // Xiaomi
     if (s.contains('xring') ||
         s.contains('surge') ||
         h.contains('v670') ||
@@ -1415,7 +1399,7 @@ class DeviceSpecHelper {
       return 'ARM Immortalis / Mali GPU';
     }
 
-    // --- JLQ Technology ---
+    // JLQ
     if (s.contains('jlq') ||
         s.contains('jr510') ||
         h.contains('jr510') ||
@@ -1423,7 +1407,7 @@ class DeviceSpecHelper {
       return 'Mali-G57 MC1';
     }
 
-    // --- Samsung Exynos Family ---
+    // Exynos
     if (s.contains('exynos') || h.contains('s5e') || h.contains('universal')) {
       if (has('2600') || has('s5e9965')) return 'Samsung Xclipse 960';
       if (has('2500') || has('s5e9955')) return 'Samsung Xclipse 950';
@@ -1476,7 +1460,7 @@ class DeviceSpecHelper {
       return 'ARM Mali / Xclipse GPU';
     }
 
-    // --- Google Tensor Family ---
+    // Tensor
     if (s.contains('tensor') ||
         b.contains('laguna') ||
         b.contains('frankel') ||
@@ -1493,7 +1477,7 @@ class DeviceSpecHelper {
       return 'ARM Mali GPU';
     }
 
-    // --- Unisoc Family ---
+    // Unisoc
     if (s.contains('unisoc') ||
         h.contains('ums') ||
         b.contains('t820') ||
@@ -1529,7 +1513,7 @@ class DeviceSpecHelper {
       return 'Mali-G57 MP1';
     }
 
-    // --- MediaTek Dimensity & Helio Family ---
+    // MediaTek
     if (s.contains('mediatek') ||
         s.contains('dimensity') ||
         s.contains('helio') ||
@@ -1642,7 +1626,7 @@ class DeviceSpecHelper {
       return 'ARM Mali GPU';
     }
 
-    // --- Qualcomm Snapdragon Family ---
+    // Snapdragon
     if (s.contains('snapdragon') ||
         h.contains('sm') ||
         h.contains('sdm') ||
@@ -1833,7 +1817,7 @@ class DeviceSpecHelper {
       }
     }
 
-    // 1. Device Name (Nama HP)
+    // Device name
     String effectiveBrand = brand.isNotEmpty && brand.toLowerCase() != 'unknown'
         ? brand
         : (manufacturer.isNotEmpty && manufacturer.toLowerCase() != 'unknown'
@@ -1855,7 +1839,7 @@ class DeviceSpecHelper {
       deviceName = 'Desktop System';
     }
 
-    // 2. Model HP (Model Code)
+    // Model code
     String modelCode;
     if (Platform.isAndroid) {
       modelCode = model.isNotEmpty && model.toLowerCase() != 'unknown'
@@ -1865,7 +1849,7 @@ class DeviceSpecHelper {
       modelCode = 'PC / Workstation';
     }
 
-    // 3. CPU (Processor)
+    // CPU
     final maxClock = getMaxCpuClockGhz();
     final socDesc = describeSoc(
       hardware: hardware,
@@ -1886,18 +1870,18 @@ class DeviceSpecHelper {
             maxClockGhz: maxClock,
           ));
 
-    // 4. GPU (Graphics)
+    // GPU
     final gpu = detectGpuName(
       hardware: hardware,
       board: board,
       socName: cpuSoc,
     );
 
-    // 5. RAM
+    // RAM
     final ramMb = getTotalRamMb();
     final marketedRamGb = getMarketedRamGb(ramMb);
 
-    // 6. Storage
+    // Storage
     final storageData = await getStorageInfo();
 
     return {
@@ -1912,7 +1896,7 @@ class DeviceSpecHelper {
       'storageFree': storageData['freeStr'] as String? ?? '142 GB',
       'storageDisplay': storageData['storageDisplay'] as String? ?? '256 GB',
       'cores': socDesc.coreCount,
-      // Backwards-compatible keys
+      // Backward-compatible keys
       'model': model,
       'manufacturer': manufacturer,
       'hardware': hardware,
@@ -1957,8 +1941,7 @@ class DeviceSpecHelper {
     return 35.0; // Fallback normal temp
   }
 
-  /// Maximum number of threads that can safely run without high risk of OOM
-  /// on the given total RAM capacity.
+  /// Maximum safe thread count based on total RAM.
   static int maxSafeThreadCount(int ramMb, [int? customPhysicalCores]) {
     final physical =
         customPhysicalCores ??
@@ -1972,8 +1955,7 @@ class DeviceSpecHelper {
     }
   }
 
-  /// Check whether the detected SoC falls into entry-level or legacy category
-  /// where 4 cores is the maximum safe allocation.
+  /// Checks whether the detected SoC is entry-level or legacy (capped at 4 cores).
   static bool isEntryOrLegacySoc({
     String? socName,
     String? hardware,
@@ -2181,12 +2163,12 @@ class DeviceSpecHelper {
         customPhysicalCores ??
         (Platform.numberOfProcessors > 0 ? Platform.numberOfProcessors : 8);
 
-    // 1. Manual User Selection: Always respect user choice clamped to physical cores
+    // Manual selection: clamped to physical cores
     if (requestedThreads != null && requestedThreads > 0) {
       return requestedThreads.clamp(1, physicalCores);
     }
 
-    // 2. Auto Mode: Adaptive hardware tiering
+    // Auto mode: adaptive hardware tiering
     final ramMb = customRamMb ?? getTotalRamMb();
     final soc =
         customSoc ??
@@ -2194,7 +2176,7 @@ class DeviceSpecHelper {
             ? detectSocName(hardware: '', board: '', manufacturer: '')
             : '');
 
-    // Check if video is 4K (width >= 3840 or height >= 2160)
+    // 4K resolution check
     final bool is4K =
         video != null &&
         (video.width >= 3840 ||

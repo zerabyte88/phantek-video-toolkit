@@ -18,7 +18,7 @@ import '../widgets/video_info_card.dart';
 import 'processing_screen.dart';
 import 'settings_screen.dart';
 
-// ─── Enum mode aplikasi ───────────────────────────────────────────────────────
+// App operation modes
 enum _AppMode { convert, downscale, extractor }
 
 class HomeScreen extends StatefulWidget {
@@ -31,7 +31,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
 
-  // Easter Egg State
+  // Easter egg state
   int _easterEggTapCount = 0;
   DateTime? _lastEasterEggTapTime;
 
@@ -68,7 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onSettingsChanged() {
     if (!mounted) return;
-    final preset = SpeedPreset.fromCpuPreset(_settingsService.settings.cpuPreset);
+    final preset = SpeedPreset.fromCpuPreset(
+      _settingsService.settings.cpuPreset,
+    );
     if (_encodingOptions.speedPreset != preset) {
       setState(() {
         _encodingOptions = _encodingOptions.copyWith(
@@ -125,14 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final retryCount = marker['retryCount'] as int? ?? 0;
     final timestamp = marker['timestamp'] as int? ?? 0;
 
-    // If marker is stale (> 24 hours), clear and return
+    // Clear stale marker (>24 hours)
     final age = DateTime.now().millisecondsSinceEpoch - timestamp;
     if (age > 24 * 60 * 60 * 1000) {
       await _settingsService.clearJobMarker();
       return;
     }
 
-    // Clean partial file if left over
+    // Clean leftover partial file
     if (outputPath != null && outputPath.isNotEmpty) {
       try {
         final f = File(outputPath);
@@ -194,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 await _settingsService.clearJobMarker();
                 if (ctx.mounted) Navigator.of(ctx).pop();
 
-                // If input file still exists, auto-load it
+                // Auto-load input file if still available
                 if (inputPath != null && File(inputPath).existsSync()) {
                   _loadVideoFromPath(inputPath);
                 }
@@ -212,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ─── Video Picking ───────────────────────────────────────────────────────
+  // Video selection
 
   Future<void> _pickVideo() async {
     final l10n = _settingsService.l10n;
@@ -229,17 +231,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final files = await FilePicker.pickFiles(type: FileType.video);
+      final file = await FilePicker.pickFile(type: FileType.video);
 
       if (!mounted) return;
 
-      if (files.isNotEmpty) {
-        final file = files.first;
-        if (file.path == null) {
-          setState(() => _isLoading = false);
-          return;
-        }
-
+      if (file != null && file.path != null) {
         await _loadVideoFromPath(file.path!);
       } else {
         setState(() => _isLoading = false);
@@ -293,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ─── Mode Switching ──────────────────────────────────────────────────────
+  // Mode switching
 
   List<VideoResolution> _getResolutionsForMode(
     _AppMode mode, [
@@ -375,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ? _encodingOptions
         : _encodingOptions.copyWith(codec: VideoCodec.h264);
 
-    // Dual-trigger confirmation dialog for heavy processing (Q5)
+    // Heavy processing confirmation dialog
     if (_selectedMode != _AppMode.extractor &&
         options.speedPreset == SpeedPreset.max &&
         _videoInfo!.isHeavyProcessing) {
@@ -403,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               TextButton(
                 onPressed: () {
-                  // Switch to Normal preset as fast alternative
+                  // Switch to Normal preset
                   options = options.copyWith(
                     speedPreset: SpeedPreset.normal,
                     crfValue: SpeedPreset.normal.defaultCrf,
@@ -447,7 +443,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ─── Easter Egg ─────────────────────────────────────────────────────────
+  // Easter egg
 
   void _onHeaderTitleTap() async {
     final now = DateTime.now();
@@ -465,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (!isAlreadyUnlocked) {
         await _settingsService.setEasterEggUnlocked(true);
-        await _settingsService.setThemeMode('sakura');
+        await _settingsService.setThemeMode('oled_sakura');
       }
 
       if (mounted) {
@@ -508,8 +504,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-
-  // ─── Build ───────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -559,7 +553,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ─── Loading State ───────────────────────────────────────────────────────
+  // Loading state
 
   Widget _buildLoadingState(ThemeData theme, AppLocalizations l10n) {
     return Center(
@@ -604,7 +598,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ─── Empty / Landing State ───────────────────────────────────────────────
+  // Empty state
 
   Widget _buildEmptyState(ThemeData theme, AppLocalizations l10n) {
     return SingleChildScrollView(
@@ -612,19 +606,19 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Mode Segmented Control ───────────────────────────────
+          // Mode selector
           _buildSegmentedModeBar(theme, l10n),
 
           const SizedBox(height: 20),
 
-          // ── Clean Media Import Box ───────────────────────────────
+          // Media import box
           _buildImportCard(theme, l10n),
         ],
       ),
     );
   }
 
-  /// Modern, clean Segmented Control for Mode selection
+  /// Segmented control for mode selection.
   Widget _buildSegmentedModeBar(ThemeData theme, AppLocalizations l10n) {
     final isVideoActive =
         _selectedMode == _AppMode.convert ||
@@ -649,7 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Video Group (Convert & Downscale) ───────────────────
+            // Video modes
             Expanded(
               flex: 11,
               child: Column(
@@ -720,7 +714,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            // ── Audio Group (Audio Extractor) ──────────────────────
+            // Audio modes
             Expanded(
               flex: 8,
               child: Column(
@@ -787,7 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Clean, modern Import / Select Video Card
+  /// Video selection card.
   Widget _buildImportCard(ThemeData theme, AppLocalizations l10n) {
     return AppGlassCard(
       onTap: _pickVideo,
@@ -843,7 +837,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ─── Content State (Video Loaded) ─────────────────────────────────────────
+  // Loaded state
 
   Widget _buildContent(ThemeData theme, AppLocalizations l10n) {
     return SingleChildScrollView(
@@ -851,15 +845,15 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Mode switch bar at top
+          // Mode switch
           _buildSegmentedModeBar(theme, l10n),
           const SizedBox(height: 14),
 
-          // Video spec info card
+          // Video info card
           VideoInfoCard(videoInfo: _videoInfo!),
           const SizedBox(height: 14),
 
-          // Options & resolutions / Audio Extractor
+          // Options card
           if (_selectedMode == _AppMode.extractor)
             AudioExtractorCard(
               sourceVideo: _videoInfo!,
@@ -883,7 +877,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 20),
 
-          // Start conversion CTA
+          // Start conversion
           ElevatedButton.icon(
             onPressed:
                 ((_selectedMode == _AppMode.extractor &&
@@ -924,7 +918,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ─── Segment Item Component ──────────────────────────────────────────────────
+// Segment item widget
 
 class _SegmentItem extends StatelessWidget {
   final IconData icon;

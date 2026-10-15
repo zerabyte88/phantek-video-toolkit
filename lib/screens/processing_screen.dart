@@ -92,8 +92,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
-    // Force wakelock ON so the screen & CPU stay active during encoding,
-    // regardless of the user's global "Keep Screen Awake" setting.
+    // Keep display and CPU awake during processing
     WakelockPlus.enable();
     _startProcessing();
   }
@@ -103,7 +102,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     _timer?.cancel();
     _pulseController.dispose();
     ForegroundServiceManager().stopService();
-    // Restore wakelock to the user's preference.
+    // Restore user wakelock preference
     WakelockPlus.toggle(enable: _settingsService.settings.keepScreenAwake);
     if (_isProcessing) {
       FFmpegService.cancelAll();
@@ -173,7 +172,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       text: '$actionText 0.0%',
     );
 
-    // 1-second timer to update elapsed time and live system telemetry
+    // Periodic telemetry update timer
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (!mounted || !_isProcessing) {
@@ -185,7 +184,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         final elapsed = now.difference(_startTime!);
         final remaining = _calculateRemainingTime(_progress, elapsed);
 
-        // Check thermal every 10 seconds
+        // Check thermal status every 10s
         if (timer.tick % 10 == 0) {
           final temp = await DeviceSpecHelper.getBatteryTemperature();
           if (temp >= 45.0 && mounted) {
@@ -204,7 +203,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           }
         }
 
-        // 1. Memory Usage (RSS in MB)
+        // Memory (RSS)
         int memMb = DeviceSpecHelper.getProcessRssMb();
         final targetBuffer = widget.appSettings.ramBufferMb > 0
             ? widget.appSettings.ramBufferMb
@@ -215,7 +214,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           memMb = (baseMem + jitter).round();
         }
 
-        // 2. Storage I/O (Throughput in MB/s)
+        // Storage throughput
         int currentBytes = _latestOutputBytes;
         if (currentBytes == 0 && _outputPath != null) {
           try {
@@ -243,7 +242,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ioMb = (1.2 * baseSpeed + wave).clamp(0.5, 12.0);
         }
 
-        // 3. CPU Usage (Real measurement from /proc/self/stat with smart workload fallback)
+        // CPU usage from /proc/self/stat
         final totalCores = Platform.numberOfProcessors > 0
             ? Platform.numberOfProcessors
             : 8;
@@ -258,7 +257,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           if (realCpu > 0.0) {
             cpuPercent = realCpu.round().clamp(5, 100);
           } else {
-            // Adaptive workload fallback based on thread allocation ratio
+            // Workload-based fallback estimate
             final threadRatio = (threads / totalCores).clamp(0.2, 1.0);
             final basePercent = threadRatio * 82.0;
             final jitter = ((elapsed.inSeconds * 7 + 2) % 11) - 5;
@@ -333,7 +332,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           ? ' | ETA: ${_formatDuration(remaining)}'
           : '';
 
-      // Always update foreground notification even if app is minimized
+      // Update foreground notification
       ForegroundServiceManager().updateService(
         title: l10n.t('app_title'),
         text: '$actionText ${_formatPercentage(progress)}$etaStr',
@@ -399,7 +398,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         force: true,
       );
     }
-    // Restore wakelock to user's preference now that encoding is done.
+    // Restore user wakelock preference
     WakelockPlus.toggle(enable: _settingsService.settings.keepScreenAwake);
     Future.delayed(const Duration(seconds: 4), () {
       ForegroundServiceManager().stopService();
@@ -631,7 +630,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     return Column(
       children: [
-        // Main circular dual-ring progress with center radial glow
+        // Circular progress indicator
         SizedBox(
           width: 190,
           height: 190,
@@ -728,7 +727,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     );
   }
 
-  /// Live System Telemetry Cards: Processor Load (Left), RAM Allocation (Middle), and Disk Write (Right)
+  /// Telemetry cards: CPU, RAM, and disk write speed.
   Widget _buildLiveSystemTelemetry(ThemeData theme, l10n) {
     final threads = DeviceSpecHelper.resolveThreadCount(
       video: widget.videoInfo,
@@ -737,7 +736,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 
     return Row(
       children: [
-        // 1. CPU (Left) - Beban Prosesor
+        // CPU load
         Expanded(
           child: _buildTelemetryTile(
             theme: theme,
@@ -754,7 +753,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
         const SizedBox(width: 8),
 
-        // 2. RAM (Middle) - Alokasi RAM
+        // RAM allocation
         Expanded(
           child: _buildTelemetryTile(
             theme: theme,
@@ -771,7 +770,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
         const SizedBox(width: 8),
 
-        // 3. Storage / Disk (Right) - Laju Tulis Disk
+        // Disk write speed
         Expanded(
           child: _buildTelemetryTile(
             theme: theme,
@@ -887,7 +886,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Column(
         children: [
-          // Row 1: Time telemetry (Elapsed & Remaining)
+          // Elapsed and remaining time
           Row(
             children: [
               Expanded(
@@ -993,9 +992,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             ),
           ],
           Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
-          // Row 2: Compact media specifications
+          // Media specifications
           _buildCompactMediaSpecs(theme, l10n),
-          // Row 3 (if finished): Output size & location
+          // Output size and location
           if (_isSuccess && _outputPath != null) ...[
             Divider(height: 14, color: theme.colorScheme.outline.withAlpha(40)),
             _buildOutputSummary(theme, l10n),
@@ -1871,12 +1870,12 @@ class _WindowsGraphPainter extends CustomPainter {
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 
-    // 3 horizontal grid lines (at 25%, 50%, 75% height)
+    // Horizontal grid lines
     for (int i = 1; i <= 3; i++) {
       final y = size.height * (i / 4.0);
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
-    // 4 vertical grid lines (at 20%, 40%, 60%, 80% width)
+    // Vertical grid lines
     for (int i = 1; i <= 4; i++) {
       final x = size.width * (i / 5.0);
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
@@ -1896,7 +1895,7 @@ class _WindowsGraphPainter extends CustomPainter {
       points.add(Offset(x, y));
     }
 
-    // 1. Area fill below curve
+    // Fill area
     final fillPath = Path();
     fillPath.moveTo(points.first.dx, size.height);
     for (final pt in points) {
@@ -1918,7 +1917,7 @@ class _WindowsGraphPainter extends CustomPainter {
 
     canvas.drawPath(fillPath, fillPaint);
 
-    // 2. Stroke line
+    // Stroke line
     final linePath = Path();
     linePath.moveTo(points.first.dx, points.first.dy);
     for (int i = 1; i < points.length; i++) {
@@ -1934,7 +1933,7 @@ class _WindowsGraphPainter extends CustomPainter {
 
     canvas.drawPath(linePath, linePaint);
 
-    // 3. Leading Head Dot
+    // Leading dot
     if (points.isNotEmpty && isProcessing) {
       final head = points.last;
       final headPaint = Paint()
@@ -1973,16 +1972,16 @@ class _DualRingProgressPainter extends CustomPainter {
     const mainStrokeWidth = 7.5;
     const outerStrokeWidth = 2.4;
 
-    // Main inner track radius
+    // Track radius
     final mainRadius = (size.width - 28) / 2;
     final mainRect = Rect.fromCircle(center: center, radius: mainRadius);
 
-    // Outer orbit radius
+    // Orbit radius
     final outerRadius = mainRadius + 8.5;
     final outerRect = Rect.fromCircle(center: center, radius: outerRadius);
 
     if (isProcessing) {
-      // 1. Dynamic Center Radial Glow Aura (Pulsing breath)
+      // Center glow
       final glowPulse = 0.5 + 0.5 * math.sin(animationValue * 2 * math.pi);
       final glowRadius = mainRadius * 0.75;
       final glowPaint = Paint()
@@ -1996,7 +1995,7 @@ class _DualRingProgressPainter extends CustomPainter {
       canvas.drawCircle(center, glowRadius, glowPaint);
     }
 
-    // 2. Base track circle (Inner)
+    // Base track
     final trackPaint = Paint()
       ..color = trackColor
       ..strokeWidth = mainStrokeWidth
@@ -2004,14 +2003,14 @@ class _DualRingProgressPainter extends CustomPainter {
     canvas.drawCircle(center, mainRadius, trackPaint);
 
     if (isProcessing) {
-      // 3. Outer faint Orbit Guide Track
+      // Orbit guide track
       final outerGuidePaint = Paint()
         ..color = color.withAlpha(15)
         ..strokeWidth = 1.0
         ..style = PaintingStyle.stroke;
       canvas.drawCircle(center, outerRadius, outerGuidePaint);
 
-      // 4. Deterministic Progress Arc (0.0 to 1.0)
+      // Progress arc
       final clampedProgress = progress.clamp(0.0, 1.0);
       if (clampedProgress > 0.005) {
         final sweepAngle = clampedProgress * 2 * math.pi;
@@ -2030,7 +2029,7 @@ class _DualRingProgressPainter extends CustomPainter {
         );
       }
 
-      // 5. Outer Orbiting Energy Pulse Arc (Continuous 1500ms rotation)
+      // Orbit pulse arc
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.rotate(animationValue * 2 * math.pi);
@@ -2058,7 +2057,7 @@ class _DualRingProgressPainter extends CustomPainter {
 
       canvas.drawArc(outerRect, 0.0, orbitSweep, false, orbitPaint);
 
-      // Smooth rounded tip ONLY at the leading head (tail fades cleanly to 0 opacity with no artifact dot)
+      // Rounded leading tip
       final headX = center.dx + outerRadius * math.cos(orbitSweep);
       final headY = center.dy + outerRadius * math.sin(orbitSweep);
       final headPaint = Paint()
@@ -2068,7 +2067,7 @@ class _DualRingProgressPainter extends CustomPainter {
 
       canvas.restore();
     } else {
-      // Completed or Error state full ring
+      // Full ring on complete or error
       final resultPaint = Paint()
         ..color = isSuccess ? const Color(0xFF10B981) : const Color(0xFFEF4444)
         ..strokeWidth = mainStrokeWidth

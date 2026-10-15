@@ -25,7 +25,7 @@ class AudioExtractorCard extends StatelessWidget {
 
     int bitrateKbps = encodingOptions.audioExtractBitrateKbps;
     if (bitrateKbps <= 0) {
-      // Stream copy: approximate with 160 kbps if source bitrate unknown
+      // Fallback estimate if source bitrate is unknown
       bitrateKbps = 160;
     }
 
@@ -113,7 +113,7 @@ class AudioExtractorCard extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // 1. Audio Format Selection
+          // Audio format
           Row(
             children: [
               Icon(
@@ -189,7 +189,7 @@ class AudioExtractorCard extends StatelessWidget {
           Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 16),
 
-          // 2. Audio Bitrate / Quality Selection (only if not WAV)
+          // Audio bitrate
           if (encodingOptions.audioFormat != AudioFormat.wav) ...[
             Row(
               children: [
@@ -292,7 +292,7 @@ class AudioExtractorCard extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // 3. Estimated Output Size
+          // Estimated size
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(

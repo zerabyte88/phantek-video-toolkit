@@ -1,40 +1,40 @@
 import 'dart:io';
 
 class AppSettings {
-  /// Number of CPU threads for FFmpeg. 0 means auto-detect / use all.
+  /// CPU thread count. 0 triggers auto-detection.
   final int cpuThreads;
 
-  /// RAM buffer size in MB for FFmpeg memory caching / buffer management.
+  /// RAM buffer size in MB.
   final int ramBufferMb;
 
-  /// FFmpeg preset for x264/x265 (ultrafast, superfast, veryfast, faster, fast, medium, slow).
+  /// Encoding speed preset.
   final String cpuPreset;
 
-  /// Audio bitrate in kbps (e.g. 64, 128, 192, 256). 0 means mute / strip audio.
+  /// Audio bitrate in kbps. 0 mutes audio.
   final int audioBitrateKbps;
 
-  /// Selected language code: 'id', 'en', 'ja', 'zh_CN', 'zh_TW', 'ko'.
+  /// Active language code.
   final String languageCode;
 
-  /// App theme mode: 'dark', 'oled', 'light'.
+  /// Active theme identifier.
   final String themeMode;
 
-  /// Keep screen awake / prevent display sleeping during encoding or app usage.
+  /// Keep screen awake during app usage.
   final bool keepScreenAwake;
 
-  /// True if the app is launched for the first time
+  /// True on first launch.
   final bool isFirstLaunch;
 
-  /// Custom output directory path chosen by the user. If empty, defaults to Movies folder.
+  /// Custom video output directory.
   final String outputDirectory;
 
-  /// Custom output directory path for extracted audio files. If empty, defaults to Music folder.
+  /// Custom audio output directory.
   final String audioOutputDirectory;
 
-  /// True if the hidden AMOLED Sakura easter egg theme has been unlocked.
+  /// True if Sakura theme is unlocked.
   final bool isEasterEggUnlocked;
 
-  /// Card surface opacity factor between 0.50 (50%) and 1.00 (100%).
+  /// Card surface opacity (0.50 to 1.00).
   final double cardOpacity;
 
   const AppSettings({
@@ -43,7 +43,7 @@ class AppSettings {
     this.cpuPreset = 'medium',
     this.audioBitrateKbps = 128,
     this.languageCode = 'en',
-    this.themeMode = 'dark',
+    this.themeMode = 'oled_snowfall',
     this.keepScreenAwake = false,
     this.isFirstLaunch = true,
     this.outputDirectory = '',
@@ -52,7 +52,7 @@ class AppSettings {
     this.cardOpacity = 1.0,
   });
 
-  /// Detected hardware core count of the phone.
+  /// Physical CPU core count.
   static int get deviceCoreCount => Platform.numberOfProcessors;
 
   AppSettings copyWith({
@@ -106,7 +106,7 @@ class AppSettings {
     };
   }
 
-  /// Sanitize preset to ensure only fast, medium, or slow are used.
+  /// Normalizes preset to supported values (fast, medium, slow).
   static String sanitizePreset(String? preset) {
     if (preset == 'fast' || preset == 'slow') return preset!;
     if (preset == 'ultrafast' ||
@@ -127,14 +127,14 @@ class AppSettings {
       cpuPreset: sanitizePreset(json['cpuPreset'] as String?),
       audioBitrateKbps: json['audioBitrateKbps'] as int? ?? 128,
       languageCode: json['languageCode'] as String? ?? 'en',
-      themeMode: json['themeMode'] as String? ?? 'dark',
+      themeMode: json['themeMode'] as String? ?? 'oled_snowfall',
       keepScreenAwake: json['keepScreenAwake'] as bool? ?? false,
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
       outputDirectory: json['outputDirectory'] as String? ?? '',
       audioOutputDirectory: json['audioOutputDirectory'] as String? ?? '',
       isEasterEggUnlocked:
           json['isEasterEggUnlocked'] as bool? ??
-          (json['themeMode'] == 'sakura'),
+          (json['themeMode'] == 'oled_sakura' || json['themeMode'] == 'sakura'),
       cardOpacity:
           (json['cardOpacity'] as num?)?.toDouble().clamp(0.5, 1.0) ?? 1.0,
     );

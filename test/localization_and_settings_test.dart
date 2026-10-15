@@ -309,7 +309,7 @@ void main() {
       expect(settings.cpuPreset, equals('medium'));
       expect(settings.audioBitrateKbps, equals(128));
       expect(settings.languageCode, equals('en'));
-      expect(settings.themeMode, equals('dark'));
+      expect(settings.themeMode, equals('oled_snowfall'));
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
       expect(settings.audioOutputDirectory, equals(''));
@@ -323,7 +323,7 @@ void main() {
         cpuPreset: 'fast',
         audioBitrateKbps: 192,
         languageCode: 'ja',
-        themeMode: 'oled',
+        themeMode: 'oled_midnight',
         keepScreenAwake: true,
         outputDirectory: '/custom/storage/Movies',
         audioOutputDirectory: '/custom/storage/Music',
@@ -338,7 +338,7 @@ void main() {
       expect(restored.cpuPreset, equals('fast'));
       expect(restored.audioBitrateKbps, equals(192));
       expect(restored.languageCode, equals('ja'));
-      expect(restored.themeMode, equals('oled'));
+      expect(restored.themeMode, equals('oled_midnight'));
       expect(restored.keepScreenAwake, isTrue);
       expect(restored.outputDirectory, equals('/custom/storage/Movies'));
       expect(restored.audioOutputDirectory, equals('/custom/storage/Music'));
@@ -353,7 +353,7 @@ void main() {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
         expect(l10n.t('settings_theme').isNotEmpty, isTrue);
-        expect(l10n.t('theme_oled').isNotEmpty, isTrue);
+        expect(l10n.t('theme_oled_midnight').isNotEmpty, isTrue);
         expect(l10n.t('theme_light').isNotEmpty, isTrue);
         expect(l10n.t('settings_wakelock').isNotEmpty, isTrue);
         expect(l10n.t('settings_wakelock_desc').isNotEmpty, isTrue);
@@ -1195,10 +1195,10 @@ void main() {
 
   group('Theme System and AMOLED Sakura Easter Egg tests', () {
     test('AppTheme returns valid ThemeData for all modes including sakura', () {
-      final dark = AppTheme.getTheme('dark');
-      final oled = AppTheme.getTheme('oled');
+      final dark = AppTheme.getTheme('oled_snowfall');
+      final oled = AppTheme.getTheme('oled_midnight');
       final light = AppTheme.getTheme('light');
-      final sakura = AppTheme.getTheme('sakura');
+      final sakura = AppTheme.getTheme('oled_sakura');
       final oledSakura = AppTheme.getTheme('oled_sakura');
 
       expect(dark.brightness, equals(Brightness.dark));
@@ -1217,21 +1217,27 @@ void main() {
       () {
         for (final code in supportedCodes) {
           final l10n = AppLocalizations(code);
-          expect(l10n.t('theme_dark').isNotEmpty, isTrue);
-          expect(l10n.t('theme_dark_desc').isNotEmpty, isTrue);
-          expect(l10n.t('theme_dark_desc'), isNot(equals('theme_dark_desc')));
+          expect(l10n.t('theme_oled_snowfall').isNotEmpty, isTrue);
+          expect(l10n.t('theme_oled_snowfall_desc').isNotEmpty, isTrue);
+          expect(
+            l10n.t('theme_oled_snowfall_desc'),
+            isNot(equals('theme_oled_snowfall_desc')),
+          );
 
-          expect(l10n.t('theme_oled').isNotEmpty, isTrue);
-          expect(l10n.t('theme_oled_desc').isNotEmpty, isTrue);
-          expect(l10n.t('theme_oled_desc'), isNot(equals('theme_oled_desc')));
+          expect(l10n.t('theme_oled_midnight').isNotEmpty, isTrue);
+          expect(l10n.t('theme_oled_midnight_desc').isNotEmpty, isTrue);
+          expect(
+            l10n.t('theme_oled_midnight_desc'),
+            isNot(equals('theme_oled_midnight_desc')),
+          );
 
           expect(l10n.t('theme_light').isNotEmpty, isTrue);
           expect(l10n.t('theme_light_desc').isNotEmpty, isTrue);
           expect(l10n.t('theme_light_desc'), isNot(equals('theme_light_desc')));
 
-          expect(l10n.t('theme_dark'), equals('Snowfall'));
-          expect(l10n.t('theme_oled'), equals('Midnight'));
-          expect(l10n.t('theme_sakura'), equals('Sakura'));
+          expect(l10n.t('theme_oled_snowfall'), equals('Snowfall'));
+          expect(l10n.t('theme_oled_midnight'), equals('Midnight'));
+          expect(l10n.t('theme_oled_sakura'), equals('Sakura'));
           expect(l10n.t('theme_light'), equals('Daylight'));
         }
       },
@@ -1247,7 +1253,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: const SettingsScreen(),
           ),
         );
@@ -1338,7 +1344,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: Scaffold(
               body: StatefulBuilder(
                 builder: (context, setState) {
@@ -1363,25 +1369,31 @@ void main() {
         await tester.pumpAndSettle();
 
         // 60, 50, 48 FPS chips should be disabled for 30 FPS video with tooltip
-        final chip60 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '60 FPS'));
+        final chip60 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '60 FPS'),
+        );
         expect(chip60.onSelected, isNull);
-        final chip50 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '50 FPS'));
+        final chip50 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '50 FPS'),
+        );
         expect(chip50.onSelected, isNull);
-        final chip48 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '48 FPS'));
+        final chip48 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '48 FPS'),
+        );
         expect(chip48.onSelected, isNull);
 
         // 30, 25, 24 FPS, Asli, and Kustom chips should be present and enabled
-        final chip30 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '30 FPS'));
+        final chip30 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '30 FPS'),
+        );
         expect(chip30.onSelected, isNotNull);
-        final chip25 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '25 FPS'));
+        final chip25 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '25 FPS'),
+        );
         expect(chip25.onSelected, isNotNull);
-        final chip24 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '24 FPS'));
+        final chip24 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '24 FPS'),
+        );
         expect(chip24.onSelected, isNotNull);
         expect(find.widgetWithText(ChoiceChip, 'Asli'), findsOneWidget);
         expect(find.widgetWithText(ChoiceChip, 'Kustom'), findsOneWidget);
@@ -1431,7 +1443,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: Scaffold(
               body: StatefulBuilder(
                 builder: (context, setState) {
@@ -1456,8 +1468,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // 60 FPS chip SHOULD be present and enabled for 60 FPS video
-        final chip60 =
-            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '60 FPS'));
+        final chip60 = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, '60 FPS'),
+        );
         expect(chip60.onSelected, isNotNull);
 
         // Tap Kustom chip
@@ -1507,7 +1520,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: Scaffold(
               body: SingleChildScrollView(
                 child: ConversionOptionsCard(
@@ -1904,7 +1917,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: const SettingsScreen(),
           ),
         );
@@ -1961,7 +1974,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: Scaffold(
               body: SingleChildScrollView(
                 child: ConversionOptionsCard(
@@ -2115,7 +2128,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: AppTheme.getTheme('dark'),
+            theme: AppTheme.getTheme('oled_snowfall'),
             home: const SettingsScreen(),
           ),
         );
@@ -2171,7 +2184,7 @@ void main() {
           MediaQuery(
             data: const MediaQueryData(textScaler: TextScaler.linear(2.0)),
             child: MaterialApp(
-              theme: AppTheme.getTheme('dark'),
+              theme: AppTheme.getTheme('oled_snowfall'),
               home: Scaffold(
                 body: Padding(
                   padding: const EdgeInsets.all(16),
@@ -2360,7 +2373,7 @@ void main() {
         expect(find.byIcon(Icons.ac_unit_rounded), findsOneWidget);
 
         // 4. oled (Midnight) -> Icons.nightlight_round
-        await service.setThemeMode('oled');
+        await service.setThemeMode('oled_midnight');
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.getTheme(service.settings.themeMode),
@@ -3092,7 +3105,8 @@ void main() {
         expect(
           presetTitle.contains('x264/x265'),
           isFalse,
-          reason: 'Language $code still contains x264/x265 in settings_cpu_preset',
+          reason:
+              'Language $code still contains x264/x265 in settings_cpu_preset',
         );
 
         // Check all 5 CPU thread descriptions exist and are non-empty
@@ -3100,7 +3114,11 @@ void main() {
         for (final key in threadKeys) {
           final text = l10n.t(key);
           expect(text, isNotEmpty, reason: 'Key $key empty in $code');
-          expect(text, isNot(equals(key)), reason: 'Key $key untranslated in $code');
+          expect(
+            text,
+            isNot(equals(key)),
+            reason: 'Key $key untranslated in $code',
+          );
           threadTexts.add(text);
         }
         // Ensure all 5 CPU thread descriptions are distinct from each other
@@ -3115,14 +3133,19 @@ void main() {
         for (final key in audioKeys) {
           final text = l10n.t(key);
           expect(text, isNotEmpty, reason: 'Key $key empty in $code');
-          expect(text, isNot(equals(key)), reason: 'Key $key untranslated in $code');
+          expect(
+            text,
+            isNot(equals(key)),
+            reason: 'Key $key untranslated in $code',
+          );
           audioTexts.add(text);
         }
         // Ensure all 5 audio descriptions are distinct from each other
         expect(
           audioTexts.length,
           equals(5),
-          reason: 'Language $code has duplicate descriptions for audio bitrates',
+          reason:
+              'Language $code has duplicate descriptions for audio bitrates',
         );
       }
     });
