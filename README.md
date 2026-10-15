@@ -68,6 +68,7 @@
   * **Static Themes:**
     * *Pure AMOLED*: Solid pitch black AMOLED canvas with animation ticker disabled for maximum battery conservation.
     * *Clean Light*: Minimalist light canvas without background animations.
+* **Easter Egg:** Tap the top app bar title (**"Phantek"**) on the home screen **10 times** in quick succession to unlock the hidden *Sakura* theme.
 * **Theme Card Layout:** Elegant centered card titles and badges (`AMOLED`, `LIGHT`, `STATIC`) with intuitive theme icons.
 * **Card Opacity:** Adjustable card transparency slider using direct alpha blending.
 * **Multilingual:** Complete UI localizations for 22 languages with adaptive layouts to prevent text clipping.
