@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.7.1&color=E11D48&style=flat-square&logo=github&logoColor=white" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.7.2&color=E11D48&style=flat-square&logo=github&logoColor=white" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android%20(arm64-v8a)&color=059669&style=flat-square&logo=android&logoColor=white" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Engine&message=Flutter%20%2B%20FFmpeg&color=2563eb&style=flat-square&logo=flutter&logoColor=white" alt="Engine" />
   <img src="https://img.shields.io/static/v1?label=Privacy&message=100%25%20Offline&color=7c3aed&style=flat-square" alt="Privacy" />
@@ -31,7 +31,7 @@
 * **Encoding Speed Presets:** Configured globally in Settings and synchronized to the conversion options card:
   * **Fast:** Uses `area` scaling filter, `veryfast` encoder preset, and default CRF 24.
   * **Normal:** Uses `bicubic` scaling filter, `faster` encoder preset, and default CRF 22.
-  * **Maximum:** Uses `lanczos` scaling filter, `fast` encoder preset, and default CRF 20.
+  * **Maximum:** Uses `lanczos` scaling filter, `fast` encoder preset, and default CRF 20. Triggers a safety confirmation dialog for heavy processing (2K+ resolution or duration ≥ 10 minutes).
 * **Rate Control:** Configurable Constant Rate Factor (CRF 16–28) with a reset button to restore the active preset default, or custom target bitrate limits (1–20 Mbps).
 * **Framerate Selection:** Frame rate adjustments (Original, 60, 50, 48, 30, 25, 24 FPS, or custom 10–source FPS) with source-rate clamping to avoid exceeding the input video frame rate.
 * **Audio Handling:** Stream copy (`-c:a copy`) when the source audio format is compatible with the target container, automatic AAC re-encoding when incompatible or when custom bitrate is set, or audio track removal (`-an`).
@@ -43,7 +43,7 @@
 * **Audio Bitrates:** Selectable bitrates (64, 128, 192, 256, 320 kbps) for compressed audio outputs.
 
 ### 3. Hardware & Resource Management
-* **Thread Allocation:** Calculates recommended CPU thread usage based on available RAM, processor specifications, and video resolution (e.g., reducing thread allocation for 4K tasks to avoid excessive memory usage).
+* **Thread Allocation:** Calculates recommended CPU thread usage based on available RAM, processor specifications, and video resolution (allocating 4 cores on entry-level SoCs / RAM ≤ 4 GB, and scaling adaptively up to 7 cores for 4K on high-end chipsets).
 * **Android SoC & GPU Detection:** Built-in hardware detection covering 64-bit ARM chipsets across Qualcomm Snapdragon, MediaTek Dimensity & Helio, Samsung Exynos, Google Tensor, HiSilicon Kirin, Xiaomi XRING/Surge, Unisoc, and JLQ.
 * **Out-Of-Memory (OOM) Detection:** Detects memory pressure or process aborts during encoding and alerts the user to adjust thread count, resolution, or buffer settings.
 * **CPU Thread Selection:** Auto-allocation or manual selection (1, 2, 4, 6, 8 cores clamped to physical core count) with warnings if core selection exceeds safe RAM limits.
@@ -82,8 +82,8 @@
 
 Download the standalone release APK directly from GitHub Releases:
 
-* **Latest Release:** [Phantek Video Toolkit v2.7.1](https://github.com/zerabyte88/phantek-video-toolkit/releases)
-* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.7.1.apk`
+* **Latest Release:** [Phantek Video Toolkit v2.7.2](https://github.com/zerabyte88/phantek-video-toolkit/releases)
+* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.7.2.apk`
 * **Architecture:** `arm64-v8a` (64-bit ARM)
 * **Minimum Android Version:** Android 8.0 (API Level 26) or higher
 
