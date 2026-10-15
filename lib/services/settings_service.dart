@@ -152,6 +152,14 @@ class SettingsService extends ChangeNotifier {
     await updateSettings(_settings.copyWith(cardOpacity: clamped));
   }
 
+  void setCardOpacityFast(double opacity) {
+    final clamped = opacity.clamp(0.5, 1.0);
+    if ((_settings.cardOpacity - clamped).abs() > 0.001) {
+      _settings = _settings.copyWith(cardOpacity: clamped);
+      notifyListeners();
+    }
+  }
+
   Future<void> resetToDefaults() async {
     final currentLang = _settings.languageCode;
     _settings = AppSettings(languageCode: currentLang);
