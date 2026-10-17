@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon/app_icon.png" width="96" height="96" alt="Phantek Logo" />
+  <img src="assets/icon/app_icon.png" width="130" height="130" alt="Phantek Logo" />
 </p>
 
 <h1 align="center">Phantek - Video Toolkit</h1>
