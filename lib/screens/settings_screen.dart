@@ -1810,17 +1810,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildDetailRow(
             theme,
             l10n.t('build_label'),
-            '$_buildNumber (${l10n.t('release_apk')})',
+            _buildNumber,
           ),
           _buildDetailRow(
             theme,
             l10n.t('architecture_label'),
-            'ARM64-v8a (FFmpeg 6.0)',
+            'ARM64-v8a',
           ),
           _buildDetailRow(
             theme,
             l10n.t('license_label'),
-            l10n.t('license_gpl'),
+            'GPLv3',
             onTap: () {
               showLicensePage(
                 context: context,
