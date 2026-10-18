@@ -21,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.7.3';
-  String _buildNumber = '39';
+  String _appVersion = 'v2.7.4';
+  String _buildNumber = '40';
   double? _dragCardOpacity;
 
   @override
@@ -40,14 +40,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '39';
+              : '40';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.7.3';
-          _buildNumber = '39';
+          _appVersion = 'v2.7.4';
+          _buildNumber = '40';
         });
       }
     }
@@ -1821,6 +1821,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme,
             l10n.t('license_label'),
             l10n.t('license_gpl'),
+            onTap: () {
+              showLicensePage(
+                context: context,
+                applicationName: 'Phantek',
+                applicationVersion: 'v$_appVersion ($_buildNumber)',
+                applicationLegalese:
+                    'Copyright © 2026 zerabyte88\nLicensed under GNU General Public License v3.0 (GPLv3)',
+              );
+            },
           ),
 
           Padding(
@@ -2279,8 +2288,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildDetailRow(ThemeData theme, String label, String value) {
-    return Padding(
+  Widget _buildDetailRow(
+    ThemeData theme,
+    String label,
+    String value, {
+    VoidCallback? onTap,
+  }) {
+    final rowContent = Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2295,17 +2309,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: onTap != null
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 14,
+                  color: theme.colorScheme.primary,
+                ),
+              ],
+            ],
           ),
         ],
       ),
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: rowContent,
+      );
+    }
+    return rowContent;
   }
 
   void _confirmResetDefaults(BuildContext context) {
