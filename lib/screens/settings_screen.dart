@@ -1824,8 +1824,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               showLicensePage(
                 context: context,
-                applicationName: 'Phantek',
-                applicationVersion: 'v$_appVersion ($_buildNumber)',
+                applicationName: 'Phantek - Video Toolkit',
+                applicationVersion: '$_appVersion ($_buildNumber)',
                 applicationLegalese:
                     'Copyright © 2026 zerabyte88\nLicensed under GNU General Public License v3.0 (GPLv3)',
               );
