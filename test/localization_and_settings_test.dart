@@ -284,6 +284,20 @@ void main() {
         }
       }
     });
+
+    test('All 22 languages have developer_role localized without maintainer', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        final role = l10n.t('developer_role');
+        expect(role.isNotEmpty, isTrue);
+        expect(role.contains('Maintainer'), isFalse);
+        expect(role.contains('メンテナー'), isFalse);
+        expect(role.contains('维护者'), isFalse);
+        expect(role.contains('維護者'), isFalse);
+        expect(role.contains('유지관리자'), isFalse);
+        expect(role.contains('Pengelola'), isFalse);
+      }
+    });
   });
 
   // Encoding tests removed due to refactor

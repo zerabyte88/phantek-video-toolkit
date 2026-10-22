@@ -21,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.7.4';
-  String _buildNumber = '40';
+  String _appVersion = 'v2.7.5';
+  String _buildNumber = '41';
   double? _dragCardOpacity;
 
   @override
@@ -40,14 +40,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '40';
+              : '41';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.7.4';
-          _buildNumber = '40';
+          _appVersion = 'v2.7.5';
+          _buildNumber = '41';
         });
       }
     }
@@ -1814,11 +1814,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildDetailRow(
             theme,
-            l10n.t('architecture_label'),
-            'ARM64-v8a',
-          ),
-          _buildDetailRow(
-            theme,
             l10n.t('license_label'),
             'GPLv3',
             onTap: () {
@@ -2293,6 +2288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String label,
     String value, {
     VoidCallback? onTap,
+    bool showChevron = false,
   }) {
     final rowContent = Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -2322,7 +2318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       : theme.colorScheme.onSurface,
                 ),
               ),
-              if (onTap != null) ...[
+              if (showChevron && onTap != null) ...[
                 const SizedBox(width: 4),
                 Icon(
                   Icons.chevron_right_rounded,
