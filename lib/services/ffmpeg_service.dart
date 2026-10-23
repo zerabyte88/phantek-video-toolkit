@@ -389,10 +389,14 @@ class FFmpegService {
             '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
 
+      final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
+          ? 'hevc_mediacodec'
+          : 'h264_mediacodec';
+
       if (useHardware) {
         codecArgs = [
           '-c:v',
-          'h264_mediacodec',
+          hwCodec,
           '-b:v',
           '${targetBitrateKbps}k',
           '-pix_fmt',
@@ -535,10 +539,13 @@ class FFmpegService {
     onLog('Command: ffmpeg $commandDebug');
     final isAdvanced = appSettings.isAdvancedSettingsEnabled;
     final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+    final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
+        ? 'hevc_mediacodec'
+        : 'h264_mediacodec';
     final encoderDesc = isStreamCopy
         ? 'Lossless Stream Copy'
         : (useHardware
-            ? 'Hardware (h264_mediacodec)'
+            ? 'Hardware ($hwCodec)'
             : 'Software (${encodingOptions.codec.ffmpegCodec}${isAdvanced && appSettings.customPreset != "default" ? " [preset: ${appSettings.customPreset}]" : ""})');
     onLog('Output: ${targetW}x$targetH via $encoderDesc');
 

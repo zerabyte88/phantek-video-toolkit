@@ -21,15 +21,26 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.8.0';
-  String _buildNumber = '42';
+  String _appVersion = 'v2.8.1';
+  String _buildNumber = '43';
   double? _dragCardOpacity;
 
   @override
   void initState() {
     super.initState();
+    _settingsService.addListener(_onSettingsChanged);
     _loadHardwareInfo();
     _loadAppVersion();
+  }
+
+  void _onSettingsChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _settingsService.removeListener(_onSettingsChanged);
+    super.dispose();
   }
 
   Future<void> _loadAppVersion() async {
@@ -40,14 +51,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '42';
+              : '43';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.8.0';
-          _buildNumber = '42';
+          _appVersion = 'v2.8.1';
+          _buildNumber = '43';
         });
       }
     }
@@ -1494,81 +1505,126 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.speed_rounded,
-              size: 16,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.t('settings_cpu_preset'),
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 6,
+    final isHwAccelActive =
+        settings.isAdvancedSettingsEnabled && settings.enableHardwareAcceleration;
+
+    return Opacity(
+      opacity: isHwAccelActive ? 0.45 : 1.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              _buildChoiceChip(
-                theme: theme,
-                label: l10n.t('preset_fast_title'),
-                selected: settings.cpuPreset == 'fast',
-                onSelected: () async {
-                  await _settingsService.setCpuPreset('fast');
-                  setState(() {});
-                },
+              Icon(
+                Icons.speed_rounded,
+                size: 16,
+                color: isHwAccelActive
+                    ? theme.colorScheme.onSurface.withAlpha(120)
+                    : theme.colorScheme.primary,
               ),
-              _buildChoiceChip(
-                theme: theme,
-                label: l10n.t('preset_normal_title'),
-                selected: settings.cpuPreset == 'medium',
-                onSelected: () async {
-                  await _settingsService.setCpuPreset('medium');
-                  setState(() {});
-                },
+              const SizedBox(width: 8),
+              Text(
+                l10n.t('settings_cpu_preset'),
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  color: isHwAccelActive
+                      ? theme.colorScheme.onSurface.withAlpha(120)
+                      : theme.colorScheme.onSurface,
+                ),
               ),
-              _buildChoiceChip(
-                theme: theme,
-                label: l10n.t('preset_slow_title'),
-                selected: settings.cpuPreset == 'slow',
-                onSelected: () async {
-                  await _settingsService.setCpuPreset('slow');
-                  setState(() {});
-                },
-              ),
+              if (isHwAccelActive) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outline.withAlpha(25),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withAlpha(50),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Text(
+                    l10n.t('hw_accel_disabled_badge'),
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface.withAlpha(140),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
-        ),
-        const SizedBox(height: 8),
-        Center(
-          child: Text(
-            settings.cpuPreset == 'fast'
-                ? l10n.t('preset_fast_desc')
-                : (settings.cpuPreset == 'slow'
-                      ? l10n.t('preset_slow_desc')
-                      : l10n.t('preset_normal_desc')),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11.5,
-              height: 1.35,
-              color: theme.colorScheme.onSurface.withAlpha(140),
+          const SizedBox(height: 10),
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                _buildChoiceChip(
+                  theme: theme,
+                  label: l10n.t('preset_fast_title'),
+                  selected: settings.cpuPreset == 'fast',
+                  enabled: !isHwAccelActive,
+                  onSelected: isHwAccelActive
+                      ? null
+                      : () async {
+                          await _settingsService.setCpuPreset('fast');
+                          setState(() {});
+                        },
+                ),
+                _buildChoiceChip(
+                  theme: theme,
+                  label: l10n.t('preset_normal_title'),
+                  selected: settings.cpuPreset == 'medium',
+                  enabled: !isHwAccelActive,
+                  onSelected: isHwAccelActive
+                      ? null
+                      : () async {
+                          await _settingsService.setCpuPreset('medium');
+                          setState(() {});
+                        },
+                ),
+                _buildChoiceChip(
+                  theme: theme,
+                  label: l10n.t('preset_slow_title'),
+                  selected: settings.cpuPreset == 'slow',
+                  enabled: !isHwAccelActive,
+                  onSelected: isHwAccelActive
+                      ? null
+                      : () async {
+                          await _settingsService.setCpuPreset('slow');
+                          setState(() {});
+                        },
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              isHwAccelActive
+                  ? l10n.t('hw_accel_preset_disabled_desc')
+                  : (settings.cpuPreset == 'fast'
+                      ? l10n.t('preset_fast_desc')
+                      : (settings.cpuPreset == 'slow'
+                            ? l10n.t('preset_slow_desc')
+                            : l10n.t('preset_normal_desc'))),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.35,
+                color: isHwAccelActive
+                    ? theme.colorScheme.onSurface.withAlpha(120)
+                    : theme.colorScheme.onSurface.withAlpha(140),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1705,6 +1761,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
+    final isCustomPresetDisabled = settings.enableHardwareAcceleration;
     return _buildModernCard(
       theme: theme,
       child: Column(
@@ -1872,87 +1929,133 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Custom Preset Selector
             InkWell(
               borderRadius: BorderRadius.circular(8),
-              onTap: () =>
-                  _showPresetPickerSheet(context, theme, settings, l10n),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.speed_rounded,
-                        size: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.t('settings_custom_preset'),
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.t('settings_custom_preset_desc'),
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: theme.colorScheme.onSurface.withAlpha(130),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withAlpha(70),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: theme.colorScheme.outline.withAlpha(40),
+              onTap: isCustomPresetDisabled
+                  ? null
+                  : () =>
+                      _showPresetPickerSheet(context, theme, settings, l10n),
+              child: Opacity(
+                opacity: isCustomPresetDisabled ? 0.45 : 1.0,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isCustomPresetDisabled
+                              ? theme.colorScheme.onSurface.withAlpha(20)
+                              : theme.colorScheme.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.speed_rounded,
+                          size: 18,
+                          color: isCustomPresetDisabled
+                              ? theme.colorScheme.onSurface.withAlpha(120)
+                              : theme.colorScheme.primary,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            settings.customPreset == 'default'
-                                ? l10n.t('preset_default')
-                                : settings.customPreset,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: settings.customPreset == 'default'
-                                  ? theme.colorScheme.onSurface.withAlpha(180)
-                                  : theme.colorScheme.primary,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  l10n.t('settings_custom_preset'),
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                if (isCustomPresetDisabled) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.outline.withAlpha(25),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: theme.colorScheme.outline.withAlpha(50),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.t('hw_accel_disabled_badge'),
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.onSurface.withAlpha(140),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 16,
-                            color: theme.colorScheme.onSurface.withAlpha(150),
-                          ),
-                        ],
+                            const SizedBox(height: 2),
+                            Text(
+                              isCustomPresetDisabled
+                                  ? l10n.t('hw_accel_preset_disabled_desc')
+                                  : l10n.t('settings_custom_preset_desc'),
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: theme.colorScheme.onSurface.withAlpha(130),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withAlpha(70),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withAlpha(40),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              isCustomPresetDisabled
+                                  ? l10n.t('hw_accel_disabled_badge')
+                                  : (settings.customPreset == 'default'
+                                      ? l10n.t('preset_default')
+                                      : settings.customPreset),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isCustomPresetDisabled
+                                    ? theme.colorScheme.onSurface.withAlpha(100)
+                                    : (settings.customPreset == 'default'
+                                        ? theme.colorScheme.onSurface.withAlpha(180)
+                                        : theme.colorScheme.primary),
+                              ),
+                            ),
+                            if (!isCustomPresetDisabled) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 16,
+                                color: theme.colorScheme.onSurface.withAlpha(150),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -2152,52 +2255,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
       {
         'id': 'default',
         'label': l10n.t('preset_default'),
-        'desc': 'Mengikuti preset tampilan (Cepat, Normal, Maksimal)',
+        'desc': l10n.t('preset_default_desc'),
       },
       {
         'id': 'ultrafast',
         'label': 'ultrafast',
-        'desc': 'Kecepatan kompresi paling instan & ringan',
+        'desc': l10n.t('preset_ultrafast_desc'),
       },
       {
         'id': 'superfast',
         'label': 'superfast',
-        'desc': 'Sangat kencang, beban CPU minimal',
+        'desc': l10n.t('preset_superfast_desc'),
       },
       {
         'id': 'veryfast',
         'label': 'veryfast',
-        'desc': 'Cepat optimal (standar mode Cepat)',
+        'desc': l10n.t('preset_veryfast_desc'),
       },
       {
         'id': 'faster',
         'label': 'faster',
-        'desc': 'Lebih cepat (standar mode Normal)',
+        'desc': l10n.t('preset_faster_desc'),
       },
       {
         'id': 'fast',
         'label': 'fast',
-        'desc': 'Cepat seimbang (standar mode Maksimal)',
+        'desc': l10n.t('preset_fast_custom_desc'),
       },
       {
         'id': 'medium',
         'label': 'medium',
-        'desc': 'Kompromi kompresi dan kecepatan standar x264',
+        'desc': l10n.t('preset_medium_desc'),
       },
       {
         'id': 'slow',
         'label': 'slow',
-        'desc': 'Kompresi lebih padat, proses lebih lama',
+        'desc': l10n.t('preset_slow_custom_desc'),
       },
       {
         'id': 'slower',
         'label': 'slower',
-        'desc': 'Kualitas kompresi sangat padat',
+        'desc': l10n.t('preset_slower_desc'),
       },
       {
         'id': 'veryslow',
         'label': 'veryslow',
-        'desc': 'Kualitas arsip tertinggi, sangat lambat',
+        'desc': l10n.t('preset_veryslow_desc'),
       },
     ];
 
@@ -2355,42 +2458,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
       {
         'id': 'default',
         'label': l10n.t('scaler_default'),
-        'desc': 'Mengikuti preset aktif (Bicubic / Lanczos / Area)',
+        'desc': l10n.t('scaler_default_desc'),
       },
       {
         'id': 'fast_bilinear',
         'label': 'fast_bilinear',
-        'desc': 'Paling ringan & cepat di ARM NEON',
+        'desc': l10n.t('scaler_fast_bilinear_desc'),
       },
       {
         'id': 'bilinear',
         'label': 'bilinear',
-        'desc': 'Interpolasi bilinear standar yang cepat',
+        'desc': l10n.t('scaler_bilinear_desc'),
       },
       {
         'id': 'bicubic',
         'label': 'bicubic',
-        'desc': 'Keseimbangan natural antara kecepatan dan ketajaman',
+        'desc': l10n.t('scaler_bicubic_desc'),
       },
       {
         'id': 'area',
         'label': 'area',
-        'desc': 'Sampling area, optimal untuk downscale anti-moiré',
+        'desc': l10n.t('scaler_area_desc'),
       },
       {
         'id': 'lanczos',
         'label': 'lanczos',
-        'desc': 'Interpolasi sinc berpresisi tinggi dengan detail tajam',
+        'desc': l10n.t('scaler_lanczos_desc'),
       },
       {
         'id': 'spline',
         'label': 'spline',
-        'desc': 'Kurva spline alami tanpa artefak dering berlebih',
+        'desc': l10n.t('scaler_spline_desc'),
       },
       {
         'id': 'gauss',
         'label': 'gauss',
-        'desc': 'Filter gaussian lembut untuk meredam noise',
+        'desc': l10n.t('scaler_gauss_desc'),
       },
     ];
 

@@ -40,10 +40,21 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void initState() {
     super.initState();
+    SettingsService().addListener(_onSettingsUpdated);
     _crfValue = widget.encodingOptions.crfValue;
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
         .clamp(1, 30);
+    final appSettings = SettingsService().settings;
+    if (appSettings.isAdvancedSettingsEnabled &&
+        appSettings.enableHardwareAcceleration &&
+        widget.encodingOptions.rateControlMode == RateControlMode.crf) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onOptionsChanged(
+          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
+        );
+      });
+    }
     final sourceFps = (widget.sourceVideo.fps > 0
         ? widget.sourceVideo.fps.round()
         : 60);
@@ -59,9 +70,39 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     }
   }
 
+  void _onSettingsUpdated() {
+    if (mounted) {
+      final appSettings = SettingsService().settings;
+      if (appSettings.isAdvancedSettingsEnabled &&
+          appSettings.enableHardwareAcceleration &&
+          widget.encodingOptions.rateControlMode == RateControlMode.crf) {
+        widget.onOptionsChanged(
+          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
+        );
+      }
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    SettingsService().removeListener(_onSettingsUpdated);
+    super.dispose();
+  }
+
   @override
   void didUpdateWidget(ConversionOptionsCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final appSettings = SettingsService().settings;
+    if (appSettings.isAdvancedSettingsEnabled &&
+        appSettings.enableHardwareAcceleration &&
+        widget.encodingOptions.rateControlMode == RateControlMode.crf) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onOptionsChanged(
+          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
+        );
+      });
+    }
     if (oldWidget.encodingOptions.crfValue != widget.encodingOptions.crfValue) {
       _crfValue = widget.encodingOptions.crfValue;
     }
@@ -96,6 +137,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
     final appSettings = SettingsService().settings;
+    final isHwAccelActive = appSettings.isAdvancedSettingsEnabled &&
+        appSettings.enableHardwareAcceleration;
     final resolvedThreads = DeviceSpecHelper.resolveThreadCount(
       video: widget.sourceVideo,
       requestedThreads: appSettings.cpuThreads,
@@ -221,18 +264,23 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               spacing: 6,
               runSpacing: 6,
               children: RateControlMode.values.map((mode) {
+                final isCrf = mode == RateControlMode.crf;
+                final isChipEnabled = !(isHwAccelActive && isCrf);
                 final isSelected =
                     widget.encodingOptions.rateControlMode == mode;
                 return _buildChoiceChip(
                   label: mode.displayName,
-                  isSelected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      widget.onOptionsChanged(
-                        widget.encodingOptions.copyWith(rateControlMode: mode),
-                      );
-                    }
-                  },
+                  isSelected: isSelected && isChipEnabled,
+                  isEnabled: isChipEnabled,
+                  onSelected: isChipEnabled
+                      ? (selected) {
+                          if (selected) {
+                            widget.onOptionsChanged(
+                              widget.encodingOptions.copyWith(rateControlMode: mode),
+                            );
+                          }
+                        }
+                      : null,
                 );
               }).toList(),
             ),
@@ -240,14 +288,18 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           const SizedBox(height: 8),
           Center(
             child: Text(
-              widget.encodingOptions.rateControlMode == RateControlMode.crf
-                  ? l10n.t('desc_crf')
-                  : l10n.t('desc_bitrate'),
+              isHwAccelActive
+                  ? l10n.t('hw_accel_crf_disabled_desc')
+                  : (widget.encodingOptions.rateControlMode == RateControlMode.crf
+                      ? l10n.t('desc_crf')
+                      : l10n.t('desc_bitrate')),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.35,
-                color: theme.colorScheme.onSurface.withAlpha(140),
+                color: isHwAccelActive
+                    ? theme.colorScheme.onSurface.withAlpha(150)
+                    : theme.colorScheme.onSurface.withAlpha(140),
               ),
             ),
           ),
@@ -1054,17 +1106,32 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   }
 
   Widget _buildActivePresetIndicator(ThemeData theme, AppLocalizations l10n) {
+    final appSettings = SettingsService().settings;
+    final isCustomPreset = appSettings.isAdvancedSettingsEnabled &&
+        (appSettings.customPreset != 'default' ||
+            appSettings.customScaler != 'default');
+
     final preset = widget.encodingOptions.speedPreset;
-    final presetLabel = preset == SpeedPreset.fast
-        ? l10n.t('preset_fast_title')
-        : (preset == SpeedPreset.max
-              ? l10n.t('preset_slow_title')
-              : l10n.t('preset_normal_title'));
+    final presetLabel = isCustomPreset
+        ? l10n.t('preset_custom_title')
+        : (preset == SpeedPreset.fast
+            ? l10n.t('preset_fast_title')
+            : (preset == SpeedPreset.max
+                ? l10n.t('preset_slow_title')
+                : l10n.t('preset_normal_title')));
+
     final presetDesc = preset == SpeedPreset.fast
         ? l10n.t('preset_fast_desc')
         : (preset == SpeedPreset.max
-              ? l10n.t('preset_slow_desc')
-              : l10n.t('preset_normal_desc'));
+            ? l10n.t('preset_slow_desc')
+            : l10n.t('preset_normal_desc'));
+
+    final effectivePreset = appSettings.customPreset != 'default'
+        ? appSettings.customPreset
+        : preset.x264Preset;
+    final effectiveScaler = appSettings.customScaler != 'default'
+        ? appSettings.customScaler
+        : preset.scaler;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1082,7 +1149,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: Icon(
-              Icons.speed_rounded,
+              isCustomPreset ? Icons.tune_rounded : Icons.speed_rounded,
               size: 16,
               color: theme.colorScheme.primary,
             ),
@@ -1112,16 +1179,86 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  presetDesc,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    height: 1.3,
-                    color: theme.colorScheme.onSurface.withAlpha(140),
+                if (isCustomPreset) ...[
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _buildPresetChoiceBadge(
+                        theme: theme,
+                        icon: Icons.speed_rounded,
+                        label:
+                            'Preset: ${appSettings.customPreset == 'default' ? "${l10n.t('preset_default')} ($effectivePreset)" : appSettings.customPreset}',
+                      ),
+                      _buildPresetChoiceBadge(
+                        theme: theme,
+                        icon: Icons.photo_size_select_large_rounded,
+                        label:
+                            'Scaler: ${appSettings.customScaler == 'default' ? "${l10n.t('scaler_default')} ($effectiveScaler)" : appSettings.customScaler}',
+                      ),
+                      if (appSettings.enableHardwareAcceleration)
+                        _buildPresetChoiceBadge(
+                          theme: theme,
+                          icon: Icons.bolt_rounded,
+                          label: 'MediaCodec (HW)',
+                        ),
+                    ],
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${appSettings.enableHardwareAcceleration ? "MediaCodec HW" : "x264 $effectivePreset"} • Scaler $effectiveScaler',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      height: 1.3,
+                      color: theme.colorScheme.onSurface.withAlpha(140),
+                    ),
+                  ),
+                ] else ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    presetDesc,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      height: 1.3,
+                      color: theme.colorScheme.onSurface.withAlpha(140),
+                    ),
+                  ),
+                ],
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPresetChoiceBadge({
+    required ThemeData theme,
+    required IconData icon,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withAlpha(25),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: theme.colorScheme.primary.withAlpha(60),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: theme.colorScheme.primary),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.primary,
             ),
           ),
         ],

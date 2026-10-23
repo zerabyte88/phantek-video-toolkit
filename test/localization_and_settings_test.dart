@@ -3291,5 +3291,353 @@ void main() {
       final vfArg = customArgs.firstWhere((a) => a.contains('scale='));
       expect(vfArg.contains('flags=fast_bilinear'), isTrue);
     });
+
+    test('Cancellation dialog and Advanced Settings keys resolve properly in all 22 supported languages', () {
+      const requiredKeys = [
+        'proc_dialog_no',
+        'proc_dialog_yes',
+        'proc_dialog_cancel',
+        'proc_dialog_continue',
+        'proc_cancel_confirm',
+        'proc_cancel_desc',
+        'settings_advanced_title',
+        'settings_advanced_badge',
+        'settings_advanced_enable',
+        'settings_advanced_enable_desc',
+        'early_access_dialog_title',
+        'early_access_dialog_desc',
+        'early_access_dialog_confirm',
+        'early_access_dialog_cancel',
+        'settings_hw_accel',
+        'settings_hw_accel_desc',
+        'settings_custom_preset',
+        'settings_custom_preset_desc',
+        'settings_custom_scaler',
+        'settings_custom_scaler_desc',
+        'preset_default',
+        'scaler_default',
+        'preset_default_desc',
+        'preset_ultrafast_desc',
+        'preset_superfast_desc',
+        'preset_veryfast_desc',
+        'preset_faster_desc',
+        'preset_fast_custom_desc',
+        'preset_medium_desc',
+        'preset_slow_custom_desc',
+        'preset_slower_desc',
+        'preset_veryslow_desc',
+        'scaler_default_desc',
+        'scaler_fast_bilinear_desc',
+        'scaler_bilinear_desc',
+        'scaler_bicubic_desc',
+        'scaler_area_desc',
+        'scaler_lanczos_desc',
+        'scaler_spline_desc',
+        'scaler_gauss_desc',
+        'preset_custom_title',
+      ];
+
+      for (final lang in AppLocalizations.supportedLanguages) {
+        final code = lang['code']!;
+        final l10n = AppLocalizations(code);
+        for (final key in requiredKeys) {
+          final val = l10n.t(key);
+          expect(val.isNotEmpty, isTrue, reason: 'Key $key empty in $code');
+          expect(val, isNot(equals(key)), reason: 'Key $key unlocalized in $code');
+        }
+      }
+    });
+
+    testWidgets(
+      'ConversionOptionsCard displays Custom Preset and user choices when advanced options are modified',
+      (WidgetTester tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final service = SettingsService();
+        await service.init();
+
+        final l10n = AppLocalizations('id');
+        const sourceVideo = VideoInfo(
+          filePath: '/storage/sample.mp4',
+          fileName: 'sample.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 120,
+          bitrate: 10000000,
+          fps: 30,
+          codec: 'h264',
+          fileSizeBytes: 50000000,
+        );
+
+        const currentOpts = EncodingOptions(
+          speedPreset: SpeedPreset.normal,
+          crfValue: 22,
+        );
+
+        const currentRes = VideoResolution(
+          label: '720p',
+          width: 1280,
+          height: 720,
+        );
+
+        Widget buildCard() => MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: ConversionOptionsCard(
+                    sourceVideo: sourceVideo,
+                    resolutions: sourceVideo.availableDownscaleTargets,
+                    selectedResolution: currentRes,
+                    onResolutionChanged: (_) {},
+                    encodingOptions: currentOpts,
+                    onOptionsChanged: (_) {},
+                    l10n: l10n,
+                  ),
+                ),
+              ),
+            );
+
+        // 1. Initially advanced settings is disabled -> displays Normal preset
+        await tester.pumpWidget(buildCard());
+        expect(find.textContaining('Normal'), findsOneWidget);
+        expect(find.textContaining('Custom Preset'), findsNothing);
+
+        // 2. Enable advanced settings with custom preset and scaler
+        await service.setAdvancedSettingsEnabled(true);
+        await service.setCustomPreset('ultrafast');
+        await service.setCustomScaler('lanczos');
+        await service.setHardwareAcceleration(true);
+        await tester.pumpWidget(buildCard());
+
+        // Must display "Custom Preset" and user's selected choices
+        expect(find.textContaining('Custom Preset'), findsOneWidget);
+        expect(find.textContaining('Preset: ultrafast'), findsOneWidget);
+        expect(find.textContaining('Scaler: lanczos'), findsOneWidget);
+        expect(find.textContaining('MediaCodec (HW)'), findsOneWidget);
+        expect(find.textContaining('MediaCodec HW • Scaler lanczos'), findsOneWidget);
+
+        // 3. Reverting advanced settings resets to standard display
+        await service.setAdvancedSettingsEnabled(false);
+        await tester.pumpWidget(buildCard());
+        expect(find.textContaining('Normal'), findsOneWidget);
+        expect(find.textContaining('Custom Preset'), findsNothing);
+      },
+    );
+
+    test('All 22 languages contain hw_accel_disabled_badge, hw_accel_preset_disabled_desc, and hw_accel_crf_disabled_desc', () {
+      final keys = [
+        'hw_accel_disabled_badge',
+        'hw_accel_preset_disabled_desc',
+        'hw_accel_crf_disabled_desc',
+      ];
+      for (final lang in AppLocalizations.supportedLanguages) {
+        final code = lang['code']!;
+        final l10n = AppLocalizations(code);
+        for (final k in keys) {
+          final translated = l10n.t(k);
+          expect(translated, isNotEmpty, reason: 'Key $k missing in $code');
+          expect(translated, isNot(equals(k)), reason: 'Key $k untranslated in $code');
+        }
+      }
+    });
+
+    test('Hardware acceleration builds valid MediaCodec arguments without -preset or -crf', () {
+      final dummyVideo = VideoInfo(
+        filePath: '/test/source.mp4',
+        fileName: 'source.mp4',
+        fileSizeBytes: 1024 * 1024 * 10,
+        durationSeconds: 60.0,
+        width: 1920,
+        height: 1080,
+        fps: 30.0,
+        codec: 'h264',
+        bitrate: 4000000,
+      );
+
+      const targetRes = VideoResolution(
+        label: '720p',
+        width: 1280,
+        height: 720,
+      );
+
+      // Normal software encoding options
+      final normalArgs = FFmpegService.buildVideoArguments(
+        sourceVideo: dummyVideo,
+        targetResolution: targetRes,
+        encodingOptions: const EncodingOptions(
+          rateControlMode: RateControlMode.crf,
+          crfValue: 22,
+        ),
+        appSettings: const AppSettings(
+          isAdvancedSettingsEnabled: false,
+          enableHardwareAcceleration: false,
+        ),
+        outputPath: '/test/output.mp4',
+      );
+
+      expect(normalArgs.contains('libx264'), isTrue);
+      expect(normalArgs.contains('-preset'), isTrue);
+      expect(normalArgs.contains('-crf'), isTrue);
+      expect(normalArgs.contains('h264_mediacodec'), isFalse);
+
+      // Hardware acceleration enabled
+      final hwArgs = FFmpegService.buildVideoArguments(
+        sourceVideo: dummyVideo,
+        targetResolution: targetRes,
+        encodingOptions: const EncodingOptions(
+          rateControlMode: RateControlMode.crf,
+          crfValue: 22,
+        ),
+        appSettings: const AppSettings(
+          isAdvancedSettingsEnabled: true,
+          enableHardwareAcceleration: true,
+        ),
+        outputPath: '/test/output.mp4',
+      );
+
+      expect(hwArgs.contains('h264_mediacodec'), isTrue);
+      expect(hwArgs.contains('-b:v'), isTrue);
+      expect(hwArgs.contains('-preset'), isFalse);
+      expect(hwArgs.contains('-crf'), isFalse);
+    });
+
+    testWidgets(
+      'SettingsScreen disables and grays out CPU presets and custom preset when hardware acceleration is active',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final service = SettingsService();
+        await service.setAdvancedSettingsEnabled(false);
+        await service.setHardwareAcceleration(false);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('oled_snowfall'),
+            home: const SettingsScreen(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // When HW accel is off: normal preset chips are enabled
+        expect(find.text('Fast'), findsOneWidget);
+        expect(find.text('Normal'), findsOneWidget);
+        expect(find.text('Maximum'), findsOneWidget);
+
+        // Turn on advanced settings and hardware acceleration
+        await service.setAdvancedSettingsEnabled(true);
+        await service.setHardwareAcceleration(true);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Must display disabled badge and description
+        expect(find.textContaining('Disabled (HW Accel)'), findsWidgets);
+        expect(find.textContaining('Disabled when Hardware Acceleration is active'), findsWidgets);
+
+        // Turn off hardware acceleration -> restores interactivity
+        await service.setHardwareAcceleration(false);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.text('Disabled (HW Accel)'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'ConversionOptionsCard disables CRF chip and auto-switches to Bitrate when hardware acceleration is active',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final service = SettingsService();
+        await service.setAdvancedSettingsEnabled(false);
+        await service.setHardwareAcceleration(false);
+
+        final dummyVideo = VideoInfo(
+          filePath: '/test/source.mp4',
+          fileName: 'source.mp4',
+          fileSizeBytes: 1024 * 1024 * 10,
+          durationSeconds: 60.0,
+          width: 1920,
+          height: 1080,
+          fps: 30.0,
+          codec: 'h264',
+          bitrate: 4000000,
+        );
+
+        const currentRes = VideoResolution(
+          label: '720p',
+          width: 1280,
+          height: 720,
+        );
+
+        EncodingOptions currentOpts = const EncodingOptions(
+          rateControlMode: RateControlMode.crf,
+        );
+
+        Widget buildCard() => MaterialApp(
+              theme: AppTheme.getTheme('oled_snowfall'),
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: ConversionOptionsCard(
+                    sourceVideo: dummyVideo,
+                    resolutions: dummyVideo.availableDownscaleTargets,
+                    selectedResolution: currentRes,
+                    onResolutionChanged: (_) {},
+                    encodingOptions: currentOpts,
+                    onOptionsChanged: (newOpts) {
+                      currentOpts = newOpts;
+                    },
+                    l10n: const AppLocalizations('en'),
+                  ),
+                ),
+              ),
+            );
+
+        await tester.pumpWidget(buildCard());
+        await tester.pump();
+
+        // 1. Initially CRF is active and selectable
+        expect(currentOpts.rateControlMode, equals(RateControlMode.crf));
+        expect(find.textContaining('Hardware Acceleration (MediaCodec) only supports Bitrate control'), findsNothing);
+
+        // 2. Enable Hardware Acceleration -> CRF automatically disables and switches to Bitrate
+        await service.setAdvancedSettingsEnabled(true);
+        await service.setHardwareAcceleration(true);
+        await tester.pumpWidget(buildCard());
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Mode automatically switched to Bitrate
+        expect(currentOpts.rateControlMode, equals(RateControlMode.bitrate));
+        expect(find.textContaining('Hardware Acceleration (MediaCodec) only supports Bitrate control'), findsOneWidget);
+
+        // Functional features (Bitrate mode chip & slider) are NOT grayed out
+        expect(find.byType(Slider), findsOneWidget);
+        final bitrateChipFinder = find.widgetWithText(ChoiceChip, 'Bitrate (CBR/VBR)');
+        expect(bitrateChipFinder, findsOneWidget);
+        final ChoiceChip bitrateChip = tester.widget(bitrateChipFinder);
+        expect(bitrateChip.selected, isTrue); // Active and selected!
+
+        // Only CRF is disabled and grayed out
+        final crfChipFinder = find.widgetWithText(ChoiceChip, 'Constant Rate Factor (CRF)');
+        expect(crfChipFinder, findsOneWidget);
+        final ChoiceChip crfChip = tester.widget(crfChipFinder);
+        expect(crfChip.selected, isFalse);
+        expect(crfChip.onSelected, isNull); // Disabled!
+
+        // 3. Disable Hardware Acceleration -> CRF re-enables
+        await service.setHardwareAcceleration(false);
+        await tester.pumpWidget(buildCard());
+        await tester.pump();
+
+        expect(find.textContaining('Hardware Acceleration (MediaCodec) only supports Bitrate control'), findsNothing);
+      },
+    );
   });
 }
+
+

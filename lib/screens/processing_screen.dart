@@ -1521,22 +1521,25 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             color: theme.colorScheme.onSurface.withAlpha(190),
           ),
         ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
-          // Tombol Cancel di kiri: Warna putih, fungsi melanjutkan konversi
+          // Tombol No di kiri (mentok kiri): Warna putih/netral, fungsi melanjutkan konversi
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             style: TextButton.styleFrom(
               foregroundColor: isDark ? Colors.white : Colors.black87,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             ),
             child: Text(
-              l10n.t('proc_dialog_cancel'),
+              l10n.t('proc_dialog_no'),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ),
-          // Tombol Continue di kanan: Warna merah, fungsi batalkan konversi & balik ke pemilihan video
+          // Tombol Yes di kanan (rata kanan): Warna merah, fungsi batalkan konversi & balik ke pemilihan video
           FilledButton(
             onPressed: () {
               FFmpegService.cancelAll();
@@ -1548,9 +1551,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
             style: FilledButton.styleFrom(
               backgroundColor: Colors.red.shade700,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
             ),
             child: Text(
-              l10n.t('proc_dialog_continue'),
+              l10n.t('proc_dialog_yes'),
               style: const TextStyle(
                 fontWeight: FontWeight.w700,
                 color: Colors.white,

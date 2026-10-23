@@ -49,9 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final defaultPreset = SpeedPreset.fromCpuPreset(
       _settingsService.settings.cpuPreset,
     );
+    final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
+        _settingsService.settings.enableHardwareAcceleration;
     _encodingOptions = EncodingOptions(
       speedPreset: defaultPreset,
       crfValue: defaultPreset.defaultCrf,
+      rateControlMode: isHw ? RateControlMode.bitrate : RateControlMode.crf,
     );
     _settingsService.addListener(_onSettingsChanged);
     CacheManagerService().clearAllCache();
@@ -71,14 +74,21 @@ class _HomeScreenState extends State<HomeScreen> {
     final preset = SpeedPreset.fromCpuPreset(
       _settingsService.settings.cpuPreset,
     );
-    if (_encodingOptions.speedPreset != preset) {
-      setState(() {
-        _encodingOptions = _encodingOptions.copyWith(
+    final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
+        _settingsService.settings.enableHardwareAcceleration;
+    setState(() {
+      var updated = _encodingOptions;
+      if (updated.speedPreset != preset) {
+        updated = updated.copyWith(
           speedPreset: preset,
           crfValue: preset.defaultCrf,
         );
-      });
-    }
+      }
+      if (isHw && updated.rateControlMode == RateControlMode.crf) {
+        updated = updated.copyWith(rateControlMode: RateControlMode.bitrate);
+      }
+      _encodingOptions = updated;
+    });
   }
 
   Future<void> _loadVideoFromPath(String path) async {
