@@ -15,6 +15,7 @@ import '../services/cache_manager_service.dart';
 import '../services/device_spec_helper.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/foreground_service.dart';
+import '../services/localization_service.dart';
 import '../services/settings_service.dart';
 import '../widgets/app_glass_card.dart';
 import '../widgets/theme_animated_background.dart';
@@ -519,31 +520,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop) return;
           if (_isProcessing) {
-            final shouldPop = await showDialog<bool>(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: Text(l10n.t('proc_cancel_confirm')),
-                content: Text(l10n.t('proc_cancel_desc')),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(false),
-                    child: Text(l10n.t('proc_continue_btn')),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      FFmpegService.cancelAll();
-                      Navigator.of(ctx).pop(true);
-                    },
-                    child: Text(
-                      l10n.t('proc_cancel_btn'),
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            final shouldPop =
+                await _showCancelConfirmationDialog(context, l10n, theme);
             if (shouldPop == true && context.mounted) {
-              Navigator.of(context).pop(false);
+              Navigator.of(context).pop(true);
             }
           } else {
             Navigator.of(context).pop(_isSuccess ? true : null);
@@ -556,34 +536,10 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               icon: const Icon(Icons.arrow_back_rounded),
               onPressed: () async {
                 if (_isProcessing) {
-                  final shouldPop = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(l10n.t('proc_cancel_confirm')),
-                      content: Text(l10n.t('proc_cancel_desc')),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(false),
-                          child: Text(l10n.t('proc_continue_btn')),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            FFmpegService.cancelAll();
-                            CacheManagerService().clearAllCache(
-                              specificInputPath: widget.videoInfo.filePath,
-                            );
-                            Navigator.of(ctx).pop(true);
-                          },
-                          child: Text(
-                            l10n.t('proc_cancel_btn'),
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  final shouldPop =
+                      await _showCancelConfirmationDialog(context, l10n, theme);
                   if (shouldPop == true && context.mounted) {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(true);
                   }
                 } else {
                   CacheManagerService().clearAllCache(
@@ -1501,43 +1457,107 @@ class _ProcessingScreenState extends State<ProcessingScreen>
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () {
-          showDialog<bool>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text(l10n.t('proc_cancel_confirm')),
-              content: Text(l10n.t('proc_cancel_desc')),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(l10n.t('proc_continue_btn')),
-                ),
-                TextButton(
-                  onPressed: () {
-                    FFmpegService.cancelAll();
-                    CacheManagerService().clearAllCache(
-                      specificInputPath: widget.videoInfo.filePath,
-                    );
-                    Navigator.of(ctx).pop(true);
-                  },
-                  child: Text(
-                    l10n.t('proc_cancel_btn'),
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          ).then((shouldPop) {
-            if (shouldPop == true && mounted) {
-              Navigator.of(context).pop();
-            }
-          });
+        onPressed: () async {
+          final shouldPop =
+              await _showCancelConfirmationDialog(context, l10n, theme);
+          if (shouldPop == true && mounted) {
+            Navigator.of(context).pop(true);
+          }
         },
         icon: const Icon(Icons.cancel_outlined, size: 18),
         label: Text(l10n.t('proc_cancel_btn')),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 11),
         ),
+      ),
+    );
+  }
+
+  Future<bool?> _showCancelConfirmationDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    final isDark = theme.brightness == Brightness.dark;
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.red.withAlpha(25),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.redAccent,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.t('proc_cancel_confirm'),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.t('proc_cancel_desc'),
+          style: TextStyle(
+            fontSize: 13.5,
+            height: 1.4,
+            color: theme.colorScheme.onSurface.withAlpha(190),
+          ),
+        ),
+        actions: [
+          // Tombol Cancel di kiri: Warna putih, fungsi melanjutkan konversi
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: isDark ? Colors.white : Colors.black87,
+            ),
+            child: Text(
+              l10n.t('proc_dialog_cancel'),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+          ),
+          // Tombol Continue di kanan: Warna merah, fungsi batalkan konversi & balik ke pemilihan video
+          FilledButton(
+            onPressed: () {
+              FFmpegService.cancelAll();
+              CacheManagerService().clearAllCache(
+                specificInputPath: widget.videoInfo.filePath,
+              );
+              Navigator.of(ctx).pop(true);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              l10n.t('proc_dialog_continue'),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

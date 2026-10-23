@@ -37,6 +37,18 @@ class AppSettings {
   /// Card surface opacity (0.50 to 1.00).
   final double cardOpacity;
 
+  /// True if advanced experimental settings are enabled.
+  final bool isAdvancedSettingsEnabled;
+
+  /// True if hardware acceleration (MediaCodec) is enabled.
+  final bool enableHardwareAcceleration;
+
+  /// Custom x264 preset ('default', 'ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow').
+  final String customPreset;
+
+  /// Custom scaler algorithm ('default', 'fast_bilinear', 'bilinear', 'bicubic', 'area', 'lanczos', 'spline', 'gauss').
+  final String customScaler;
+
   const AppSettings({
     this.cpuThreads = 0,
     this.ramBufferMb = 512,
@@ -50,6 +62,10 @@ class AppSettings {
     this.audioOutputDirectory = '',
     this.isEasterEggUnlocked = false,
     this.cardOpacity = 1.0,
+    this.isAdvancedSettingsEnabled = false,
+    this.enableHardwareAcceleration = false,
+    this.customPreset = 'default',
+    this.customScaler = 'default',
   });
 
   /// Physical CPU core count.
@@ -68,6 +84,10 @@ class AppSettings {
     String? audioOutputDirectory,
     bool? isEasterEggUnlocked,
     double? cardOpacity,
+    bool? isAdvancedSettingsEnabled,
+    bool? enableHardwareAcceleration,
+    String? customPreset,
+    String? customScaler,
   }) {
     return AppSettings(
       cpuThreads: cpuThreads ?? this.cpuThreads,
@@ -86,6 +106,12 @@ class AppSettings {
       cardOpacity: cardOpacity != null
           ? cardOpacity.clamp(0.5, 1.0)
           : this.cardOpacity,
+      isAdvancedSettingsEnabled:
+          isAdvancedSettingsEnabled ?? this.isAdvancedSettingsEnabled,
+      enableHardwareAcceleration:
+          enableHardwareAcceleration ?? this.enableHardwareAcceleration,
+      customPreset: customPreset ?? this.customPreset,
+      customScaler: customScaler ?? this.customScaler,
     );
   }
 
@@ -103,6 +129,10 @@ class AppSettings {
       'audioOutputDirectory': audioOutputDirectory,
       'isEasterEggUnlocked': isEasterEggUnlocked,
       'cardOpacity': cardOpacity,
+      'isAdvancedSettingsEnabled': isAdvancedSettingsEnabled,
+      'enableHardwareAcceleration': enableHardwareAcceleration,
+      'customPreset': customPreset,
+      'customScaler': customScaler,
     };
   }
 
@@ -137,6 +167,12 @@ class AppSettings {
           (json['themeMode'] == 'oled_sakura' || json['themeMode'] == 'sakura'),
       cardOpacity:
           (json['cardOpacity'] as num?)?.toDouble().clamp(0.5, 1.0) ?? 1.0,
+      isAdvancedSettingsEnabled:
+          json['isAdvancedSettingsEnabled'] as bool? ?? false,
+      enableHardwareAcceleration:
+          json['enableHardwareAcceleration'] as bool? ?? false,
+      customPreset: json['customPreset'] as String? ?? 'default',
+      customScaler: json['customScaler'] as String? ?? 'default',
     );
   }
 }

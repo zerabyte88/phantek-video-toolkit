@@ -156,7 +156,10 @@ class AppLocalizations {
       'proc_cancel': 'Batalkan',
       'proc_cancel_btn': 'Batalkan',
       'proc_cancel_confirm': 'Batalkan Konversi?',
-      'proc_cancel_desc': 'Proses encoding sedang berjalan. Apakah Anda yakin ingin menghentikannya?',
+      'proc_cancel_desc':
+          'Proses encoding sedang berjalan. Tekan Continue untuk membatalkan konversi dan kembali ke pemilihan video, atau Cancel untuk tetap melanjutkan konversi.',
+      'proc_dialog_cancel': 'Cancel',
+      'proc_dialog_continue': 'Continue',
       'proc_completed': 'Selesai!',
       'proc_continue_btn': 'Lanjutkan',
       'proc_converting': 'Mengkonversi video...',
@@ -283,6 +286,27 @@ class AppLocalizations {
       'unit_core': 'Core',
       'unknown': 'Tidak Diketahui',
       'video_options': 'Opsi Video & Kompresi',
+      'settings_advanced_title': 'Pengaturan Lanjutan',
+      'settings_advanced_badge': 'EARLY ACCESS',
+      'settings_advanced_enable': 'Aktifkan Pengaturan Lanjutan',
+      'settings_advanced_enable_desc':
+          'Buka opsi akselerasi hardware, preset kustom, dan algoritma scaler',
+      'early_access_dialog_title': 'Peringatan Fitur Early Access',
+      'early_access_dialog_desc':
+          'Fitur pengaturan lanjutan (seperti Hardware Acceleration MediaCodec, preset kustom, dan custom scaler) masih dalam tahap eksperimental. Hasil kompresi, kualitas visual, atau kompatibilitas playback dapat bervariasi tergantung chipset perangkat Anda. Apakah Anda yakin ingin mengaktifkannya?',
+      'early_access_dialog_confirm': 'Saya Mengerti & Aktifkan',
+      'early_access_dialog_cancel': 'Batal',
+      'settings_hw_accel': 'Akselerasi Perangkat Keras',
+      'settings_hw_accel_desc':
+          'Gunakan encoder chip SoC (MediaCodec) untuk kompresi berkecepatan tinggi',
+      'settings_custom_preset': 'Preset Kecepatan Khusus',
+      'settings_custom_preset_desc':
+          'Pilih preset x264 dari ultrafast hingga veryslow',
+      'settings_custom_scaler': 'Metode Skala Video (Scaler)',
+      'settings_custom_scaler_desc':
+          'Pilih algoritma interpolasi piksel downscaling',
+      'preset_default': 'Otomatis (Sesuai Preset)',
+      'scaler_default': 'Otomatis (Sesuai Preset)',
     },
     'en': {
       'theme_oled_pure': 'Pure AMOLED',
@@ -417,7 +441,10 @@ class AppLocalizations {
       'proc_cancel': 'Cancel',
       'proc_cancel_btn': 'Cancel',
       'proc_cancel_confirm': 'Cancel Conversion?',
-      'proc_cancel_desc': 'Video encoding is currently in progress. Are you sure you want to cancel?',
+      'proc_cancel_desc':
+          'Video encoding is in progress. Press Continue to cancel conversion and return to video selection, or Cancel to keep converting.',
+      'proc_dialog_cancel': 'Cancel',
+      'proc_dialog_continue': 'Continue',
       'proc_completed': 'Completed!',
       'proc_continue_btn': 'Continue',
       'proc_converting': 'Converting video...',
@@ -546,6 +573,27 @@ class AppLocalizations {
       'unit_core': 'Core',
       'unknown': 'Unknown',
       'video_options': 'Video & Compression Options',
+      'settings_advanced_title': 'Advanced Settings',
+      'settings_advanced_badge': 'EARLY ACCESS',
+      'settings_advanced_enable': 'Enable Advanced Settings',
+      'settings_advanced_enable_desc':
+          'Unlock hardware acceleration, custom presets, and scaler algorithms',
+      'early_access_dialog_title': 'Early Access Feature Warning',
+      'early_access_dialog_desc':
+          'Advanced settings (such as Hardware Acceleration via MediaCodec, custom presets, and custom scalers) are experimental. Compression speed, visual fidelity, or playback compatibility may vary depending on your device SoC. Are you sure you want to enable this?',
+      'early_access_dialog_confirm': 'I Understand & Enable',
+      'early_access_dialog_cancel': 'Cancel',
+      'settings_hw_accel': 'Hardware Acceleration',
+      'settings_hw_accel_desc':
+          'Use SoC hardware chip encoder (MediaCodec) for maximum compression speed',
+      'settings_custom_preset': 'Custom Speed Preset',
+      'settings_custom_preset_desc':
+          'Select x264 preset from ultrafast to veryslow',
+      'settings_custom_scaler': 'Video Scaling Method (Scaler)',
+      'settings_custom_scaler_desc':
+          'Select pixel interpolation algorithm for downscaling',
+      'preset_default': 'Auto (Follow Preset)',
+      'scaler_default': 'Auto (Follow Preset)',
     },
     'zh': {
       'settings_cpu_auto_subtitle': '针对高分辨率视频自动优化',

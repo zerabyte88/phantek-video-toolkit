@@ -354,14 +354,23 @@ class FFmpegService {
       );
 
       final speedPreset = encodingOptions.speedPreset;
-      final scaleFlag = speedPreset.scaler;
-      final x264Preset = speedPreset.x264Preset;
+      var scaleFlag = speedPreset.scaler;
+      var x264Preset = speedPreset.x264Preset;
 
-      final List<String> rateControlArgs;
-      if (encodingOptions.rateControlMode == RateControlMode.crf) {
-        rateControlArgs = ['-crf', '${encodingOptions.crfValue}'];
-      } else {
-        rateControlArgs = ['-b:v', '${targetBitrateKbps}k'];
+      // Advanced settings overrides
+      final isAdvanced = appSettings.isAdvancedSettingsEnabled;
+      final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+
+      if (isAdvanced &&
+          appSettings.customScaler.isNotEmpty &&
+          appSettings.customScaler != 'default') {
+        scaleFlag = appSettings.customScaler;
+      }
+
+      if (isAdvanced &&
+          appSettings.customPreset.isNotEmpty &&
+          appSettings.customPreset != 'default') {
+        x264Preset = appSettings.customPreset;
       }
 
       if (isOriginalResolution) {
@@ -380,19 +389,41 @@ class FFmpegService {
             '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
 
-      codecArgs = [
-        '-c:v',
-        'libx264',
-        '-preset',
-        x264Preset,
-        '-profile:v',
-        'high',
-        '-level:v',
-        '4.1',
-        ...rateControlArgs,
-        '-pix_fmt',
-        'yuv420p',
-      ];
+      if (useHardware) {
+        codecArgs = [
+          '-c:v',
+          'h264_mediacodec',
+          '-b:v',
+          '${targetBitrateKbps}k',
+          '-pix_fmt',
+          'yuv420p',
+        ];
+      } else {
+        final List<String> rateControlArgs;
+        if (encodingOptions.rateControlMode == RateControlMode.crf) {
+          rateControlArgs = ['-crf', '${encodingOptions.crfValue}'];
+        } else {
+          rateControlArgs = ['-b:v', '${targetBitrateKbps}k'];
+        }
+
+        final codecName = encodingOptions.codec.ffmpegCodec;
+
+        codecArgs = [
+          '-c:v',
+          codecName,
+          '-preset',
+          x264Preset,
+          if (codecName == 'libx264') ...[
+            '-profile:v',
+            'high',
+            '-level:v',
+            '4.1',
+          ],
+          ...rateControlArgs,
+          '-pix_fmt',
+          'yuv420p',
+        ];
+      }
     }
 
     // Container flags
@@ -502,11 +533,14 @@ class FFmpegService {
 
     final commandDebug = arguments.join(' ');
     onLog('Command: ffmpeg $commandDebug');
-    onLog(
-      isStreamCopy
-          ? 'Output: ${targetW}x$targetH via Lossless Stream Copy'
-          : 'Output: ${targetW}x$targetH via Software (libx264)',
-    );
+    final isAdvanced = appSettings.isAdvancedSettingsEnabled;
+    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+    final encoderDesc = isStreamCopy
+        ? 'Lossless Stream Copy'
+        : (useHardware
+            ? 'Hardware (h264_mediacodec)'
+            : 'Software (${encodingOptions.codec.ffmpegCodec}${isAdvanced && appSettings.customPreset != "default" ? " [preset: ${appSettings.customPreset}]" : ""})');
+    onLog('Output: ${targetW}x$targetH via $encoderDesc');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
     final completer = Completer<FFmpegSession>();

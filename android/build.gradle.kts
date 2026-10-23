@@ -9,13 +9,13 @@ allprojects {
         resolutionStrategy {
             dependencySubstitution {
                 substitute(module("com.arthenica:ffmpeg-kit-full-gpl:6.0-2"))
-                    .using(module("dev.ffmpegkit-maintained:ffmpeg-kit-full-gpl:6.0.4"))
-                    .because("com.arthenica binaries were retired from Maven Central")
+                    .using(module("dev.ffmpegkit-maintained:ffmpeg-kit-full-gpl:8.1.9"))
+                    .because("com.arthenica binaries were retired from Maven Central; upgrade to FFmpeg 8.1")
             }
             eachDependency {
                 if (requested.group == "com.arthenica" && requested.name.startsWith("ffmpeg-kit")) {
-                    useTarget("dev.ffmpegkit-maintained:${requested.name}:6.0.4")
-                    because("com.arthenica binaries were retired from Maven Central")
+                    useTarget("dev.ffmpegkit-maintained:${requested.name}:8.1.9")
+                    because("com.arthenica binaries were retired from Maven Central; upgrade to FFmpeg 8.1")
                 }
             }
         }

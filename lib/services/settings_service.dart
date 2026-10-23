@@ -152,6 +152,38 @@ class SettingsService extends ChangeNotifier {
     await updateSettings(_settings.copyWith(cardOpacity: clamped));
   }
 
+  Future<void> setAdvancedSettingsEnabled(bool enabled) async {
+    if (!enabled) {
+      // Revert all advanced overrides back to default when toggled off
+      await updateSettings(
+        _settings.copyWith(
+          isAdvancedSettingsEnabled: false,
+          enableHardwareAcceleration: false,
+          customPreset: 'default',
+          customScaler: 'default',
+        ),
+      );
+    } else {
+      await updateSettings(
+        _settings.copyWith(isAdvancedSettingsEnabled: true),
+      );
+    }
+  }
+
+  Future<void> setHardwareAcceleration(bool enabled) async {
+    await updateSettings(
+      _settings.copyWith(enableHardwareAcceleration: enabled),
+    );
+  }
+
+  Future<void> setCustomPreset(String preset) async {
+    await updateSettings(_settings.copyWith(customPreset: preset));
+  }
+
+  Future<void> setCustomScaler(String scaler) async {
+    await updateSettings(_settings.copyWith(customScaler: scaler));
+  }
+
   void setCardOpacityFast(double opacity) {
     final clamped = opacity.clamp(0.5, 1.0);
     if ((_settings.cardOpacity - clamped).abs() > 0.001) {

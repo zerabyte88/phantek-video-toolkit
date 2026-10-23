@@ -3164,4 +3164,132 @@ void main() {
       }
     });
   });
+
+  group('Advanced Settings & Hardware Acceleration tests', () {
+    test('AppSettings defaults, copyWith, and json serialization for advanced fields', () {
+      final defaultSettings = AppSettings();
+      expect(defaultSettings.isAdvancedSettingsEnabled, isFalse);
+      expect(defaultSettings.enableHardwareAcceleration, isFalse);
+      expect(defaultSettings.customPreset, equals('default'));
+      expect(defaultSettings.customScaler, equals('default'));
+
+      final modified = defaultSettings.copyWith(
+        isAdvancedSettingsEnabled: true,
+        enableHardwareAcceleration: true,
+        customPreset: 'ultrafast',
+        customScaler: 'fast_bilinear',
+      );
+      expect(modified.isAdvancedSettingsEnabled, isTrue);
+      expect(modified.enableHardwareAcceleration, isTrue);
+      expect(modified.customPreset, equals('ultrafast'));
+      expect(modified.customScaler, equals('fast_bilinear'));
+
+      final json = modified.toJson();
+      final restored = AppSettings.fromJson(json);
+      expect(restored.isAdvancedSettingsEnabled, isTrue);
+      expect(restored.enableHardwareAcceleration, isTrue);
+      expect(restored.customPreset, equals('ultrafast'));
+      expect(restored.customScaler, equals('fast_bilinear'));
+    });
+
+    test('SettingsService persists and modifies advanced settings correctly', () async {
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+
+      expect(service.settings.isAdvancedSettingsEnabled, isFalse);
+      expect(service.settings.enableHardwareAcceleration, isFalse);
+
+      await service.setAdvancedSettingsEnabled(true);
+      expect(service.settings.isAdvancedSettingsEnabled, isTrue);
+
+      await service.setHardwareAcceleration(true);
+      expect(service.settings.enableHardwareAcceleration, isTrue);
+
+      await service.setCustomPreset('veryfast');
+      expect(service.settings.customPreset, equals('veryfast'));
+
+      await service.setCustomScaler('lanczos');
+      expect(service.settings.customScaler, equals('lanczos'));
+
+      // Toggling off advanced settings must reset all overrides back to defaults
+      await service.setAdvancedSettingsEnabled(false);
+      expect(service.settings.isAdvancedSettingsEnabled, isFalse);
+      expect(service.settings.enableHardwareAcceleration, isFalse);
+      expect(service.settings.customPreset, equals('default'));
+      expect(service.settings.customScaler, equals('default'));
+    });
+
+    test('FFmpegService.buildVideoArguments correctly generates hardware acceleration arguments', () {
+      const video = VideoInfo(
+        filePath: '/source/input.mp4',
+        fileName: 'input.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 60,
+        bitrate: 5000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 20000000,
+      );
+
+      const targetResolution =
+          VideoResolution(label: '720p', width: 1280, height: 720);
+
+      const encodingOptions = EncodingOptions(
+        codec: VideoCodec.h264,
+        container: VideoContainer.mp4,
+      );
+
+      // 1. Standard software encoding (advanced disabled)
+      final normalArgs = FFmpegService.buildVideoArguments(
+        sourceVideo: video,
+        targetResolution: targetResolution,
+        encodingOptions: encodingOptions,
+        appSettings: AppSettings(),
+        outputPath: '/output/out.mp4',
+      );
+      expect(normalArgs.contains('libx264'), isTrue);
+      expect(normalArgs.contains('h264_mediacodec'), isFalse);
+
+      // 2. Hardware acceleration active
+      final hwSettings = AppSettings(
+        isAdvancedSettingsEnabled: true,
+        enableHardwareAcceleration: true,
+      );
+      final hwArgs = FFmpegService.buildVideoArguments(
+        sourceVideo: video,
+        targetResolution: targetResolution,
+        encodingOptions: encodingOptions,
+        appSettings: hwSettings,
+        outputPath: '/output/out.mp4',
+      );
+      expect(hwArgs.contains('h264_mediacodec'), isTrue);
+      expect(hwArgs.contains('libx264'), isFalse);
+      expect(hwArgs.contains('-preset'), isFalse);
+      expect(hwArgs.contains('-crf'), isFalse);
+      expect(hwArgs.contains('-b:v'), isTrue);
+
+      // 3. Custom Preset and Scaler overrides (software)
+      final customSettings = AppSettings(
+        isAdvancedSettingsEnabled: true,
+        enableHardwareAcceleration: false,
+        customPreset: 'ultrafast',
+        customScaler: 'fast_bilinear',
+      );
+      final customArgs = FFmpegService.buildVideoArguments(
+        sourceVideo: video,
+        targetResolution: targetResolution,
+        encodingOptions: encodingOptions,
+        appSettings: customSettings,
+        outputPath: '/output/out.mp4',
+      );
+      final presetIndex = customArgs.indexOf('-preset');
+      expect(presetIndex, isNot(-1));
+      expect(customArgs[presetIndex + 1], equals('ultrafast'));
+
+      final vfArg = customArgs.firstWhere((a) => a.contains('scale='));
+      expect(vfArg.contains('flags=fast_bilinear'), isTrue);
+    });
+  });
 }

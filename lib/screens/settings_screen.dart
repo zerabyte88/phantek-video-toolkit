@@ -21,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.7.5';
-  String _buildNumber = '41';
+  String _appVersion = 'v2.8.0';
+  String _buildNumber = '42';
   double? _dragCardOpacity;
 
   @override
@@ -40,14 +40,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '41';
+              : '42';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.7.5';
-          _buildNumber = '41';
+          _appVersion = 'v2.8.0';
+          _buildNumber = '42';
         });
       }
     }
@@ -209,7 +209,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 20),
 
-              // 3. Storage
+              // 3. Advanced Settings (Early Access)
+              _buildSectionTitle(
+                icon: Icons.science_outlined,
+                title: l10n.t('settings_advanced_title'),
+                theme: theme,
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withAlpha(30),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: Colors.amber.withAlpha(120),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Text(
+                    l10n.t('settings_advanced_badge'),
+                    style: const TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: Colors.amber,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildAdvancedSettingsCard(context, theme, settings, l10n),
+
+              const SizedBox(height: 20),
+
+              // 4. Storage
               _buildSectionTitle(
                 icon: Icons.folder_copy_outlined,
                 title: l10n.t('storage_cache'),
@@ -439,6 +473,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required IconData icon,
     required String title,
     required ThemeData theme,
+    Widget? trailing,
   }) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 2),
@@ -457,6 +492,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
+          ?trailing,
         ],
       ),
     );
@@ -1659,6 +1695,847 @@ class _SettingsScreenState extends State<SettingsScreen> {
           args: {'kbps': kbps.toString()},
         );
     }
+  }
+
+  // Advanced & Experimental Settings (Early Access)
+
+  Widget _buildAdvancedSettingsCard(
+    BuildContext context,
+    ThemeData theme,
+    AppSettings settings,
+    AppLocalizations l10n,
+  ) {
+    return _buildModernCard(
+      theme: theme,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Master switch
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: (settings.isAdvancedSettingsEnabled
+                          ? Colors.amber
+                          : theme.colorScheme.primary)
+                      .withAlpha(20),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.science_rounded,
+                  size: 18,
+                  color: settings.isAdvancedSettingsEnabled
+                      ? Colors.amber
+                      : theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.t('settings_advanced_enable'),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.t('settings_advanced_enable_desc'),
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: theme.colorScheme.onSurface.withAlpha(130),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: settings.isAdvancedSettingsEnabled,
+                activeTrackColor: Colors.amber.withAlpha(160),
+                activeThumbColor: Colors.amber,
+                onChanged: (val) =>
+                    _handleToggleAdvancedSettings(context, val, l10n, theme),
+              ),
+            ],
+          ),
+
+          if (settings.isAdvancedSettingsEnabled) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outline.withAlpha(25),
+              ),
+            ),
+
+            // Hardware Acceleration Toggle
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: (settings.enableHardwareAcceleration
+                            ? Colors.green
+                            : theme.colorScheme.primary)
+                        .withAlpha(20),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.bolt_rounded,
+                    size: 18,
+                    color: settings.enableHardwareAcceleration
+                        ? Colors.green
+                        : theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              l10n.t('settings_hw_accel'),
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withAlpha(25),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.green.withAlpha(80),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: const Text(
+                              'MediaCodec',
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.t('settings_hw_accel_desc'),
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: theme.colorScheme.onSurface.withAlpha(130),
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: settings.enableHardwareAcceleration,
+                  activeTrackColor: Colors.green.withAlpha(160),
+                  activeThumbColor: Colors.green,
+                  onChanged: (val) async {
+                    await _settingsService.setHardwareAcceleration(val);
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ],
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outline.withAlpha(25),
+              ),
+            ),
+
+            // Custom Preset Selector
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () =>
+                  _showPresetPickerSheet(context, theme, settings, l10n),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.speed_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.t('settings_custom_preset'),
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.t('settings_custom_preset_desc'),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: theme.colorScheme.onSurface.withAlpha(130),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withAlpha(70),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withAlpha(40),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            settings.customPreset == 'default'
+                                ? l10n.t('preset_default')
+                                : settings.customPreset,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: settings.customPreset == 'default'
+                                  ? theme.colorScheme.onSurface.withAlpha(180)
+                                  : theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 16,
+                            color: theme.colorScheme.onSurface.withAlpha(150),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outline.withAlpha(25),
+              ),
+            ),
+
+            // Custom Scaler Selector
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () =>
+                  _showScalerPickerSheet(context, theme, settings, l10n),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.aspect_ratio_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.t('settings_custom_scaler'),
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.t('settings_custom_scaler_desc'),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: theme.colorScheme.onSurface.withAlpha(130),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withAlpha(70),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withAlpha(40),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            settings.customScaler == 'default'
+                                ? l10n.t('scaler_default')
+                                : settings.customScaler,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: settings.customScaler == 'default'
+                                  ? theme.colorScheme.onSurface.withAlpha(180)
+                                  : theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 16,
+                            color: theme.colorScheme.onSurface.withAlpha(150),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleToggleAdvancedSettings(
+    BuildContext context,
+    bool enable,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) async {
+    if (enable) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: theme.colorScheme.surface,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withAlpha(30),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.amber,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.t('early_access_dialog_title'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            l10n.t('early_access_dialog_desc'),
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: theme.colorScheme.onSurface.withAlpha(200),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(
+                l10n.t('early_access_dialog_cancel'),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withAlpha(160),
+                ),
+              ),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.amber.shade800,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                l10n.t('early_access_dialog_confirm'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
+        await _settingsService.setAdvancedSettingsEnabled(true);
+        if (mounted) setState(() {});
+      }
+    } else {
+      await _settingsService.setAdvancedSettingsEnabled(false);
+      if (mounted) setState(() {});
+    }
+  }
+
+  void _showPresetPickerSheet(
+    BuildContext context,
+    ThemeData theme,
+    AppSettings settings,
+    AppLocalizations l10n,
+  ) {
+    final presets = [
+      {
+        'id': 'default',
+        'label': l10n.t('preset_default'),
+        'desc': 'Mengikuti preset tampilan (Cepat, Normal, Maksimal)',
+      },
+      {
+        'id': 'ultrafast',
+        'label': 'ultrafast',
+        'desc': 'Kecepatan kompresi paling instan & ringan',
+      },
+      {
+        'id': 'superfast',
+        'label': 'superfast',
+        'desc': 'Sangat kencang, beban CPU minimal',
+      },
+      {
+        'id': 'veryfast',
+        'label': 'veryfast',
+        'desc': 'Cepat optimal (standar mode Cepat)',
+      },
+      {
+        'id': 'faster',
+        'label': 'faster',
+        'desc': 'Lebih cepat (standar mode Normal)',
+      },
+      {
+        'id': 'fast',
+        'label': 'fast',
+        'desc': 'Cepat seimbang (standar mode Maksimal)',
+      },
+      {
+        'id': 'medium',
+        'label': 'medium',
+        'desc': 'Kompromi kompresi dan kecepatan standar x264',
+      },
+      {
+        'id': 'slow',
+        'label': 'slow',
+        'desc': 'Kompresi lebih padat, proses lebih lama',
+      },
+      {
+        'id': 'slower',
+        'label': 'slower',
+        'desc': 'Kualitas kompresi sangat padat',
+      },
+      {
+        'id': 'veryslow',
+        'label': 'veryslow',
+        'desc': 'Kualitas arsip tertinggi, sangat lambat',
+      },
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.65,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (context, scrollController) {
+            return Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withAlpha(40),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.speed_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.t('settings_custom_preset'),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: presets.length,
+                    itemBuilder: (context, i) {
+                      final p = presets[i];
+                      final isSelected = settings.customPreset == p['id'];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: Material(
+                          color: isSelected
+                              ? theme.colorScheme.primary.withAlpha(20)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              Navigator.of(ctx).pop();
+                              await _settingsService.setCustomPreset(p['id']!);
+                              if (mounted) setState(() {});
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outline.withAlpha(20),
+                                  width: isSelected ? 1.5 : 1.0,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isSelected
+                                        ? Icons.check_circle_rounded
+                                        : Icons.radio_button_unchecked_rounded,
+                                    size: 20,
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outline
+                                            .withAlpha(100),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          p['label']!,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: isSelected
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.onSurface,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          p['desc']!,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: theme.colorScheme.onSurface
+                                                .withAlpha(130),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showScalerPickerSheet(
+    BuildContext context,
+    ThemeData theme,
+    AppSettings settings,
+    AppLocalizations l10n,
+  ) {
+    final scalers = [
+      {
+        'id': 'default',
+        'label': l10n.t('scaler_default'),
+        'desc': 'Mengikuti preset aktif (Bicubic / Lanczos / Area)',
+      },
+      {
+        'id': 'fast_bilinear',
+        'label': 'fast_bilinear',
+        'desc': 'Paling ringan & cepat di ARM NEON',
+      },
+      {
+        'id': 'bilinear',
+        'label': 'bilinear',
+        'desc': 'Interpolasi bilinear standar yang cepat',
+      },
+      {
+        'id': 'bicubic',
+        'label': 'bicubic',
+        'desc': 'Keseimbangan natural antara kecepatan dan ketajaman',
+      },
+      {
+        'id': 'area',
+        'label': 'area',
+        'desc': 'Sampling area, optimal untuk downscale anti-moiré',
+      },
+      {
+        'id': 'lanczos',
+        'label': 'lanczos',
+        'desc': 'Interpolasi sinc berpresisi tinggi dengan detail tajam',
+      },
+      {
+        'id': 'spline',
+        'label': 'spline',
+        'desc': 'Kurva spline alami tanpa artefak dering berlebih',
+      },
+      {
+        'id': 'gauss',
+        'label': 'gauss',
+        'desc': 'Filter gaussian lembut untuk meredam noise',
+      },
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.65,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (context, scrollController) {
+            return Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withAlpha(40),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.aspect_ratio_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.t('settings_custom_scaler'),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: scalers.length,
+                    itemBuilder: (context, i) {
+                      final s = scalers[i];
+                      final isSelected = settings.customScaler == s['id'];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: Material(
+                          color: isSelected
+                              ? theme.colorScheme.primary.withAlpha(20)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              Navigator.of(ctx).pop();
+                              await _settingsService.setCustomScaler(s['id']!);
+                              if (mounted) setState(() {});
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outline.withAlpha(20),
+                                  width: isSelected ? 1.5 : 1.0,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isSelected
+                                        ? Icons.check_circle_rounded
+                                        : Icons.radio_button_unchecked_rounded,
+                                    size: 20,
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outline
+                                            .withAlpha(100),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          s['label']!,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: isSelected
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.onSurface,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          s['desc']!,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: theme.colorScheme.onSurface
+                                                .withAlpha(130),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   // Storage folder tile
