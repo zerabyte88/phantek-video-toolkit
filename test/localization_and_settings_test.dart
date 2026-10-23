@@ -323,7 +323,7 @@ void main() {
       expect(settings.cpuPreset, equals('medium'));
       expect(settings.audioBitrateKbps, equals(128));
       expect(settings.languageCode, equals('en'));
-      expect(settings.themeMode, equals('oled_snowfall'));
+      expect(settings.themeMode, equals('oled_pure'));
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
       expect(settings.audioOutputDirectory, equals(''));
@@ -3637,6 +3637,73 @@ void main() {
         expect(find.textContaining('Hardware Acceleration (MediaCodec) only supports Bitrate control'), findsNothing);
       },
     );
+
+    test('Default Theme and Language resolution adapts to system environment', () {
+      // 1. Theme resolution
+      expect(SettingsService.resolveInitialTheme(Brightness.dark), equals('oled_pure'));
+      expect(SettingsService.resolveInitialTheme(Brightness.light), equals('light_clean'));
+
+      // 2. Language resolution: supported languages
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('id', 'ID')]), equals('id'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('in', 'ID')]), equals('id'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ms', 'MY')]), equals('ms'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ja', 'JP')]), equals('ja'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('es', 'ES')]), equals('es'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('de', 'DE')]), equals('de'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('fr', 'FR')]), equals('fr'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ko', 'KR')]), equals('ko'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ru', 'RU')]), equals('ru'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ar', 'SA')]), equals('ar'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('hi', 'IN')]), equals('hi'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('th', 'TH')]), equals('th'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('vi', 'VN')]), equals('vi'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('it', 'IT')]), equals('it'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nl', 'NL')]), equals('nl'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('pt', 'BR')]), equals('pt'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('fi', 'FI')]), equals('fi'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('sv', 'SE')]), equals('sv'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('da', 'DK')]), equals('da'));
+
+      // Chinese regional variants
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')]), equals('zh_CN'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'CN')]), equals('zh_CN'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh')]), equals('zh_CN'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')]), equals('zh_TW'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'TW')]), equals('zh_TW'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'HK')]), equals('zh_TW'));
+
+      // Norwegian mapping
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('no', 'NO')]), equals('no'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nb', 'NO')]), equals('no'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nn', 'NO')]), equals('no'));
+
+      // Unsupported language falls back to English ('en')
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('pl', 'PL')]), equals('en'));
+      expect(AppLocalizations.resolveSupportedLanguage([const Locale('tr', 'TR')]), equals('en'));
+      expect(AppLocalizations.resolveSupportedLanguage([]), equals('en'));
+    });
+
+    test('SettingsService applies system theme and language on first launch and reset', () async {
+      SharedPreferences.setMockInitialValues({});
+      final service = SettingsService();
+      await service.init();
+
+      // First launch must automatically resolve initial theme & language
+      expect(service.settings.isFirstLaunch, isFalse);
+      expect(
+        service.settings.themeMode == 'oled_pure' || service.settings.themeMode == 'light_clean',
+        isTrue,
+      );
+      expect(AppLocalizations.supportedLanguages.any((m) => m['code'] == service.settings.languageCode), isTrue);
+
+      // Mutate and resetToDefaults
+      await service.setThemeMode('oled_snowfall');
+      await service.resetToDefaults();
+      expect(
+        service.settings.themeMode == 'oled_pure' || service.settings.themeMode == 'light_clean',
+        isTrue,
+      );
+    });
   });
 }
 

@@ -36,6 +36,8 @@ class SettingsService extends ChangeNotifier {
           _settings = _settings.copyWith(ramBufferMb: 2048);
           await _saveSettings();
         }
+      } else {
+        _settings = const AppSettings();
       }
 
       // Auto-detect hardware on first launch
@@ -53,6 +55,28 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
+  /// Resolves the default theme based on device system brightness:
+  /// - [Brightness.dark] -> 'oled_pure' (AMOLED Murni)
+  /// - [Brightness.light] -> 'light_clean' (Terang Bersih)
+  static String resolveInitialTheme([Brightness? brightness]) {
+    if (brightness != null) {
+      return brightness == Brightness.light ? 'light_clean' : 'oled_pure';
+    }
+    try {
+      final platformBrightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      return platformBrightness == Brightness.light ? 'light_clean' : 'oled_pure';
+    } catch (_) {
+      return 'oled_pure';
+    }
+  }
+
+  /// Resolves the default language based on device system locales:
+  /// Matches against supported languages or falls back to 'en'.
+  static String resolveInitialLanguage([List<Locale>? locales]) {
+    return AppLocalizations.resolveSupportedLanguage(locales);
+  }
+
   Future<void> _applyFirstLaunchDefaults() async {
     final tier = DeviceSpecHelper.getDeviceTier();
 
@@ -61,10 +85,15 @@ class SettingsService extends ChangeNotifier {
     if (tier == DeviceTier.highEnd) preset = 'medium';
     if (tier == DeviceTier.lowEnd) preset = 'fast';
 
+    final initialTheme = resolveInitialTheme();
+    final initialLang = resolveInitialLanguage();
+
     _settings = _settings.copyWith(
       isFirstLaunch: false,
       cpuPreset: preset,
       cpuThreads: 0, // Auto
+      themeMode: initialTheme,
+      languageCode: initialLang,
     );
     await _saveSettings();
   }
@@ -194,7 +223,11 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> resetToDefaults() async {
     final currentLang = _settings.languageCode;
-    _settings = AppSettings(languageCode: currentLang);
+    final initialTheme = resolveInitialTheme();
+    _settings = AppSettings(
+      languageCode: currentLang,
+      themeMode: initialTheme,
+    );
     notifyListeners();
     await _saveSettings();
     await _applyWakelock(_settings.keepScreenAwake);
