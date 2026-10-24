@@ -345,14 +345,6 @@ class FFmpegService {
       codecArgs = ['-c:v', 'copy'];
     } else {
       // Transcoding pipeline
-      final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
-        targetWidth: targetW,
-        targetHeight: targetH,
-        sourceWidth: sourceVideo.width,
-        sourceHeight: sourceVideo.height,
-        sourceBitrateBps: sourceVideo.bitrate,
-      );
-
       final speedPreset = encodingOptions.speedPreset;
       var scaleFlag = speedPreset.scaler;
       var x264Preset = speedPreset.x264Preset;
@@ -360,6 +352,15 @@ class FFmpegService {
       // Advanced settings overrides
       final isAdvanced = appSettings.isAdvancedSettingsEnabled;
       final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+
+      final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
+        targetWidth: targetW,
+        targetHeight: targetH,
+        sourceWidth: sourceVideo.width,
+        sourceHeight: sourceVideo.height,
+        sourceBitrateBps: sourceVideo.bitrate,
+        isHardware: useHardware,
+      );
 
       if (isAdvanced &&
           appSettings.customScaler.isNotEmpty &&
@@ -373,20 +374,22 @@ class FFmpegService {
         x264Preset = appSettings.customPreset;
       }
 
+      final pixelFormat = useHardware ? 'nv12' : 'yuv420p';
+
       if (isOriginalResolution) {
         final needsPad =
             sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
         if (needsPad) {
           vfFilter =
-              '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+              '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=$pixelFormat';
         } else if (fpsFilter.isNotEmpty) {
-          vfFilter = '${fpsFilter}format=yuv420p';
+          vfFilter = '${fpsFilter}format=$pixelFormat';
         } else {
-          vfFilter = 'format=yuv420p';
+          vfFilter = 'format=$pixelFormat';
         }
       } else {
         vfFilter =
-            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
+            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=$pixelFormat';
       }
 
       final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
@@ -399,8 +402,12 @@ class FFmpegService {
           hwCodec,
           '-b:v',
           '${targetBitrateKbps}k',
+          '-maxrate',
+          '${(targetBitrateKbps * 1.5).round()}k',
+          '-bufsize',
+          '${(targetBitrateKbps * 2.0).round()}k',
           '-pix_fmt',
-          'yuv420p',
+          'nv12',
         ];
       } else {
         final List<String> rateControlArgs;
@@ -598,6 +605,27 @@ class FFmpegService {
         } catch (_) {}
       }
       return null;
+    } else if (useHardware) {
+      final logs = await session.getAllLogsAsString();
+      onLog('\n[HW Accel] MediaCodec hardware encoding encountered a device limitation or failed: $logs');
+      onLog('[HW Accel Fallback] Automatically falling back to software CPU encoder (${encodingOptions.codec.ffmpegCodec}) for 100% device compatibility...');
+      final partialFile = File(outputPath);
+      if (await partialFile.exists()) {
+        try {
+          await partialFile.delete();
+        } catch (_) {}
+      }
+      final fallbackSettings = appSettings.copyWith(
+        enableHardwareAcceleration: false,
+      );
+      return processVideo(
+        sourceVideo: sourceVideo,
+        targetResolution: targetResolution,
+        encodingOptions: encodingOptions,
+        appSettings: fallbackSettings,
+        onProgress: onProgress,
+        onLog: onLog,
+      );
     } else {
       final logs = await session.getAllLogsAsString();
       onLog('\nEncoding failed: $logs');

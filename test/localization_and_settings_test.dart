@@ -3269,6 +3269,13 @@ void main() {
       expect(hwArgs.contains('-preset'), isFalse);
       expect(hwArgs.contains('-crf'), isFalse);
       expect(hwArgs.contains('-b:v'), isTrue);
+      expect(hwArgs.contains('-maxrate'), isTrue);
+      expect(hwArgs.contains('-bufsize'), isTrue);
+      final hwPixFmtIdx = hwArgs.indexOf('-pix_fmt');
+      expect(hwPixFmtIdx, isNot(-1));
+      expect(hwArgs[hwPixFmtIdx + 1], equals('nv12'));
+      final hwVf = hwArgs[hwArgs.indexOf('-vf') + 1];
+      expect(hwVf, contains('format=nv12'));
 
       // 3. Custom Preset and Scaler overrides (software)
       final customSettings = AppSettings(
@@ -3497,6 +3504,52 @@ void main() {
       expect(hwArgs.contains('-b:v'), isTrue);
       expect(hwArgs.contains('-preset'), isFalse);
       expect(hwArgs.contains('-crf'), isFalse);
+    });
+
+    test('Hardware Acceleration applies bitrate quality compensation and minimum floors to prevent burik quality', () {
+      const opts = EncodingOptions(
+        rateControlMode: RateControlMode.crf,
+        crfValue: 22,
+      );
+
+      // Software 720p bitrate
+      final swBitrate720 = opts.calculateTargetBitrateKbps(
+        targetWidth: 1280,
+        targetHeight: 720,
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        sourceBitrateBps: 10000000,
+        isHardware: false,
+      );
+
+      // Hardware 720p bitrate (should be ~1.45x higher to prevent visual degradation on MediaCodec)
+      final hwBitrate720 = opts.calculateTargetBitrateKbps(
+        targetWidth: 1280,
+        targetHeight: 720,
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        sourceBitrateBps: 10000000,
+        isHardware: true,
+      );
+
+      expect(swBitrate720, inInclusiveRange(1800, 2200));
+      expect(hwBitrate720, greaterThan(swBitrate720));
+      expect(hwBitrate720, inInclusiveRange(2700, 3200));
+
+      // In Bitrate mode with low custom bitrate, hardware enforces safe floor
+      const lowBitrateOpts = EncodingOptions(
+        rateControlMode: RateControlMode.bitrate,
+        customBitrateKbps: 800,
+      );
+      final hwSafeBitrate = lowBitrateOpts.calculateTargetBitrateKbps(
+        targetWidth: 1280,
+        targetHeight: 720,
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        sourceBitrateBps: 10000000,
+        isHardware: true,
+      );
+      expect(hwSafeBitrate, equals(2500));
     });
 
     testWidgets(

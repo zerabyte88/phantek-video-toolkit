@@ -275,11 +275,14 @@ class _HomeScreenState extends State<HomeScreen> {
       final defaultPreset = SpeedPreset.fromCpuPreset(
         _settingsService.settings.cpuPreset,
       );
+      final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
+          _settingsService.settings.enableHardwareAcceleration;
       _encodingOptions = EncodingOptions(
         speedPreset: defaultPreset,
         crfValue: defaultPreset.defaultCrf,
         codec: VideoCodec.h264,
         container: VideoContainer.mp4,
+        rateControlMode: isHw ? RateControlMode.bitrate : RateControlMode.crf,
       );
       if (_videoInfo != null) {
         final resolutions = _getResolutionsForMode(_selectedMode, _videoInfo);

@@ -217,14 +217,25 @@ class EncodingOptions {
   }
 
   /// Estimates target video bitrate in kbps.
+  ///
+  /// When [isHardware] is true, applies quality compensation factor (~1.45x)
+  /// because mobile ASIC hardware encoders (MediaCodec) lack libx264's advanced
+  /// psychovisual rate control and require higher bitrate to prevent pixelation.
   int calculateTargetBitrateKbps({
     required int targetWidth,
     required int targetHeight,
     required int sourceWidth,
     required int sourceHeight,
     required int sourceBitrateBps,
+    bool isHardware = false,
   }) {
     if (rateControlMode == RateControlMode.bitrate) {
+      if (isHardware && customBitrateKbps > 0) {
+        // Ensure bitrate doesn't fall below minimal quality floor on hardware encoders
+        final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
+        final minHwKbps = maxDim >= 1920 ? 4000 : (maxDim >= 1280 ? 2500 : 1200);
+        return math.max(customBitrateKbps, minHwKbps);
+      }
       return customBitrateKbps;
     }
 
@@ -248,14 +259,21 @@ class EncodingOptions {
     final factor = diff / 6.0;
     double estimatedBitrateMbps = baseMbps * math.pow(0.5, factor);
 
+    // Hardware encoder quality compensation
+    if (isHardware) {
+      estimatedBitrateMbps *= 1.45;
+    }
+
     // Avoid upscaling bitrate beyond source video
     if (sourceBitrateBps > 0) {
       final sourceKbps = sourceBitrateBps ~/ 1000;
+      final maxMultiplier = isHardware ? 1.15 : 0.95;
       if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {
-        estimatedBitrateMbps = (sourceKbps / 1000.0) * 0.95;
+        estimatedBitrateMbps = (sourceKbps / 1000.0) * maxMultiplier;
       }
     }
 
-    return (estimatedBitrateMbps * 1000).round().clamp(300, 50000);
+    final minBitrate = isHardware ? 1200 : 300;
+    return (estimatedBitrateMbps * 1000).round().clamp(minBitrate, 50000);
   }
 }

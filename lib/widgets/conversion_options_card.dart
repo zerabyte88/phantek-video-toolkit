@@ -1023,6 +1023,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       final targetH =
           widget.selectedResolution?.height ?? widget.sourceVideo.height;
 
+      final appSettings = SettingsService().settings;
+      final isHw = appSettings.isAdvancedSettingsEnabled &&
+          appSettings.enableHardwareAcceleration;
+
       final targetBitrateKbps = widget.encodingOptions
           .calculateTargetBitrateKbps(
             targetWidth: targetW,
@@ -1030,6 +1034,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             sourceWidth: widget.sourceVideo.width,
             sourceHeight: widget.sourceVideo.height,
             sourceBitrateBps: widget.sourceVideo.bitrate,
+            isHardware: isHw,
           );
 
       final totalBitrateKbps = targetBitrateKbps + 128;
