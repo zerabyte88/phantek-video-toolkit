@@ -359,10 +359,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
           _isOom = true;
         }
         if (log.contains('Encoding failed:') ||
-            log.contains('Extraction failed:') ||
-            log.toLowerCase().contains('error')) {
+            log.contains('Extraction failed:')) {
           _errorMessage = log
-              .replaceFirst(RegExp(r'\n(Encoding|Extraction) failed:\s*'), '')
+              .replaceFirst(RegExp(r'\n?(Encoding|Extraction) failed:\s*'), '')
               .trim();
         }
         debugPrint(log);
@@ -426,6 +425,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         if (result != null) {
           _isSuccess = true;
           _outputPath = result;
+          _errorMessage = null;
           _statusText = l10n.t('proc_completed');
         } else {
           _isSuccess = false;

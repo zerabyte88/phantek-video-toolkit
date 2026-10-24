@@ -3269,13 +3269,13 @@ void main() {
       expect(hwArgs.contains('-preset'), isFalse);
       expect(hwArgs.contains('-crf'), isFalse);
       expect(hwArgs.contains('-b:v'), isTrue);
-      expect(hwArgs.contains('-maxrate'), isTrue);
-      expect(hwArgs.contains('-bufsize'), isTrue);
-      final hwPixFmtIdx = hwArgs.indexOf('-pix_fmt');
-      expect(hwPixFmtIdx, isNot(-1));
-      expect(hwArgs[hwPixFmtIdx + 1], equals('nv12'));
+      expect(hwArgs.contains('-maxrate'), isFalse);
+      expect(hwArgs.contains('-bufsize'), isFalse);
+      expect(hwArgs.contains('-g'), isTrue);
       final hwVf = hwArgs[hwArgs.indexOf('-vf') + 1];
-      expect(hwVf, contains('format=nv12'));
+      expect(hwVf, contains('format=nv12|yuv420p'));
+      final hwThreadIdx = hwArgs.indexOf('-threads');
+      expect(hwArgs[hwThreadIdx + 1], equals('1'));
 
       // 3. Custom Preset and Scaler overrides (software)
       final customSettings = AppSettings(
@@ -3834,6 +3834,46 @@ void main() {
         expect(l10n.t('heavy_process_use_normal'), isNotEmpty, reason: 'heavy_process_use_normal missing in $code');
         expect(l10n.t('heavy_process_continue'), isNotEmpty, reason: 'heavy_process_continue missing in $code');
         expect(l10n.t('heavy_process_cancel'), isNotEmpty, reason: 'heavy_process_cancel missing in $code');
+      }
+    });
+
+    test('Preset and scaler descriptions resolve across all 22 supported languages and zh fallback', () {
+      const presetKeys = [
+        'preset_default_desc',
+        'preset_ultrafast_desc',
+        'preset_superfast_desc',
+        'preset_veryfast_desc',
+        'preset_faster_desc',
+        'preset_fast_custom_desc',
+        'preset_medium_desc',
+        'preset_slow_custom_desc',
+        'preset_slower_desc',
+        'preset_veryslow_desc',
+      ];
+
+      const scalerKeys = [
+        'scaler_default_desc',
+        'scaler_fast_bilinear_desc',
+        'scaler_bilinear_desc',
+        'scaler_gauss_desc',
+        'scaler_area_desc',
+        'scaler_bicubic_desc',
+        'scaler_spline_desc',
+        'scaler_lanczos_desc',
+      ];
+
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        for (final k in presetKeys) {
+          final text = l10n.t(k);
+          expect(text, isNotEmpty, reason: '$k missing in $code');
+          expect(text, isNot(equals(k)), reason: '$k untranslated in $code');
+        }
+        for (final k in scalerKeys) {
+          final text = l10n.t(k);
+          expect(text, isNotEmpty, reason: '$k missing in $code');
+          expect(text, isNot(equals(k)), reason: '$k untranslated in $code');
+        }
       }
     });
   });

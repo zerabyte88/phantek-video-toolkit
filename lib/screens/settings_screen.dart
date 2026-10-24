@@ -2471,9 +2471,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'desc': l10n.t('scaler_bilinear_desc'),
       },
       {
-        'id': 'bicubic',
-        'label': 'bicubic',
-        'desc': l10n.t('scaler_bicubic_desc'),
+        'id': 'gauss',
+        'label': 'gauss',
+        'desc': l10n.t('scaler_gauss_desc'),
       },
       {
         'id': 'area',
@@ -2481,9 +2481,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'desc': l10n.t('scaler_area_desc'),
       },
       {
-        'id': 'lanczos',
-        'label': 'lanczos',
-        'desc': l10n.t('scaler_lanczos_desc'),
+        'id': 'bicubic',
+        'label': 'bicubic',
+        'desc': l10n.t('scaler_bicubic_desc'),
       },
       {
         'id': 'spline',
@@ -2491,9 +2491,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'desc': l10n.t('scaler_spline_desc'),
       },
       {
-        'id': 'gauss',
-        'label': 'gauss',
-        'desc': l10n.t('scaler_gauss_desc'),
+        'id': 'lanczos',
+        'label': 'lanczos',
+        'desc': l10n.t('scaler_lanczos_desc'),
       },
     ];
 

@@ -7,6 +7,7 @@ import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/log.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/statistics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/app_settings.dart';
@@ -252,6 +253,9 @@ class FFmpegService {
     required AppSettings appSettings,
     required String outputPath,
   }) {
+    final isAdvanced = appSettings.isAdvancedSettingsEnabled;
+    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+
     // Target dimensions
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
@@ -272,9 +276,18 @@ class FFmpegService {
       targetW = (targetH * sourceAspect).round();
     }
 
-    // Ensure even dimensions
-    targetW = (targetW ~/ 2) * 2;
-    targetH = (targetH ~/ 2) * 2;
+    // Ensure dimensions meet hardware/software alignment constraints
+    if (useHardware) {
+      // Android MediaCodec hardware encoders strictly require 16x16 macroblock alignment.
+      // Non-16 aligned dimensions cause AMediaCodec_configure failures across Qualcomm/MediaTek/Exynos.
+      targetW = ((targetW + 8) ~/ 16) * 16;
+      targetH = ((targetH + 8) ~/ 16) * 16;
+      if (targetW < 16) targetW = 16;
+      if (targetH < 16) targetH = 16;
+    } else {
+      targetW = (targetW ~/ 2) * 2;
+      targetH = (targetH ~/ 2) * 2;
+    }
 
     // Thread count
     final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
@@ -374,20 +387,32 @@ class FFmpegService {
         x264Preset = appSettings.customPreset;
       }
 
-      final pixelFormat = useHardware ? 'nv12' : 'yuv420p';
-
       if (isOriginalResolution) {
-        final needsPad =
-            sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
-        if (needsPad) {
-          vfFilter =
-              '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=$pixelFormat';
-        } else if (fpsFilter.isNotEmpty) {
-          vfFilter = '${fpsFilter}format=$pixelFormat';
+        if (useHardware) {
+          final needsPad =
+              sourceVideo.width % 16 != 0 || sourceVideo.height % 16 != 0;
+          if (needsPad) {
+            vfFilter =
+                '${fpsFilter}pad=ceil(iw/16)*16:ceil(ih/16)*16:(ow-iw)/2:(oh-ih)/2,format=nv12|yuv420p';
+          } else if (fpsFilter.isNotEmpty) {
+            vfFilter = '${fpsFilter}format=nv12|yuv420p';
+          } else {
+            vfFilter = 'format=nv12|yuv420p';
+          }
         } else {
-          vfFilter = 'format=$pixelFormat';
+          final needsPad =
+              sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
+          if (needsPad) {
+            vfFilter =
+                '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+          } else if (fpsFilter.isNotEmpty) {
+            vfFilter = '${fpsFilter}format=yuv420p';
+          } else {
+            vfFilter = 'format=yuv420p';
+          }
         }
       } else {
+        final pixelFormat = useHardware ? 'nv12|yuv420p' : 'yuv420p';
         vfFilter =
             '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=$pixelFormat';
       }
@@ -402,12 +427,8 @@ class FFmpegService {
           hwCodec,
           '-b:v',
           '${targetBitrateKbps}k',
-          '-maxrate',
-          '${(targetBitrateKbps * 1.5).round()}k',
-          '-bufsize',
-          '${(targetBitrateKbps * 2.0).round()}k',
-          '-pix_fmt',
-          'nv12',
+          '-g',
+          '${encodingOptions.targetFps > 0 ? encodingOptions.targetFps * 2 : 60}',
         ];
       } else {
         final List<String> rateControlArgs;
@@ -444,6 +465,15 @@ class FFmpegService {
       containerFlags.addAll(['-movflags', '+faststart']);
     }
 
+    final threadArgs = useHardware
+        ? ['-threads', '1']
+        : [
+            '-threads',
+            '$effectiveThreads',
+            '-filter_threads',
+            '$effectiveThreads',
+          ];
+
     return <String>[
       '-i',
       sourceVideo.filePath,
@@ -451,10 +481,7 @@ class FFmpegService {
       '0:v:0',
       '-map',
       '0:a:0?',
-      '-threads',
-      '$effectiveThreads',
-      '-filter_threads',
-      '$effectiveThreads',
+      ...threadArgs,
       if (!isStreamCopy && vfFilter.isNotEmpty) ...['-vf', vfFilter],
       ...codecArgs,
       ...audioArgs,
@@ -517,8 +544,17 @@ class FFmpegService {
     } else {
       targetW = (targetH * sourceAspect).round();
     }
-    targetW = (targetW ~/ 2) * 2;
-    targetH = (targetH ~/ 2) * 2;
+    final isAdvanced = appSettings.isAdvancedSettingsEnabled;
+    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
+    if (useHardware) {
+      targetW = ((targetW + 8) ~/ 16) * 16;
+      targetH = ((targetH + 8) ~/ 16) * 16;
+      if (targetW < 16) targetW = 16;
+      if (targetH < 16) targetH = 16;
+    } else {
+      targetW = (targetW ~/ 2) * 2;
+      targetH = (targetH ~/ 2) * 2;
+    }
 
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
@@ -544,8 +580,6 @@ class FFmpegService {
 
     final commandDebug = arguments.join(' ');
     onLog('Command: ffmpeg $commandDebug');
-    final isAdvanced = appSettings.isAdvancedSettingsEnabled;
-    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
     final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
         ? 'hevc_mediacodec'
         : 'h264_mediacodec';
@@ -607,8 +641,9 @@ class FFmpegService {
       return null;
     } else if (useHardware) {
       final logs = await session.getAllLogsAsString();
-      onLog('\n[HW Accel] MediaCodec hardware encoding encountered a device limitation or failed: $logs');
+      onLog('\n[HW Accel] MediaCodec hardware encoding unavailable on this device chipset.');
       onLog('[HW Accel Fallback] Automatically falling back to software CPU encoder (${encodingOptions.codec.ffmpegCodec}) for 100% device compatibility...');
+      debugPrint('MediaCodec HW failure detail: $logs');
       final partialFile = File(outputPath);
       if (await partialFile.exists()) {
         try {
