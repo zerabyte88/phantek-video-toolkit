@@ -218,7 +218,7 @@ class EncodingOptions {
 
   /// Estimates target video bitrate in kbps.
   ///
-  /// When [isHardware] is true, applies quality compensation factor (~1.45x)
+  /// When [isHardware] is true, applies dedicated hardware bitrate allocation and safe quality floors
   /// because mobile ASIC hardware encoders (MediaCodec) lack libx264's advanced
   /// psychovisual rate control and require higher bitrate to prevent pixelation.
   int calculateTargetBitrateKbps({
@@ -229,29 +229,49 @@ class EncodingOptions {
     required int sourceBitrateBps,
     bool isHardware = false,
   }) {
+    final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
+
     if (rateControlMode == RateControlMode.bitrate) {
       if (isHardware && customBitrateKbps > 0) {
-        // Ensure bitrate doesn't fall below minimal quality floor on hardware encoders
-        final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
-        final minHwKbps = maxDim >= 1920 ? 4000 : (maxDim >= 1280 ? 2500 : 1200);
+        // Safe bitrate floors for MediaCodec hardware encoders to prevent macroblocking
+        final minHwKbps = maxDim >= 2560
+            ? 18000
+            : (maxDim >= 1920
+                ? 8000
+                : (maxDim >= 1280 ? 5000 : 2500));
         return math.max(customBitrateKbps, minHwKbps);
       }
       return customBitrateKbps;
     }
 
-    // Baseline bitrate by target resolution
-    final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
-    double baseMbps = 4.5;
-    if (maxDim >= 2560) {
-      baseMbps = 8.5;
-    } else if (maxDim >= 1920) {
-      baseMbps = 4.5;
-    } else if (maxDim >= 1280) {
-      baseMbps = 2.5;
-    } else if (maxDim >= 854) {
-      baseMbps = 1.3;
+    // Baseline bitrate by target resolution.
+    // Hardware encoders on mobile SoCs lack libx264's deep psychovisual optimizations (psy-rd, aq-mode)
+    // and require ~2x to 2.5x the bitrate to deliver sharp, artifact-free video.
+    final double baseMbps;
+    if (isHardware) {
+      if (maxDim >= 2560) {
+        baseMbps = 26.0;
+      } else if (maxDim >= 1920) {
+        baseMbps = 11.0;
+      } else if (maxDim >= 1280) {
+        baseMbps = 6.5;
+      } else if (maxDim >= 854) {
+        baseMbps = 3.5;
+      } else {
+        baseMbps = 2.0;
+      }
     } else {
-      baseMbps = 0.8;
+      if (maxDim >= 2560) {
+        baseMbps = 8.5;
+      } else if (maxDim >= 1920) {
+        baseMbps = 4.5;
+      } else if (maxDim >= 1280) {
+        baseMbps = 2.5;
+      } else if (maxDim >= 854) {
+        baseMbps = 1.3;
+      } else {
+        baseMbps = 0.8;
+      }
     }
 
     // Scale factor: ±6 CRF halves or doubles bitrate
@@ -259,21 +279,27 @@ class EncodingOptions {
     final factor = diff / 6.0;
     double estimatedBitrateMbps = baseMbps * math.pow(0.5, factor);
 
-    // Hardware encoder quality compensation
-    if (isHardware) {
-      estimatedBitrateMbps *= 1.45;
-    }
+    // Minimum safe quality floor for hardware encoders per resolution tier
+    final minFloorKbps = isHardware
+        ? (maxDim >= 2560
+            ? 16000
+            : (maxDim >= 1920
+                ? 7000
+                : (maxDim >= 1280 ? 4500 : 2000)))
+        : 300;
 
-    // Avoid upscaling bitrate beyond source video
+    // Avoid upscaling bitrate beyond source video unless hardware encoder needs minimal quality floor
     if (sourceBitrateBps > 0) {
       final sourceKbps = sourceBitrateBps ~/ 1000;
-      final maxMultiplier = isHardware ? 1.15 : 0.95;
+      final maxMultiplier = isHardware ? 1.25 : 0.95;
       if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {
-        estimatedBitrateMbps = (sourceKbps / 1000.0) * maxMultiplier;
+        final cappedMbps = (sourceKbps / 1000.0) * maxMultiplier;
+        estimatedBitrateMbps = isHardware
+            ? math.max(cappedMbps, minFloorKbps / 1000.0)
+            : cappedMbps;
       }
     }
 
-    final minBitrate = isHardware ? 1200 : 300;
-    return (estimatedBitrateMbps * 1000).round().clamp(minBitrate, 50000);
+    return (estimatedBitrateMbps * 1000).round().clamp(minFloorKbps, 50000);
   }
 }

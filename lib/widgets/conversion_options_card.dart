@@ -554,10 +554,10 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               children: [
                 Expanded(
                   child: Slider(
-                    value: _customBitrateMbps.toDouble(),
+                    value: _customBitrateMbps.toDouble().clamp(1.0, 35.0),
                     min: 1,
-                    max: 20,
-                    divisions: 19,
+                    max: 35,
+                    divisions: 34,
                     label: '$_customBitrateMbps Mbps',
                     onChanged: (val) {
                       final newBitrate = val.round();
