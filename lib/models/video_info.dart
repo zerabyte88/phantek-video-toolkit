@@ -52,9 +52,19 @@ class VideoInfo {
     this.audioBitrateKbps,
   });
 
-  /// True if video is 2K+ (1440p) or duration is 10 minutes or longer.
+  /// True if video is 4K (2160p or higher in any orientation).
+  bool get is4K =>
+      shortDimension >= 2160 ||
+      width >= 3840 ||
+      height >= 2160 ||
+      (width >= 2160 && height >= 3840);
+
+  /// True if video duration is 10 minutes (600 seconds) or longer.
+  bool get isLongDuration => durationSeconds >= 600;
+
+  /// True if video is 2K+ (1440p), 4K, or duration is 10 minutes or longer.
   bool get isHeavyProcessing =>
-      shortDimension >= 1440 || durationSeconds >= 600;
+      is4K || isLongDuration || shortDimension >= 1440;
 
   /// Shorter edge dimension used for resolution classification.
   int get shortDimension => width < height ? width : height;

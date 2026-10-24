@@ -121,4 +121,149 @@ void main() {
       expect(currentOpts.crfValue, equals(22));
     },
   );
+
+  testWidgets(
+    'ConversionOptionsCard displays warning banner for 4K and >30 min videos',
+    (WidgetTester tester) async {
+      final l10n = const AppLocalizations('id');
+
+      // 1. Standard video (1080p, 2 min) -> No banner
+      const standardVid = VideoInfo(
+        filePath: '/storage/sample.mp4',
+        fileName: 'sample.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 120,
+        bitrate: 10000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 50000000,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: standardVid,
+                resolutions: standardVid.availableDownscaleTargets,
+                selectedResolution: standardVid.availableDownscaleTargets.first,
+                onResolutionChanged: (_) {},
+                encodingOptions: const EncodingOptions(),
+                onOptionsChanged: (_) {},
+                l10n: l10n,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('heavy_process_warning_banner')), findsNothing);
+
+      // 2. 4K video (3840x2160, 2 min) -> Banner appears with 4K text
+      const vid4K = VideoInfo(
+        filePath: '/storage/4k.mp4',
+        fileName: '4k.mp4',
+        width: 3840,
+        height: 2160,
+        durationSeconds: 120,
+        bitrate: 20000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 300000000,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: vid4K,
+                resolutions: vid4K.availableDownscaleTargets,
+                selectedResolution: vid4K.availableDownscaleTargets.first,
+                onResolutionChanged: (_) {},
+                encodingOptions: const EncodingOptions(),
+                onOptionsChanged: (_) {},
+                l10n: l10n,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
+      expect(find.text(l10n.t('heavy_process_banner_4k')), findsOneWidget);
+
+      // 3. Long duration video (1080p, 12 min = 720s) -> Banner appears with long duration text
+      const vidLong = VideoInfo(
+        filePath: '/storage/long.mp4',
+        fileName: 'long.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 720,
+        bitrate: 5000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 500000000,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: vidLong,
+                resolutions: vidLong.availableDownscaleTargets,
+                selectedResolution: vidLong.availableDownscaleTargets.first,
+                onResolutionChanged: (_) {},
+                encodingOptions: const EncodingOptions(),
+                onOptionsChanged: (_) {},
+                l10n: l10n,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
+      expect(
+        find.text(l10n.t('heavy_process_banner_long', args: {'duration': vidLong.formattedDuration})),
+        findsOneWidget,
+      );
+
+      // 4. Combined 4K + Long duration video -> Combined banner
+      const vid4KLong = VideoInfo(
+        filePath: '/storage/4k_long.mp4',
+        fileName: '4k_long.mp4',
+        width: 3840,
+        height: 2160,
+        durationSeconds: 2400,
+        bitrate: 20000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 2000000000,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: vid4KLong,
+                resolutions: vid4KLong.availableDownscaleTargets,
+                selectedResolution: vid4KLong.availableDownscaleTargets.first,
+                onResolutionChanged: (_) {},
+                encodingOptions: const EncodingOptions(),
+                onOptionsChanged: (_) {},
+                l10n: l10n,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
+      expect(find.text(l10n.t('heavy_process_banner_4k_long')), findsOneWidget);
+    },
+  );
 }

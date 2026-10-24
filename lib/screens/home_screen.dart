@@ -384,11 +384,36 @@ class _HomeScreenState extends State<HomeScreen> {
         ? _encodingOptions
         : _encodingOptions.copyWith(codec: VideoCodec.h264);
 
+    final isSource4K = _videoInfo!.is4K;
+    final isTarget4K = fallbackRes.height >= 2160 ||
+        fallbackRes.width >= 3840 ||
+        (fallbackRes.width >= 2160 && fallbackRes.height >= 3840);
+    final is4K = isSource4K || isTarget4K;
+    final isLong = _videoInfo!.isLongDuration;
+    final isMaxPresetHeavy =
+        options.speedPreset == SpeedPreset.max && _videoInfo!.isHeavyProcessing;
+    final isHeavyProcess = is4K || isLong || isMaxPresetHeavy;
+
     // Heavy processing confirmation dialog
-    if (_selectedMode != _AppMode.extractor &&
-        options.speedPreset == SpeedPreset.max &&
-        _videoInfo!.isHeavyProcessing) {
+    if (_selectedMode != _AppMode.extractor && isHeavyProcess) {
       final l10n = _settingsService.l10n;
+      final String descText;
+      if (is4K && isLong) {
+        descText = l10n.t(
+          'heavy_process_desc_4k_long',
+          args: {'duration': _videoInfo!.formattedDuration},
+        );
+      } else if (is4K) {
+        descText = l10n.t('heavy_process_desc_4k');
+      } else if (isLong) {
+        descText = l10n.t(
+          'heavy_process_desc_long',
+          args: {'duration': _videoInfo!.formattedDuration},
+        );
+      } else {
+        descText = l10n.t('heavy_process_desc');
+      }
+
       final proceed = await showDialog<bool>(
         context: context,
         builder: (ctx) {
@@ -406,21 +431,26 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             content: Text(
-              l10n.t('heavy_process_desc'),
+              descText,
               style: const TextStyle(fontSize: 13, height: 1.4),
             ),
             actions: [
               TextButton(
-                onPressed: () {
-                  // Switch to Normal preset
-                  options = options.copyWith(
-                    speedPreset: SpeedPreset.normal,
-                    crfValue: SpeedPreset.normal.defaultCrf,
-                  );
-                  Navigator.of(ctx).pop(true);
-                },
-                child: Text(l10n.t('heavy_process_use_normal')),
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l10n.t('heavy_process_cancel')),
               ),
+              if (options.speedPreset == SpeedPreset.max)
+                TextButton(
+                  onPressed: () {
+                    // Switch to Normal preset
+                    options = options.copyWith(
+                      speedPreset: SpeedPreset.normal,
+                      crfValue: SpeedPreset.normal.defaultCrf,
+                    );
+                    Navigator.of(ctx).pop(true);
+                  },
+                  child: Text(l10n.t('heavy_process_use_normal')),
+                ),
               FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
                 child: Text(l10n.t('heavy_process_continue')),

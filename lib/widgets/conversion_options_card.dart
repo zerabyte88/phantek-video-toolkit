@@ -143,10 +143,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
       video: widget.sourceVideo,
       requestedThreads: appSettings.cpuThreads,
     );
-    final is4K =
-        widget.sourceVideo.width >= 3840 ||
-        widget.sourceVideo.height >= 2160 ||
-        (widget.sourceVideo.width >= 2160 && widget.sourceVideo.height >= 3840);
+    final is4K = widget.sourceVideo.is4K;
+    final isLongDuration = widget.sourceVideo.isLongDuration;
 
     return AppGlassCard(
       child: Column(
@@ -219,6 +217,56 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                   fontStyle: FontStyle.italic,
                   color: theme.colorScheme.primary.withAlpha(190),
                 ),
+              ),
+            ),
+          ],
+          if (is4K || isLongDuration) ...[
+            const SizedBox(height: 12),
+            Container(
+              key: const Key('heavy_process_warning_banner'),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.amber.withAlpha(22),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.amber.withAlpha(90),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.amber,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      is4K && isLongDuration
+                          ? l10n.t('heavy_process_banner_4k_long')
+                          : is4K
+                              ? l10n.t('heavy_process_banner_4k')
+                              : l10n.t(
+                                  'heavy_process_banner_long',
+                                  args: {
+                                    'duration':
+                                        widget.sourceVideo.formattedDuration,
+                                  },
+                                ),
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.35,
+                        color: theme.colorScheme.onSurface.withAlpha(220),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -3757,6 +3757,85 @@ void main() {
         isTrue,
       );
     });
+
+    test('VideoInfo accurately classifies 4K, long duration (>30m), and heavy processing', () {
+      const vid4kLandscape = VideoInfo(
+        filePath: '/test/4k.mp4',
+        fileName: '4k.mp4',
+        width: 3840,
+        height: 2160,
+        durationSeconds: 120,
+        bitrate: 20000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 300000000,
+      );
+      expect(vid4kLandscape.is4K, isTrue);
+      expect(vid4kLandscape.isLongDuration, isFalse);
+      expect(vid4kLandscape.isHeavyProcessing, isTrue);
+
+      const vid4kPortrait = VideoInfo(
+        filePath: '/test/4k_v.mp4',
+        fileName: '4k_v.mp4',
+        width: 2160,
+        height: 3840,
+        durationSeconds: 120,
+        bitrate: 20000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 300000000,
+      );
+      expect(vid4kPortrait.is4K, isTrue);
+      expect(vid4kPortrait.isLongDuration, isFalse);
+      expect(vid4kPortrait.isHeavyProcessing, isTrue);
+
+      const vidLong = VideoInfo(
+        filePath: '/test/long.mp4',
+        fileName: 'long.mp4',
+        width: 1280,
+        height: 720,
+        durationSeconds: 601, // > 10 minutes
+        bitrate: 2000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 450000000,
+      );
+      expect(vidLong.is4K, isFalse);
+      expect(vidLong.isLongDuration, isTrue);
+      expect(vidLong.isHeavyProcessing, isTrue);
+
+      const vidStandard = VideoInfo(
+        filePath: '/test/standard.mp4',
+        fileName: 'standard.mp4',
+        width: 1920,
+        height: 1080,
+        durationSeconds: 300, // 5 minutes
+        bitrate: 5000000,
+        fps: 30,
+        codec: 'h264',
+        fileSizeBytes: 180000000,
+      );
+      expect(vidStandard.is4K, isFalse);
+      expect(vidStandard.isLongDuration, isFalse);
+      expect(vidStandard.isHeavyProcessing, isFalse);
+    });
+
+    test('4K and long duration heavy processing localization strings resolve across all 22 supported languages', () {
+      for (final code in supportedCodes) {
+        final l10n = AppLocalizations(code);
+        expect(l10n.t('heavy_process_title'), isNotEmpty, reason: 'heavy_process_title missing in $code');
+        expect(l10n.t('heavy_process_desc'), isNotEmpty, reason: 'heavy_process_desc missing in $code');
+        expect(l10n.t('heavy_process_desc_4k'), isNotEmpty, reason: 'heavy_process_desc_4k missing in $code');
+        expect(l10n.t('heavy_process_desc_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_desc_long missing in $code');
+        expect(l10n.t('heavy_process_desc_4k_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_desc_4k_long missing in $code');
+        expect(l10n.t('heavy_process_banner_4k'), isNotEmpty, reason: 'heavy_process_banner_4k missing in $code');
+        expect(l10n.t('heavy_process_banner_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_banner_long missing in $code');
+        expect(l10n.t('heavy_process_banner_4k_long'), isNotEmpty, reason: 'heavy_process_banner_4k_long missing in $code');
+        expect(l10n.t('heavy_process_use_normal'), isNotEmpty, reason: 'heavy_process_use_normal missing in $code');
+        expect(l10n.t('heavy_process_continue'), isNotEmpty, reason: 'heavy_process_continue missing in $code');
+        expect(l10n.t('heavy_process_cancel'), isNotEmpty, reason: 'heavy_process_cancel missing in $code');
+      }
+    });
   });
 }
 
