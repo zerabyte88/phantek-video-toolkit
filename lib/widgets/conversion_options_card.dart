@@ -1257,7 +1257,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         _buildPresetChoiceBadge(
                           theme: theme,
                           icon: Icons.bolt_rounded,
-                          label: 'MediaCodec (HW)',
+                          label: 'MediaCodec (HW) • ${l10n.t('badge_experimental')}',
                         ),
                     ],
                   ),

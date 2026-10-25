@@ -24,8 +24,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.8.3';
-  String _buildNumber = '45';
+  String _appVersion = 'v2.8.5';
+  String _buildNumber = '47';
   double? _dragCardOpacity;
 
   @override
@@ -54,14 +54,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '45';
+              : '47';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.8.3';
-          _buildNumber = '45';
+          _appVersion = 'v2.8.5';
+          _buildNumber = '47';
         });
       }
     }
@@ -1900,6 +1900,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withAlpha(25),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.amber.withAlpha(90),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Text(
+                              l10n.t('badge_experimental'),
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 2),
@@ -1915,13 +1938,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Switch(
+                  key: const Key('hw_accel_switch'),
                   value: settings.enableHardwareAcceleration,
                   activeTrackColor: Colors.green.withAlpha(160),
                   activeThumbColor: Colors.green,
-                  onChanged: (val) async {
-                    await _settingsService.setHardwareAcceleration(val);
-                    if (mounted) setState(() {});
-                  },
+                  onChanged: (val) => _handleToggleHardwareAcceleration(
+                    context,
+                    val,
+                    l10n,
+                    theme,
+                  ),
                 ),
               ],
             ),
@@ -2257,6 +2283,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } else {
       await _settingsService.setAdvancedSettingsEnabled(false);
+      if (mounted) setState(() {});
+    }
+  }
+
+  Future<void> _handleToggleHardwareAcceleration(
+    BuildContext context,
+    bool enable,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) async {
+    if (enable) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: theme.colorScheme.surface,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withAlpha(30),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.amber,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.t('hw_accel_warning_title'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            l10n.t('hw_accel_warning_desc'),
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: theme.colorScheme.onSurface.withAlpha(200),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(
+                l10n.t('hw_accel_warning_cancel'),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withAlpha(160),
+                ),
+              ),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.amber.shade800,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                l10n.t('hw_accel_warning_confirm'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
+        await _settingsService.setHardwareAcceleration(true);
+        if (mounted) setState(() {});
+      }
+    } else {
+      await _settingsService.setHardwareAcceleration(false);
       if (mounted) setState(() {});
     }
   }

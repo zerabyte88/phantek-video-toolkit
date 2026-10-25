@@ -3426,11 +3426,16 @@ void main() {
       },
     );
 
-    test('All 22 languages contain hw_accel_disabled_badge, hw_accel_preset_disabled_desc, and hw_accel_crf_disabled_desc', () {
+    test('All 22 languages contain hw_accel_disabled_badge, hw_accel_preset_disabled_desc, hw_accel_crf_disabled_desc, and experimental warning keys', () {
       final keys = [
         'hw_accel_disabled_badge',
         'hw_accel_preset_disabled_desc',
         'hw_accel_crf_disabled_desc',
+        'badge_experimental',
+        'hw_accel_warning_title',
+        'hw_accel_warning_desc',
+        'hw_accel_warning_confirm',
+        'hw_accel_warning_cancel',
       ];
       for (final lang in AppLocalizations.supportedLanguages) {
         final code = lang['code']!;
@@ -3596,6 +3601,65 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         expect(find.text('Disabled (HW Accel)'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'SettingsScreen displays Experimental badge and shows confirmation warning dialog when toggling Hardware Acceleration ON',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final service = SettingsService();
+        await service.setAdvancedSettingsEnabled(true);
+        await service.setHardwareAcceleration(false);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('oled_snowfall'),
+            home: const SettingsScreen(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // 1. Experimental badge is visible
+        expect(find.text('Experimental'), findsWidgets);
+
+        // 2. Toggle HW Accel switch ON -> triggers confirmation dialog
+        final switchFinder = find.byKey(const Key('hw_accel_switch'));
+        expect(switchFinder, findsOneWidget);
+        await tester.tap(switchFinder);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+
+        // Dialog should be visible with title, description, Cancel, and Confirm
+        expect(find.text('Experimental Feature'), findsOneWidget);
+        expect(
+          find.textContaining(
+            'Hardware acceleration (MediaCodec) is still experimental',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.text('Enable Anyway'), findsOneWidget);
+
+        // 3. Tap Cancel -> HW Accel remains false
+        await tester.tap(find.text('Cancel'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(service.settings.enableHardwareAcceleration, isFalse);
+
+        // 4. Toggle switch ON again and tap Confirm -> HW Accel becomes true
+        await tester.tap(switchFinder);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.tap(find.text('Enable Anyway'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(service.settings.enableHardwareAcceleration, isTrue);
       },
     );
 
