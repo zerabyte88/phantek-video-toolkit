@@ -149,17 +149,6 @@ enum SpeedPreset {
         return SpeedPreset.normal;
     }
   }
-
-  String toCpuPreset() {
-    switch (this) {
-      case SpeedPreset.fast:
-        return 'fast';
-      case SpeedPreset.max:
-        return 'slow';
-      case SpeedPreset.normal:
-        return 'medium';
-    }
-  }
 }
 
 class EncodingOptions {

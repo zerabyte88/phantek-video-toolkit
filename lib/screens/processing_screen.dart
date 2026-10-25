@@ -19,6 +19,7 @@ import '../services/device_spec_helper.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/foreground_service.dart';
 import '../services/localization_service.dart';
+import '../services/media_scanner_service.dart';
 import '../services/settings_service.dart';
 import '../widgets/app_glass_card.dart';
 import '../widgets/theme_animated_background.dart';
@@ -437,6 +438,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       });
 
       if (_isSuccess && _outputPath != null) {
+        MediaScannerService.scanFile(_outputPath);
         _showSuccessSheet();
       }
     }
@@ -1779,7 +1781,12 @@ class _SuccessBottomSheet extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               TextButton.icon(
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () {
+                  if (outputPath.isNotEmpty) {
+                    MediaScannerService.scanFile(outputPath);
+                  }
+                  Navigator.of(context).pop(true);
+                },
                 icon: const Icon(Icons.home_rounded, size: 18),
                 label: Text(
                   l10n.t('back_to_home'),

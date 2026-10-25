@@ -700,7 +700,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
               fontSize: 16.5,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? Colors.white : theme.colorScheme.onSurface,
               letterSpacing: -0.2,
             ),
           ),
@@ -719,6 +719,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
             label: Text(l10n.t('pick_video')),
             style: FilledButton.styleFrom(
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

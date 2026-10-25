@@ -13,6 +13,7 @@ import 'package:phantek_video_toolkit/services/cache_manager_service.dart';
 import 'package:phantek_video_toolkit/services/device_spec_helper.dart';
 import 'package:phantek_video_toolkit/services/ffmpeg_service.dart';
 import 'package:phantek_video_toolkit/services/localization_service.dart';
+import 'package:phantek_video_toolkit/services/media_scanner_service.dart';
 import 'package:phantek_video_toolkit/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:phantek_video_toolkit/services/settings_service.dart';
@@ -2129,26 +2130,6 @@ void main() {
             isTrue,
             reason: 'device_cpu_generic missing in $code',
           );
-          expect(
-            l10n.t('device_cpu_detail_title').isNotEmpty,
-            isTrue,
-            reason: 'device_cpu_detail_title missing in $code',
-          );
-          expect(
-            l10n.t('copy_specs').isNotEmpty,
-            isTrue,
-            reason: 'copy_specs missing in $code',
-          );
-          expect(
-            l10n.t('specs_copied').isNotEmpty,
-            isTrue,
-            reason: 'specs_copied missing in $code',
-          );
-          expect(
-            l10n.t('cores_detected').isNotEmpty,
-            isTrue,
-            reason: 'cores_detected missing in $code',
-          );
         }
       },
     );
@@ -2184,8 +2165,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         // 3. Bottom sheet should NOT be present
-        expect(find.text(l10n.t('device_cpu_detail_title')), findsNothing);
-        expect(find.text(l10n.t('copy_specs')), findsNothing);
+        expect(find.byType(BottomSheet), findsNothing);
       },
     );
 
@@ -3794,6 +3774,19 @@ void main() {
           expect(text, isNot(equals(k)), reason: '$k untranslated in $code');
         }
       }
+    });
+
+    group('MediaScannerService tests', () {
+      test('scanFile returns false for null or empty paths', () async {
+        expect(await MediaScannerService.scanFile(null), isFalse);
+        expect(await MediaScannerService.scanFile(''), isFalse);
+      });
+
+      test('scanFile safely handles non-Android platform or host test runner', () async {
+        // When running tests on Windows host, Platform.isAndroid is false
+        final result = await MediaScannerService.scanFile('/storage/emulated/0/Movies/sample.mp4');
+        expect(result, isFalse);
+      });
     });
   });
 }

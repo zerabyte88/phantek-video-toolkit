@@ -52,6 +52,7 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: sakuraPrimary,
+        onPrimary: Colors.white,
         secondary: sakuraSecondary,
         surface: effectiveSurface,
         onSurface: textPrimary,
@@ -210,6 +211,7 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: _primaryColor,
+        onPrimary: Colors.white,
         secondary: _secondaryColor,
         surface: effectiveSurface,
         onSurface: textPrimary,
@@ -368,6 +370,7 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
         primary: _primaryColor,
+        onPrimary: Colors.white,
         secondary: _secondaryColor,
         surface: effectiveSurface,
         onSurface: textPrimary,

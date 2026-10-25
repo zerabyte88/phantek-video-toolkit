@@ -12,37 +12,6 @@ class CacheManagerService {
   factory CacheManagerService() => _instance;
   CacheManagerService._internal();
 
-  /// Total temporary cache size in bytes.
-  Future<int> getCacheSizeBytes() async {
-    int totalBytes = 0;
-
-    try {
-      // Internal cache
-      final tempDir = await getTemporaryDirectory();
-      if (await tempDir.exists()) {
-        totalBytes += await _getDirSize(tempDir);
-      }
-    } catch (e) {
-      debugPrint('Error getting tempDir size: $e');
-    }
-
-    try {
-      // External cache
-      final extCacheDirs = await getExternalCacheDirectories();
-      if (extCacheDirs != null) {
-        for (final dir in extCacheDirs) {
-          if (await dir.exists()) {
-            totalBytes += await _getDirSize(dir);
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error getting extCacheDirs size: $e');
-    }
-
-    return totalBytes;
-  }
-
   /// Recursively calculates directory size.
   Future<int> _getDirSize(Directory dir) async {
     int size = 0;
