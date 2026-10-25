@@ -34,8 +34,6 @@ class AppSettings {
   /// Custom audio output directory.
   final String audioOutputDirectory;
 
-  /// True if Sakura theme is unlocked.
-  final bool isEasterEggUnlocked;
 
   /// Card surface opacity (0.50 to 1.00).
   final double cardOpacity;
@@ -63,7 +61,6 @@ class AppSettings {
     this.isFirstLaunch = true,
     this.outputDirectory = '',
     this.audioOutputDirectory = '',
-    this.isEasterEggUnlocked = false,
     this.cardOpacity = 1.0,
     this.isAdvancedSettingsEnabled = false,
     this.enableHardwareAcceleration = false,
@@ -85,7 +82,6 @@ class AppSettings {
     bool? isFirstLaunch,
     String? outputDirectory,
     String? audioOutputDirectory,
-    bool? isEasterEggUnlocked,
     double? cardOpacity,
     bool? isAdvancedSettingsEnabled,
     bool? enableHardwareAcceleration,
@@ -105,7 +101,6 @@ class AppSettings {
       isFirstLaunch: isFirstLaunch ?? this.isFirstLaunch,
       outputDirectory: outputDirectory ?? this.outputDirectory,
       audioOutputDirectory: audioOutputDirectory ?? this.audioOutputDirectory,
-      isEasterEggUnlocked: isEasterEggUnlocked ?? this.isEasterEggUnlocked,
       cardOpacity: cardOpacity != null
           ? cardOpacity.clamp(0.5, 1.0)
           : this.cardOpacity,
@@ -130,7 +125,6 @@ class AppSettings {
       'isFirstLaunch': isFirstLaunch,
       'outputDirectory': outputDirectory,
       'audioOutputDirectory': audioOutputDirectory,
-      'isEasterEggUnlocked': isEasterEggUnlocked,
       'cardOpacity': cardOpacity,
       'isAdvancedSettingsEnabled': isAdvancedSettingsEnabled,
       'enableHardwareAcceleration': enableHardwareAcceleration,
@@ -165,9 +159,6 @@ class AppSettings {
       isFirstLaunch: json['isFirstLaunch'] as bool? ?? true,
       outputDirectory: json['outputDirectory'] as String? ?? '',
       audioOutputDirectory: json['audioOutputDirectory'] as String? ?? '',
-      isEasterEggUnlocked:
-          json['isEasterEggUnlocked'] as bool? ??
-          (json['themeMode'] == 'oled_sakura' || json['themeMode'] == 'sakura'),
       cardOpacity:
           (json['cardOpacity'] as num?)?.toDouble().clamp(0.5, 1.0) ?? 1.0,
       isAdvancedSettingsEnabled:

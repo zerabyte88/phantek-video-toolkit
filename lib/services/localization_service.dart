@@ -107,9 +107,6 @@ class AppLocalizations {
       'device_storage': 'Penyimpanan',
       'device_temp_warning': 'Peringatan: Suhu Perangkat Tinggi ({temp}°C)',
       'duration': 'Durasi',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg Terbuka: Tema AMOLED Sakura Diaktifkan!',
-      'easter_egg_already_active': 'Tema Easter Egg AMOLED Sakura sudah aktif!',
       'error_details': 'Detail Error',
       'error_open_file': 'Gagal membuka file video',
       'error_read_video': 'Gagal membaca informasi video',
@@ -421,10 +418,6 @@ class AppLocalizations {
       'device_storage': 'Storage',
       'device_temp_warning': 'Warning: Device Temperature High ({temp}°C)',
       'duration': 'Duration',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg Unlocked: AMOLED Sakura Theme Activated!',
-      'easter_egg_already_active':
-          'AMOLED Sakura Easter Egg theme is already active!',
       'error_details': 'Error Details',
       'error_open_file': 'Failed to open video file',
       'error_read_video': 'Failed to read video information',
@@ -727,7 +720,6 @@ class AppLocalizations {
       'device_storage': '存储空间',
       'device_temp_warning': '警告：设备温度过高 ({temp}°C)',
       'duration': '时长',
-      'easter_egg_sakura_unlocked': '彩蛋已解锁：AMOLED 樱花主题已启用！',
       'error_details': '错误详情',
       'error_open_file': '无法打开视频文件',
       'error_read_video': '读取视频信息失败',
@@ -1003,8 +995,6 @@ class AppLocalizations {
       'device_storage': '存储空间',
       'device_temp_warning': '警告：设备温度过高 ({temp}°C)',
       'duration': '时长',
-      'easter_egg_sakura_unlocked': '彩蛋已解锁：AMOLED 樱花主题已启用！',
-      'easter_egg_already_active': 'AMOLED 樱花彩蛋主题已处于启用状态！',
       'error_details': '错误详情',
       'error_open_file': '无法打开视频文件',
       'error_read_video': '读取视频信息失败',
@@ -1282,8 +1272,6 @@ class AppLocalizations {
       'device_storage': '儲存空間',
       'device_temp_warning': '警告：設備溫度過高 ({temp}°C)',
       'duration': '長度',
-      'easter_egg_sakura_unlocked': '彩蛋已解鎖：AMOLED 櫻花主題已啟用！',
-      'easter_egg_already_active': 'AMOLED 櫻花彩蛋主題已處於啟用狀態！',
       'error_details': '錯誤詳情',
       'error_open_file': '無法開啟影片檔案',
       'error_read_video': '讀取影片資訊失敗',
@@ -1568,10 +1556,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Advertencia: Temperatura del dispositivo alta ({temp}°C)',
       'duration': 'Duración',
-      'easter_egg_sakura_unlocked':
-          '¡Easter Egg desbloqueado: Tema AMOLED Sakura activado!',
-      'easter_egg_already_active':
-          '¡El tema Easter Egg AMOLED Sakura ya está activo!',
       'error_details': 'Detalles del Error',
       'error_open_file': 'No se pudo abrir el archivo de video',
       'error_read_video': 'Error al leer la información del video',
@@ -1875,10 +1859,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Aviso: Temperatura do dispositivo elevada ({temp}°C)',
       'duration': 'Duração',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg desbloqueado: Tema AMOLED Sakura ativado!',
-      'easter_egg_already_active':
-          'O tema Easter Egg AMOLED Sakura já está ativo!',
       'error_details': 'Detalhes do Erro',
       'error_open_file': 'Não foi possível abrir o arquivo de vídeo',
       'error_read_video': 'Falha ao ler informações do vídeo',
@@ -2178,8 +2158,6 @@ class AppLocalizations {
       'device_storage': 'ストレージ',
       'device_temp_warning': '警告: デバイス温度が高温です ({temp}°C)',
       'duration': '再生時間',
-      'easter_egg_sakura_unlocked': 'イースターエッグ解除: AMOLED 桜テーマが有効になりました！',
-      'easter_egg_already_active': 'AMOLED 桜イースターエッグテーマはすでに有効です！',
       'error_details': 'エラー詳細',
       'error_open_file': '動画ファイルを開けませんでした',
       'error_read_video': '動画情報の読み取りに失敗しました',
@@ -2462,8 +2440,6 @@ class AppLocalizations {
       'device_storage': '저장 공간',
       'device_temp_warning': '경고: 기기 온도가 높습니다 ({temp}°C)',
       'duration': '재생 시간',
-      'easter_egg_sakura_unlocked': '이스터에그 해제: AMOLED 사쿠라 테마가 활성화되었습니다!',
-      'easter_egg_already_active': 'AMOLED 사쿠라 이스터에그 테마가 이미 활성화되어 있습니다!',
       'error_details': '오류 상세',
       'error_open_file': '동영상 파일을 열 수 없습니다',
       'error_read_video': '동영상 정보를 읽는데 실패했습니다',
@@ -2751,9 +2727,6 @@ class AppLocalizations {
       'device_storage': 'स्टोरेज',
       'device_temp_warning': 'चेतावनी: डिवाइस का तापमान अधिक है ({temp}°C)',
       'duration': 'अवधि',
-      'easter_egg_sakura_unlocked': 'ईस्टर एग अनलॉक: AMOLED सकुरा थीम सक्रिय!',
-      'easter_egg_already_active':
-          'AMOLED सकुरा ईस्टर एग थीम पहले से ही सक्रिय है!',
       'error_details': 'त्रुटि विवरण',
       'error_open_file': 'वीडियो फ़ाइल खोलने में असमर्थ',
       'error_read_video': 'वीडियो जानकारी पढ़ने में विफल',
@@ -3048,9 +3021,6 @@ class AppLocalizations {
       'device_storage': 'التخزين الداخلي',
       'device_temp_warning': 'تحذير: درجة حرارة الجهاز مرتفعة ({temp}°C)',
       'duration': 'المدة',
-      'easter_egg_sakura_unlocked':
-          'تم فتح المفاجأة: تم تفعيل سمة AMOLED Sakura!',
-      'easter_egg_already_active': 'سمة عيد الفصح AMOLED Sakura مفعلة بالفعل!',
       'error_details': 'تفاصيل الخطأ',
       'error_open_file': 'تعذر فتح ملف الفيديو',
       'error_read_video': 'فشل في قراءة معلومات الفيديو',
@@ -3352,10 +3322,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Avertissement : Température de l\'appareil élevée ({temp}°C)',
       'duration': 'Durée',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg débloqué : Thème AMOLED Sakura activé !',
-      'easter_egg_already_active':
-          'Le thème Easter Egg AMOLED Sakura est déjà actif !',
       'error_details': 'Détails de l\'erreur',
       'error_open_file': 'Échec de l\'ouverture du fichier vidéo',
       'error_read_video': 'Impossible de lire les informations de la vidéo',
@@ -3651,10 +3617,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Внимание: Высокая температура устройства ({temp}°C)',
       'duration': 'Длительность',
-      'easter_egg_sakura_unlocked':
-          'Пасхалка открыта: Тема AMOLED Sakura активирована!',
-      'easter_egg_already_active':
-          'Тема Easter Egg AMOLED Sakura уже активирована!',
       'error_details': 'Подробности ошибки',
       'error_open_file': 'Не удалось открыть видеофайл',
       'error_read_video': 'Не удалось прочитать информацию о видео',
@@ -3953,10 +3915,6 @@ class AppLocalizations {
       'device_storage': 'Speicher',
       'device_temp_warning': 'Warnung: Hohe Gerätetemperatur ({temp}°C)',
       'duration': 'Dauer',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg freigeschaltet: AMOLED Sakura Theme aktiviert!',
-      'easter_egg_already_active':
-          'AMOLED Sakura Easter Egg-Theme ist bereits aktiv!',
       'error_details': 'Fehlerdetails',
       'error_open_file': 'Videodatei konnte nicht geöffnet werden',
       'error_read_video': 'Videoinformationen konnten nicht gelesen werden',
@@ -4257,10 +4215,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Attenzione: temperatura dispositivo elevata ({temp}°C)',
       'duration': 'Durata',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg sbloccato: tema AMOLED Sakura attivato!',
-      'easter_egg_already_active':
-          'Il tema Easter Egg AMOLED Sakura è già attivo!',
       'error_details': 'Dettagli errore',
       'error_open_file': 'Impossibile aprire il file video',
       'error_read_video': 'Impossibile leggere le informazioni video',
@@ -4559,10 +4513,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Waarschuwing: Apparaattemperatuur hoog ({temp}°C)',
       'duration': 'Duur',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg ontgrendeld: AMOLED Sakura-thema geactiveerd!',
-      'easter_egg_already_active':
-          'AMOLED Sakura Easter Egg-thema is al actief!',
       'error_details': 'Foutdetails',
       'error_open_file': 'Kan videobestand niet openen',
       'error_read_video': 'Kan video-informatie niet lezen',
@@ -4862,10 +4812,6 @@ class AppLocalizations {
       'device_storage': 'Lagerplads',
       'device_temp_warning': 'Advarsel: Høj enhedstemperatur ({temp}°C)',
       'duration': 'Varighed',
-      'easter_egg_sakura_unlocked':
-          'Påskeæg låst op: AMOLED Sakura-tema aktiveret!',
-      'easter_egg_already_active':
-          'AMOLED Sakura Easter Egg-tema er allerede aktivt!',
       'error_details': 'Fejldetaljer',
       'error_open_file': 'Kunne ikke åbne videofil',
       'error_read_video': 'Kunne ikke læse videooplysninger',
@@ -5160,10 +5106,6 @@ class AppLocalizations {
       'device_temp_warning':
           'Varoitus: Laitteen lämpötila on korkea ({temp}°C)',
       'duration': 'Kesto',
-      'easter_egg_sakura_unlocked':
-          'Pääsiäismuna avattu: AMOLED Sakura -teema aktivoitu!',
-      'easter_egg_already_active':
-          'AMOLED Sakura -pääsiäismunateema on jo aktiivinen!',
       'error_details': 'Virheen tiedot',
       'error_open_file': 'Videotiedoston avaaminen epäonnistui',
       'error_read_video': 'Videon tietojen lukeminen epäonnistui',
@@ -5460,10 +5402,6 @@ class AppLocalizations {
       'device_storage': 'Lagring',
       'device_temp_warning': 'Advarsel: Høy enhetstemperatur ({temp}°C)',
       'duration': 'Varighet',
-      'easter_egg_sakura_unlocked':
-          'Påskeegg låst opp: AMOLED Sakura-tema aktivert!',
-      'easter_egg_already_active':
-          'AMOLED Sakura Easter Egg-tema er allerede aktivt!',
       'error_details': 'Feildetaljer',
       'error_open_file': 'Kunne ikke åpne videofil',
       'error_read_video': 'Kunne ikke lese videoinformasjon',
@@ -5759,10 +5697,6 @@ class AppLocalizations {
       'device_storage': 'Lagring',
       'device_temp_warning': 'Varning: Hög enhetstemperatur ({temp}°C)',
       'duration': 'Varaktighet',
-      'easter_egg_sakura_unlocked':
-          'Påskägg upplåst: AMOLED Sakura-tema aktiverat!',
-      'easter_egg_already_active':
-          'AMOLED Sakura-påskäggstemat är redan aktivt!',
       'error_details': 'Feldetaljer',
       'error_open_file': 'Kunde inte öppna videofil',
       'error_read_video': 'Kunde inte läsa videoinformation',
@@ -6056,9 +5990,6 @@ class AppLocalizations {
       'device_storage': 'Storan',
       'device_temp_warning': 'Amaran: Suhu Peranti Tinggi ({temp}°C)',
       'duration': 'Tempoh',
-      'easter_egg_sakura_unlocked':
-          'Easter Egg Dibuka: Tema AMOLED Sakura Diaktifkan!',
-      'easter_egg_already_active': 'Tema Easter Egg AMOLED Sakura sudah aktif!',
       'error_details': 'Butiran Ralat',
       'error_open_file': 'Gagal membuka fail video',
       'error_read_video': 'Gagal membaca maklumat video',
@@ -6357,10 +6288,6 @@ class AppLocalizations {
       'device_storage': 'Bộ nhớ lưu trữ',
       'device_temp_warning': 'Cảnh báo: Nhiệt độ thiết bị cao ({temp}°C)',
       'duration': 'Thời lượng',
-      'easter_egg_sakura_unlocked':
-          'Trứng phục sinh mở khóa: Chủ đề AMOLED Sakura đã được kích hoạt!',
-      'easter_egg_already_active':
-          'Chủ đề Trứng phục sinh AMOLED Sakura đã được kích hoạt!',
       'error_details': 'Chi tiết lỗi',
       'error_open_file': 'Không thể mở tệp video',
       'error_read_video': 'Không thể đọc thông tin video',
@@ -6658,10 +6585,6 @@ class AppLocalizations {
       'device_storage': 'พื้นที่จัดเก็บ',
       'device_temp_warning': 'คำเตือน: อุณหภูมิอุปกรณ์สูง ({temp}°C)',
       'duration': 'ความยาว',
-      'easter_egg_sakura_unlocked':
-          'ปลดล็อกอีสเตอร์เอ้ก: เปิดใช้งานธีม AMOLED ซากุระแล้ว!',
-      'easter_egg_already_active':
-          'ธีมอีสเตอร์เอ้ก AMOLED ซากุระเปิดใช้งานอยู่แล้ว!',
       'error_details': 'รายละเอียดข้อผิดพลาด',
       'error_open_file': 'เปิดไฟล์วิดีโอไม่สำเร็จ',
       'error_read_video': 'อ่านข้อมูลวิดีโอไม่สำเร็จ',

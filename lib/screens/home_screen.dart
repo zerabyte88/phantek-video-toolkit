@@ -34,9 +34,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
 
-  // Easter egg state
-  int _easterEggTapCount = 0;
-  DateTime? _lastEasterEggTapTime;
 
   // State
   _AppMode _selectedMode = _AppMode.convert;
@@ -489,67 +486,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Easter egg
-
-  void _onHeaderTitleTap() async {
-    final now = DateTime.now();
-    if (_lastEasterEggTapTime == null ||
-        now.difference(_lastEasterEggTapTime!) > const Duration(seconds: 2)) {
-      _easterEggTapCount = 1;
-    } else {
-      _easterEggTapCount++;
-    }
-    _lastEasterEggTapTime = now;
-
-    if (_easterEggTapCount >= 10) {
-      _easterEggTapCount = 0;
-      final isAlreadyUnlocked = _settingsService.settings.isEasterEggUnlocked;
-
-      if (!isAlreadyUnlocked) {
-        await _settingsService.setEasterEggUnlocked(true);
-        await _settingsService.setThemeMode('oled_sakura');
-      }
-
-      if (mounted) {
-        final l10n = _settingsService.l10n;
-        final message = isAlreadyUnlocked
-            ? l10n.t('easter_egg_already_active')
-            : l10n.t('easter_egg_sakura_unlocked');
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.local_florist_rounded,
-                  color: Color(0xFFF472B6),
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFFFF1F2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: const Color(0xFF140D13),
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Color(0xFFF472B6), width: 1.5),
-            ),
-          ),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -565,11 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: l10n.t('back_to_home'),
               )
             : null,
-        title: GestureDetector(
-          onTap: _onHeaderTitleTap,
-          behavior: HitTestBehavior.opaque,
-          child: AnimatedFlameTitle(title: l10n.t('app_title')),
-        ),
+        title: AnimatedFlameTitle(title: l10n.t('app_title')),
         centerTitle: true,
         actions: [
           if (_videoInfo != null && !_isLoading)

@@ -141,16 +141,7 @@ class SettingsService extends ChangeNotifier {
   }
 
   Future<void> setThemeMode(String themeMode) async {
-    final unlock = (themeMode == 'oled_sakura' || themeMode == 'sakura')
-        ? true
-        : _settings.isEasterEggUnlocked;
-    await updateSettings(
-      _settings.copyWith(themeMode: themeMode, isEasterEggUnlocked: unlock),
-    );
-  }
-
-  Future<void> setEasterEggUnlocked(bool unlocked) async {
-    await updateSettings(_settings.copyWith(isEasterEggUnlocked: unlocked));
+    await updateSettings(_settings.copyWith(themeMode: themeMode));
   }
 
   Future<void> setKeepScreenAwake(bool enable) async {

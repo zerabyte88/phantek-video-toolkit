@@ -77,7 +77,6 @@
   * **Static Themes:**
     * *Pure AMOLED*: Solid pitch black AMOLED canvas with animation ticker disabled for maximum battery conservation.
     * *Clean Light*: Minimalist light canvas without background animations.
-* **Easter Egg:** Tap the top app bar title (**"Phantek"**) on the home screen **10 times** in quick succession to unlock the hidden *Sakura* theme.
 * **Theme Card Layout:** Elegant centered card titles and badges (`AMOLED`, `LIGHT`, `STATIC`) with intuitive theme icons.
 * **Card Opacity:** Adjustable card transparency slider using direct alpha blending.
 * **Multilingual:** Complete UI localizations for 22 languages with adaptive layouts to prevent text clipping.
@@ -101,8 +100,8 @@
 
 Download the standalone release APK directly from GitHub Releases:
 
-* **Latest Release:** [Phantek Video Toolkit v2.8.1](https://github.com/zerabyte88/phantek-video-toolkit/releases)
-* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.8.1.apk`
+* **Latest Release:** [Phantek Video Toolkit v2.8.3](https://github.com/zerabyte88/phantek-video-toolkit/releases)
+* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.8.3.apk`
 * **Architecture:** `arm64-v8a` (64-bit ARM)
 * **Minimum Android Version:** Android 8.0 (API Level 26) or higher
 

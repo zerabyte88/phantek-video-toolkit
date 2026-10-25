@@ -330,7 +330,6 @@ void main() {
       expect(settings.keepScreenAwake, isFalse);
       expect(settings.outputDirectory, equals(''));
       expect(settings.audioOutputDirectory, equals(''));
-      expect(settings.isEasterEggUnlocked, isFalse);
     });
 
     test('Serialization to and from JSON works', () {
@@ -344,7 +343,6 @@ void main() {
         keepScreenAwake: true,
         outputDirectory: '/custom/storage/Movies',
         audioOutputDirectory: '/custom/storage/Music',
-        isEasterEggUnlocked: true,
       );
 
       final json = original.toJson();
@@ -359,11 +357,6 @@ void main() {
       expect(restored.keepScreenAwake, isTrue);
       expect(restored.outputDirectory, equals('/custom/storage/Movies'));
       expect(restored.audioOutputDirectory, equals('/custom/storage/Music'));
-      expect(restored.isEasterEggUnlocked, isTrue);
-
-      // Legacy fallback: if themeMode is sakura without isEasterEggUnlocked key
-      final legacy = AppSettings.fromJson({'themeMode': 'sakura'});
-      expect(legacy.isEasterEggUnlocked, isTrue);
     });
 
     test('New theme, wakelock, and cache storage translations exist', () {
@@ -395,7 +388,7 @@ void main() {
         expect(l10n.t('settings_audio_reset_folder').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_changed').isNotEmpty, isTrue);
         expect(l10n.t('settings_audio_folder_default').isNotEmpty, isTrue);
-        expect(l10n.t('easter_egg_already_active').isNotEmpty, isTrue);
+        expect(l10n.t('theme_oled_sakura_desc').isNotEmpty, isTrue);
       }
     });
 
@@ -1210,7 +1203,7 @@ void main() {
     });
   });
 
-  group('Theme System and AMOLED Sakura Easter Egg tests', () {
+  group('Theme System and AMOLED Sakura tests', () {
     test('AppTheme returns valid ThemeData for all modes including sakura', () {
       final dark = AppTheme.getTheme('oled_snowfall');
       final oled = AppTheme.getTheme('oled_midnight');

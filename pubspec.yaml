@@ -1,5 +1,5 @@
 name: phantek_video_toolkit
-description: "A modern, offline mobile video transcoding, downscaling, and compression toolkit powered by Flutter and FFmpeg."
+description: "Offline on-device Android video transcoding, resolution downscaling, and audio extraction powered by Flutter and FFmpeg."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

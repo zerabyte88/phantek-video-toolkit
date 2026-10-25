@@ -21,8 +21,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.8.1';
-  String _buildNumber = '43';
+  String _appVersion = 'v2.8.3';
+  String _buildNumber = '45';
   double? _dragCardOpacity;
 
   @override
@@ -51,14 +51,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '43';
+              : '45';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.8.1';
-          _buildNumber = '43';
+          _appVersion = 'v2.8.3';
+          _buildNumber = '45';
         });
       }
     }
@@ -831,15 +831,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'accent': const Color(0xFFA78BFA),
         'badge': 'AMOLED',
       },
-      if (settings.isEasterEggUnlocked)
-        {
-          'id': 'oled_sakura',
-          'title': l10n.t('theme_oled_sakura'),
-          'desc': l10n.t('theme_oled_sakura_desc'),
-          'icon': Icons.local_florist_rounded,
-          'accent': const Color(0xFFF472B6),
-          'badge': 'AMOLED',
-        },
+      {
+        'id': 'oled_sakura',
+        'title': l10n.t('theme_oled_sakura'),
+        'desc': l10n.t('theme_oled_sakura_desc'),
+        'icon': Icons.local_florist_rounded,
+        'accent': const Color(0xFFF472B6),
+        'badge': 'AMOLED',
+      },
       {
         'id': 'oled_pure',
         'title': l10n.t('theme_oled_pure'),
