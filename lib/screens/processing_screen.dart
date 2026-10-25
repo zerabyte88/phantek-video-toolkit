@@ -96,8 +96,8 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
-    // Keep display and CPU awake during processing
-    WakelockPlus.enable();
+    // Respect user wakelock preference during processing
+    WakelockPlus.toggle(enable: _settingsService.settings.keepScreenAwake);
     _startProcessing();
   }
 

@@ -16,6 +16,11 @@ on:
         required: false
         type: boolean
         default: false
+      prerelease:
+        description: 'Mark release as pre-release'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -127,6 +132,6 @@ jobs:
             build/app/outputs/flutter-apk/Phantek-Video-Toolkit-arm64-v8a-v*.apk
           generate_release_notes: true
           draft: false
-          prerelease: false
+          prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.prerelease) || contains(github.ref_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

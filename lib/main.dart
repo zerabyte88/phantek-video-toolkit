@@ -62,7 +62,7 @@ class VideoDownscalerApp extends StatelessWidget {
         );
 
         return MaterialApp(
-          title: 'Video Downscaler',
+          title: 'Phantek',
           debugShowCheckedModeBanner: false,
           theme: theme,
           home: const HomeScreen(),
