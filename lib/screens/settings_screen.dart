@@ -24,8 +24,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.9.0';
-  String _buildNumber = '49';
+  String _appVersion = 'v2.9.1';
+  String _buildNumber = '50';
   double? _dragCardOpacity;
 
   @override
@@ -54,14 +54,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '49';
+              : '50';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.9.0';
-          _buildNumber = '49';
+          _appVersion = 'v2.9.1';
+          _buildNumber = '50';
         });
       }
     }
@@ -111,13 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     // Language
                     _buildLanguageTile(context, theme, settings, l10n),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Theme header
                     Row(
@@ -143,24 +137,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Theme selector
                     _buildThemeGrid(theme, settings, l10n),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Card opacity
                     _buildCardOpacitySlider(theme, settings, l10n),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Screen wakelock
                     _buildWakelockTile(theme, settings, l10n),
@@ -185,35 +167,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // CPU cores
                     _buildCpuCoresSection(theme, settings, deviceCores, l10n),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // RAM buffer
                     _buildRamBufferSection(theme, settings, l10n),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Speed preset
                     _buildCpuPresetSection(theme, settings, l10n),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Audio bitrate
                     _buildAudioQualitySection(theme, settings, l10n),
@@ -293,13 +257,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       l10n: l10n,
                     ),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(
-                        height: 1,
-                        color: theme.colorScheme.outline.withAlpha(25),
-                      ),
-                    ),
+                    _buildDivider(theme),
 
                     // Audio folder
                     _buildFolderTile(
@@ -373,7 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _hardwareInfo!['deviceName'] as String? ??
                             '${_hardwareInfo!['manufacturer']} ${_hardwareInfo!['model']}',
                       ),
-                      const SizedBox(height: 6),
+                      _buildDivider(theme, vertical: 7),
                       _buildSpecRow(
                         theme,
                         l10n.t('device_model'),
@@ -381,7 +339,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _hardwareInfo!['model'] as String? ??
                             l10n.t('unknown'),
                       ),
-                      const SizedBox(height: 6),
+                      _buildDivider(theme, vertical: 7),
                       _buildCpuSpecRow(
                         context: context,
                         theme: theme,
@@ -396,21 +354,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _hardwareInfo!['cores'] as int? ??
                             AppSettings.deviceCoreCount,
                       ),
-                      const SizedBox(height: 6),
+                      _buildDivider(theme, vertical: 7),
                       _buildSpecRow(
                         theme,
                         l10n.t('device_gpu'),
                         _hardwareInfo!['gpu'] as String? ??
                             l10n.t('hardware_accel'),
                       ),
-                      const SizedBox(height: 6),
+                      _buildDivider(theme, vertical: 7),
                       _buildSpecRow(
                         theme,
                         l10n.t('device_ram'),
                         _hardwareInfo!['ram'] as String? ??
                             '${_hardwareInfo!['ramMb']} MB',
                       ),
-                      const SizedBox(height: 6),
+                      _buildDivider(theme, vertical: 7),
                       _buildSpecRow(
                         theme,
                         l10n.t('device_storage'),
@@ -497,6 +455,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return AppGlassCard(padding: padding, child: child);
   }
 
+  Widget _buildDivider(ThemeData theme, {double vertical = 12}) {
+    final isDark = theme.brightness == Brightness.dark;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: vertical),
+      child: Divider(
+        height: 1,
+        thickness: 1,
+        color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+      ),
+    );
+  }
+
   // Language selector
 
   Widget _buildLanguageTile(
@@ -537,64 +507,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    l10n.t('settings_language'),
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(18),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withAlpha(60),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        active['flag'] ?? '',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        active['name']?.split(' ').first ?? 'Language',
+                        l10n.t('settings_language'),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.primary,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: 18,
-                        color: theme.colorScheme.primary,
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.t('settings_language_desc'),
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          height: 1.3,
+                          color: theme.colorScheme.onSurface.withAlpha(140),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: const EdgeInsets.only(left: 46),
-              child: Text(
-                l10n.t('settings_language_desc'),
-                style: TextStyle(
-                  fontSize: 11.5,
-                  height: 1.3,
-                  color: theme.colorScheme.onSurface.withAlpha(140),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withAlpha(15),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withAlpha(45),
                 ),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    active['flag'] ?? '',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      active['name'] ?? 'Language',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
               ),
             ),
           ],
@@ -666,7 +638,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Divider(
                   height: 1,
-                  color: theme.colorScheme.outline.withAlpha(30),
+                  thickness: 1,
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFCBD5E1),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -1134,12 +1109,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            Switch(
-              value: settings.keepScreenAwake,
-              onChanged: (val) async {
-                await _settingsService.setKeepScreenAwake(val);
-                setState(() {});
-              },
+            RepaintBoundary(
+              child: Switch(
+                value: settings.keepScreenAwake,
+                onChanged: (val) {
+                  _settingsService.setKeepScreenAwake(val);
+                },
+              ),
             ),
           ],
         ),
@@ -1749,217 +1725,244 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-              Switch(
-                key: const Key('advanced_settings_switch'),
-                value: settings.isAdvancedSettingsEnabled,
-                activeTrackColor: Colors.amber.withAlpha(160),
-                activeThumbColor: Colors.amber,
-                onChanged: (val) => _handleToggleAdvancedSettings(val),
+              RepaintBoundary(
+                child: Switch(
+                  key: const Key('advanced_settings_switch'),
+                  value: settings.isAdvancedSettingsEnabled,
+                  activeTrackColor: Colors.amber.withAlpha(160),
+                  activeThumbColor: Colors.amber,
+                  onChanged: (val) => _handleToggleAdvancedSettings(val),
+                ),
               ),
             ],
           ),
 
-          if (settings.isAdvancedSettingsEnabled) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(
-                height: 1,
-                color: theme.colorScheme.outline.withAlpha(25),
-              ),
-            ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: settings.isAdvancedSettingsEnabled
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDivider(theme),
 
-            // Custom Preset Selector
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () =>
-                  _showPresetPickerSheet(context, theme, settings, l10n),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.speed_rounded,
-                        size: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.t('settings_custom_preset'),
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.t('settings_custom_preset_desc'),
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: theme.colorScheme.onSurface.withAlpha(130),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withAlpha(70),
+                      // Custom Preset Selector
+                      InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: theme.colorScheme.outline.withAlpha(40),
+                        onTap: () => _showPresetPickerSheet(
+                          context,
+                          theme,
+                          settings,
+                          l10n,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    20,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.speed_rounded,
+                                  size: 18,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.t('settings_custom_preset'),
+                                      style: TextStyle(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      l10n.t('settings_custom_preset_desc'),
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: theme.colorScheme.onSurface
+                                            .withAlpha(130),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme
+                                      .colorScheme
+                                      .surfaceContainerHighest
+                                      .withAlpha(70),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: theme.colorScheme.outline.withAlpha(
+                                      40,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      settings.customPreset == 'default'
+                                          ? l10n.t('preset_default')
+                                          : settings.customPreset,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color:
+                                            settings.customPreset == 'default'
+                                            ? theme.colorScheme.onSurface
+                                                  .withAlpha(180)
+                                            : theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 16,
+                                      color: theme.colorScheme.onSurface
+                                          .withAlpha(150),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            settings.customPreset == 'default'
-                                ? l10n.t('preset_default')
-                                : settings.customPreset,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: settings.customPreset == 'default'
-                                  ? theme.colorScheme.onSurface.withAlpha(180)
-                                  : theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 16,
-                            color: theme.colorScheme.onSurface.withAlpha(150),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(
-                height: 1,
-                color: theme.colorScheme.outline.withAlpha(25),
-              ),
-            ),
+                      _buildDivider(theme),
 
-            // Custom Scaler Selector
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () =>
-                  _showScalerPickerSheet(context, theme, settings, l10n),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.aspect_ratio_rounded,
-                        size: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.t('settings_custom_scaler'),
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.t('settings_custom_scaler_desc'),
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: theme.colorScheme.onSurface.withAlpha(130),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withAlpha(70),
+                      // Custom Scaler Selector
+                      InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: theme.colorScheme.outline.withAlpha(40),
+                        onTap: () => _showScalerPickerSheet(
+                          context,
+                          theme,
+                          settings,
+                          l10n,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    20,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.aspect_ratio_rounded,
+                                  size: 18,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.t('settings_custom_scaler'),
+                                      style: TextStyle(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      l10n.t('settings_custom_scaler_desc'),
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: theme.colorScheme.onSurface
+                                            .withAlpha(130),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme
+                                      .colorScheme
+                                      .surfaceContainerHighest
+                                      .withAlpha(70),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: theme.colorScheme.outline.withAlpha(
+                                      40,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      settings.customScaler == 'default'
+                                          ? l10n.t('scaler_default')
+                                          : settings.customScaler,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color:
+                                            settings.customScaler == 'default'
+                                            ? theme.colorScheme.onSurface
+                                                  .withAlpha(180)
+                                            : theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 16,
+                                      color: theme.colorScheme.onSurface
+                                          .withAlpha(150),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            settings.customScaler == 'default'
-                                ? l10n.t('scaler_default')
-                                : settings.customScaler,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: settings.customScaler == 'default'
-                                  ? theme.colorScheme.onSurface.withAlpha(180)
-                                  : theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 16,
-                            color: theme.colorScheme.onSurface.withAlpha(150),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _handleToggleAdvancedSettings(bool enable) async {
-    await _settingsService.setAdvancedSettingsEnabled(enable);
-    if (mounted) setState(() {});
+  void _handleToggleAdvancedSettings(bool enable) {
+    _settingsService.setAdvancedSettingsEnabled(enable);
   }
 
   void _showPresetPickerSheet(
@@ -2055,7 +2058,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                const Divider(height: 1),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFCBD5E1),
+                ),
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
@@ -2237,7 +2246,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                const Divider(height: 1),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFCBD5E1),
+                ),
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
@@ -2482,7 +2497,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Detail rows
           _buildDetailRow(theme, l10n.t('app_version'), _appVersion),
+          _buildDivider(theme, vertical: 6),
           _buildDetailRow(theme, l10n.t('build_label'), _buildNumber),
+          _buildDivider(theme, vertical: 6),
           _buildDetailRow(
             theme,
             l10n.t('license_label'),
@@ -2490,79 +2507,109 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => _showAppLicensePage(context, theme),
           ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Divider(
-              height: 1,
-              color: theme.colorScheme.outline.withAlpha(25),
-            ),
-          ),
+          _buildDivider(theme, vertical: 12),
 
           // Developer profile
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Developer: zerabyte88',
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withAlpha(12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.primary.withAlpha(35),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withAlpha(22),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.terminal_rounded,
+                    size: 18,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    final uri = Uri.parse(
-                      'https://github.com/zerabyte88/phantek-video-toolkit',
-                    );
-                    try {
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (_) {}
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(22),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: theme.colorScheme.primary.withAlpha(90),
-                        width: 0.9,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.open_in_new_rounded,
-                          size: 13,
-                          color: theme.colorScheme.primary,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Developer: zerabyte88',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'GitHub',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'github.com/zerabyte88',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.onSurface.withAlpha(130),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () async {
+                      final uri = Uri.parse(
+                        'https://github.com/zerabyte88/phantek-video-toolkit',
+                      );
+                      try {
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (_) {}
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(22),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withAlpha(70),
+                          width: 0.9,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 13,
                             color: theme.colorScheme.primary,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Text(
+                            'GitHub',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -2579,21 +2626,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
             margin: const EdgeInsets.only(top: 8, bottom: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF06B6D4).withAlpha(24),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFF06B6D4).withAlpha(60),
-                width: 1,
-              ),
-            ),
-            child: const Icon(
-              Icons.video_collection_rounded,
-              color: Color(0xFF06B6D4),
-              size: 22,
+            child: Image.asset(
+              'assets/icon/app_icon.png',
+              width: 56,
+              height: 56,
+              fit: BoxFit.contain,
             ),
           ),
           Text(

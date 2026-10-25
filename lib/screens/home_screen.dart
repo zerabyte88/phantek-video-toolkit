@@ -480,6 +480,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: (_videoInfo != null && !_isLoading)
             ? IconButton(
                 onPressed: _resetVideo,
@@ -565,181 +567,98 @@ class _HomeScreenState extends State<HomeScreen> {
   // Empty state
 
   Widget _buildEmptyState(ThemeData theme, AppLocalizations l10n) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Mode selector
-          _buildSegmentedModeBar(theme, l10n),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Mode selector
+              _buildSegmentedModeBar(theme, l10n),
 
-          const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-          // Media import box
-          _buildImportCard(theme, l10n),
-        ],
+              // Media import box
+              _buildImportCard(theme, l10n),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  /// Segmented control for mode selection.
+  /// Unified segmented control for mode selection.
   Widget _buildSegmentedModeBar(ThemeData theme, AppLocalizations l10n) {
-    final isVideoActive =
-        _selectedMode == _AppMode.convert ||
-        _selectedMode == _AppMode.downscale;
-    final isAudioActive = _selectedMode == _AppMode.extractor;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 8),
-          child: Text(
-            l10n.t('select_mode'),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface.withAlpha(150),
-              letterSpacing: 0.2,
-            ),
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Row(
+            children: [
+              Icon(
+                Icons.tune_rounded,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.t('select_mode'),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface.withAlpha(160),
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
           ),
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Video modes
-            Expanded(
-              flex: 11,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, bottom: 6),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.videocam_outlined,
-                          size: 13,
-                          color: isVideoActive
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurface.withAlpha(150),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.t('category_video'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.3,
-                            color: isVideoActive
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurface.withAlpha(150),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isVideoActive
-                            ? theme.colorScheme.primary.withAlpha(120)
-                            : theme.colorScheme.outline,
-                        width: isVideoActive ? 1.2 : 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _SegmentItem(
-                            icon: Icons.swap_horiz_rounded,
-                            label: l10n.t('mode_convert'),
-                            isSelected: _selectedMode == _AppMode.convert,
-                            onTap: () => _onModeChanged(_AppMode.convert),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: _SegmentItem(
-                            icon: Icons.compress_rounded,
-                            label: l10n.t('mode_downscale'),
-                            isSelected: _selectedMode == _AppMode.downscale,
-                            onTap: () => _onModeChanged(_AppMode.downscale),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: theme.colorScheme.outline.withAlpha(isDark ? 35 : 55),
+              width: 1.0,
             ),
-            const SizedBox(width: 10),
-            // Audio modes
-            Expanded(
-              flex: 8,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, bottom: 6),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.audiotrack_outlined,
-                          size: 13,
-                          color: isAudioActive
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurface.withAlpha(150),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.t('category_audio'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.3,
-                            color: isAudioActive
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurface.withAlpha(150),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isAudioActive
-                            ? theme.colorScheme.primary.withAlpha(120)
-                            : theme.colorScheme.outline,
-                        width: isAudioActive ? 1.2 : 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _SegmentItem(
-                            icon: Icons.audiotrack_rounded,
-                            label: l10n.t('mode_extractor'),
-                            isSelected: _selectedMode == _AppMode.extractor,
-                            onTap: () => _onModeChanged(_AppMode.extractor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.swap_horiz_rounded,
+                  label: l10n.t('mode_convert'),
+                  isSelected: _selectedMode == _AppMode.convert,
+                  onTap: () => _onModeChanged(_AppMode.convert),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.compress_rounded,
+                  label: l10n.t('mode_downscale'),
+                  isSelected: _selectedMode == _AppMode.downscale,
+                  onTap: () => _onModeChanged(_AppMode.downscale),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: _SegmentItem(
+                  icon: Icons.audiotrack_rounded,
+                  label: l10n.t('mode_extractor'),
+                  isSelected: _selectedMode == _AppMode.extractor,
+                  onTap: () => _onModeChanged(_AppMode.extractor),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -747,18 +666,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Video selection card.
   Widget _buildImportCard(ThemeData theme, AppLocalizations l10n) {
+    final isDark = theme.brightness == Brightness.dark;
+
     return AppGlassCard(
       onTap: _pickVideo,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
-      border: Border.all(color: theme.colorScheme.outline, width: 1.2),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+      border: Border.all(
+        color: theme.colorScheme.outline.withAlpha(isDark ? 35 : 55),
+        width: 1.0,
+      ),
       child: Column(
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 68,
+            height: 68,
             decoration: BoxDecoration(
               color: theme.colorScheme.primary.withAlpha(20),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: theme.colorScheme.primary.withAlpha(45),
+                width: 1.5,
+              ),
             ),
             child: Icon(
               Icons.file_upload_outlined,
@@ -766,11 +694,11 @@ class _HomeScreenState extends State<HomeScreen> {
               color: theme.colorScheme.primary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Text(
             l10n.t('pick_video'),
             style: TextStyle(
-              fontSize: 17,
+              fontSize: 16.5,
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.onSurface,
               letterSpacing: -0.2,
@@ -779,6 +707,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 6),
           Text(
             l10n.t('supported_formats_hint'),
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
               color: theme.colorScheme.onSurface.withAlpha(140),
@@ -790,9 +719,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
             label: Text(l10n.t('pick_video')),
             style: ElevatedButton.styleFrom(
+              elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -804,79 +734,92 @@ class _HomeScreenState extends State<HomeScreen> {
   // Loaded state
 
   Widget _buildContent(ThemeData theme, AppLocalizations l10n) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Mode switch
-          _buildSegmentedModeBar(theme, l10n),
-          const SizedBox(height: 14),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Mode switch
+              _buildSegmentedModeBar(theme, l10n),
+              const SizedBox(height: 14),
 
-          // Video info card
-          VideoInfoCard(videoInfo: _videoInfo!),
-          const SizedBox(height: 14),
+              // Video info card
+              VideoInfoCard(videoInfo: _videoInfo!),
+              const SizedBox(height: 14),
 
-          // Options card
-          if (_selectedMode == _AppMode.extractor)
-            AudioExtractorCard(
-              sourceVideo: _videoInfo!,
-              encodingOptions: _encodingOptions,
-              onOptionsChanged: (opts) =>
-                  setState(() => _encodingOptions = opts),
-              l10n: l10n,
-            )
-          else
-            ConversionOptionsCard(
-              sourceVideo: _videoInfo!,
-              resolutions: _getResolutionsForMode(_selectedMode),
-              selectedResolution: _selectedResolution,
-              encodingOptions: _encodingOptions,
-              onResolutionChanged: (res) =>
-                  setState(() => _selectedResolution = res),
-              onOptionsChanged: (opts) =>
-                  setState(() => _encodingOptions = opts),
-              l10n: l10n,
-            ),
+              // Options card
+              if (_selectedMode == _AppMode.extractor)
+                AudioExtractorCard(
+                  sourceVideo: _videoInfo!,
+                  encodingOptions: _encodingOptions,
+                  onOptionsChanged: (opts) =>
+                      setState(() => _encodingOptions = opts),
+                  l10n: l10n,
+                )
+              else
+                ConversionOptionsCard(
+                  sourceVideo: _videoInfo!,
+                  resolutions: _getResolutionsForMode(_selectedMode),
+                  selectedResolution: _selectedResolution,
+                  encodingOptions: _encodingOptions,
+                  onResolutionChanged: (res) =>
+                      setState(() => _selectedResolution = res),
+                  onOptionsChanged: (opts) =>
+                      setState(() => _encodingOptions = opts),
+                  l10n: l10n,
+                ),
 
-          const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-          // Start conversion
-          ElevatedButton.icon(
-            onPressed:
-                ((_selectedMode == _AppMode.extractor &&
-                        (_videoInfo?.hasAudio ?? true)) ||
-                    (_selectedMode != _AppMode.extractor &&
-                        _selectedResolution != null))
-                ? _startProcessing
-                : null,
-            icon: Icon(
-              _selectedMode == _AppMode.extractor
-                  ? Icons.audiotrack_rounded
-                  : Icons.play_arrow_rounded,
-              size: 22,
-            ),
-            label: Text(
-              _selectedMode == _AppMode.extractor
-                  ? l10n.t('start_audio_extraction')
-                  : l10n.t('start_conversion'),
-            ),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
+              // Start conversion
+              ElevatedButton.icon(
+                onPressed:
+                    ((_selectedMode == _AppMode.extractor &&
+                            (_videoInfo?.hasAudio ?? true)) ||
+                        (_selectedMode != _AppMode.extractor &&
+                            _selectedResolution != null))
+                    ? _startProcessing
+                    : null,
+                icon: Icon(
+                  _selectedMode == _AppMode.extractor
+                      ? Icons.audiotrack_rounded
+                      : Icons.play_arrow_rounded,
+                  size: 22,
+                ),
+                label: Text(
+                  _selectedMode == _AppMode.extractor
+                      ? l10n.t('start_audio_extraction')
+                      : l10n.t('start_conversion'),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Change video
+              OutlinedButton.icon(
+                onPressed: _pickVideo,
+                icon: const Icon(Icons.sync_rounded, size: 18),
+                label: Text(l10n.t('change_video')),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-
-          // Change video
-          OutlinedButton.icon(
-            onPressed: _pickVideo,
-            icon: const Icon(Icons.sync_rounded, size: 18),
-            label: Text(l10n.t('change_video')),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 13),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -901,44 +844,58 @@ class _SegmentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isSelected
-                  ? Colors.white
-                  : theme.colorScheme.onSurface.withAlpha(180),
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected
-                        ? Colors.white
-                        : theme.colorScheme.onSurface.withAlpha(180),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withAlpha(50),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 15,
+                color: isSelected
+                    ? Colors.white
+                    : theme.colorScheme.onSurface.withAlpha(160),
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : theme.colorScheme.onSurface.withAlpha(160),
+                    ),
+                    maxLines: 1,
                   ),
-                  maxLines: 1,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
