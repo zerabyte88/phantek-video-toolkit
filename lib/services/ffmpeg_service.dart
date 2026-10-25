@@ -428,11 +428,11 @@ class FFmpegService {
         codecArgs = [
           '-c:v',
           hwCodec,
+          '-bitrate_mode',
+          'vbr',
           if (hwCodec == 'h264_mediacodec') ...[
             '-profile:v',
             'high',
-            '-level:v',
-            '4.1',
           ],
           '-b:v',
           '${targetBitrateKbps}k',

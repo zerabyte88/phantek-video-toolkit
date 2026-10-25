@@ -47,7 +47,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     _crfValue = widget.encodingOptions.crfValue;
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
-        .clamp(1, 30);
+        .clamp(1, 35);
     final appSettings = SettingsService().settings;
     if (appSettings.isAdvancedSettingsEnabled &&
         appSettings.enableHardwareAcceleration &&
@@ -113,7 +113,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         widget.encodingOptions.customBitrateKbps) {
       _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
           .round()
-          .clamp(1, 30);
+          .clamp(1, 35);
     }
     if (oldWidget.encodingOptions.targetFps !=
         widget.encodingOptions.targetFps) {

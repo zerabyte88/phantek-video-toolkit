@@ -188,7 +188,7 @@ class EncodingOptions {
     this.rateControlMode = RateControlMode.crf,
     this.speedPreset = SpeedPreset.normal,
     this.crfValue = 22,
-    this.customBitrateKbps = 6000,
+    this.customBitrateKbps = 10000,
     this.targetFps = 0,
     this.audioFormat = AudioFormat.mp3,
     this.audioExtractBitrateKbps = 192,
@@ -238,10 +238,10 @@ class EncodingOptions {
       if (isHardware && customBitrateKbps > 0) {
         // Safe bitrate floors for MediaCodec hardware encoders to prevent macroblocking
         final minHwKbps = maxDim >= 2560
-            ? 18000
+            ? 28000
             : (maxDim >= 1920
-                ? 8000
-                : (maxDim >= 1280 ? 5000 : 2500));
+                ? 14000
+                : (maxDim >= 1280 ? 8500 : 4000));
         return math.max(customBitrateKbps, minHwKbps);
       }
       return customBitrateKbps;
@@ -253,15 +253,15 @@ class EncodingOptions {
     final double baseMbps;
     if (isHardware) {
       if (maxDim >= 2560) {
-        baseMbps = 26.0;
+        baseMbps = 32.0;
       } else if (maxDim >= 1920) {
-        baseMbps = 11.0;
+        baseMbps = 15.0;
       } else if (maxDim >= 1280) {
-        baseMbps = 6.5;
+        baseMbps = 9.0;
       } else if (maxDim >= 854) {
-        baseMbps = 3.5;
+        baseMbps = 5.0;
       } else {
-        baseMbps = 2.0;
+        baseMbps = 3.0;
       }
     } else {
       if (maxDim >= 2560) {
@@ -285,10 +285,10 @@ class EncodingOptions {
     // Minimum safe quality floor for hardware encoders per resolution tier
     final minFloorKbps = isHardware
         ? (maxDim >= 2560
-            ? 16000
+            ? 25000
             : (maxDim >= 1920
-                ? 7000
-                : (maxDim >= 1280 ? 4500 : 2000)))
+                ? 12000
+                : (maxDim >= 1280 ? 7500 : 3500)))
         : 300;
 
     // Avoid upscaling bitrate beyond source video unless hardware encoder needs minimal quality floor

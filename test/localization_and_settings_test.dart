@@ -3501,10 +3501,11 @@ void main() {
       expect(hwArgs.contains('-b:v'), isTrue);
       expect(hwArgs.contains('-preset'), isFalse);
       expect(hwArgs.contains('-crf'), isFalse);
+      expect(hwArgs.contains('-bitrate_mode'), isTrue);
+      expect(hwArgs.contains('vbr'), isTrue);
       expect(hwArgs.contains('-profile:v'), isTrue);
       expect(hwArgs.contains('high'), isTrue);
-      expect(hwArgs.contains('-level:v'), isTrue);
-      expect(hwArgs.contains('4.1'), isTrue);
+      expect(hwArgs.contains('-level:v'), isFalse);
     });
 
     test('Hardware Acceleration applies bitrate quality compensation and minimum floors to prevent burik quality', () {
@@ -3535,7 +3536,7 @@ void main() {
 
       expect(swBitrate720, inInclusiveRange(1800, 2200));
       expect(hwBitrate720, greaterThan(swBitrate720));
-      expect(hwBitrate720, inInclusiveRange(4800, 5600));
+      expect(hwBitrate720, inInclusiveRange(7000, 8000));
 
       // In Bitrate mode with low custom bitrate, hardware enforces safe floor
       const lowBitrateOpts = EncodingOptions(
@@ -3550,7 +3551,7 @@ void main() {
         sourceBitrateBps: 10000000,
         isHardware: true,
       );
-      expect(hwSafeBitrate, equals(5000));
+      expect(hwSafeBitrate, equals(8500));
     });
 
     testWidgets(
