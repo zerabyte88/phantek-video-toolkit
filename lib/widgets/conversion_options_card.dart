@@ -49,15 +49,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
         .round()
         .clamp(1, 35);
     final appSettings = SettingsService().settings;
-    if (appSettings.isAdvancedSettingsEnabled &&
-        appSettings.enableHardwareAcceleration &&
-        widget.encodingOptions.rateControlMode == RateControlMode.crf) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onOptionsChanged(
-          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
-        );
-      });
-    }
     final sourceFps = (widget.sourceVideo.fps > 0
         ? widget.sourceVideo.fps.round()
         : 60);
@@ -75,14 +66,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
 
   void _onSettingsUpdated() {
     if (mounted) {
-      final appSettings = SettingsService().settings;
-      if (appSettings.isAdvancedSettingsEnabled &&
-          appSettings.enableHardwareAcceleration &&
-          widget.encodingOptions.rateControlMode == RateControlMode.crf) {
-        widget.onOptionsChanged(
-          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
-        );
-      }
       setState(() {});
     }
   }
@@ -96,16 +79,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
   @override
   void didUpdateWidget(ConversionOptionsCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final appSettings = SettingsService().settings;
-    if (appSettings.isAdvancedSettingsEnabled &&
-        appSettings.enableHardwareAcceleration &&
-        widget.encodingOptions.rateControlMode == RateControlMode.crf) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onOptionsChanged(
-          widget.encodingOptions.copyWith(rateControlMode: RateControlMode.bitrate),
-        );
-      });
-    }
     if (oldWidget.encodingOptions.crfValue != widget.encodingOptions.crfValue) {
       _crfValue = widget.encodingOptions.crfValue;
     }
@@ -140,8 +113,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final theme = Theme.of(context);
     final l10n = widget.l10n;
     final appSettings = SettingsService().settings;
-    final isHwAccelActive = appSettings.isAdvancedSettingsEnabled &&
-        appSettings.enableHardwareAcceleration;
     final resolvedThreads = DeviceSpecHelper.resolveThreadCount(
       video: widget.sourceVideo,
       requestedThreads: appSettings.cpuThreads,
@@ -315,23 +286,19 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               spacing: 6,
               runSpacing: 6,
               children: RateControlMode.values.map((mode) {
-                final isCrf = mode == RateControlMode.crf;
-                final isChipEnabled = !(isHwAccelActive && isCrf);
                 final isSelected =
                     widget.encodingOptions.rateControlMode == mode;
                 return _buildChoiceChip(
                   label: mode.displayName,
-                  isSelected: isSelected && isChipEnabled,
-                  isEnabled: isChipEnabled,
-                  onSelected: isChipEnabled
-                      ? (selected) {
-                          if (selected) {
-                            widget.onOptionsChanged(
-                              widget.encodingOptions.copyWith(rateControlMode: mode),
-                            );
-                          }
-                        }
-                      : null,
+                  isSelected: isSelected,
+                  isEnabled: true,
+                  onSelected: (selected) {
+                    if (selected) {
+                      widget.onOptionsChanged(
+                        widget.encodingOptions.copyWith(rateControlMode: mode),
+                      );
+                    }
+                  },
                 );
               }).toList(),
             ),
@@ -339,18 +306,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
           const SizedBox(height: 8),
           Center(
             child: Text(
-              isHwAccelActive
-                  ? l10n.t('hw_accel_crf_disabled_desc')
-                  : (widget.encodingOptions.rateControlMode == RateControlMode.crf
-                      ? l10n.t('desc_crf')
-                      : l10n.t('desc_bitrate')),
+              widget.encodingOptions.rateControlMode == RateControlMode.crf
+                  ? l10n.t('desc_crf')
+                  : l10n.t('desc_bitrate'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.35,
-                color: isHwAccelActive
-                    ? theme.colorScheme.onSurface.withAlpha(150)
-                    : theme.colorScheme.onSurface.withAlpha(140),
+                color: theme.colorScheme.onSurface.withAlpha(140),
               ),
             ),
           ),
@@ -1069,14 +1032,15 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final durationSecs = widget.sourceVideo.durationSeconds;
 
     if (durationSecs > 0) {
-      final targetW =
-          widget.selectedResolution?.width ?? widget.sourceVideo.width;
-      final targetH =
-          widget.selectedResolution?.height ?? widget.sourceVideo.height;
-
-      final appSettings = SettingsService().settings;
-      final isHw = appSettings.isAdvancedSettingsEnabled &&
-          appSettings.enableHardwareAcceleration;
+      final isPortrait =
+          widget.sourceVideo.height > widget.sourceVideo.width;
+      final res = widget.selectedResolution;
+      final targetW = (isPortrait && res != null && !res.label.startsWith('Original'))
+          ? res.height
+          : (res?.width ?? widget.sourceVideo.width);
+      final targetH = (isPortrait && res != null && !res.label.startsWith('Original'))
+          ? res.width
+          : (res?.height ?? widget.sourceVideo.height);
 
       final targetBitrateKbps = widget.encodingOptions
           .calculateTargetBitrateKbps(
@@ -1085,7 +1049,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
             sourceWidth: widget.sourceVideo.width,
             sourceHeight: widget.sourceVideo.height,
             sourceBitrateBps: widget.sourceVideo.bitrate,
-            isHardware: isHw,
           );
 
       final totalBitrateKbps = targetBitrateKbps + 128;
@@ -1253,17 +1216,11 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                         label:
                             'Scaler: ${appSettings.customScaler == 'default' ? "${l10n.t('scaler_default')} ($effectiveScaler)" : appSettings.customScaler}',
                       ),
-                      if (appSettings.enableHardwareAcceleration)
-                        _buildPresetChoiceBadge(
-                          theme: theme,
-                          icon: Icons.bolt_rounded,
-                          label: 'MediaCodec (HW) • ${l10n.t('badge_experimental')}',
-                        ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${appSettings.enableHardwareAcceleration ? "MediaCodec HW" : "x264 $effectivePreset"} • Scaler $effectiveScaler',
+                    'x264 $effectivePreset • Scaler $effectiveScaler',
                     style: TextStyle(
                       fontSize: 10.5,
                       height: 1.3,

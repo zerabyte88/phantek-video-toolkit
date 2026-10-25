@@ -256,15 +256,13 @@ class FFmpegService {
     required AppSettings appSettings,
     required String outputPath,
   }) {
-    final isAdvanced = appSettings.isAdvancedSettingsEnabled;
-    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
-
     // Target dimensions
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
 
-    // Swap target dimensions for portrait source
-    if (sourceVideo.height > sourceVideo.width) {
+    // Swap target dimensions for portrait source (unless target is already Original)
+    if (sourceVideo.height > sourceVideo.width &&
+        !targetResolution.label.toLowerCase().startsWith('original')) {
       targetW = targetResolution.height;
       targetH = targetResolution.width;
     }
@@ -279,18 +277,9 @@ class FFmpegService {
       targetW = (targetH * sourceAspect).round();
     }
 
-    // Ensure dimensions meet hardware/software alignment constraints
-    if (useHardware) {
-      // Android MediaCodec hardware encoders strictly require 16x16 macroblock alignment.
-      // Non-16 aligned dimensions cause AMediaCodec_configure failures across Qualcomm/MediaTek/Exynos.
-      targetW = ((targetW + 8) ~/ 16) * 16;
-      targetH = ((targetH + 8) ~/ 16) * 16;
-      if (targetW < 16) targetW = 16;
-      if (targetH < 16) targetH = 16;
-    } else {
-      targetW = (targetW ~/ 2) * 2;
-      targetH = (targetH ~/ 2) * 2;
-    }
+    // Target dimensions (ensure even numbers for standard YUV420p video codecs)
+    targetW = (targetW ~/ 2) * 2;
+    targetH = (targetH ~/ 2) * 2;
 
     // Thread count
     final effectiveThreads = DeviceSpecHelper.resolveThreadCount(
@@ -367,7 +356,6 @@ class FFmpegService {
 
       // Advanced settings overrides
       final isAdvanced = appSettings.isAdvancedSettingsEnabled;
-      final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
 
       final targetBitrateKbps = encodingOptions.calculateTargetBitrateKbps(
         targetWidth: targetW,
@@ -375,7 +363,6 @@ class FFmpegService {
         sourceWidth: sourceVideo.width,
         sourceHeight: sourceVideo.height,
         sourceBitrateBps: sourceVideo.bitrate,
-        isHardware: useHardware,
       );
 
       if (isAdvanced &&
@@ -391,80 +378,45 @@ class FFmpegService {
       }
 
       if (isOriginalResolution) {
-        if (useHardware) {
-          final needsPad =
-              sourceVideo.width % 16 != 0 || sourceVideo.height % 16 != 0;
-          if (needsPad) {
-            vfFilter =
-                '${fpsFilter}pad=ceil(iw/16)*16:ceil(ih/16)*16:(ow-iw)/2:(oh-ih)/2,format=nv12|yuv420p';
-          } else if (fpsFilter.isNotEmpty) {
-            vfFilter = '${fpsFilter}format=nv12|yuv420p';
-          } else {
-            vfFilter = 'format=nv12|yuv420p';
-          }
+        final needsPad =
+            sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
+        if (needsPad) {
+          vfFilter =
+              '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
+        } else if (fpsFilter.isNotEmpty) {
+          vfFilter = '${fpsFilter}format=yuv420p';
         } else {
-          final needsPad =
-              sourceVideo.width % 2 != 0 || sourceVideo.height % 2 != 0;
-          if (needsPad) {
-            vfFilter =
-                '${fpsFilter}pad=ceil(iw/2)*2:ceil(ih/2)*2:(ow-iw)/2:(oh-ih)/2,format=yuv420p';
-          } else if (fpsFilter.isNotEmpty) {
-            vfFilter = '${fpsFilter}format=yuv420p';
-          } else {
-            vfFilter = 'format=yuv420p';
-          }
+          vfFilter = 'format=yuv420p';
         }
       } else {
-        final pixelFormat = useHardware ? 'nv12|yuv420p' : 'yuv420p';
         vfFilter =
-            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=$pixelFormat';
+            '${fpsFilter}scale=$targetW:$targetH:flags=$scaleFlag,format=yuv420p';
       }
 
-      final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
-          ? 'hevc_mediacodec'
-          : 'h264_mediacodec';
-
-      if (useHardware) {
-        codecArgs = [
-          '-c:v',
-          hwCodec,
-          '-bitrate_mode',
-          'vbr',
-          if (hwCodec == 'h264_mediacodec') ...[
-            '-profile:v',
-            'high',
-          ],
-          '-b:v',
-          '${targetBitrateKbps}k',
-          '-g',
-          '${encodingOptions.targetFps > 0 ? encodingOptions.targetFps * 2 : 60}',
-        ];
+      final List<String> rateControlArgs;
+      if (encodingOptions.rateControlMode == RateControlMode.crf) {
+        rateControlArgs = ['-crf', '${encodingOptions.crfValue}'];
       } else {
-        final List<String> rateControlArgs;
-        if (encodingOptions.rateControlMode == RateControlMode.crf) {
-          rateControlArgs = ['-crf', '${encodingOptions.crfValue}'];
-        } else {
-          rateControlArgs = ['-b:v', '${targetBitrateKbps}k'];
-        }
-
-        final codecName = encodingOptions.codec.ffmpegCodec;
-
-        codecArgs = [
-          '-c:v',
-          codecName,
-          '-preset',
-          x264Preset,
-          if (codecName == 'libx264') ...[
-            '-profile:v',
-            'high',
-            '-level:v',
-            '4.1',
-          ],
-          ...rateControlArgs,
-          '-pix_fmt',
-          'yuv420p',
-        ];
+        rateControlArgs = ['-b:v', '${targetBitrateKbps}k'];
       }
+
+      final codecName = encodingOptions.codec.ffmpegCodec;
+
+      codecArgs = [
+        '-c:v',
+        codecName,
+        '-preset',
+        x264Preset,
+        if (codecName == 'libx264') ...[
+          '-profile:v',
+          'high',
+          '-level:v',
+          '4.1',
+        ],
+        ...rateControlArgs,
+        '-pix_fmt',
+        'yuv420p',
+      ];
     }
 
     // Container flags
@@ -474,14 +426,12 @@ class FFmpegService {
       containerFlags.addAll(['-movflags', '+faststart']);
     }
 
-    final threadArgs = useHardware
-        ? ['-threads', '1']
-        : [
-            '-threads',
-            '$effectiveThreads',
-            '-filter_threads',
-            '$effectiveThreads',
-          ];
+    final threadArgs = [
+      '-threads',
+      '$effectiveThreads',
+      '-filter_threads',
+      '$effectiveThreads',
+    ];
 
     return <String>[
       '-i',
@@ -541,7 +491,8 @@ class FFmpegService {
     // Target dimensions for metadata
     int targetW = targetResolution.width;
     int targetH = targetResolution.height;
-    if (sourceVideo.height > sourceVideo.width) {
+    if (sourceVideo.height > sourceVideo.width &&
+        !targetResolution.label.toLowerCase().startsWith('original')) {
       targetW = targetResolution.height;
       targetH = targetResolution.width;
     }
@@ -554,16 +505,8 @@ class FFmpegService {
       targetW = (targetH * sourceAspect).round();
     }
     final isAdvanced = appSettings.isAdvancedSettingsEnabled;
-    final useHardware = isAdvanced && appSettings.enableHardwareAcceleration;
-    if (useHardware) {
-      targetW = ((targetW + 8) ~/ 16) * 16;
-      targetH = ((targetH + 8) ~/ 16) * 16;
-      if (targetW < 16) targetW = 16;
-      if (targetH < 16) targetH = 16;
-    } else {
-      targetW = (targetW ~/ 2) * 2;
-      targetH = (targetH ~/ 2) * 2;
-    }
+    targetW = (targetW ~/ 2) * 2;
+    targetH = (targetH ~/ 2) * 2;
 
     final isOriginalResolution =
         targetW == sourceVideo.width && targetH == sourceVideo.height;
@@ -589,14 +532,9 @@ class FFmpegService {
 
     final commandDebug = arguments.join(' ');
     onLog('Command: ffmpeg $commandDebug');
-    final hwCodec = (encodingOptions.codec.ffmpegCodec == 'libx265')
-        ? 'hevc_mediacodec'
-        : 'h264_mediacodec';
     final encoderDesc = isStreamCopy
         ? 'Lossless Stream Copy'
-        : (useHardware
-            ? 'Hardware ($hwCodec)'
-            : 'Software (${encodingOptions.codec.ffmpegCodec}${isAdvanced && appSettings.customPreset != "default" ? " [preset: ${appSettings.customPreset}]" : ""})');
+        : 'Software (${encodingOptions.codec.ffmpegCodec}${isAdvanced && appSettings.customPreset != "default" ? " [preset: ${appSettings.customPreset}]" : ""})';
     onLog('Output: ${targetW}x$targetH via $encoderDesc');
 
     final totalDuration = sourceVideo.durationSeconds * 1000; // in ms
@@ -648,28 +586,6 @@ class FFmpegService {
         } catch (_) {}
       }
       return null;
-    } else if (useHardware) {
-      final logs = await session.getAllLogsAsString();
-      onLog('\n[HW Accel] MediaCodec hardware encoding unavailable on this device chipset.');
-      onLog('[HW Accel Fallback] Automatically falling back to software CPU encoder (${encodingOptions.codec.ffmpegCodec}) for 100% device compatibility...');
-      debugPrint('MediaCodec HW failure detail: $logs');
-      final partialFile = File(outputPath);
-      if (await partialFile.exists()) {
-        try {
-          await partialFile.delete();
-        } catch (_) {}
-      }
-      final fallbackSettings = appSettings.copyWith(
-        enableHardwareAcceleration: false,
-      );
-      return processVideo(
-        sourceVideo: sourceVideo,
-        targetResolution: targetResolution,
-        encodingOptions: encodingOptions,
-        appSettings: fallbackSettings,
-        onProgress: onProgress,
-        onLog: onLog,
-      );
     } else {
       final logs = await session.getAllLogsAsString();
       onLog('\nEncoding failed: $logs');

@@ -41,9 +41,6 @@ class AppSettings {
   /// True if advanced experimental settings are enabled.
   final bool isAdvancedSettingsEnabled;
 
-  /// True if hardware acceleration (MediaCodec) is enabled.
-  final bool enableHardwareAcceleration;
-
   /// Custom x264 preset ('default', 'ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow').
   final String customPreset;
 
@@ -63,7 +60,6 @@ class AppSettings {
     this.audioOutputDirectory = '',
     this.cardOpacity = 1.0,
     this.isAdvancedSettingsEnabled = false,
-    this.enableHardwareAcceleration = false,
     this.customPreset = 'default',
     this.customScaler = 'default',
   });
@@ -84,7 +80,6 @@ class AppSettings {
     String? audioOutputDirectory,
     double? cardOpacity,
     bool? isAdvancedSettingsEnabled,
-    bool? enableHardwareAcceleration,
     String? customPreset,
     String? customScaler,
   }) {
@@ -106,8 +101,6 @@ class AppSettings {
           : this.cardOpacity,
       isAdvancedSettingsEnabled:
           isAdvancedSettingsEnabled ?? this.isAdvancedSettingsEnabled,
-      enableHardwareAcceleration:
-          enableHardwareAcceleration ?? this.enableHardwareAcceleration,
       customPreset: customPreset ?? this.customPreset,
       customScaler: customScaler ?? this.customScaler,
     );
@@ -127,7 +120,6 @@ class AppSettings {
       'audioOutputDirectory': audioOutputDirectory,
       'cardOpacity': cardOpacity,
       'isAdvancedSettingsEnabled': isAdvancedSettingsEnabled,
-      'enableHardwareAcceleration': enableHardwareAcceleration,
       'customPreset': customPreset,
       'customScaler': customScaler,
     };
@@ -163,8 +155,6 @@ class AppSettings {
           (json['cardOpacity'] as num?)?.toDouble().clamp(0.5, 1.0) ?? 1.0,
       isAdvancedSettingsEnabled:
           json['isAdvancedSettingsEnabled'] as bool? ?? false,
-      enableHardwareAcceleration:
-          json['enableHardwareAcceleration'] as bool? ?? false,
       customPreset: json['customPreset'] as String? ?? 'default',
       customScaler: json['customScaler'] as String? ?? 'default',
     );

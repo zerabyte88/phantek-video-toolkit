@@ -602,6 +602,51 @@ void main() {
       expect(args[args.indexOf('-movflags') + 1], equals('+faststart'));
     });
 
+    test('FFmpegService.buildVideoArguments preserves portrait dimensions and enables stream copy for Original resolution', () {
+      const portraitSource = VideoInfo(
+        filePath: '/storage/emulated/0/DCIM/portrait_video.mp4',
+        fileName: 'portrait_video.mp4',
+        width: 1080,
+        height: 1920,
+        durationSeconds: 14.5,
+        bitrate: 15000000,
+        fps: 30.0,
+        codec: 'h264',
+        fileSizeBytes: 27000000,
+        hasAudio: true,
+        audioCodec: 'aac',
+        audioChannels: 2,
+        audioBitrateKbps: 128,
+      );
+
+      const targetOriginal = VideoResolution(
+        label: 'Original (1080x1920)',
+        width: 1080,
+        height: 1920,
+      );
+
+      const encodingOpts = EncodingOptions(
+        rateControlMode: RateControlMode.crf,
+        speedPreset: SpeedPreset.normal,
+        targetFps: 0,
+      );
+
+      const appSettings = AppSettings(audioBitrateKbps: 128);
+
+      final args = FFmpegService.buildVideoArguments(
+        sourceVideo: portraitSource,
+        targetResolution: targetOriginal,
+        encodingOptions: encodingOpts,
+        appSettings: appSettings,
+        outputPath: '/storage/emulated/0/Movies/output-orig.mp4',
+      );
+
+      // Verify stream copy is activated because portrait original dimensions are preserved
+      expect(args, contains('-c:v'));
+      expect(args[args.indexOf('-c:v') + 1], equals('copy'));
+      expect(args, isNot(contains('-vf')));
+    });
+
     test('FFmpegService smart audio passthrough enforces 4 strict rules', () {
       const baseVideo = VideoInfo(
         filePath: '/test.mp4',

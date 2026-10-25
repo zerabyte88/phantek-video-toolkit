@@ -49,12 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final defaultPreset = SpeedPreset.fromCpuPreset(
       _settingsService.settings.cpuPreset,
     );
-    final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
-        _settingsService.settings.enableHardwareAcceleration;
     _encodingOptions = EncodingOptions(
       speedPreset: defaultPreset,
       crfValue: defaultPreset.defaultCrf,
-      rateControlMode: isHw ? RateControlMode.bitrate : RateControlMode.crf,
     );
     _settingsService.addListener(_onSettingsChanged);
     CacheManagerService().clearAllCache();
@@ -74,20 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final preset = SpeedPreset.fromCpuPreset(
       _settingsService.settings.cpuPreset,
     );
-    final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
-        _settingsService.settings.enableHardwareAcceleration;
     setState(() {
-      var updated = _encodingOptions;
-      if (updated.speedPreset != preset) {
-        updated = updated.copyWith(
+      if (_encodingOptions.speedPreset != preset) {
+        _encodingOptions = _encodingOptions.copyWith(
           speedPreset: preset,
           crfValue: preset.defaultCrf,
         );
       }
-      if (isHw && updated.rateControlMode == RateControlMode.crf) {
-        updated = updated.copyWith(rateControlMode: RateControlMode.bitrate);
-      }
-      _encodingOptions = updated;
     });
   }
 
@@ -275,14 +265,11 @@ class _HomeScreenState extends State<HomeScreen> {
       final defaultPreset = SpeedPreset.fromCpuPreset(
         _settingsService.settings.cpuPreset,
       );
-      final isHw = _settingsService.settings.isAdvancedSettingsEnabled &&
-          _settingsService.settings.enableHardwareAcceleration;
       _encodingOptions = EncodingOptions(
         speedPreset: defaultPreset,
         crfValue: defaultPreset.defaultCrf,
         codec: VideoCodec.h264,
         container: VideoContainer.mp4,
-        rateControlMode: isHw ? RateControlMode.bitrate : RateControlMode.crf,
       );
       if (_videoInfo != null) {
         final resolutions = _getResolutionsForMode(_selectedMode, _videoInfo);

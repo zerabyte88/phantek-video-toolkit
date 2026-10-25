@@ -183,7 +183,6 @@ class SettingsService extends ChangeNotifier {
       await updateSettings(
         _settings.copyWith(
           isAdvancedSettingsEnabled: false,
-          enableHardwareAcceleration: false,
           customPreset: 'default',
           customScaler: 'default',
         ),
@@ -193,12 +192,6 @@ class SettingsService extends ChangeNotifier {
         _settings.copyWith(isAdvancedSettingsEnabled: true),
       );
     }
-  }
-
-  Future<void> setHardwareAcceleration(bool enabled) async {
-    await updateSettings(
-      _settings.copyWith(enableHardwareAcceleration: enabled),
-    );
   }
 
   Future<void> setCustomPreset(String preset) async {

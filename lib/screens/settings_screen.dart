@@ -24,8 +24,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.8.5';
-  String _buildNumber = '47';
+  String _appVersion = 'v2.9.0';
+  String _buildNumber = '49';
   double? _dragCardOpacity;
 
   @override
@@ -54,14 +54,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '47';
+              : '49';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.8.5';
-          _buildNumber = '47';
+          _appVersion = 'v2.9.0';
+          _buildNumber = '49';
         });
       }
     }
@@ -223,34 +223,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 20),
 
-              // 3. Advanced Settings (Early Access)
+              // 3. Advanced Settings
               _buildSectionTitle(
                 icon: Icons.science_outlined,
                 title: l10n.t('settings_advanced_title'),
                 theme: theme,
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 7,
-                    vertical: 2.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withAlpha(30),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: Colors.amber.withAlpha(120),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Text(
-                    l10n.t('settings_advanced_badge'),
-                    style: const TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ),
               ),
               const SizedBox(height: 8),
               _buildAdvancedSettingsCard(context, theme, settings, l10n),
@@ -1507,130 +1484,84 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
-    final isHwAccelActive =
-        settings.isAdvancedSettingsEnabled &&
-        settings.enableHardwareAcceleration;
-
-    return Opacity(
-      opacity: isHwAccelActive ? 0.45 : 1.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.speed_rounded,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.t('settings_cpu_preset'),
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
-              Icon(
-                Icons.speed_rounded,
-                size: 16,
-                color: isHwAccelActive
-                    ? theme.colorScheme.onSurface.withAlpha(120)
-                    : theme.colorScheme.primary,
+              _buildChoiceChip(
+                theme: theme,
+                label: l10n.t('preset_fast_title'),
+                selected: settings.cpuPreset == 'fast',
+                enabled: true,
+                onSelected: () async {
+                  await _settingsService.setCpuPreset('fast');
+                  setState(() {});
+                },
               ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.t('settings_cpu_preset'),
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: isHwAccelActive
-                      ? theme.colorScheme.onSurface.withAlpha(120)
-                      : theme.colorScheme.onSurface,
-                ),
+              _buildChoiceChip(
+                theme: theme,
+                label: l10n.t('preset_normal_title'),
+                selected: settings.cpuPreset == 'medium',
+                enabled: true,
+                onSelected: () async {
+                  await _settingsService.setCpuPreset('medium');
+                  setState(() {});
+                },
               ),
-              if (isHwAccelActive) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withAlpha(25),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withAlpha(50),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Text(
-                    l10n.t('hw_accel_disabled_badge'),
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface.withAlpha(140),
-                    ),
-                  ),
-                ),
-              ],
+              _buildChoiceChip(
+                theme: theme,
+                label: l10n.t('preset_slow_title'),
+                selected: settings.cpuPreset == 'slow',
+                enabled: true,
+                onSelected: () async {
+                  await _settingsService.setCpuPreset('slow');
+                  setState(() {});
+                },
+              ),
             ],
           ),
-          const SizedBox(height: 10),
-          Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 6,
-              children: [
-                _buildChoiceChip(
-                  theme: theme,
-                  label: l10n.t('preset_fast_title'),
-                  selected: settings.cpuPreset == 'fast',
-                  enabled: !isHwAccelActive,
-                  onSelected: isHwAccelActive
-                      ? null
-                      : () async {
-                          await _settingsService.setCpuPreset('fast');
-                          setState(() {});
-                        },
-                ),
-                _buildChoiceChip(
-                  theme: theme,
-                  label: l10n.t('preset_normal_title'),
-                  selected: settings.cpuPreset == 'medium',
-                  enabled: !isHwAccelActive,
-                  onSelected: isHwAccelActive
-                      ? null
-                      : () async {
-                          await _settingsService.setCpuPreset('medium');
-                          setState(() {});
-                        },
-                ),
-                _buildChoiceChip(
-                  theme: theme,
-                  label: l10n.t('preset_slow_title'),
-                  selected: settings.cpuPreset == 'slow',
-                  enabled: !isHwAccelActive,
-                  onSelected: isHwAccelActive
-                      ? null
-                      : () async {
-                          await _settingsService.setCpuPreset('slow');
-                          setState(() {});
-                        },
-                ),
-              ],
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: Text(
+            settings.cpuPreset == 'fast'
+                ? l10n.t('preset_fast_desc')
+                : (settings.cpuPreset == 'slow'
+                      ? l10n.t('preset_slow_desc')
+                      : l10n.t('preset_normal_desc')),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11.5,
+              height: 1.35,
+              color: theme.colorScheme.onSurface.withAlpha(140),
             ),
           ),
-          const SizedBox(height: 8),
-          Center(
-            child: Text(
-              isHwAccelActive
-                  ? l10n.t('hw_accel_preset_disabled_desc')
-                  : (settings.cpuPreset == 'fast'
-                        ? l10n.t('preset_fast_desc')
-                        : (settings.cpuPreset == 'slow'
-                              ? l10n.t('preset_slow_desc')
-                              : l10n.t('preset_normal_desc'))),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11.5,
-                height: 1.35,
-                color: isHwAccelActive
-                    ? theme.colorScheme.onSurface.withAlpha(120)
-                    : theme.colorScheme.onSurface.withAlpha(140),
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -1759,7 +1690,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  // Advanced & Experimental Settings (Early Access)
+  // Advanced Settings
 
   Widget _buildAdvancedSettingsCard(
     BuildContext context,
@@ -1767,7 +1698,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
-    final isCustomPresetDisabled = settings.enableHardwareAcceleration;
     return _buildModernCard(
       theme: theme,
       child: Column(
@@ -1820,11 +1750,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               Switch(
+                key: const Key('advanced_settings_switch'),
                 value: settings.isAdvancedSettingsEnabled,
                 activeTrackColor: Colors.amber.withAlpha(160),
                 activeThumbColor: Colors.amber,
-                onChanged: (val) =>
-                    _handleToggleAdvancedSettings(context, val, l10n, theme),
+                onChanged: (val) => _handleToggleAdvancedSettings(val),
               ),
             ],
           ),
@@ -1838,266 +1768,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
 
-            // Hardware Acceleration Toggle
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color:
-                        (settings.enableHardwareAcceleration
-                                ? Colors.green
-                                : theme.colorScheme.primary)
-                            .withAlpha(20),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.bolt_rounded,
-                    size: 18,
-                    color: settings.enableHardwareAcceleration
-                        ? Colors.green
-                        : theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+            // Custom Preset Selector
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () =>
+                  _showPresetPickerSheet(context, theme, settings, l10n),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.speed_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              l10n.t('settings_hw_accel'),
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                          Text(
+                            l10n.t('settings_custom_preset'),
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withAlpha(25),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: Colors.green.withAlpha(80),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: const Text(
-                              'MediaCodec',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.withAlpha(25),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: Colors.amber.withAlpha(90),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Text(
-                              l10n.t('badge_experimental'),
-                              style: const TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.amber,
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.t('settings_custom_preset_desc'),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: theme.colorScheme.onSurface.withAlpha(
+                                130,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.t('settings_hw_accel_desc'),
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: theme.colorScheme.onSurface.withAlpha(130),
-                          height: 1.3,
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withAlpha(70),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withAlpha(40),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  key: const Key('hw_accel_switch'),
-                  value: settings.enableHardwareAcceleration,
-                  activeTrackColor: Colors.green.withAlpha(160),
-                  activeThumbColor: Colors.green,
-                  onChanged: (val) => _handleToggleHardwareAcceleration(
-                    context,
-                    val,
-                    l10n,
-                    theme,
-                  ),
-                ),
-              ],
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(
-                height: 1,
-                color: theme.colorScheme.outline.withAlpha(25),
-              ),
-            ),
-
-            // Custom Preset Selector
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: isCustomPresetDisabled
-                  ? null
-                  : () =>
-                        _showPresetPickerSheet(context, theme, settings, l10n),
-              child: Opacity(
-                opacity: isCustomPresetDisabled ? 0.45 : 1.0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isCustomPresetDisabled
-                              ? theme.colorScheme.onSurface.withAlpha(20)
-                              : theme.colorScheme.primary.withAlpha(20),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.speed_rounded,
-                          size: 18,
-                          color: isCustomPresetDisabled
-                              ? theme.colorScheme.onSurface.withAlpha(120)
-                              : theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  l10n.t('settings_custom_preset'),
-                                  style: TextStyle(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                                if (isCustomPresetDisabled) ...[
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.outline
-                                          .withAlpha(25),
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: theme.colorScheme.outline
-                                            .withAlpha(50),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      l10n.t('hw_accel_disabled_badge'),
-                                      style: TextStyle(
-                                        fontSize: 9.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.onSurface
-                                            .withAlpha(140),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            settings.customPreset == 'default'
+                                ? l10n.t('preset_default')
+                                : settings.customPreset,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: settings.customPreset == 'default'
+                                  ? theme.colorScheme.onSurface.withAlpha(180)
+                                  : theme.colorScheme.primary,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              isCustomPresetDisabled
-                                  ? l10n.t('hw_accel_preset_disabled_desc')
-                                  : l10n.t('settings_custom_preset_desc'),
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  130,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest
-                              .withAlpha(70),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: theme.colorScheme.outline.withAlpha(40),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              isCustomPresetDisabled
-                                  ? l10n.t('hw_accel_disabled_badge')
-                                  : (settings.customPreset == 'default'
-                                        ? l10n.t('preset_default')
-                                        : settings.customPreset),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isCustomPresetDisabled
-                                    ? theme.colorScheme.onSurface.withAlpha(100)
-                                    : (settings.customPreset == 'default'
-                                          ? theme.colorScheme.onSurface
-                                                .withAlpha(180)
-                                          : theme.colorScheme.primary),
-                              ),
-                            ),
-                            if (!isCustomPresetDisabled) ...[
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 16,
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  150,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 16,
+                            color: theme.colorScheme.onSurface.withAlpha(150),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -2203,172 +1959,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _handleToggleAdvancedSettings(
-    BuildContext context,
-    bool enable,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) async {
-    if (enable) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: theme.colorScheme.surface,
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.amber,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  l10n.t('early_access_dialog_title'),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            l10n.t('early_access_dialog_desc'),
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: theme.colorScheme.onSurface.withAlpha(200),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(
-                l10n.t('early_access_dialog_cancel'),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface.withAlpha(160),
-                ),
-              ),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.amber.shade800,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(
-                l10n.t('early_access_dialog_confirm'),
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ),
-      );
-
-      if (confirmed == true) {
-        await _settingsService.setAdvancedSettingsEnabled(true);
-        if (mounted) setState(() {});
-      }
-    } else {
-      await _settingsService.setAdvancedSettingsEnabled(false);
-      if (mounted) setState(() {});
-    }
-  }
-
-  Future<void> _handleToggleHardwareAcceleration(
-    BuildContext context,
-    bool enable,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) async {
-    if (enable) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: theme.colorScheme.surface,
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.amber,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  l10n.t('hw_accel_warning_title'),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            l10n.t('hw_accel_warning_desc'),
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: theme.colorScheme.onSurface.withAlpha(200),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(
-                l10n.t('hw_accel_warning_cancel'),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface.withAlpha(160),
-                ),
-              ),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.amber.shade800,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(
-                l10n.t('hw_accel_warning_confirm'),
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ),
-      );
-
-      if (confirmed == true) {
-        await _settingsService.setHardwareAcceleration(true);
-        if (mounted) setState(() {});
-      }
-    } else {
-      await _settingsService.setHardwareAcceleration(false);
-      if (mounted) setState(() {});
-    }
+  Future<void> _handleToggleAdvancedSettings(bool enable) async {
+    await _settingsService.setAdvancedSettingsEnabled(enable);
+    if (mounted) setState(() {});
   }
 
   void _showPresetPickerSheet(
@@ -2895,36 +2488,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildDetailRow(
             theme,
             l10n.t('license_label'),
-            'GPL-3.0-or-later',
-            onTap: () {
-              showLicensePage(
-                context: context,
-                applicationName: 'Phantek - Video Toolkit',
-                applicationVersion: '$_appVersion ($_buildNumber)',
-                applicationLegalese:
-                    'Copyright © 2026 zerabyte88\n'
-                    'Licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).\n\n'
-                    'This program comes with ABSOLUTELY NO WARRANTY. This is free software, '
-                    'and you are welcome to redistribute it under certain conditions.\n\n'
-                    'Source code: https://github.com/zerabyte88/phantek-video-toolkit\n'
-                    'Third-party notices: https://github.com/zerabyte88/phantek-video-toolkit/blob/main/THIRD_PARTY_NOTICES.md',
-              );
-            },
-          ),
-          _buildDetailRow(
-            theme,
-            'Source code',
-            'GitHub',
-            onTap: () async {
-              try {
-                await launchUrl(
-                  Uri.parse(
-                    'https://github.com/zerabyte88/phantek-video-toolkit',
-                  ),
-                  mode: LaunchMode.externalApplication,
-                );
-              } catch (_) {}
-            },
+            'GPLv3',
+            onTap: () => _showAppLicensePage(context, theme),
           ),
 
           Padding(
@@ -2938,46 +2503,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Developer profile
           Row(
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF06B6D4).withAlpha(22),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: const Color(0xFF06B6D4).withAlpha(60),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.person_rounded,
-                  color: Color(0xFF06B6D4),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Developer: zerabyte88',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      l10n.t('developer_role'),
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                        color: theme.colorScheme.onSurface.withAlpha(130),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Developer: zerabyte88',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -3034,6 +2567,157 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showAppLicensePage(BuildContext context, ThemeData theme) {
+    showLicensePage(
+      context: context,
+      applicationName: 'Phantek - Video Toolkit',
+      applicationVersion: '',
+      applicationLegalese: '',
+      applicationIcon: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF06B6D4).withAlpha(24),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF06B6D4).withAlpha(60),
+                width: 1,
+              ),
+            ),
+            child: const Icon(
+              Icons.video_collection_rounded,
+              color: Color(0xFF06B6D4),
+              size: 22,
+            ),
+          ),
+          Text(
+            '$_appVersion ($_buildNumber)',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface.withAlpha(140),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Text(
+              'Copyright © 2026 zerabyte88\n'
+              'Licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).\n\n'
+              'This program comes with ABSOLUTELY NO WARRANTY. This is free software, '
+              'and you are welcome to redistribute it under certain conditions.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.45,
+                color: theme.colorScheme.onSurface.withAlpha(160),
+              ),
+            ),
+          ),
+          _buildLicenseLinkTile(
+            theme: theme,
+            icon: Icons.code_rounded,
+            label: 'Source code',
+            url: 'https://github.com/zerabyte88/phantek-video-toolkit',
+          ),
+          const SizedBox(height: 8),
+          _buildLicenseLinkTile(
+            theme: theme,
+            icon: Icons.description_outlined,
+            label: 'Third-party notices',
+            url:
+                'https://github.com/zerabyte88/phantek-video-toolkit/blob/main/THIRD_PARTY_NOTICES.md',
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLicenseLinkTile({
+    required ThemeData theme,
+    required IconData icon,
+    required String label,
+    required String url,
+  }) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 420),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () async {
+            try {
+              await launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              );
+            } catch (_) {}
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withAlpha(12),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: theme.colorScheme.outline.withAlpha(35),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 16,
+                  color: const Color(0xFF06B6D4),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        url,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: const Color(0xFF06B6D4),
+                          decoration: TextDecoration.underline,
+                          decorationColor:
+                              const Color(0xFF06B6D4).withAlpha(120),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.open_in_new_rounded,
+                  size: 13,
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

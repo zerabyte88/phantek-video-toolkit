@@ -219,87 +219,44 @@ class EncodingOptions {
     );
   }
 
-  /// Estimates target video bitrate in kbps.
-  ///
-  /// When [isHardware] is true, applies dedicated hardware bitrate allocation and safe quality floors
-  /// because mobile ASIC hardware encoders (MediaCodec) lack libx264's advanced
-  /// psychovisual rate control and require higher bitrate to prevent pixelation.
+  /// Estimates target video bitrate in kbps based on resolution and rate control mode.
   int calculateTargetBitrateKbps({
     required int targetWidth,
     required int targetHeight,
     required int sourceWidth,
     required int sourceHeight,
     required int sourceBitrateBps,
-    bool isHardware = false,
   }) {
     final maxDim = targetWidth > targetHeight ? targetWidth : targetHeight;
 
     if (rateControlMode == RateControlMode.bitrate) {
-      if (isHardware && customBitrateKbps > 0) {
-        // Safe bitrate floors for MediaCodec hardware encoders to prevent macroblocking
-        final minHwKbps = maxDim >= 2560
-            ? 28000
-            : (maxDim >= 1920
-                ? 14000
-                : (maxDim >= 1280 ? 8500 : 4000));
-        return math.max(customBitrateKbps, minHwKbps);
-      }
       return customBitrateKbps;
     }
 
-    // Baseline bitrate by target resolution.
-    // Hardware encoders on mobile SoCs lack libx264's deep psychovisual optimizations (psy-rd, aq-mode)
-    // and require ~2x to 2.5x the bitrate to deliver sharp, artifact-free video.
     final double baseMbps;
-    if (isHardware) {
-      if (maxDim >= 2560) {
-        baseMbps = 32.0;
-      } else if (maxDim >= 1920) {
-        baseMbps = 15.0;
-      } else if (maxDim >= 1280) {
-        baseMbps = 9.0;
-      } else if (maxDim >= 854) {
-        baseMbps = 5.0;
-      } else {
-        baseMbps = 3.0;
-      }
+    if (maxDim >= 2560) {
+      baseMbps = 8.5;
+    } else if (maxDim >= 1920) {
+      baseMbps = 4.5;
+    } else if (maxDim >= 1280) {
+      baseMbps = 2.5;
+    } else if (maxDim >= 854) {
+      baseMbps = 1.3;
     } else {
-      if (maxDim >= 2560) {
-        baseMbps = 8.5;
-      } else if (maxDim >= 1920) {
-        baseMbps = 4.5;
-      } else if (maxDim >= 1280) {
-        baseMbps = 2.5;
-      } else if (maxDim >= 854) {
-        baseMbps = 1.3;
-      } else {
-        baseMbps = 0.8;
-      }
+      baseMbps = 0.8;
     }
 
     // Scale factor: ±6 CRF halves or doubles bitrate
     final diff = crfValue - 20;
     final factor = diff / 6.0;
     double estimatedBitrateMbps = baseMbps * math.pow(0.5, factor);
+    const minFloorKbps = 300;
 
-    // Minimum safe quality floor for hardware encoders per resolution tier
-    final minFloorKbps = isHardware
-        ? (maxDim >= 2560
-            ? 25000
-            : (maxDim >= 1920
-                ? 12000
-                : (maxDim >= 1280 ? 7500 : 3500)))
-        : 300;
-
-    // Avoid upscaling bitrate beyond source video unless hardware encoder needs minimal quality floor
+    // Avoid upscaling bitrate beyond source video
     if (sourceBitrateBps > 0) {
       final sourceKbps = sourceBitrateBps ~/ 1000;
-      final maxMultiplier = isHardware ? 1.25 : 0.95;
       if (sourceKbps > 500 && (estimatedBitrateMbps * 1000) > sourceKbps) {
-        final cappedMbps = (sourceKbps / 1000.0) * maxMultiplier;
-        estimatedBitrateMbps = isHardware
-            ? math.max(cappedMbps, minFloorKbps / 1000.0)
-            : cappedMbps;
+        estimatedBitrateMbps = (sourceKbps / 1000.0) * 0.95;
       }
     }
 
