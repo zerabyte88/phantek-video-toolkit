@@ -24,8 +24,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.9.2';
-  String _buildNumber = '51';
+  String _appVersion = 'v2.9.3';
+  String _buildNumber = '52';
   double? _dragCardOpacity;
 
   @override
@@ -54,14 +54,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '51';
+              : '52';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.9.2';
-          _buildNumber = '51';
+          _appVersion = 'v2.9.3';
+          _buildNumber = '52';
         });
       }
     }
@@ -507,30 +507,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.t('settings_language'),
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.t('settings_language_desc'),
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          height: 1.3,
-                          color: theme.colorScheme.onSurface.withAlpha(140),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    l10n.t('settings_language'),
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 6),
+            Center(
+              child: Text(
+                l10n.t('settings_language_desc'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  height: 1.3,
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
+              ),
             ),
             const SizedBox(height: 10),
             Container(
@@ -2813,20 +2811,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 105,
-                    child: Text(
-                      l10n.t('device_cpu'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withAlpha(140),
-                      ),
+                  Text(
+                    l10n.t('device_cpu'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withAlpha(140),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       cpuDisplay,
+                      textAlign: TextAlign.end,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -2837,10 +2833,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 14,
-                    color: theme.colorScheme.primary.withAlpha(150),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Icon(
+                      Icons.info_outline_rounded,
+                      size: 14,
+                      color: theme.colorScheme.primary.withAlpha(150),
+                    ),
                   ),
                 ],
               ),
@@ -3040,20 +3039,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 105,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.onSurface.withAlpha(140),
-            ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: theme.colorScheme.onSurface.withAlpha(140),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
             value,
+            textAlign: TextAlign.end,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(

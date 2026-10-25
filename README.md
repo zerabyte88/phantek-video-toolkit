@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">
-  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.9.2&color=E11D48&style=flat-square&logo=github&logoColor=white" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.9.3&color=E11D48&style=flat-square&logo=github&logoColor=white" alt="Version" /></a>
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android%20(arm64-v8a)&color=059669&style=flat-square&logo=android&logoColor=white" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Engine&message=Flutter%20%2B%20FFmpeg&color=2563eb&style=flat-square&logo=flutter&logoColor=white" alt="Engine" />
   <img src="https://img.shields.io/static/v1?label=Privacy&message=100%25%20Offline&color=7c3aed&style=flat-square" alt="Privacy" />
@@ -100,8 +100,8 @@
 
 Download the standalone release APK directly from GitHub Releases:
 
-* **Latest Release:** [Phantek Video Toolkit v2.9.2](https://github.com/zerabyte88/phantek-video-toolkit/releases)
-* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.9.2.apk`
+* **Latest Release:** [Phantek Video Toolkit v2.9.3](https://github.com/zerabyte88/phantek-video-toolkit/releases)
+* **File:** `Phantek-Video-Toolkit-arm64-v8a-v2.9.3.apk`
 * **Architecture:** `arm64-v8a` (64-bit ARM)
 * **Minimum Android Version:** Android 8.0 (API Level 26) or higher
 
