@@ -11,7 +11,7 @@ remains under its own license, and nothing in this file changes those licenses.
 | Component | Role | License | Upstream |
 |:--|:--|:--|:--|
 | FFmpeg | Video/audio transcoding, scaling, extraction | GNU GPL (GPL build with libx264 enabled), used here under GPL-3.0 | https://ffmpeg.org |
-| FFmpegKit (`ffmpeg_kit_flutter_new`, full-GPL build) | FFmpeg/FFprobe bindings for Flutter and Android | Core under LGPL-3.0; the full-GPL build also contains GPL v3.0 components, so the combined binary is distributed under GPL-3.0 | https://pub.dev/packages/ffmpeg_kit_flutter_new, original project https://github.com/arthenica/ffmpeg-kit |
+| FFmpegKit (`ffmpeg_kit_flutter_new`, full-GPL build) | FFmpeg/FFprobe bindings for Flutter and Android | Core under LGPL-3.0 (see [LICENSE.ffmpegkit](LICENSE.ffmpegkit)); the full-GPL build also contains GPL v3.0 components (see [LICENSE.ffmpegkit.GPLv3](LICENSE.ffmpegkit.GPLv3)), so the combined binary is distributed under GPL-3.0 | https://pub.dev/packages/ffmpeg_kit_flutter_new, original project https://github.com/arthenica/ffmpeg-kit |
 | x264 (`libx264`) | H.264 video encoding | GPL-2.0-or-later | https://www.videolan.org/developers/x264.html |
 | LAME (`libmp3lame`) | MP3 audio encoding | LGPL (see upstream for the exact version terms) | https://lame.sourceforge.io |
 

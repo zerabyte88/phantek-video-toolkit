@@ -2154,7 +2154,7 @@ void main() {
     );
 
     testWidgets(
-      'SettingsScreen CPU row displays clean name without (X Core), opens bottom sheet on tap, and copies specs',
+      'SettingsScreen CPU row displays clean name without (X Core), without info icon, and does not open bottom sheet',
       (tester) async {
         tester.view.physicalSize = const Size(1080, 2400);
         tester.view.devicePixelRatio = 1.0;
@@ -2175,26 +2175,17 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 
-        // 1. Verify CPU row exists and does not contain "(8 Core)" or similar
+        // 1. Verify CPU row exists
         expect(find.text(l10n.t('device_cpu')), findsOneWidget);
-        expect(find.byIcon(Icons.info_outline_rounded), findsWidgets);
 
-        // 2. Tap on the CPU row to open bottom sheet
+        // 2. Tap on the CPU row — bottom sheet should not open
         await tester.tap(find.text(l10n.t('device_cpu')));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 
-        // 3. Bottom sheet should be visible with title and Copy button
-        expect(find.text(l10n.t('device_cpu_detail_title')), findsOneWidget);
-        expect(find.text(l10n.t('copy_specs')), findsOneWidget);
-
-        // 4. Tap "Copy Details"
-        await tester.tap(find.text(l10n.t('copy_specs')));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 300));
-
-        // 5. SnackBar appears
-        expect(find.text(l10n.t('specs_copied')), findsOneWidget);
+        // 3. Bottom sheet should NOT be present
+        expect(find.text(l10n.t('device_cpu_detail_title')), findsNothing);
+        expect(find.text(l10n.t('copy_specs')), findsNothing);
       },
     );
 

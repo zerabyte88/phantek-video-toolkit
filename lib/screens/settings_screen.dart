@@ -3,7 +3,6 @@
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -341,7 +340,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 7),
                       _buildCpuSpecRow(
-                        context: context,
                         theme: theme,
                         l10n: l10n,
                         soc:
@@ -2499,15 +2497,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(22),
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withAlpha(50),
+                      width: 1.2,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.terminal_rounded,
-                    size: 18,
-                    color: theme.colorScheme.primary,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.8),
+                    child: Image.asset(
+                      'assets/icon/developer_avatar.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: theme.colorScheme.primary.withAlpha(22),
+                        child: Icon(
+                          Icons.person_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -2771,7 +2783,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildCpuSpecRow({
-    required BuildContext context,
     required ThemeData theme,
     required AppLocalizations l10n,
     required SocDescription? soc,
@@ -2779,7 +2790,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required int cores,
   }) {
     final String cpuDisplay;
-    final String rawName = soc?.rawName ?? fallbackText;
     if (soc != null && soc.isPrecise) {
       cpuDisplay = soc.displayName;
     } else if (soc != null && soc.displayName.isNotEmpty) {
@@ -2789,250 +2799,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           '${l10n.t('device_cpu_generic')} · $cores ${l10n.t('unit_core')}';
     }
 
-    return Semantics(
-      label: '${l10n.t('device_cpu_detail_title')}, tap to open',
-      button: true,
-      child: Tooltip(
-        message: rawName,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(6),
-            onTap: () => _showCpuDetailBottomSheet(
-              context: context,
-              theme: theme,
-              l10n: l10n,
-              soc: soc,
-              displayCpu: cpuDisplay,
-              cores: cores,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.t('device_cpu'),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withAlpha(140),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      cpuDisplay,
-                      textAlign: TextAlign.end,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 1),
-                    child: Icon(
-                      Icons.info_outline_rounded,
-                      size: 14,
-                      color: theme.colorScheme.primary.withAlpha(150),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showCpuDetailBottomSheet({
-    required BuildContext context,
-    required ThemeData theme,
-    required AppLocalizations l10n,
-    required SocDescription? soc,
-    required String displayCpu,
-    required int cores,
-  }) {
-    final rawName = soc?.rawName ?? displayCpu;
-    final details = <MapEntry<String, String>>[];
-
-    details.add(MapEntry(l10n.t('device_cpu'), displayCpu));
-    if (soc?.socModel != null && soc!.socModel!.isNotEmpty) {
-      details.add(MapEntry('SoC Model', soc.socModel!));
-    }
-    if (soc?.hardware != null && soc!.hardware!.isNotEmpty) {
-      details.add(MapEntry('Hardware', soc.hardware!));
-    }
-    if (soc?.board != null && soc!.board!.isNotEmpty) {
-      details.add(MapEntry('Board', soc.board!));
-    }
-    if (soc?.brand != null && soc!.brand!.isNotEmpty) {
-      details.add(MapEntry('Brand', soc.brand!));
-    }
-    if (soc?.manufacturer != null && soc!.manufacturer!.isNotEmpty) {
-      details.add(MapEntry('Manufacturer', soc.manufacturer!));
-    }
-    details.add(
-      MapEntry(l10n.t('cores_detected'), '$cores ${l10n.t('unit_core')}'),
-    );
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: theme.colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withAlpha(50),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.memory_rounded,
-                      color: theme.colorScheme.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.t('device_cpu_detail_title'),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      icon: const Icon(Icons.close_rounded, size: 20),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withAlpha(
-                      60,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withAlpha(30),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        rawName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ...details.map(
-                        (e) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: 110,
-                                child: Text(
-                                  e.key,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: theme.colorScheme.onSurface
-                                        .withAlpha(150),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  e.value,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final sb = StringBuffer();
-                      sb.writeln('=== CPU / SoC Specifications ===');
-                      for (final e in details) {
-                        sb.writeln('${e.key}: ${e.value}');
-                      }
-                      sb.writeln('Raw: $rawName');
-                      try {
-                        await Clipboard.setData(
-                          ClipboardData(text: sb.toString().trim()),
-                        );
-                      } catch (_) {}
-                      if (context.mounted) {
-                        Navigator.of(ctx).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.t('specs_copied')),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.copy_rounded, size: 16),
-                    label: Text(l10n.t('copy_specs')),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    return _buildSpecRow(theme, l10n.t('device_cpu'), cpuDisplay);
   }
 
   Widget _buildSpecRow(ThemeData theme, String label, String value) {

@@ -148,5 +148,5 @@ This project is licensed under the **GNU General Public License v3.0 or later (G
 ### Third-Party Licenses & Acknowledgments
 
 * **FFmpeg:** This software uses libraries from the [FFmpeg](https://ffmpeg.org) project under the GNU General Public License v3.0 (compiled with `libx264` support). FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
-* **FFmpegKit:** Built using [ffmpeg-kit](https://github.com/arthenica/ffmpeg-kit) / `ffmpeg_kit_flutter_new` under GPLv3.
+* **FFmpegKit:** Built using [ffmpeg-kit](https://github.com/arthenica/ffmpeg-kit) / `ffmpeg_kit_flutter_new` under GPLv3 (see [LICENSE.ffmpegkit](LICENSE.ffmpegkit) and [LICENSE.ffmpegkit.GPLv3](LICENSE.ffmpegkit.GPLv3)).
 * **Flutter & Dependencies:** Third-party Dart/Flutter packages are licensed under their respective open-source licenses (BSD, MIT, Apache 2.0). Complete open-source licenses can be inspected directly in the app under **Settings > About > License**.
