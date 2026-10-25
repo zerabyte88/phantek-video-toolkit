@@ -60,7 +60,6 @@ class AppLocalizations {
       'badge_auto': 'Auto',
       'settings_card_opacity': 'Opasitas Kartu',
       'settings_card_opacity_desc': 'Atur transparansi kartu dan efek kaca\nKurangi opasitas untuk performa lebih ringan',
-      'about_phantek_subtitle': 'Transcoder Video & Ekstraktor Audio Offline',
       'active_language_badge': 'Aktif',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -372,7 +371,6 @@ class AppLocalizations {
       'badge_auto': 'Auto',
       'settings_card_opacity': 'Card Opacity',
       'settings_card_opacity_desc': 'Adjust card transparency and glass effect\nLower opacity for smoother performance',
-      'about_phantek_subtitle': 'Offline Video Transcoder & Audio Extractor',
       'active_language_badge': 'Active',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -678,7 +676,6 @@ class AppLocalizations {
       'badge_auto': '自动',
       'settings_card_opacity': '卡片不透明度',
       'settings_card_opacity_desc': '调整卡片表面透明度与毛玻璃磨砂效果',
-      'about_phantek_subtitle': '离线视频转码与音频提取工具',
       'active_language_badge': '使用中',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -945,7 +942,6 @@ class AppLocalizations {
       'badge_auto': '自动',
       'settings_card_opacity': '卡片不透明度',
       'settings_card_opacity_desc': '调整卡片表面透明度与毛玻璃磨砂效果',
-      'about_phantek_subtitle': '离线视频转码与音频提取工具',
       'active_language_badge': '使用中',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -1214,7 +1210,6 @@ class AppLocalizations {
       'badge_auto': '自動',
       'settings_card_opacity': '卡片不透明度',
       'settings_card_opacity_desc': '調整卡片表面透明度與毛玻璃磨砂效果',
-      'about_phantek_subtitle': '離線影片轉檔與音訊擷取工具',
       'active_language_badge': '使用中',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -1486,8 +1481,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Opacidad de Tarjeta',
       'settings_card_opacity_desc':
           'Ajusta la transparencia de tarjetas y efecto de cristal',
-      'about_phantek_subtitle':
-          'Conjunto de herramientas de video y audio local y rápido',
       'active_language_badge': 'Activo',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -1797,8 +1790,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Opacidade do Cartão',
       'settings_card_opacity_desc':
           'Ajustar transparência dos cartões e efeito de vidro',
-      'about_phantek_subtitle':
-          'Conjunto de ferramentas de vídeo e áudio local e veloz',
       'active_language_badge': 'Ativo',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -2106,7 +2097,6 @@ class AppLocalizations {
       'badge_auto': '自動',
       'settings_card_opacity': 'カードの不透明度',
       'settings_card_opacity_desc': 'カードの透明度とすりガラス効果を調整',
-      'about_phantek_subtitle': 'オフライン動画変換＆音声抽出ツール',
       'active_language_badge': '有効',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -2380,7 +2370,6 @@ class AppLocalizations {
       'badge_auto': '자동',
       'settings_card_opacity': '카드 불투명도',
       'settings_card_opacity_desc': '카드 표면 투명도 및 글래스모피즘 효과 조절',
-      'about_phantek_subtitle': '오프라인 비디오 트랜스코더 & 오디오 추출기',
       'active_language_badge': '활성',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -2656,7 +2645,6 @@ class AppLocalizations {
       'settings_card_opacity': 'कार्ड अपारदर्शिता',
       'settings_card_opacity_desc':
           'कार्ड की पारदर्शिता और ग्लास प्रभाव समायोजित करें',
-      'about_phantek_subtitle': 'तेज़ और स्थानीय वीडियो एवं ऑडियो टूलकिट',
       'active_language_badge': 'सक्रिय',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -2953,7 +2941,6 @@ class AppLocalizations {
       'badge_auto': 'تلقائي',
       'settings_card_opacity': 'شفافية البطاقات',
       'settings_card_opacity_desc': 'ضبط شفافية أسطح البطاقات وتأثير الزجاج',
-      'about_phantek_subtitle': 'مجموعة أدوات فيديو وصوت محلية فائقة السرعة',
       'active_language_badge': 'نشط',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -3252,8 +3239,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Opacité des Cartes',
       'settings_card_opacity_desc':
           'Ajuster la transparence des cartes et l\'effet de verre',
-      'about_phantek_subtitle':
-          'Boîte à outils vidéo et audio locale et véloce',
       'active_language_badge': 'Actif',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -3555,8 +3540,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Прозрачность карточек',
       'settings_card_opacity_desc':
           'Настройка прозрачности карточек и эффекта стекла',
-      'about_phantek_subtitle':
-          'Быстрый локальный инструментарий для видео и аудио',
       'active_language_badge': 'Активен',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -3858,7 +3841,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Karten-Deckkraft',
       'settings_card_opacity_desc':
           'Transparenz der Karten und Glaseffekt anpassen',
-      'about_phantek_subtitle': 'Offline-Video-Transcoder & Audio-Extraktor',
       'active_language_badge': 'Aktiv',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -4162,7 +4144,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Opacità Schede',
       'settings_card_opacity_desc':
           'Regola trasparenza delle schede ed effetto vetro',
-      'about_phantek_subtitle': 'Transcoder video ed estrattore audio offline',
       'active_language_badge': 'Attivo',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -4468,7 +4449,6 @@ class AppLocalizations {
       'badge_auto': 'Automatisch',
       'settings_card_opacity': 'Kaartdekking',
       'settings_card_opacity_desc': 'Pas kaarttransparantie en glaseffect aan',
-      'about_phantek_subtitle': 'Offline video-transcoder & audio-extractor',
       'active_language_badge': 'Actief',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -4776,7 +4756,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Kortgennemsigtighed',
       'settings_card_opacity_desc':
           'Juster kortets gennemsigtighed og glaseffekt',
-      'about_phantek_subtitle': 'Offline videotranscoder og lydudtrækker',
       'active_language_badge': 'Aktiv',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -5079,7 +5058,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Kortin Läpinäkyvyys',
       'settings_card_opacity_desc':
           'Säädä korttien läpinäkyvyyttä ja lasitehostetta',
-      'about_phantek_subtitle': 'Offline-videomuunnin ja äänenerotin',
       'active_language_badge': 'Aktiivinen',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -5384,7 +5362,6 @@ class AppLocalizations {
       'badge_auto': 'Automatisk',
       'settings_card_opacity': 'Kortopasitet',
       'settings_card_opacity_desc': 'Juster korttransparens og glasseffekt',
-      'about_phantek_subtitle': 'Frakoblet videotranskoder og lyduttrekker',
       'active_language_badge': 'Aktiv',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -5685,7 +5662,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Kortopacitet',
       'settings_card_opacity_desc':
           'Justera kortens genomskinlighet och glaseffekt',
-      'about_phantek_subtitle': 'Offline-videotranskodare och ljudextraherare',
       'active_language_badge': 'Aktiv',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -5989,8 +5965,6 @@ class AppLocalizations {
       'badge_auto': 'Automatik',
       'settings_card_opacity': 'Kelegapan Kad',
       'settings_card_opacity_desc': 'Kawal ketelusan kad dan kesan kaca',
-      'about_phantek_subtitle':
-          'Transkoder Video & Pengekstrak Audio Luar Talian',
       'active_language_badge': 'Aktif',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -6292,8 +6266,6 @@ class AppLocalizations {
       'settings_card_opacity': 'Độ Mờ Thẻ',
       'settings_card_opacity_desc':
           'Điều chỉnh độ trong suốt của thẻ và hiệu ứng kính',
-      'about_phantek_subtitle':
-          'Bộ chuyển mã video & trích xuất âm thanh ngoại tuyến',
       'active_language_badge': 'Đang hoạt động',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',
@@ -6598,7 +6570,6 @@ class AppLocalizations {
       'badge_auto': 'อัตโนมัติ',
       'settings_card_opacity': 'ความทึบของการ์ด',
       'settings_card_opacity_desc': 'ปรับความโปร่งใสของการ์ดและเอฟเฟกต์กระจก',
-      'about_phantek_subtitle': 'โปรแกรมแปลงสัญญาณวิดีโอและแยกเสียงแบบออฟไลน์',
       'active_language_badge': 'ใช้งานอยู่',
       'app_long_title': 'Phantek - Video Toolkit',
       'app_title': 'Phantek',

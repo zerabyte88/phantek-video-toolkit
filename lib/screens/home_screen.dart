@@ -567,19 +567,19 @@ class _HomeScreenState extends State<HomeScreen> {
   // Empty state
 
   Widget _buildEmptyState(ThemeData theme, AppLocalizations l10n) {
-    return Center(
+    return Align(
+      alignment: Alignment.topCenter,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
+          constraints: const BoxConstraints(maxWidth: 500),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Mode selector
               _buildSegmentedModeBar(theme, l10n),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
               // Media import box
               _buildImportCard(theme, l10n),
@@ -670,7 +670,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return AppGlassCard(
       onTap: _pickVideo,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       border: Border.all(
         color: theme.colorScheme.outline.withAlpha(isDark ? 35 : 55),
         width: 1.0,
@@ -694,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: theme.colorScheme.primary,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Text(
             l10n.t('pick_video'),
             style: TextStyle(
@@ -713,13 +713,12 @@ class _HomeScreenState extends State<HomeScreen> {
               color: theme.colorScheme.onSurface.withAlpha(140),
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
+          const SizedBox(height: 18),
+          FilledButton.icon(
             onPressed: _pickVideo,
             icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
             label: Text(l10n.t('pick_video')),
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
+            style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -734,7 +733,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // Loaded state
 
   Widget _buildContent(ThemeData theme, AppLocalizations l10n) {
-    return Center(
+    return Align(
+      alignment: Alignment.topCenter,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
         child: SingleChildScrollView(
