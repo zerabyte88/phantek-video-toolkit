@@ -299,7 +299,8 @@ class AppLocalizations {
       'video_options': 'Opsi Video & Kompresi',
       'settings_advanced_title': 'Pengaturan Lanjutan',
       'settings_advanced_enable': 'Aktifkan Pengaturan Lanjutan',
-      'settings_advanced_enable_desc': 'Buka opsi preset kustom dan algoritma scaler',
+      'settings_advanced_enable_desc':
+          'Buka opsi preset kustom dan algoritma scaler',
 
       'settings_custom_preset': 'Preset Kecepatan Khusus',
       'settings_custom_preset_desc':
@@ -309,24 +310,39 @@ class AppLocalizations {
           'Pilih algoritma interpolasi piksel downscaling',
       'preset_default': 'Otomatis (Sesuai Preset)',
       'scaler_default': 'Otomatis (Sesuai Preset)',
-      'preset_default_desc': 'Mengikuti preset tampilan (Cepat, Normal, Maksimal)',
-      'preset_ultrafast_desc': 'Paling cepat, efisiensi kompresi & kualitas paling rendah',
-      'preset_superfast_desc': 'Sangat cepat, kualitas rendah, beban CPU minimal',
-      'preset_veryfast_desc': 'Cepat, efisiensi lumayan hemat baterai (bawaan mode Cepat)',
-      'preset_faster_desc': 'Cukup cepat, kualitas seimbang harian (bawaan mode Normal)',
-      'preset_fast_custom_desc': 'Kecepatan moderat, visual tajam (bawaan mode Maksimal)',
+      'preset_default_desc':
+          'Mengikuti preset tampilan (Cepat, Normal, Maksimal)',
+      'preset_ultrafast_desc':
+          'Paling cepat, efisiensi kompresi & kualitas paling rendah',
+      'preset_superfast_desc':
+          'Sangat cepat, kualitas rendah, beban CPU minimal',
+      'preset_veryfast_desc':
+          'Cepat, efisiensi lumayan hemat baterai (bawaan mode Cepat)',
+      'preset_faster_desc':
+          'Cukup cepat, kualitas seimbang harian (bawaan mode Normal)',
+      'preset_fast_custom_desc':
+          'Kecepatan moderat, visual tajam (bawaan mode Maksimal)',
       'preset_medium_desc': 'Sedang, standar x264 kompromi kecepatan & ukuran',
       'preset_slow_custom_desc': 'Lambat, kompresi lebih padat & visual jernih',
-      'preset_slower_desc': 'Sangat lambat, analisis makroblok mendalam & detail presisi',
-      'preset_veryslow_desc': 'Paling lambat, efisiensi kompresi maksimal & kualitas terbaik',
-      'scaler_default_desc': 'Mengikuti preset aktif (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Paling cepat, kualitas terendah (linear sederhana ARM NEON)',
-      'scaler_bilinear_desc': 'Sangat cepat, kualitas rendah (lembut/blur, minim ketajaman)',
-      'scaler_bicubic_desc': 'Sedang-lambat, standar seimbang antara kecepatan & ketajaman',
-      'scaler_area_desc': 'Sedang, sampling area terbaik cegah moiré pada downscale',
+      'preset_slower_desc':
+          'Sangat lambat, analisis makroblok mendalam & detail presisi',
+      'preset_veryslow_desc':
+          'Paling lambat, efisiensi kompresi maksimal & kualitas terbaik',
+      'scaler_default_desc':
+          'Mengikuti preset aktif (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Paling cepat, kualitas terendah (linear sederhana ARM NEON)',
+      'scaler_bilinear_desc':
+          'Sangat cepat, kualitas rendah (lembut/blur, minim ketajaman)',
+      'scaler_bicubic_desc':
+          'Sedang-lambat, standar seimbang antara kecepatan & ketajaman',
+      'scaler_area_desc':
+          'Sedang, sampling area terbaik cegah moiré pada downscale',
       'scaler_lanczos_desc': 'Paling lambat, rekonstruksi sinc 3-lobe dengan detail & ketajaman terbaik',
-      'scaler_spline_desc': 'Lambat, kurva spline alami tajam tanpa artefak dering',
-      'scaler_gauss_desc': 'Cepat-sedang, filter gaussian lembut untuk meredam noise',
+      'scaler_spline_desc':
+          'Lambat, kurva spline alami tajam tanpa artefak dering',
+      'scaler_gauss_desc':
+          'Cepat-sedang, filter gaussian lembut untuk meredam noise',
     },
     'en': {
       'theme_oled_pure': 'Pure AMOLED',
@@ -600,7 +616,8 @@ class AppLocalizations {
       'video_options': 'Video & Compression Options',
       'settings_advanced_title': 'Advanced Settings',
       'settings_advanced_enable': 'Enable Advanced Settings',
-      'settings_advanced_enable_desc': 'Unlock custom presets and scaler algorithms',
+      'settings_advanced_enable_desc':
+          'Unlock custom presets and scaler algorithms',
 
       'settings_custom_preset': 'Custom Speed Preset',
       'settings_custom_preset_desc':
@@ -610,24 +627,38 @@ class AppLocalizations {
           'Select pixel interpolation algorithm for downscaling',
       'preset_default': 'Auto (Follow Preset)',
       'scaler_default': 'Auto (Follow Preset)',
-      'preset_default_desc': 'Follows active display preset (Fast, Normal, Maximum)',
-      'preset_ultrafast_desc': 'Fastest, lowest compression efficiency & quality',
+      'preset_default_desc':
+          'Follows active display preset (Fast, Normal, Maximum)',
+      'preset_ultrafast_desc':
+          'Fastest, lowest compression efficiency & quality',
       'preset_superfast_desc': 'Very fast, low quality, minimal CPU load',
-      'preset_veryfast_desc': 'Fast, battery-friendly efficiency (Fast mode default)',
-      'preset_faster_desc': 'Fairly fast, balanced daily quality (Normal mode default)',
-      'preset_fast_custom_desc': 'Moderate speed, crisp visual detail (Maximum mode default)',
+      'preset_veryfast_desc':
+          'Fast, battery-friendly efficiency (Fast mode default)',
+      'preset_faster_desc':
+          'Fairly fast, balanced daily quality (Normal mode default)',
+      'preset_fast_custom_desc':
+          'Moderate speed, crisp visual detail (Maximum mode default)',
       'preset_medium_desc': 'Medium, standard x264 speed & compression balance',
       'preset_slow_custom_desc': 'Slow, tighter compression & cleaner visuals',
-      'preset_slower_desc': 'Very slow, deep macroblock analysis & precise detail',
-      'preset_veryslow_desc': 'Slowest, maximum compression efficiency & highest quality',
+      'preset_slower_desc':
+          'Very slow, deep macroblock analysis & precise detail',
+      'preset_veryslow_desc':
+          'Slowest, maximum compression efficiency & highest quality',
       'scaler_default_desc': 'Follows active preset (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Fastest, lowest quality (simple linear on ARM NEON)',
-      'scaler_bilinear_desc': 'Very fast, low quality (soft/blurry, low sharpness)',
-      'scaler_bicubic_desc': 'Medium-slow, standard balance of speed & edge sharpness',
-      'scaler_area_desc': 'Medium, area averaging optimal for anti-moiré downscaling',
-      'scaler_lanczos_desc': 'Slowest, 3-lobe sinc filter with best detail & sharpness',
-      'scaler_spline_desc': 'Slow, natural spline curves with sharp ringing-free edges',
-      'scaler_gauss_desc': 'Fast-medium, soft Gaussian filter to suppress grain & noise',
+      'scaler_fast_bilinear_desc':
+          'Fastest, lowest quality (simple linear on ARM NEON)',
+      'scaler_bilinear_desc':
+          'Very fast, low quality (soft/blurry, low sharpness)',
+      'scaler_bicubic_desc':
+          'Medium-slow, standard balance of speed & edge sharpness',
+      'scaler_area_desc':
+          'Medium, area averaging optimal for anti-moiré downscaling',
+      'scaler_lanczos_desc':
+          'Slowest, 3-lobe sinc filter with best detail & sharpness',
+      'scaler_spline_desc':
+          'Slow, natural spline curves with sharp ringing-free edges',
+      'scaler_gauss_desc':
+          'Fast-medium, soft Gaussian filter to suppress grain & noise',
     },
     'zh': {
       'settings_cpu_auto_subtitle': '针对高分辨率视频自动优化',
@@ -791,10 +822,13 @@ class AppLocalizations {
       'preset_normal_desc': '双线性缩放 • 兼顾转换速度与文件压缩率的最佳日常平衡模式。',
       'preset_slow_desc': '双三次缩放 (16点插值) • 微细节曲线高精度与高压缩率，优先保证画质细节。',
       'heavy_process_title': '高负载视频处理',
-      'heavy_process_desc': '此视频分辨率较高或时长较长，且选用了最大画质预设。处理将耗费较多时间并占用较高 CPU 资源，建议连接充电器。',
+      'heavy_process_desc':
+          '此视频分辨率较高或时长较长，且选用了最大画质预设。处理将耗费较多时间并占用较高 CPU 资源，建议连接充电器。',
       'heavy_process_desc_4k': '此视频为 4K 超高清分辨率。4K 编码需要高强度计算与更长的时间，建议连接充电器。',
-      'heavy_process_desc_long': '此视频时长较长（{duration}）。编码过程将需要较多时间，建议保持应用开启并连接充电器。',
-      'heavy_process_desc_4k_long': '此视频为 4K 分辨率且时长超过 10 分钟（{duration}）。编码将耗费大量时间与电量，建议连接充电器。',
+      'heavy_process_desc_long':
+          '此视频时长较长（{duration}）。编码过程将需要较多时间，建议保持应用开启并连接充电器。',
+      'heavy_process_desc_4k_long':
+          '此视频为 4K 分辨率且时长超过 10 分钟（{duration}）。编码将耗费大量时间与电量，建议连接充电器。',
       'heavy_process_banner_4k': '4K 视频：超高清编码需要密集计算与更长时间。',
       'heavy_process_banner_long': '长视频（{duration}）：视频转换需要更多时间完成。',
       'heavy_process_banner_4k_long': '4K 视频 • 时长 > 10 分钟：转换过程需要额外时间与较高电量。',
@@ -1057,10 +1091,13 @@ class AppLocalizations {
       'preset_normal_desc': '双线性缩放 • 兼顾转换速度与文件压缩率的最佳日常平衡模式。',
       'preset_slow_desc': '双三次缩放 (16点插值) • 微细节曲线高精度与高压缩率，优先保证画质细节。',
       'heavy_process_title': '高负载视频处理',
-      'heavy_process_desc': '此视频分辨率较高或时长较长，且选用了最大画质预设。处理将耗费较多时间并占用较高 CPU 资源，建议连接充电器。',
+      'heavy_process_desc':
+          '此视频分辨率较高或时长较长，且选用了最大画质预设。处理将耗费较多时间并占用较高 CPU 资源，建议连接充电器。',
       'heavy_process_desc_4k': '此视频为 4K 超高清分辨率。4K 编码需要高强度计算与更长的时间，建议连接充电器。',
-      'heavy_process_desc_long': '此视频时长较长（{duration}）。编码过程将需要较多时间，建议保持应用开启并连接充电器。',
-      'heavy_process_desc_4k_long': '此视频为 4K 分辨率且时长超过 10 分钟（{duration}）。编码将耗费大量时间与电量，建议连接充电器。',
+      'heavy_process_desc_long':
+          '此视频时长较长（{duration}）。编码过程将需要较多时间，建议保持应用开启并连接充电器。',
+      'heavy_process_desc_4k_long':
+          '此视频为 4K 分辨率且时长超过 10 分钟（{duration}）。编码将耗费大量时间与电量，建议连接充电器。',
       'heavy_process_banner_4k': '4K 视频：超高清编码需要密集计算与更长时间。',
       'heavy_process_banner_long': '长视频（{duration}）：视频转换需要更多时间完成。',
       'heavy_process_banner_4k_long': '4K 视频 • 时长 > 10 分钟：转换过程需要额外时间与较高电量。',
@@ -1323,10 +1360,13 @@ class AppLocalizations {
       'preset_normal_desc': '雙線性縮放 • 兼顧轉換速度與檔案壓縮率的最佳日常平衡模式。',
       'preset_slow_desc': '雙三次縮放 (16點插值) • 微細節曲線高精度與高壓縮率，優先保證畫質細節。',
       'heavy_process_title': '高負載影片處理',
-      'heavy_process_desc': '此影片解析度較高或時長較長，且使用了最大畫質預設。處理將耗費較多時間並佔用較多 CPU 資源，建議連接充電器。',
+      'heavy_process_desc':
+          '此影片解析度較高或時長較長，且使用了最大畫質預設。處理將耗費較多時間並佔用較多 CPU 資源，建議連接充電器。',
       'heavy_process_desc_4k': '此影片為 4K 超高畫質解析度。4K 編碼需要高強度運算與更長的時間，建議連接充電器。',
-      'heavy_process_desc_long': '此影片時長較長（{duration}）。編碼過程將需要較多時間，建議保持應用開啟並連接充電器。',
-      'heavy_process_desc_4k_long': '此影片為 4K 解析度且時長超過 10 分鐘（{duration}）。編碼將耗費大量時間與電力，建議連接充電器。',
+      'heavy_process_desc_long':
+          '此影片時長較長（{duration}）。編碼過程將需要較多時間，建議保持應用開啟並連接充電器。',
+      'heavy_process_desc_4k_long':
+          '此影片為 4K 解析度且時長超過 10 分鐘（{duration}）。編碼將耗費大量時間與電力，建議連接充電器。',
       'heavy_process_banner_4k': '4K 影片：超高畫質編碼需要密集運算與更長時間。',
       'heavy_process_banner_long': '長影片（{duration}）：影片轉檔需要更多時間完成。',
       'heavy_process_banner_4k_long': '4K 影片 • 時長 > 10 分鐘：轉檔過程需要額外時間與較高電力。',
@@ -1685,32 +1725,50 @@ class AppLocalizations {
       'video_options': 'Opciones de Video y Compresión',
       'settings_advanced_title': 'Configuración Avanzada',
       'settings_advanced_enable': 'Habilitar Configuración Avanzada',
-      'settings_advanced_enable_desc': 'Desbloquea ajustes personalizados y algoritmos de escalado',
+      'settings_advanced_enable_desc':
+          'Desbloquea ajustes personalizados y algoritmos de escalado',
 
       'settings_custom_preset': 'Ajuste de Velocidad Personalizado',
-      'settings_custom_preset_desc': 'Selecciona el ajuste x264 desde ultrafast hasta veryslow',
+      'settings_custom_preset_desc':
+          'Selecciona el ajuste x264 desde ultrafast hasta veryslow',
       'settings_custom_scaler': 'Método de Escalado de Video (Scaler)',
-      'settings_custom_scaler_desc': 'Selecciona el algoritmo de interpolación de píxeles para reducción',
+      'settings_custom_scaler_desc':
+          'Selecciona el algoritmo de interpolación de píxeles para reducción',
       'preset_default': 'Automático (Según Ajuste)',
       'scaler_default': 'Automático (Según Ajuste)',
       'preset_default_desc': 'Sigue el ajuste activo (Rápido, Normal, Máximo)',
-      'preset_ultrafast_desc': 'El más rápido, menor eficiencia de compresión y calidad',
+      'preset_ultrafast_desc':
+          'El más rápido, menor eficiencia de compresión y calidad',
       'preset_superfast_desc': 'Muy rápido, calidad baja, carga mínima de CPU',
-      'preset_veryfast_desc': 'Rápido, eficiente y ahorra batería (predeterminado Rápido)',
-      'preset_faster_desc': 'Bastante rápido, calidad equilibrada diaria (predeterminado Normal)',
-      'preset_fast_custom_desc': 'Velocidad moderada, detalles nítidos (predeterminado Máximo)',
-      'preset_medium_desc': 'Medio, equilibrio estándar de velocidad y compresión x264',
-      'preset_slow_custom_desc': 'Lento, compresión más ajustada e imagen más limpia',
-      'preset_slower_desc': 'Muy lento, análisis profundo de macrobloques y detalle fino',
-      'preset_veryslow_desc': 'El más lento, máxima eficiencia de compresión y calidad superior',
-      'scaler_default_desc': 'Sigue el ajuste activo (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'El más rápido, menor calidad (lineal simple en ARM NEON)',
-      'scaler_bilinear_desc': 'Muy rápido, baja calidad (suave/borroso, poca nitidez)',
-      'scaler_bicubic_desc': 'Medio-lento, equilibrio estándar entre velocidad y nitidez',
-      'scaler_area_desc': 'Medio, muestreo de área óptimo para reducir sin efecto moiré',
+      'preset_veryfast_desc':
+          'Rápido, eficiente y ahorra batería (predeterminado Rápido)',
+      'preset_faster_desc':
+          'Bastante rápido, calidad equilibrada diaria (predeterminado Normal)',
+      'preset_fast_custom_desc':
+          'Velocidad moderada, detalles nítidos (predeterminado Máximo)',
+      'preset_medium_desc':
+          'Medio, equilibrio estándar de velocidad y compresión x264',
+      'preset_slow_custom_desc':
+          'Lento, compresión más ajustada e imagen más limpia',
+      'preset_slower_desc':
+          'Muy lento, análisis profundo de macrobloques y detalle fino',
+      'preset_veryslow_desc':
+          'El más lento, máxima eficiencia de compresión y calidad superior',
+      'scaler_default_desc':
+          'Sigue el ajuste activo (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'El más rápido, menor calidad (lineal simple en ARM NEON)',
+      'scaler_bilinear_desc':
+          'Muy rápido, baja calidad (suave/borroso, poca nitidez)',
+      'scaler_bicubic_desc':
+          'Medio-lento, equilibrio estándar entre velocidad y nitidez',
+      'scaler_area_desc':
+          'Medio, muestreo de área óptimo para reducir sin efecto moiré',
       'scaler_lanczos_desc': 'El más lento, filtro sinc de 3 lóbulos con el mejor detalle y nitidez',
-      'scaler_spline_desc': 'Lento, curvas spline naturales sin halos de timbre',
-      'scaler_gauss_desc': 'Rápido-medio, filtro gaussiano suave para suprimir ruido y grano',
+      'scaler_spline_desc':
+          'Lento, curvas spline naturales sin halos de timbre',
+      'scaler_gauss_desc':
+          'Rápido-medio, filtro gaussiano suave para suprimir ruido y grano',
     },
     'pt': {
       'theme_oled_pure': 'AMOLED Puro',
@@ -1903,7 +1961,8 @@ class AppLocalizations {
       'heavy_process_desc_long': 'Este vídeo tem longa duração ({duration}). O processo de codificação levará mais tempo. Recomenda-se manter o app aberto e conectar o carregador.',
       'heavy_process_desc_4k_long': 'Este vídeo é 4K e tem mais de 10 minutos ({duration}). A codificação exigirá tempo significativo e muita energia. Recomenda-se conectar o carregador.',
       'heavy_process_banner_4k': 'Vídeo 4K: A codificação Ultra HD requer computação intensiva e mais tempo.',
-      'heavy_process_banner_long': 'Duração Longa ({duration}): A conversão de vídeo levará mais tempo.',
+      'heavy_process_banner_long':
+          'Duração Longa ({duration}): A conversão de vídeo levará mais tempo.',
       'heavy_process_banner_4k_long': 'Vídeo 4K • Duração > 10 Min: A conversão requer tempo extra e maior consumo de bateria.',
       'heavy_process_use_normal': 'Usar Normal',
       'heavy_process_continue': 'Continuar Mesmo Assim',
@@ -1978,29 +2037,48 @@ class AppLocalizations {
       'settings_advanced_enable_desc': 'Desbloqueie predefinições e algoritmos de escalonamento personalizados',
 
       'settings_custom_preset': 'Predefinição de Velocidade Personalizada',
-      'settings_custom_preset_desc': 'Selecione a predefinição x264 de ultrafast a veryslow',
+      'settings_custom_preset_desc':
+          'Selecione a predefinição x264 de ultrafast a veryslow',
       'settings_custom_scaler': 'Método de Escalonamento de Vídeo (Scaler)',
-      'settings_custom_scaler_desc': 'Selecione o algoritmo de interpolação de pixels para redução',
+      'settings_custom_scaler_desc':
+          'Selecione o algoritmo de interpolação de pixels para redução',
       'preset_default': 'Automático (Padrão)',
       'scaler_default': 'Automático (Padrão)',
-      'preset_default_desc': 'Segue a predefinição ativa (Rápido, Normal, Máximo)',
-      'preset_ultrafast_desc': 'Mais rápido, menor eficiência de compressão e qualidade',
-      'preset_superfast_desc': 'Muito rápido, qualidade baixa, uso mínimo de CPU',
-      'preset_veryfast_desc': 'Rápido, eficiente e poupa bateria (padrão Rápido)',
-      'preset_faster_desc': 'Bastante rápido, qualidade diária equilibrada (padrão Normal)',
-      'preset_fast_custom_desc': 'Velocidade moderada, detalhes visuais nítidos (padrão Máximo)',
-      'preset_medium_desc': 'Médio, equilíbrio padrão de velocidade e compressão x264',
-      'preset_slow_custom_desc': 'Lento, compressão mais compacta e visual mais límpido',
-      'preset_slower_desc': 'Muito lento, análise profunda de macroblocos e detalhes finos',
-      'preset_veryslow_desc': 'Mais lento, máxima eficiência de compressão e qualidade máxima',
-      'scaler_default_desc': 'Segue a predefinição ativa (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Mais rápido, menor qualidade (linear simples em ARM NEON)',
-      'scaler_bilinear_desc': 'Muito rápido, qualidade baixa (suave/desfocado, pouca nitidez)',
-      'scaler_bicubic_desc': 'Médio-lento, equilíbrio clássico entre velocidade e nitidez',
-      'scaler_area_desc': 'Médio, amostragem de área ideal contra padrões de moiré',
+      'preset_default_desc':
+          'Segue a predefinição ativa (Rápido, Normal, Máximo)',
+      'preset_ultrafast_desc':
+          'Mais rápido, menor eficiência de compressão e qualidade',
+      'preset_superfast_desc':
+          'Muito rápido, qualidade baixa, uso mínimo de CPU',
+      'preset_veryfast_desc':
+          'Rápido, eficiente e poupa bateria (padrão Rápido)',
+      'preset_faster_desc':
+          'Bastante rápido, qualidade diária equilibrada (padrão Normal)',
+      'preset_fast_custom_desc':
+          'Velocidade moderada, detalhes visuais nítidos (padrão Máximo)',
+      'preset_medium_desc':
+          'Médio, equilíbrio padrão de velocidade e compressão x264',
+      'preset_slow_custom_desc':
+          'Lento, compressão mais compacta e visual mais límpido',
+      'preset_slower_desc':
+          'Muito lento, análise profunda de macroblocos e detalhes finos',
+      'preset_veryslow_desc':
+          'Mais lento, máxima eficiência de compressão e qualidade máxima',
+      'scaler_default_desc':
+          'Segue a predefinição ativa (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Mais rápido, menor qualidade (linear simples em ARM NEON)',
+      'scaler_bilinear_desc':
+          'Muito rápido, qualidade baixa (suave/desfocado, pouca nitidez)',
+      'scaler_bicubic_desc':
+          'Médio-lento, equilíbrio clássico entre velocidade e nitidez',
+      'scaler_area_desc':
+          'Médio, amostragem de área ideal contra padrões de moiré',
       'scaler_lanczos_desc': 'Mais lento, filtro sinc de 3 lóbulos com detalhes e nitidez superiores',
-      'scaler_spline_desc': 'Lento, curvas spline naturais nítidas sem halos visíveis',
-      'scaler_gauss_desc': 'Rápido-médio, filtro gaussiano suave para atenuar ruído e grão',
+      'scaler_spline_desc':
+          'Lento, curvas spline naturais nítidas sem halos visíveis',
+      'scaler_gauss_desc':
+          'Rápido-médio, filtro gaussiano suave para atenuar ruído e grão',
     },
     'ja': {
       'theme_oled_pure': 'ピュアAMOLED',
@@ -2177,12 +2255,14 @@ class AppLocalizations {
       'preset_slow_desc': 'バイキュービックスケーラー (16点) • 高精度なディテール再現と最大圧縮、画質最優先。',
       'heavy_process_title': '高負荷動画処理',
       'heavy_process_desc': 'この動画は高解像度または長時間であり、最大プリセットが選択されています。処理に時間がかかりCPU消費も高くなるため、充電器の接続を推奨します。',
-      'heavy_process_desc_4k': 'この動画は4K Ultra HD解像度です。4Kエンコードは集中的な計算と長い時間を要するため、充電器の接続を推奨します。',
+      'heavy_process_desc_4k':
+          'この動画は4K Ultra HD解像度です。4Kエンコードは集中的な計算と長い時間を要するため、充電器の接続を推奨します。',
       'heavy_process_desc_long': 'この動画は再生時間が長い動画です（{duration}）。エンコード処理に時間がかかります。アプリを開いたままにし、充電器の接続を推奨します。',
       'heavy_process_desc_4k_long': 'この動画は4K解像度で10分を超えています（{duration}）。エンコードには多くの時間と電力を消費するため、充電器の接続を推奨します。',
       'heavy_process_banner_4k': '4K動画：Ultra HDエンコードは集中的な処理と長時間の変換が必要です。',
       'heavy_process_banner_long': '長時間動画（{duration}）：動画の変換完了まで時間がかかります。',
-      'heavy_process_banner_4k_long': '4K動画 • 再生時間 > 10分：変換には長時間の処理と高いバッテリー消費が必要です。',
+      'heavy_process_banner_4k_long':
+          '4K動画 • 再生時間 > 10分：変換には長時間の処理と高いバッテリー消費が必要です。',
       'heavy_process_use_normal': '標準を使用',
       'heavy_process_continue': 'このまま続行',
       'heavy_process_cancel': 'キャンセル',
@@ -2453,8 +2533,10 @@ class AppLocalizations {
       'heavy_process_desc_long': '이 비디오는 긴 재생 시간({duration})을 가집니다. 인코딩 과정에 시간이 더 걸리므로 앱을 열어두고 충전기를 연결하는 것을 권장합니다。',
       'heavy_process_desc_4k_long': '이 비디오는 4K 해상도이며 10분 이상({duration})입니다. 인코딩에 상당한 시간과 전력이 소모되므로 충전기 연결을 권장합니다。',
       'heavy_process_banner_4k': '4K 비디오: Ultra HD 인코딩은 고강도 연산과 추가 시간이 필요합니다。',
-      'heavy_process_banner_long': '긴 재생 시간({duration}): 비디오 변환을 완료하는 데 시간이 더 걸립니다。',
-      'heavy_process_banner_4k_long': '4K 비디오 • 재생 시간 > 10분: 변환에 추가 시간과 많은 배터리 소모가 발생합니다。',
+      'heavy_process_banner_long':
+          '긴 재생 시간({duration}): 비디오 변환을 완료하는 데 시간이 더 걸립니다。',
+      'heavy_process_banner_4k_long':
+          '4K 비디오 • 재생 시간 > 10분: 변환에 추가 시간과 많은 배터리 소모가 발생합니다。',
       'heavy_process_use_normal': '보통 사용',
       'heavy_process_continue': '계속 진행',
       'heavy_process_cancel': '취소',
@@ -2804,32 +2886,46 @@ class AppLocalizations {
       'video_options': 'वीडियो और संपीड़न विकल्प',
       'settings_advanced_title': 'उन्नत सेटिंग्स',
       'settings_advanced_enable': 'उन्नत सेटिंग्स सक्षम करें',
-      'settings_advanced_enable_desc': 'कस्टम प्रीसेट और स्केलर एल्गोरिदम अनलॉक करें',
+      'settings_advanced_enable_desc':
+          'कस्टम प्रीसेट और स्केलर एल्गोरिदम अनलॉक करें',
 
       'settings_custom_preset': 'कस्टम गति प्रीसेट',
-      'settings_custom_preset_desc': 'ultrafast से veryslow तक x264 प्रीसेट चुनें',
+      'settings_custom_preset_desc':
+          'ultrafast से veryslow तक x264 प्रीसेट चुनें',
       'settings_custom_scaler': 'वीडियो स्केलिंग विधि (Scaler)',
-      'settings_custom_scaler_desc': 'डाउनस्केलिंग के लिए पिक्सेल इंटरपोलेशन एल्गोरिदम चुनें',
+      'settings_custom_scaler_desc':
+          'डाउनस्केलिंग के लिए पिक्सेल इंटरपोलेशन एल्गोरिदम चुनें',
       'preset_default': 'स्वचालित (प्रीसेट अनुसार)',
       'scaler_default': 'स्वचालित (प्रीसेट अनुसार)',
-      'preset_default_desc': 'सक्रिय डिस्प्ले प्रीसेट (तेज़, सामान्य, अधिकतम) का अनुसरण करता है',
+      'preset_default_desc':
+          'सक्रिय डिस्प्ले प्रीसेट (तेज़, सामान्य, अधिकतम) का अनुसरण करता है',
       'preset_ultrafast_desc': 'सबसे तेज़, संपीड़न दक्षता और गुणवत्ता सबसे कम',
       'preset_superfast_desc': 'बहुत तेज़, कम गुणवत्ता, न्यूनतम सीपीयू लोड',
       'preset_veryfast_desc': 'तेज़, बैटरी अनुकूल दक्षता (तेज़ मोड डिफ़ॉल्ट)',
-      'preset_faster_desc': 'काफी तेज़, संतुलित दैनिक गुणवत्ता (सामान्य मोड डिफ़ॉल्ट)',
-      'preset_fast_custom_desc': 'मध्यम गति, स्पष्ट विवरण (अधिकतम मोड डिफ़ॉल्ट)',
+      'preset_faster_desc':
+          'काफी तेज़, संतुलित दैनिक गुणवत्ता (सामान्य मोड डिफ़ॉल्ट)',
+      'preset_fast_custom_desc':
+          'मध्यम गति, स्पष्ट विवरण (अधिकतम मोड डिफ़ॉल्ट)',
       'preset_medium_desc': 'मध्यम, मानक x264 गति और संपीड़न संतुलन',
       'preset_slow_custom_desc': 'धीमा, सघन संपीड़न और स्पष्ट दृश्य',
-      'preset_slower_desc': 'बहुत धीमा, गहरा मैक्रोब्लॉक विश्लेषण और सटीक विवरण',
-      'preset_veryslow_desc': 'सबसे धीमा, अधिकतम संपीड़न दक्षता और उच्चतम गुणवत्ता',
-      'scaler_default_desc': 'सक्रिय प्रीसेट का अनुसरण करता है (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'सबसे तेज़, गुणवत्ता सबसे कम (ARM NEON पर सरल रैखिक)',
+      'preset_slower_desc':
+          'बहुत धीमा, गहरा मैक्रोब्लॉक विश्लेषण और सटीक विवरण',
+      'preset_veryslow_desc':
+          'सबसे धीमा, अधिकतम संपीड़न दक्षता और उच्चतम गुणवत्ता',
+      'scaler_default_desc':
+          'सक्रिय प्रीसेट का अनुसरण करता है (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'सबसे तेज़, गुणवत्ता सबसे कम (ARM NEON पर सरल रैखिक)',
       'scaler_bilinear_desc': 'बहुत तेज़, कम गुणवत्ता (धुंधलापन, कम तीक्ष्णता)',
       'scaler_bicubic_desc': 'धीमा-मध्यम, गति और तीक्ष्णता का संतुलित मानक',
-      'scaler_area_desc': 'मध्यम, मोइरे पैटर्न रोकने हेतु डाउनस्केलिंग के लिए अनुकूल',
-      'scaler_lanczos_desc': 'सबसे धीमा, बेहतरीन विवरण और तीक्ष्णता के लिए 3-लोब सिंक फिल्टर',
-      'scaler_spline_desc': 'धीमा, बिना रिंगिंग कलाकृतियों के प्राकृतिक स्प्लाइन वक्र',
-      'scaler_gauss_desc': 'मध्यम गति, शोर और कणों को दबाने के लिए नरम गॉसियन फिल्टर',
+      'scaler_area_desc':
+          'मध्यम, मोइरे पैटर्न रोकने हेतु डाउनस्केलिंग के लिए अनुकूल',
+      'scaler_lanczos_desc':
+          'सबसे धीमा, बेहतरीन विवरण और तीक्ष्णता के लिए 3-लोब सिंक फिल्टर',
+      'scaler_spline_desc':
+          'धीमा, बिना रिंगिंग कलाकृतियों के प्राकृतिक स्प्लाइन वक्र',
+      'scaler_gauss_desc':
+          'मध्यम गति, शोर और कणों को दबाने के लिए नरम गॉसियन फिल्टर',
     },
     'ar': {
       'theme_oled_pure': 'AMOLED نقي',
@@ -3017,8 +3113,10 @@ class AppLocalizations {
       'heavy_process_desc_4k': 'هذا الفيديو بدقة 4K فائقة الوضوح. يتطلب ترميز 4K معالجة مكثفة ووقتاً إضافياً. يُنصح بتوصيل الشاحن.',
       'heavy_process_desc_long': 'هذا الفيديو طويل المدة ({duration}). ستستغرق عملية الترميز وقتاً أطول. يُوصى بإبقاء التطبيق مفتوحاً وتوصيل الشاحن.',
       'heavy_process_desc_4k_long': 'هذا الفيديو بدقة 4K ومدته أكثر من 10 دقائق ({duration}). سيستغرق الترميز وقتاً وطاقة كبيرة. يُنصح بتوصيل الشاحن.',
-      'heavy_process_banner_4k': 'فيديو 4K: يتطلب ترميز Ultra HD معالجة مكثفة ووقتاً أطول.',
-      'heavy_process_banner_long': 'مدة طويلة ({duration}): سيستغرق تحويل الفيديو وقتاً أطول للاكتمال.',
+      'heavy_process_banner_4k':
+          'فيديو 4K: يتطلب ترميز Ultra HD معالجة مكثفة ووقتاً أطول.',
+      'heavy_process_banner_long':
+          'مدة طويلة ({duration}): سيستغرق تحويل الفيديو وقتاً أطول للاكتمال.',
       'heavy_process_banner_4k_long': 'فيديو 4K • مدة > 10 دقائق: يتطلب التحويل وقتاً إضافياً واستهلاكاً أعلى للبطارية.',
       'heavy_process_use_normal': 'استخدام عادي',
       'heavy_process_continue': 'متابعة على أي حال',
@@ -3089,30 +3187,39 @@ class AppLocalizations {
       'video_options': 'خيارات الفيديو والضغط',
       'settings_advanced_title': 'الإعدادات المتقدمة',
       'settings_advanced_enable': 'تفعيل الإعدادات المتقدمة',
-      'settings_advanced_enable_desc': 'فتح الإعدادات المسبقة المخصصة وخوارزميات تغيير الحجم',
+      'settings_advanced_enable_desc':
+          'فتح الإعدادات المسبقة المخصصة وخوارزميات تغيير الحجم',
 
       'settings_custom_preset': 'إعداد مسبق للسرعة مخصص',
-      'settings_custom_preset_desc': 'اختر إعداد x264 مسبق من ultrafast إلى veryslow',
+      'settings_custom_preset_desc':
+          'اختر إعداد x264 مسبق من ultrafast إلى veryslow',
       'settings_custom_scaler': 'طريقة تحجيم الفيديو (Scaler)',
-      'settings_custom_scaler_desc': 'اختر خوارزمية استيفاء البكسل لتصغير الدقة',
+      'settings_custom_scaler_desc':
+          'اختر خوارزمية استيفاء البكسل لتصغير الدقة',
       'preset_default': 'تلقائي (حسب الإعداد المسبق)',
       'scaler_default': 'تلقائي (حسب الإعداد المسبق)',
       'preset_default_desc': 'يتبع الإعداد المسبق النشط (سريع، عادي، أقصى)',
       'preset_ultrafast_desc': 'الأسرع، أقل كفاءة ضغط وجودة',
       'preset_superfast_desc': 'سريع جداً، جودة منخفضة، أدنى حمل على المعالج',
-      'preset_veryfast_desc': 'سريع، موفر للطاقة ومتوازن (افتراضي الوضع السريع)',
-      'preset_faster_desc': 'سريع نسبياً، جودة يومية متوازنة (افتراضي الوضع العادي)',
-      'preset_fast_custom_desc': 'سرعة معتدلة، تفاصيل بصرية واضحة (افتراضي الوضع الأقصى)',
+      'preset_veryfast_desc':
+          'سريع، موفر للطاقة ومتوازن (افتراضي الوضع السريع)',
+      'preset_faster_desc':
+          'سريع نسبياً، جودة يومية متوازنة (افتراضي الوضع العادي)',
+      'preset_fast_custom_desc':
+          'سرعة معتدلة، تفاصيل بصرية واضحة (افتراضي الوضع الأقصى)',
       'preset_medium_desc': 'متوسط، توازن قياسي بين السرعة والضغط في x264',
       'preset_slow_custom_desc': 'بطيء، ضغط أكثر إحكاماً وصورة أكثر نقاءً',
       'preset_slower_desc': 'بطيء جداً، تحليل عميق للكتل وتفاصيل دقيقة',
       'preset_veryslow_desc': 'الأبطأ، أقصى كفاءة ضغط وأعلى جودة مرئية',
-      'scaler_default_desc': 'يتبع الإعداد المسبق النشط (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'الأسرع، أقل جودة (استيفاء خطي مبسط على ARM NEON)',
+      'scaler_default_desc':
+          'يتبع الإعداد المسبق النشط (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'الأسرع، أقل جودة (استيفاء خطي مبسط على ARM NEON)',
       'scaler_bilinear_desc': 'سريع جداً، جودة منخفضة (ناعم/ضبابي، وضوح قليل)',
       'scaler_bicubic_desc': 'متوسط-بطيء، توازن قياسي بين السرعة وحدة الحواف',
       'scaler_area_desc': 'متوسط، أخذ عينات مساحية مثالي لمنع تشوه التموج',
-      'scaler_lanczos_desc': 'الأبطأ، مرشح سينك ثلاثي الحلقات لأعلى وضوح وتفاصيل فائقة',
+      'scaler_lanczos_desc':
+          'الأبطأ، مرشح سينك ثلاثي الحلقات لأعلى وضوح وتفاصيل فائقة',
       'scaler_spline_desc': 'بطيء، منحنيات طبيعية دقيقة وخالية من هالات الرنين',
       'scaler_gauss_desc': 'متوسط السرعة، مرشح غاوسي ناعم لكتم الضوضاء والتحبب',
     },
@@ -3381,29 +3488,45 @@ class AppLocalizations {
       'settings_advanced_enable_desc': 'Débloquez les préréglages personnalisés et les algorithmes d\'échelle',
 
       'settings_custom_preset': 'Préréglage de Vitesse Personnalisé',
-      'settings_custom_preset_desc': 'Sélectionnez le préréglage x264 de ultrafast à veryslow',
+      'settings_custom_preset_desc':
+          'Sélectionnez le préréglage x264 de ultrafast à veryslow',
       'settings_custom_scaler': 'Méthode de Redimensionnement (Scaler)',
       'settings_custom_scaler_desc': 'Sélectionnez l\'algorithme d\'interpolation des pixels pour la réduction',
       'preset_default': 'Automatique (Selon Préréglage)',
       'scaler_default': 'Automatique (Selon Préréglage)',
-      'preset_default_desc': 'Suit le préréglage actif (Rapide, Normal, Maximum)',
-      'preset_ultrafast_desc': 'Le plus rapide, efficacité de compression et qualité minimales',
+      'preset_default_desc':
+          'Suit le préréglage actif (Rapide, Normal, Maximum)',
+      'preset_ultrafast_desc':
+          'Le plus rapide, efficacité de compression et qualité minimales',
       'preset_superfast_desc': 'Très rapide, qualité faible, charge CPU minime',
-      'preset_veryfast_desc': 'Rapide, économe en batterie (par défaut mode Rapide)',
+      'preset_veryfast_desc':
+          'Rapide, économe en batterie (par défaut mode Rapide)',
       'preset_faster_desc': 'Assez rapide, qualité équilibrée quotidienne (par défaut mode Normal)',
-      'preset_fast_custom_desc': 'Vitesse modérée, détails visuels nets (par défaut mode Maximum)',
-      'preset_medium_desc': 'Moyen, compromis standard vitesse et compression x264',
-      'preset_slow_custom_desc': 'Lent, compression plus dense et image plus propre',
-      'preset_slower_desc': 'Très lent, analyse approfondie des macroblocs et détails fins',
-      'preset_veryslow_desc': 'Le plus lent, efficacité de compression maximale et qualité ultime',
-      'scaler_default_desc': 'Suit le préréglage actif (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Le plus rapide, qualité minimale (linéaire simplifié ARM NEON)',
-      'scaler_bilinear_desc': 'Très rapide, qualité faible (flou/doux, manque de piqué)',
-      'scaler_bicubic_desc': 'Moyen-lent, équilibre classique entre rapidité et netteté',
-      'scaler_area_desc': 'Moyen, moyenne surfacique idéale contre les effets de moiré',
+      'preset_fast_custom_desc':
+          'Vitesse modérée, détails visuels nets (par défaut mode Maximum)',
+      'preset_medium_desc':
+          'Moyen, compromis standard vitesse et compression x264',
+      'preset_slow_custom_desc':
+          'Lent, compression plus dense et image plus propre',
+      'preset_slower_desc':
+          'Très lent, analyse approfondie des macroblocs et détails fins',
+      'preset_veryslow_desc':
+          'Le plus lent, efficacité de compression maximale et qualité ultime',
+      'scaler_default_desc':
+          'Suit le préréglage actif (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Le plus rapide, qualité minimale (linéaire simplifié ARM NEON)',
+      'scaler_bilinear_desc':
+          'Très rapide, qualité faible (flou/doux, manque de piqué)',
+      'scaler_bicubic_desc':
+          'Moyen-lent, équilibre classique entre rapidité et netteté',
+      'scaler_area_desc':
+          'Moyen, moyenne surfacique idéale contre les effets de moiré',
       'scaler_lanczos_desc': 'Le plus lent, filtre sinc à 3 lobes pour les détails et la netteté ultimes',
-      'scaler_spline_desc': 'Lent, courbes splines naturelles et nettes sans artéfacts de halo',
-      'scaler_gauss_desc': 'Rapide-moyen, filtre gaussien doux pour atténuer bruit et grain',
+      'scaler_spline_desc':
+          'Lent, courbes splines naturelles et nettes sans artéfacts de halo',
+      'scaler_gauss_desc':
+          'Rapide-moyen, filtre gaussien doux pour atténuer bruit et grain',
     },
     'ru': {
       'theme_oled_pure': 'Чистый AMOLED',
@@ -3661,32 +3784,50 @@ class AppLocalizations {
       'video_options': 'Параметры видео и сжатия',
       'settings_advanced_title': 'Расширенные настройки',
       'settings_advanced_enable': 'Включить расширенные настройки',
-      'settings_advanced_enable_desc': 'Разблокировать кастомные пресеты и алгоритмы масштабирования',
+      'settings_advanced_enable_desc':
+          'Разблокировать кастомные пресеты и алгоритмы масштабирования',
 
       'settings_custom_preset': 'Пользовательский пресет скорости',
-      'settings_custom_preset_desc': 'Выберите пресет x264 от ultrafast до veryslow',
+      'settings_custom_preset_desc':
+          'Выберите пресет x264 от ultrafast до veryslow',
       'settings_custom_scaler': 'Метод масштабирования (Scaler)',
-      'settings_custom_scaler_desc': 'Выберите алгоритм интерполяции пикселей для уменьшения',
+      'settings_custom_scaler_desc':
+          'Выберите алгоритм интерполяции пикселей для уменьшения',
       'preset_default': 'Авто (По пресету)',
       'scaler_default': 'Авто (По пресету)',
-      'preset_default_desc': 'Следует активному пресету экрана (Быстрый, Обычный, Максимум)',
-      'preset_ultrafast_desc': 'Самый быстрый, минимальная эффективность сжатия и качество',
-      'preset_superfast_desc': 'Очень быстрый, низкое качество, минимальная нагрузка на CPU',
-      'preset_veryfast_desc': 'Быстрый, экономичный к батарее (по умолчанию для Быстрого режима)',
+      'preset_default_desc':
+          'Следует активному пресету экрана (Быстрый, Обычный, Максимум)',
+      'preset_ultrafast_desc':
+          'Самый быстрый, минимальная эффективность сжатия и качество',
+      'preset_superfast_desc':
+          'Очень быстрый, низкое качество, минимальная нагрузка на CPU',
+      'preset_veryfast_desc':
+          'Быстрый, экономичный к батарее (по умолчанию для Быстрого режима)',
       'preset_faster_desc': 'Достаточно быстрый, сбалансированное качество (по умолчанию для Обычного)',
-      'preset_fast_custom_desc': 'Умеренная скорость, четкие детали (по умолчанию для Максимума)',
-      'preset_medium_desc': 'Средний, стандартный баланс скорости и сжатия x264',
-      'preset_slow_custom_desc': 'Медленный, более плотное сжатие и чистое изображение',
-      'preset_slower_desc': 'Очень медленный, глубокий анализ макроблоков и точные детали',
-      'preset_veryslow_desc': 'Самый медленный, максимальное сжатие и наивысшее качество',
-      'scaler_default_desc': 'Следует активному пресету (Bicubic / Lanczos / Area)',
+      'preset_fast_custom_desc':
+          'Умеренная скорость, четкие детали (по умолчанию для Максимума)',
+      'preset_medium_desc':
+          'Средний, стандартный баланс скорости и сжатия x264',
+      'preset_slow_custom_desc':
+          'Медленный, более плотное сжатие и чистое изображение',
+      'preset_slower_desc':
+          'Очень медленный, глубокий анализ макроблоков и точные детали',
+      'preset_veryslow_desc':
+          'Самый медленный, максимальное сжатие и наивысшее качество',
+      'scaler_default_desc':
+          'Следует активному пресету (Bicubic / Lanczos / Area)',
       'scaler_fast_bilinear_desc': 'Самый быстрый, низшее качество (простая линейная интерполяция на ARM NEON)',
-      'scaler_bilinear_desc': 'Очень быстрый, низкое качество (мягкий/размытый, слабая четкость)',
-      'scaler_bicubic_desc': 'Средне-медленный, эталонный баланс скорости и четкости контуров',
-      'scaler_area_desc': 'Средний, усреднение по площади, идеально против муара при сжатии',
+      'scaler_bilinear_desc':
+          'Очень быстрый, низкое качество (мягкий/размытый, слабая четкость)',
+      'scaler_bicubic_desc':
+          'Средне-медленный, эталонный баланс скорости и четкости контуров',
+      'scaler_area_desc':
+          'Средний, усреднение по площади, идеально против муара при сжатии',
       'scaler_lanczos_desc': 'Самый медленный, 3-лепестковый фильтр sinc с максимальной детализацией',
-      'scaler_spline_desc': 'Медленный, естественные сплайны без артефактов ореолов',
-      'scaler_gauss_desc': 'Быстрый-средний, мягкий фильтр Гаусса для подавления шума и зерна',
+      'scaler_spline_desc':
+          'Медленный, естественные сплайны без артефактов ореолов',
+      'scaler_gauss_desc':
+          'Быстрый-средний, мягкий фильтр Гаусса для подавления шума и зерна',
     },
     'de': {
       'theme_oled_pure': 'Reines AMOLED',
@@ -3952,32 +4093,48 @@ class AppLocalizations {
       'video_options': 'Video- & Kompressionsoptionen',
       'settings_advanced_title': 'Erweiterte Einstellungen',
       'settings_advanced_enable': 'Erweiterte Einstellungen aktivieren',
-      'settings_advanced_enable_desc': 'Benutzerdefinierte Presets und Skalierungsalgorithmen freischalten',
+      'settings_advanced_enable_desc':
+          'Benutzerdefinierte Presets und Skalierungsalgorithmen freischalten',
 
       'settings_custom_preset': 'Benutzerdefiniertes Geschwindigkeits-Preset',
-      'settings_custom_preset_desc': 'Wählen Sie das x264-Preset von ultrafast bis veryslow',
+      'settings_custom_preset_desc':
+          'Wählen Sie das x264-Preset von ultrafast bis veryslow',
       'settings_custom_scaler': 'Videoskalierungsmethode (Scaler)',
       'settings_custom_scaler_desc': 'Wählen Sie den Pixel-Interpolationsalgorithmus für die Verkleinerung',
       'preset_default': 'Automatisch (Gemäß Preset)',
       'scaler_default': 'Automatisch (Gemäß Preset)',
-      'preset_default_desc': 'Folgt der aktiven Voreinstellung (Schnell, Normal, Maximal)',
-      'preset_ultrafast_desc': 'Am schnellsten, geringste Kompressionseffizienz und Qualität',
-      'preset_superfast_desc': 'Sehr schnell, niedrige Qualität, minimale CPU-Last',
-      'preset_veryfast_desc': 'Schnell, akkuschonend und effizient (Standard im Schnell-Modus)',
+      'preset_default_desc':
+          'Folgt der aktiven Voreinstellung (Schnell, Normal, Maximal)',
+      'preset_ultrafast_desc':
+          'Am schnellsten, geringste Kompressionseffizienz und Qualität',
+      'preset_superfast_desc':
+          'Sehr schnell, niedrige Qualität, minimale CPU-Last',
+      'preset_veryfast_desc':
+          'Schnell, akkuschonend und effizient (Standard im Schnell-Modus)',
       'preset_faster_desc': 'Ziemlich schnell, ausgewogene Alltagsqualität (Standard im Normal-Modus)',
       'preset_fast_custom_desc': 'Moderate Geschwindigkeit, scharfe Details (Standard im Maximal-Modus)',
-      'preset_medium_desc': 'Mittel, x264-Standardkompromiss aus Tempo und Kompression',
-      'preset_slow_custom_desc': 'Langsam, dichtere Kompression und sauberes Bild',
-      'preset_slower_desc': 'Sehr langsam, tiefe Makroblock-Analyse und feine Details',
-      'preset_veryslow_desc': 'Am langsamsten, maximale Kompressionseffizienz und höchste Qualität',
-      'scaler_default_desc': 'Folgt der aktiven Voreinstellung (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Am schnellsten, niedrigste Qualität (einfach linear auf ARM NEON)',
+      'preset_medium_desc':
+          'Mittel, x264-Standardkompromiss aus Tempo und Kompression',
+      'preset_slow_custom_desc':
+          'Langsam, dichtere Kompression und sauberes Bild',
+      'preset_slower_desc':
+          'Sehr langsam, tiefe Makroblock-Analyse und feine Details',
+      'preset_veryslow_desc':
+          'Am langsamsten, maximale Kompressionseffizienz und höchste Qualität',
+      'scaler_default_desc':
+          'Folgt der aktiven Voreinstellung (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Am schnellsten, niedrigste Qualität (einfach linear auf ARM NEON)',
       'scaler_bilinear_desc': 'Sehr schnell, geringe Qualität (weich/unscharf, wenig Kantenschärfe)',
-      'scaler_bicubic_desc': 'Mittel-langsam, Standardbalance aus Geschwindigkeit und Schärfe',
+      'scaler_bicubic_desc':
+          'Mittel-langsam, Standardbalance aus Geschwindigkeit und Schärfe',
       'scaler_area_desc': 'Mittel, Flächenmittelung optimal gegen Moiré-Effekte beim Verkleinern',
-      'scaler_lanczos_desc': 'Am langsamsten, 3-Lobe-Sinc-Filter für beste Details und Schärfe',
-      'scaler_spline_desc': 'Langsam, natürliche Spline-Kurven ohne störende Ringing-Artefakte',
-      'scaler_gauss_desc': 'Mittel-schnell, sanfter Gauß-Filter zur Dämpfung von Bildrauschen',
+      'scaler_lanczos_desc':
+          'Am langsamsten, 3-Lobe-Sinc-Filter für beste Details und Schärfe',
+      'scaler_spline_desc':
+          'Langsam, natürliche Spline-Kurven ohne störende Ringing-Artefakte',
+      'scaler_gauss_desc':
+          'Mittel-schnell, sanfter Gauß-Filter zur Dämpfung von Bildrauschen',
     },
     'it': {
       'theme_oled_pure': 'AMOLED Puro',
@@ -4239,32 +4396,49 @@ class AppLocalizations {
       'video_options': 'Opzioni video e compressione',
       'settings_advanced_title': 'Impostazioni Avanzate',
       'settings_advanced_enable': 'Abilita Impostazioni Avanzate',
-      'settings_advanced_enable_desc': 'Sblocca preset personalizzati e algoritmi di ridimensionamento',
+      'settings_advanced_enable_desc':
+          'Sblocca preset personalizzati e algoritmi di ridimensionamento',
 
       'settings_custom_preset': 'Preset di Velocità Personalizzato',
-      'settings_custom_preset_desc': 'Seleziona il preset x264 da ultrafast a veryslow',
+      'settings_custom_preset_desc':
+          'Seleziona il preset x264 da ultrafast a veryslow',
       'settings_custom_scaler': 'Metodo di Ridimensionamento Video (Scaler)',
-      'settings_custom_scaler_desc': 'Seleziona l\'algoritmo di interpolazione pixel per il downscaling',
+      'settings_custom_scaler_desc':
+          'Seleziona l\'algoritmo di interpolazione pixel per il downscaling',
       'preset_default': 'Automatico (Segui Preset)',
       'scaler_default': 'Automatico (Segui Preset)',
-      'preset_default_desc': 'Segue il preset attivo (Veloce, Normale, Massimo)',
-      'preset_ultrafast_desc': 'Il più veloce, minore efficienza di compressione e qualità',
+      'preset_default_desc':
+          'Segue il preset attivo (Veloce, Normale, Massimo)',
+      'preset_ultrafast_desc':
+          'Il più veloce, minore efficienza di compressione e qualità',
       'preset_superfast_desc': 'Molto veloce, bassa qualità, carico CPU minimo',
-      'preset_veryfast_desc': 'Veloce, efficiente e a basso consumo (predefinito Veloce)',
+      'preset_veryfast_desc':
+          'Veloce, efficiente e a basso consumo (predefinito Veloce)',
       'preset_faster_desc': 'Abbastanza veloce, qualità bilanciata quotidiana (predefinito Normale)',
-      'preset_fast_custom_desc': 'Velocità moderata, dettagli visivi nitidi (predefinito Massimo)',
-      'preset_medium_desc': 'Medio, equilibrio standard x264 tra velocità e compressione',
-      'preset_slow_custom_desc': 'Lento, compressione più compatta e immagini più pulite',
-      'preset_slower_desc': 'Molto lento, analisi approfondita dei macroblocchi e dettagli fini',
+      'preset_fast_custom_desc':
+          'Velocità moderata, dettagli visivi nitidi (predefinito Massimo)',
+      'preset_medium_desc':
+          'Medio, equilibrio standard x264 tra velocità e compressione',
+      'preset_slow_custom_desc':
+          'Lento, compressione più compatta e immagini più pulite',
+      'preset_slower_desc':
+          'Molto lento, analisi approfondita dei macroblocchi e dettagli fini',
       'preset_veryslow_desc': 'Il più lento, massima efficienza di compressione e qualità superiore',
-      'scaler_default_desc': 'Segue il preset attivo (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Il più veloce, qualità minima (lineare semplice su ARM NEON)',
-      'scaler_bilinear_desc': 'Molto veloce, bassa qualità (morbido/sfocato, poca nitidezza)',
-      'scaler_bicubic_desc': 'Medio-lento, equilibrio classico tra velocità e nitidezza dei bordi',
-      'scaler_area_desc': 'Medio, campionamento ad area ottimale contro il moiré nel downscale',
+      'scaler_default_desc':
+          'Segue il preset attivo (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Il più veloce, qualità minima (lineare semplice su ARM NEON)',
+      'scaler_bilinear_desc':
+          'Molto veloce, bassa qualità (morbido/sfocato, poca nitidezza)',
+      'scaler_bicubic_desc':
+          'Medio-lento, equilibrio classico tra velocità e nitidezza dei bordi',
+      'scaler_area_desc':
+          'Medio, campionamento ad area ottimale contro il moiré nel downscale',
       'scaler_lanczos_desc': 'Il più lento, filtro sinc a 3 lobi con i dettagli e la nitidezza migliori',
-      'scaler_spline_desc': 'Lento, curve spline naturali senza artefatti di ringing',
-      'scaler_gauss_desc': 'Medio-veloce, filtro gaussiano morbido per attenuare rumore e grana',
+      'scaler_spline_desc':
+          'Lento, curve spline naturali senza artefatti di ringing',
+      'scaler_gauss_desc':
+          'Medio-veloce, filtro gaussiano morbido per attenuare rumore e grana',
     },
     'nl': {
       'theme_oled_pure': 'Puur AMOLED',
@@ -4528,32 +4702,52 @@ class AppLocalizations {
       'video_options': 'Video- & compressie-opties',
       'settings_advanced_title': 'Geavanceerde Instellingen',
       'settings_advanced_enable': 'Geavanceerde Instellingen Inschakelen',
-      'settings_advanced_enable_desc': 'Ontgrendel aangepaste voorinstellingen en schaalalgoritmen',
+      'settings_advanced_enable_desc':
+          'Ontgrendel aangepaste voorinstellingen en schaalalgoritmen',
 
       'settings_custom_preset': 'Aangepaste Snelheidsvoorinstelling',
-      'settings_custom_preset_desc': 'Selecteer x264-voorinstelling van ultrafast tot veryslow',
+      'settings_custom_preset_desc':
+          'Selecteer x264-voorinstelling van ultrafast tot veryslow',
       'settings_custom_scaler': 'Videoschaalmethode (Scaler)',
-      'settings_custom_scaler_desc': 'Selecteer pixelinterpolatie-algoritme voor verkleinen',
+      'settings_custom_scaler_desc':
+          'Selecteer pixelinterpolatie-algoritme voor verkleinen',
       'preset_default': 'Automatisch (Volgens Voorinstelling)',
       'scaler_default': 'Automatisch (Volgens Voorinstelling)',
-      'preset_default_desc': 'Volgt de actieve voorinstelling (Snel, Normaal, Maximaal)',
-      'preset_ultrafast_desc': 'Snelst, laagste compressie-efficiëntie en kwaliteit',
-      'preset_superfast_desc': 'Zeer snel, lage kwaliteit, minimale CPU-belasting',
-      'preset_veryfast_desc': 'Snel, batterijvriendelijk en efficiënt (standaard Snel-modus)',
+      'preset_default_desc':
+          'Volgt de actieve voorinstelling (Snel, Normaal, Maximaal)',
+      'preset_ultrafast_desc':
+          'Snelst, laagste compressie-efficiëntie en kwaliteit',
+      'preset_superfast_desc':
+          'Zeer snel, lage kwaliteit, minimale CPU-belasting',
+      'preset_veryfast_desc':
+          'Snel, batterijvriendelijk en efficiënt (standaard Snel-modus)',
       'preset_faster_desc': 'Vrij snel, gebalanceerde dagelijkse kwaliteit (standaard Normaal-modus)',
-      'preset_fast_custom_desc': 'Matige snelheid, scherpe visuele details (standaard Maximaal-modus)',
-      'preset_medium_desc': 'Gemiddeld, standaard x264-balans tussen snelheid en compressie',
-      'preset_slow_custom_desc': 'Langzaam, strakkere compressie en helderder beeld',
-      'preset_slower_desc': 'Zeer langzaam, diepe macroblok-analyse en fijne details',
-      'preset_veryslow_desc': 'Langzaamst, maximale compressie-efficiëntie en hoogste kwaliteit',
-      'scaler_default_desc': 'Volgt de actieve voorinstelling (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Snelst, laagste kwaliteit (eenvoudig lineair op ARM NEON)',
-      'scaler_bilinear_desc': 'Zeer snel, lage kwaliteit (zacht/wazig, weinig scherpte)',
-      'scaler_bicubic_desc': 'Gemiddeld-langzaam, standaardbalans tussen snelheid en randscherpte',
-      'scaler_area_desc': 'Gemiddeld, oppervlakte-middeling ideaal tegen moiré bij verkleinen',
-      'scaler_lanczos_desc': 'Langzaamst, 3-lobig sinc-filter voor ultieme details en scherpte',
-      'scaler_spline_desc': 'Langzaam, natuurlijke spline-curven zonder storende randeffecten',
-      'scaler_gauss_desc': 'Snel-gemiddeld, zacht Gaussiaans filter om ruis en korrel te dempen',
+      'preset_fast_custom_desc':
+          'Matige snelheid, scherpe visuele details (standaard Maximaal-modus)',
+      'preset_medium_desc':
+          'Gemiddeld, standaard x264-balans tussen snelheid en compressie',
+      'preset_slow_custom_desc':
+          'Langzaam, strakkere compressie en helderder beeld',
+      'preset_slower_desc':
+          'Zeer langzaam, diepe macroblok-analyse en fijne details',
+      'preset_veryslow_desc':
+          'Langzaamst, maximale compressie-efficiëntie en hoogste kwaliteit',
+      'scaler_default_desc':
+          'Volgt de actieve voorinstelling (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Snelst, laagste kwaliteit (eenvoudig lineair op ARM NEON)',
+      'scaler_bilinear_desc':
+          'Zeer snel, lage kwaliteit (zacht/wazig, weinig scherpte)',
+      'scaler_bicubic_desc':
+          'Gemiddeld-langzaam, standaardbalans tussen snelheid en randscherpte',
+      'scaler_area_desc':
+          'Gemiddeld, oppervlakte-middeling ideaal tegen moiré bij verkleinen',
+      'scaler_lanczos_desc':
+          'Langzaamst, 3-lobig sinc-filter voor ultieme details en scherpte',
+      'scaler_spline_desc':
+          'Langzaam, natuurlijke spline-curven zonder storende randeffecten',
+      'scaler_gauss_desc':
+          'Snel-gemiddeld, zacht Gaussiaans filter om ruis en korrel te dempen',
     },
     'da': {
       'theme_oled_pure': 'Ren AMOLED',
@@ -4686,7 +4880,8 @@ class AppLocalizations {
       'proc_cancel': 'Annuller',
       'proc_cancel_btn': 'Annuller',
       'proc_cancel_confirm': 'Annuller konvertering?',
-      'proc_cancel_desc': 'Vil du annullere den igangværende videokonvertering?',
+      'proc_cancel_desc':
+          'Vil du annullere den igangværende videokonvertering?',
       'proc_dialog_no': 'Nej',
       'proc_dialog_yes': 'Ja',
       'proc_dialog_cancel': 'Annuller',
@@ -4814,29 +5009,47 @@ class AppLocalizations {
       'settings_advanced_enable_desc': 'Lås op for brugerdefinerede forudindstillinger og skaleringsalgoritmer',
 
       'settings_custom_preset': 'Brugerdefineret Hastighedsindstilling',
-      'settings_custom_preset_desc': 'Vælg x264-forudindstilling fra ultrafast til veryslow',
+      'settings_custom_preset_desc':
+          'Vælg x264-forudindstilling fra ultrafast til veryslow',
       'settings_custom_scaler': 'Videoskaleringsmetode (Scaler)',
-      'settings_custom_scaler_desc': 'Vælg pixelinterpoleringsalgoritme til nedskalering',
+      'settings_custom_scaler_desc':
+          'Vælg pixelinterpoleringsalgoritme til nedskalering',
       'preset_default': 'Automatisk (Følg Indstilling)',
       'scaler_default': 'Automatisk (Følg Indstilling)',
-      'preset_default_desc': 'Følger den aktive forudindstilling (Hurtig, Normal, Maksimal)',
-      'preset_ultrafast_desc': 'Hurtigst, laveste komprimeringseffektivitet og kvalitet',
-      'preset_superfast_desc': 'Meget hurtig, lav kvalitet, minimal CPU-belastning',
-      'preset_veryfast_desc': 'Hurtig, batterivenlig effektivitet (standard i Hurtig-tilstand)',
+      'preset_default_desc':
+          'Følger den aktive forudindstilling (Hurtig, Normal, Maksimal)',
+      'preset_ultrafast_desc':
+          'Hurtigst, laveste komprimeringseffektivitet og kvalitet',
+      'preset_superfast_desc':
+          'Meget hurtig, lav kvalitet, minimal CPU-belastning',
+      'preset_veryfast_desc':
+          'Hurtig, batterivenlig effektivitet (standard i Hurtig-tilstand)',
       'preset_faster_desc': 'Temmelig hurtig, afbalanceret hverdagskvalitet (standard i Normal-tilstand)',
-      'preset_fast_custom_desc': 'Moderat hastighed, skarpe detaljer (standard i Maksimal-tilstand)',
-      'preset_medium_desc': 'Middel, x264-standardkompromis mellem fart og komprimering',
-      'preset_slow_custom_desc': 'Langsom, strammere komprimering og renere billede',
-      'preset_slower_desc': 'Meget langsom, dyb makroblokanalyse og præcise detaljer',
-      'preset_veryslow_desc': 'Langsomst, maksimal komprimeringseffektivitet og højeste kvalitet',
-      'scaler_default_desc': 'Følger aktiv forudindstilling (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Hurtigst, laveste kvalitet (simpel lineær på ARM NEON)',
-      'scaler_bilinear_desc': 'Meget hurtig, lav kvalitet (blød/sløret, ringe skarphed)',
-      'scaler_bicubic_desc': 'Middel-langsom, klassisk balance mellem hastighed og kantskarphed',
-      'scaler_area_desc': 'Middel, arealgennemsnit ideelt mod moiré-mønstre ved nedskalering',
+      'preset_fast_custom_desc':
+          'Moderat hastighed, skarpe detaljer (standard i Maksimal-tilstand)',
+      'preset_medium_desc':
+          'Middel, x264-standardkompromis mellem fart og komprimering',
+      'preset_slow_custom_desc':
+          'Langsom, strammere komprimering og renere billede',
+      'preset_slower_desc':
+          'Meget langsom, dyb makroblokanalyse og præcise detaljer',
+      'preset_veryslow_desc':
+          'Langsomst, maksimal komprimeringseffektivitet og højeste kvalitet',
+      'scaler_default_desc':
+          'Følger aktiv forudindstilling (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Hurtigst, laveste kvalitet (simpel lineær på ARM NEON)',
+      'scaler_bilinear_desc':
+          'Meget hurtig, lav kvalitet (blød/sløret, ringe skarphed)',
+      'scaler_bicubic_desc':
+          'Middel-langsom, klassisk balance mellem hastighed og kantskarphed',
+      'scaler_area_desc':
+          'Middel, arealgennemsnit ideelt mod moiré-mønstre ved nedskalering',
       'scaler_lanczos_desc': 'Langsomst, 3-fløjet sinc-filter for de skarpeste detaljer og konturer',
-      'scaler_spline_desc': 'Langsom, naturlige spline-kurver uden uønskede ringe-artefakter',
-      'scaler_gauss_desc': 'Mellem-hurtig, blødt Gauss-filter til at dæmpe støj og korn',
+      'scaler_spline_desc':
+          'Langsom, naturlige spline-kurver uden uønskede ringe-artefakter',
+      'scaler_gauss_desc':
+          'Mellem-hurtig, blødt Gauss-filter til at dæmpe støj og korn',
     },
     'fi': {
       'theme_oled_pure': 'Puhdas AMOLED',
@@ -5026,7 +5239,8 @@ class AppLocalizations {
       'heavy_process_desc_long': 'Tämä video on pitkäkestoinen ({duration}). Koodausprosessi kestää kauemmin. On suositeltavaa pitää sovellus auki ja kytkeä laturi.',
       'heavy_process_desc_4k_long': 'Tämä video on 4K-laatuinen ja kestää yli 10 minuuttia ({duration}). Koodaus vaatii huomattavasti aikaa ja akkua. Laturin kytkemistä suositellaan.',
       'heavy_process_banner_4k': '4K-video: Ultra HD -koodaus vaatii intensiivistä laskentaa ja lisäaikaa.',
-      'heavy_process_banner_long': 'Pitkä kesto ({duration}): Videon muuntaminen kestää kauemmin.',
+      'heavy_process_banner_long':
+          'Pitkä kesto ({duration}): Videon muuntaminen kestää kauemmin.',
       'heavy_process_banner_4k_long': '4K-video • Kesto > 10 min: Muuntaminen vaatii lisäaikaa ja korkeampaa akkukapasiteettia.',
       'heavy_process_use_normal': 'Käytä Normaalia',
       'heavy_process_continue': 'Jatka silti',
@@ -5097,31 +5311,50 @@ class AppLocalizations {
       'video_options': 'Video- ja pakkausasetukset',
       'settings_advanced_title': 'Lisäasetukset',
       'settings_advanced_enable': 'Ota Lisäasetukset Käyttöön',
-      'settings_advanced_enable_desc': 'Avaa mukautetut esiasetukset ja skaalausalgoritmit',
+      'settings_advanced_enable_desc':
+          'Avaa mukautetut esiasetukset ja skaalausalgoritmit',
 
       'settings_custom_preset': 'Mukautettu Nopeuden Esiasetus',
-      'settings_custom_preset_desc': 'Valitse x264-esiasetus väliltä ultrafast – veryslow',
+      'settings_custom_preset_desc':
+          'Valitse x264-esiasetus väliltä ultrafast – veryslow',
       'settings_custom_scaler': 'Videon Skaalausmenetelmä (Scaler)',
-      'settings_custom_scaler_desc': 'Valitse pikseli-interpolaatioalgoritmi pienentämiseen',
+      'settings_custom_scaler_desc':
+          'Valitse pikseli-interpolaatioalgoritmi pienentämiseen',
       'preset_default': 'Automaattinen (Esiasetuksen mukaan)',
       'scaler_default': 'Automaattinen (Esiasetuksen mukaan)',
-      'preset_default_desc': 'Noudattaa aktiivista esiasetusta (Nopea, Normaali, Maksimi)',
+      'preset_default_desc':
+          'Noudattaa aktiivista esiasetusta (Nopea, Normaali, Maksimi)',
       'preset_ultrafast_desc': 'Nopein, alhaisin pakkaustehokkuus ja laatu',
-      'preset_superfast_desc': 'Erittäin nopea, heikko laatu, minimaalinen CPU-kuormitus',
-      'preset_veryfast_desc': 'Nopea, akkuystävällinen ja kevyt (Nopea-tilan oletus)',
-      'preset_faster_desc': 'Melko nopea, tasapainoinen arkilaatu (Normaali-tilan oletus)',
-      'preset_fast_custom_desc': 'Kohtalainen nopeus, terävät yksityiskohdat (Maksimi-tilan oletus)',
-      'preset_medium_desc': 'Keskitaso, x264-standardin mukainen nopeuden ja koon tasapaino',
-      'preset_slow_custom_desc': 'Hidas, tiiviimpi pakkaus ja puhtaampi visuaalinen laatu',
-      'preset_slower_desc': 'Erittäin hidas, syvä makrolohkoanalyysi ja tarkat yksityiskohdat',
-      'preset_veryslow_desc': 'Hitain, maksimaalinen pakkaustehokkuus ja korkein laatu',
-      'scaler_default_desc': 'Noudattaa aktiivista esiasetusta (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Nopein, heikoin laatu (yksinkertainen lineaarinen ARM NEONissa)',
-      'scaler_bilinear_desc': 'Erittäin nopea, alhainen laatu (pehmeä/sumea, matala terävyys)',
-      'scaler_bicubic_desc': 'Keski-hidas, nopeuden ja reunaterävyyden kultainen keskitie',
-      'scaler_area_desc': 'Keskitaso, pinta-alakeskiarvoistus moiré-ilmiön ehkäisyyn',
-      'scaler_lanczos_desc': 'Hitain, 3-lohkoinen sinc-suodatin parhaalla terävyydellä',
-      'scaler_spline_desc': 'Hidas, luonnolliset spline-käyrät ilman häiritsevää rengaskohinaa',
+      'preset_superfast_desc':
+          'Erittäin nopea, heikko laatu, minimaalinen CPU-kuormitus',
+      'preset_veryfast_desc':
+          'Nopea, akkuystävällinen ja kevyt (Nopea-tilan oletus)',
+      'preset_faster_desc':
+          'Melko nopea, tasapainoinen arkilaatu (Normaali-tilan oletus)',
+      'preset_fast_custom_desc':
+          'Kohtalainen nopeus, terävät yksityiskohdat (Maksimi-tilan oletus)',
+      'preset_medium_desc':
+          'Keskitaso, x264-standardin mukainen nopeuden ja koon tasapaino',
+      'preset_slow_custom_desc':
+          'Hidas, tiiviimpi pakkaus ja puhtaampi visuaalinen laatu',
+      'preset_slower_desc':
+          'Erittäin hidas, syvä makrolohkoanalyysi ja tarkat yksityiskohdat',
+      'preset_veryslow_desc':
+          'Hitain, maksimaalinen pakkaustehokkuus ja korkein laatu',
+      'scaler_default_desc':
+          'Noudattaa aktiivista esiasetusta (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Nopein, heikoin laatu (yksinkertainen lineaarinen ARM NEONissa)',
+      'scaler_bilinear_desc':
+          'Erittäin nopea, alhainen laatu (pehmeä/sumea, matala terävyys)',
+      'scaler_bicubic_desc':
+          'Keski-hidas, nopeuden ja reunaterävyyden kultainen keskitie',
+      'scaler_area_desc':
+          'Keskitaso, pinta-alakeskiarvoistus moiré-ilmiön ehkäisyyn',
+      'scaler_lanczos_desc':
+          'Hitain, 3-lohkoinen sinc-suodatin parhaalla terävyydellä',
+      'scaler_spline_desc':
+          'Hidas, luonnolliset spline-käyrät ilman häiritsevää rengaskohinaa',
       'scaler_gauss_desc': 'Keskinopea, pehmeä Gauss-suodatin kohinan ja rakeisuuden vaimennukseen',
     },
     'no': {
@@ -5379,32 +5612,51 @@ class AppLocalizations {
       'video_options': 'Video- og komprimeringsalternativer',
       'settings_advanced_title': 'Avanserte Innstillinger',
       'settings_advanced_enable': 'Aktiver Avanserte Innstillinger',
-      'settings_advanced_enable_desc': 'Lås opp tilpassede forhåndsinnstillinger og skaleringsalgoritmer',
+      'settings_advanced_enable_desc':
+          'Lås opp tilpassede forhåndsinnstillinger og skaleringsalgoritmer',
 
       'settings_custom_preset': 'Tilpasset Hastighetsforhåndsinnstilling',
-      'settings_custom_preset_desc': 'Velg x264-forhåndsinnstilling fra ultrafast til veryslow',
+      'settings_custom_preset_desc':
+          'Velg x264-forhåndsinnstilling fra ultrafast til veryslow',
       'settings_custom_scaler': 'Videoskaleringsmetode (Scaler)',
-      'settings_custom_scaler_desc': 'Velg pikselinterpolasjonsalgoritme for nedskalering',
+      'settings_custom_scaler_desc':
+          'Velg pikselinterpolasjonsalgoritme for nedskalering',
       'preset_default': 'Automatisk (Følg Forhåndsinnstilling)',
       'scaler_default': 'Automatisk (Følg Forhåndsinnstilling)',
-      'preset_default_desc': 'Følger den aktive forhåndsinnstillingen (Rask, Normal, Maksimal)',
-      'preset_ultrafast_desc': 'Raskest, lavest komprimeringseffektivitet og kvalitet',
-      'preset_superfast_desc': 'Veldig rask, lav kvalitet, minimal CPU-belastning',
-      'preset_veryfast_desc': 'Rask, batterivennlig effektivitet (standard i Rask-modus)',
-      'preset_faster_desc': 'Ganske rask, balansert hverdagskvalitet (standard i Normal-modus)',
-      'preset_fast_custom_desc': 'Moderat hastighet, skarpe detaljer (standard i Maksimal-modus)',
-      'preset_medium_desc': 'Middels, x264-standardbalanse mellom fart og komprimering',
+      'preset_default_desc':
+          'Følger den aktive forhåndsinnstillingen (Rask, Normal, Maksimal)',
+      'preset_ultrafast_desc':
+          'Raskest, lavest komprimeringseffektivitet og kvalitet',
+      'preset_superfast_desc':
+          'Veldig rask, lav kvalitet, minimal CPU-belastning',
+      'preset_veryfast_desc':
+          'Rask, batterivennlig effektivitet (standard i Rask-modus)',
+      'preset_faster_desc':
+          'Ganske rask, balansert hverdagskvalitet (standard i Normal-modus)',
+      'preset_fast_custom_desc':
+          'Moderat hastighet, skarpe detaljer (standard i Maksimal-modus)',
+      'preset_medium_desc':
+          'Middels, x264-standardbalanse mellom fart og komprimering',
       'preset_slow_custom_desc': 'Treg, strammere komprimering og renere bilde',
-      'preset_slower_desc': 'Veldig treg, dyp makroblokkanalyse og presise detaljer',
-      'preset_veryslow_desc': 'Tregest, maksimal komprimeringseffektivitet og høyeste kvalitet',
-      'scaler_default_desc': 'Følger aktiv forhåndsinnstilling (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Raskest, lavest kvalitet (enkel lineær på ARM NEON)',
-      'scaler_bilinear_desc': 'Veldig rask, lav kvalitet (myk/uskarp, lite skarphet)',
-      'scaler_bicubic_desc': 'Middels-treg, klassisk balanse mellom hastighet og kantskarphet',
+      'preset_slower_desc':
+          'Veldig treg, dyp makroblokkanalyse og presise detaljer',
+      'preset_veryslow_desc':
+          'Tregest, maksimal komprimeringseffektivitet og høyeste kvalitet',
+      'scaler_default_desc':
+          'Følger aktiv forhåndsinnstilling (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Raskest, lavest kvalitet (enkel lineær på ARM NEON)',
+      'scaler_bilinear_desc':
+          'Veldig rask, lav kvalitet (myk/uskarp, lite skarphet)',
+      'scaler_bicubic_desc':
+          'Middels-treg, klassisk balanse mellom hastighet og kantskarphet',
       'scaler_area_desc': 'Middels, arealgjennomsnitt ideelt mot moiré-mønstre ved nedskalering',
-      'scaler_lanczos_desc': 'Tregest, 3-fløyet sinc-filter med overlegne detaljer og skarphet',
-      'scaler_spline_desc': 'Treg, naturlige spline-kurver uten forstyrrende ringeartefakter',
-      'scaler_gauss_desc': 'Middels rask, mykt Gauss-filter for å dempe støy og korn',
+      'scaler_lanczos_desc':
+          'Tregest, 3-fløyet sinc-filter med overlegne detaljer og skarphet',
+      'scaler_spline_desc':
+          'Treg, naturlige spline-kurver uten forstyrrende ringeartefakter',
+      'scaler_gauss_desc':
+          'Middels rask, mykt Gauss-filter for å dempe støy og korn',
     },
     'sv': {
       'theme_oled_pure': 'Ren AMOLED',
@@ -5593,7 +5845,8 @@ class AppLocalizations {
       'heavy_process_desc_4k': 'Denna video har 4K Ultra HD-upplösning. 4K-kodning kräver intensiv beräkning och mer tid. Det rekommenderas att ansluta en laddare.',
       'heavy_process_desc_long': 'Denna video har lång speltid ({duration}). Kodningsprocessen tar längre tid. Det rekommenderas att hålla appen öppen och ansluta en laddare.',
       'heavy_process_desc_4k_long': 'Denna video är 4K och längre än 10 minuter ({duration}). Kodningen kräver betydande tid och ström. Det rekommenderas att ansluta en laddare.',
-      'heavy_process_banner_4k': '4K-video: Ultra HD-kodning kräver intensiv beräkning och extra tid.',
+      'heavy_process_banner_4k':
+          '4K-video: Ultra HD-kodning kräver intensiv beräkning och extra tid.',
       'heavy_process_banner_long': 'Lång Speltid ({duration}): Videokonvertering tar längre tid att slutföra.',
       'heavy_process_banner_4k_long': '4K-video • Speltid > 10 Min: Konvertering kräver extra tid och högre batteriförbrukning.',
       'heavy_process_use_normal': 'Använd Normal',
@@ -5663,32 +5916,52 @@ class AppLocalizations {
       'video_options': 'Video- och komprimeringsalternativ',
       'settings_advanced_title': 'Avancerade Inställningar',
       'settings_advanced_enable': 'Aktivera Avancerade Inställningar',
-      'settings_advanced_enable_desc': 'Lås upp anpassade förinställningar och skaleringsalgoritmer',
+      'settings_advanced_enable_desc':
+          'Lås upp anpassade förinställningar och skaleringsalgoritmer',
 
       'settings_custom_preset': 'Anpassad Hastighetsförinställning',
-      'settings_custom_preset_desc': 'Välj x264-förinställning från ultrafast till veryslow',
+      'settings_custom_preset_desc':
+          'Välj x264-förinställning från ultrafast till veryslow',
       'settings_custom_scaler': 'Videoskaleringsmetod (Scaler)',
-      'settings_custom_scaler_desc': 'Välj pixelinterpoleringsalgoritm för nedskalning',
+      'settings_custom_scaler_desc':
+          'Välj pixelinterpoleringsalgoritm för nedskalning',
       'preset_default': 'Automatisk (Följ Förinställning)',
       'scaler_default': 'Automatisk (Följ Förinställning)',
-      'preset_default_desc': 'Följer aktiv förinställning (Snabb, Normal, Maximal)',
-      'preset_ultrafast_desc': 'Snabbast, lägst komprimeringseffektivitet och kvalitet',
-      'preset_superfast_desc': 'Mycket snabb, låg kvalitet, minimal CPU-belastning',
-      'preset_veryfast_desc': 'Snabb, batterivänlig effektivitet (standard i Snabb-läge)',
-      'preset_faster_desc': 'Ganska snabb, balanserad vardagskvalitet (standard i Normal-läge)',
-      'preset_fast_custom_desc': 'Måttlig hastighet, skarpa detaljer (standard i Maximal-läge)',
-      'preset_medium_desc': 'Medel, x264-standardbalans mellan hastighet och komprimering',
+      'preset_default_desc':
+          'Följer aktiv förinställning (Snabb, Normal, Maximal)',
+      'preset_ultrafast_desc':
+          'Snabbast, lägst komprimeringseffektivitet och kvalitet',
+      'preset_superfast_desc':
+          'Mycket snabb, låg kvalitet, minimal CPU-belastning',
+      'preset_veryfast_desc':
+          'Snabb, batterivänlig effektivitet (standard i Snabb-läge)',
+      'preset_faster_desc':
+          'Ganska snabb, balanserad vardagskvalitet (standard i Normal-läge)',
+      'preset_fast_custom_desc':
+          'Måttlig hastighet, skarpa detaljer (standard i Maximal-läge)',
+      'preset_medium_desc':
+          'Medel, x264-standardbalans mellan hastighet och komprimering',
       'preset_slow_custom_desc': 'Långsam, tätare komprimering och renare bild',
-      'preset_slower_desc': 'Mycket långsam, djup makroblocksanalys och exakta detaljer',
-      'preset_veryslow_desc': 'Långsammast, maximal komprimeringseffektivitet och högsta kvalitet',
-      'scaler_default_desc': 'Följer aktiv förinställning (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Snabbast, lägst kvalitet (enkel linjär på ARM NEON)',
-      'scaler_bilinear_desc': 'Mycket snabb, låg kvalitet (mjuk/suddig, låg skärpa)',
-      'scaler_bicubic_desc': 'Medel-långsam, klassisk balans mellan fart och kantskärpa',
-      'scaler_area_desc': 'Medel, areamedelvärde optimalt mot moirémönster vid nedskalning',
-      'scaler_lanczos_desc': 'Långsammast, 3-lobers sinc-filter för bästa detaljer och skärpa',
-      'scaler_spline_desc': 'Långsam, naturliga splinekurvor utan störande ringningsartefakter',
-      'scaler_gauss_desc': 'Medelsnabb, mjukt Gauss-filter för att dämpa brus och kornighet',
+      'preset_slower_desc':
+          'Mycket långsam, djup makroblocksanalys och exakta detaljer',
+      'preset_veryslow_desc':
+          'Långsammast, maximal komprimeringseffektivitet och högsta kvalitet',
+      'scaler_default_desc':
+          'Följer aktiv förinställning (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Snabbast, lägst kvalitet (enkel linjär på ARM NEON)',
+      'scaler_bilinear_desc':
+          'Mycket snabb, låg kvalitet (mjuk/suddig, låg skärpa)',
+      'scaler_bicubic_desc':
+          'Medel-långsam, klassisk balans mellan fart och kantskärpa',
+      'scaler_area_desc':
+          'Medel, areamedelvärde optimalt mot moirémönster vid nedskalning',
+      'scaler_lanczos_desc':
+          'Långsammast, 3-lobers sinc-filter för bästa detaljer och skärpa',
+      'scaler_spline_desc':
+          'Långsam, naturliga splinekurvor utan störande ringningsartefakter',
+      'scaler_gauss_desc':
+          'Medelsnabb, mjukt Gauss-filter för att dämpa brus och kornighet',
     },
     'ms': {
       'theme_oled_pure': 'AMOLED Tulen',
@@ -5822,7 +6095,8 @@ class AppLocalizations {
       'proc_cancel': 'Batal',
       'proc_cancel_btn': 'Batal',
       'proc_cancel_confirm': 'Batalkan Penukaran?',
-      'proc_cancel_desc': 'Batalkan proses penukaran video yang sedang berjalan?',
+      'proc_cancel_desc':
+          'Batalkan proses penukaran video yang sedang berjalan?',
       'proc_dialog_no': 'Tidak',
       'proc_dialog_yes': 'Ya',
       'proc_dialog_cancel': 'Batal',
@@ -5947,32 +6221,50 @@ class AppLocalizations {
       'video_options': 'Pilihan Video & Mampatan',
       'settings_advanced_title': 'Tetapan Lanjutan',
       'settings_advanced_enable': 'Dayakan Tetapan Lanjutan',
-      'settings_advanced_enable_desc': 'Buka pilihan pratetap tersuai dan algoritma penskala',
+      'settings_advanced_enable_desc':
+          'Buka pilihan pratetap tersuai dan algoritma penskala',
 
       'settings_custom_preset': 'Pratetap Kelajuan Tersuai',
-      'settings_custom_preset_desc': 'Pilih pratetap x264 daripada ultrafast hingga veryslow',
+      'settings_custom_preset_desc':
+          'Pilih pratetap x264 daripada ultrafast hingga veryslow',
       'settings_custom_scaler': 'Kaedah Penskalaan Video (Scaler)',
-      'settings_custom_scaler_desc': 'Pilih algoritma interpolasi piksel penskalaan ke bawah',
+      'settings_custom_scaler_desc':
+          'Pilih algoritma interpolasi piksel penskalaan ke bawah',
       'preset_default': 'Auto (Ikut Pratetap)',
       'scaler_default': 'Auto (Ikut Pratetap)',
-      'preset_default_desc': 'Mengikut pratetap paparan aktif (Pantas, Normal, Maksimum)',
-      'preset_ultrafast_desc': 'Paling pantas, kecekapan mampatan & kualiti terendah',
-      'preset_superfast_desc': 'Sangat pantas, kualiti rendah, beban CPU minimum',
+      'preset_default_desc':
+          'Mengikut pratetap paparan aktif (Pantas, Normal, Maksimum)',
+      'preset_ultrafast_desc':
+          'Paling pantas, kecekapan mampatan & kualiti terendah',
+      'preset_superfast_desc':
+          'Sangat pantas, kualiti rendah, beban CPU minimum',
       'preset_veryfast_desc': 'Pantas, cekap jimat bateri (lalai mod Pantas)',
-      'preset_faster_desc': 'Agak pantas, kualiti harian seimbang (lalai mod Normal)',
-      'preset_fast_custom_desc': 'Kelajuan sederhana, perincian visual tajam (lalai mod Maksimum)',
-      'preset_medium_desc': 'Sederhana, kompromi standard x264 antara kelajuan & saiz',
-      'preset_slow_custom_desc': 'Perlahan, mampatan lebih padat & visual jernih',
-      'preset_slower_desc': 'Sangat perlahan, analisis makroblok mendalam & perincian tepat',
-      'preset_veryslow_desc': 'Paling perlahan, kecekapan mampatan maksimum & kualiti tertinggi',
-      'scaler_default_desc': 'Mengikut pratetap aktif (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'Paling pantas, kualiti terendah (linear ringkas ARM NEON)',
-      'scaler_bilinear_desc': 'Sangat pantas, kualiti rendah (lembut/kabur, ketajaman minima)',
-      'scaler_bicubic_desc': 'Sederhana-perlahan, standard seimbang antara kelajuan & ketajaman',
+      'preset_faster_desc':
+          'Agak pantas, kualiti harian seimbang (lalai mod Normal)',
+      'preset_fast_custom_desc':
+          'Kelajuan sederhana, perincian visual tajam (lalai mod Maksimum)',
+      'preset_medium_desc':
+          'Sederhana, kompromi standard x264 antara kelajuan & saiz',
+      'preset_slow_custom_desc':
+          'Perlahan, mampatan lebih padat & visual jernih',
+      'preset_slower_desc':
+          'Sangat perlahan, analisis makroblok mendalam & perincian tepat',
+      'preset_veryslow_desc':
+          'Paling perlahan, kecekapan mampatan maksimum & kualiti tertinggi',
+      'scaler_default_desc':
+          'Mengikut pratetap aktif (Bicubic / Lanczos / Area)',
+      'scaler_fast_bilinear_desc':
+          'Paling pantas, kualiti terendah (linear ringkas ARM NEON)',
+      'scaler_bilinear_desc':
+          'Sangat pantas, kualiti rendah (lembut/kabur, ketajaman minima)',
+      'scaler_bicubic_desc':
+          'Sederhana-perlahan, standard seimbang antara kelajuan & ketajaman',
       'scaler_area_desc': 'Sederhana, pensampelan kawasan terbaik cegah moiré semasa turun skala',
       'scaler_lanczos_desc': 'Paling perlahan, penapis sinc 3-lob dengan perincian & ketajaman terbaik',
-      'scaler_spline_desc': 'Perlahan, lengkung spline semula jadi tajam tanpa artifak dering',
-      'scaler_gauss_desc': 'Pantas-sederhana, penapis gaussian lembut untuk meredam hingar',
+      'scaler_spline_desc':
+          'Perlahan, lengkung spline semula jadi tajam tanpa artifak dering',
+      'scaler_gauss_desc':
+          'Pantas-sederhana, penapis gaussian lembut untuk meredam hingar',
     },
     'vi': {
       'theme_oled_pure': 'AMOLED Thuần Khiết',
@@ -6237,31 +6529,47 @@ class AppLocalizations {
       'video_options': 'Tùy chọn video & nén',
       'settings_advanced_title': 'Cài đặt nâng cao',
       'settings_advanced_enable': 'Bật cài đặt nâng cao',
-      'settings_advanced_enable_desc': 'Mở khóa preset tùy chỉnh và thuật toán scaler',
+      'settings_advanced_enable_desc':
+          'Mở khóa preset tùy chỉnh và thuật toán scaler',
 
       'settings_custom_preset': 'Preset tốc độ tùy chỉnh',
-      'settings_custom_preset_desc': 'Chọn preset x264 từ ultrafast đến veryslow',
+      'settings_custom_preset_desc':
+          'Chọn preset x264 từ ultrafast đến veryslow',
       'settings_custom_scaler': 'Phương pháp thu phóng video (Scaler)',
-      'settings_custom_scaler_desc': 'Chọn thuật toán nội suy điểm ảnh khi giảm độ phân giải',
+      'settings_custom_scaler_desc':
+          'Chọn thuật toán nội suy điểm ảnh khi giảm độ phân giải',
       'preset_default': 'Tự động (Theo preset)',
       'scaler_default': 'Tự động (Theo preset)',
-      'preset_default_desc': 'Theo cài đặt trước hiển thị (Nhanh, Bình thường, Tối đa)',
-      'preset_ultrafast_desc': 'Nhanh nhất, hiệu quả nén và chất lượng thấp nhất',
+      'preset_default_desc':
+          'Theo cài đặt trước hiển thị (Nhanh, Bình thường, Tối đa)',
+      'preset_ultrafast_desc':
+          'Nhanh nhất, hiệu quả nén và chất lượng thấp nhất',
       'preset_superfast_desc': 'Rất nhanh, chất lượng thấp, tải CPU tối thiểu',
-      'preset_veryfast_desc': 'Nhanh, tiết kiệm pin và hiệu quả (mặc định chế độ Nhanh)',
+      'preset_veryfast_desc':
+          'Nhanh, tiết kiệm pin và hiệu quả (mặc định chế độ Nhanh)',
       'preset_faster_desc': 'Khá nhanh, chất lượng cân bằng hằng ngày (mặc định chế độ Bình thường)',
-      'preset_fast_custom_desc': 'Tốc độ vừa phải, chi tiết sắc nét (mặc định chế độ Tối đa)',
-      'preset_medium_desc': 'Trung bình, cân bằng chuẩn x264 giữa tốc độ và độ nén',
-      'preset_slow_custom_desc': 'Chậm, nén chặt hơn và hình ảnh trong trẻo hơn',
-      'preset_slower_desc': 'Rất chậm, phân tích macroblock sâu và chi tiết chính xác',
-      'preset_veryslow_desc': 'Chậm nhất, hiệu quả nén tối đa và chất lượng cao nhất',
-      'scaler_default_desc': 'Theo cài đặt trước đang kích hoạt (Bicubic / Lanczos / Area)',
+      'preset_fast_custom_desc':
+          'Tốc độ vừa phải, chi tiết sắc nét (mặc định chế độ Tối đa)',
+      'preset_medium_desc':
+          'Trung bình, cân bằng chuẩn x264 giữa tốc độ và độ nén',
+      'preset_slow_custom_desc':
+          'Chậm, nén chặt hơn và hình ảnh trong trẻo hơn',
+      'preset_slower_desc':
+          'Rất chậm, phân tích macroblock sâu và chi tiết chính xác',
+      'preset_veryslow_desc':
+          'Chậm nhất, hiệu quả nén tối đa và chất lượng cao nhất',
+      'scaler_default_desc':
+          'Theo cài đặt trước đang kích hoạt (Bicubic / Lanczos / Area)',
       'scaler_fast_bilinear_desc': 'Nhanh nhất, chất lượng thấp nhất (nội suy tuyến tính đơn giản ARM NEON)',
-      'scaler_bilinear_desc': 'Rất nhanh, chất lượng thấp (mềm/mờ, ít độ sắc nét)',
-      'scaler_bicubic_desc': 'Trung bình-chậm, cân bằng chuẩn mực giữa tốc độ và độ sắc nét viền',
+      'scaler_bilinear_desc':
+          'Rất nhanh, chất lượng thấp (mềm/mờ, ít độ sắc nét)',
+      'scaler_bicubic_desc':
+          'Trung bình-chậm, cân bằng chuẩn mực giữa tốc độ và độ sắc nét viền',
       'scaler_area_desc': 'Trung bình, lấy mẫu diện tích tối ưu chống hiện tượng moiré khi hạ độ phân giải',
-      'scaler_lanczos_desc': 'Chậm nhất, bộ lọc sinc 3-lobe tái tạo chi tiết và độ sắc nét tối ưu',
-      'scaler_spline_desc': 'Chậm, đường cong spline tự nhiên sắc nét không bị viền bóng mờ',
+      'scaler_lanczos_desc':
+          'Chậm nhất, bộ lọc sinc 3-lobe tái tạo chi tiết và độ sắc nét tối ưu',
+      'scaler_spline_desc':
+          'Chậm, đường cong spline tự nhiên sắc nét không bị viền bóng mờ',
       'scaler_gauss_desc': 'Nhanh vừa, bộ lọc gaussian mềm để khử nhiễu và hạt',
     },
     'th': {
@@ -6521,32 +6829,47 @@ class AppLocalizations {
       'video_options': 'ตัวเลือกวิดีโอและการบีบอัด',
       'settings_advanced_title': 'การตั้งค่าขั้นสูง',
       'settings_advanced_enable': 'เปิดใช้งานการตั้งค่าขั้นสูง',
-      'settings_advanced_enable_desc': 'ปลดล็อกพรีเซ็ตแบบกำหนดเองและอัลกอริทึมการปรับขนาด',
+      'settings_advanced_enable_desc':
+          'ปลดล็อกพรีเซ็ตแบบกำหนดเองและอัลกอริทึมการปรับขนาด',
 
       'settings_custom_preset': 'พรีเซ็ตความเร็วแบบกำหนดเอง',
-      'settings_custom_preset_desc': 'เลือกพรีเซ็ต x264 ตั้งแต่ ultrafast ถึง veryslow',
+      'settings_custom_preset_desc':
+          'เลือกพรีเซ็ต x264 ตั้งแต่ ultrafast ถึง veryslow',
       'settings_custom_scaler': 'วิธีปรับขนาดวิดีโอ (Scaler)',
-      'settings_custom_scaler_desc': 'เลือกอัลกอริทึมการประมาณค่าพิกเซลสำหรับการย่อขนาด',
+      'settings_custom_scaler_desc':
+          'เลือกอัลกอริทึมการประมาณค่าพิกเซลสำหรับการย่อขนาด',
       'preset_default': 'อัตโนมัติ (ตามพรีเซ็ต)',
       'scaler_default': 'อัตโนมัติ (ตามพรีเซ็ต)',
-      'preset_default_desc': 'ทำตามพรีเซ็ตหน้าจอที่ใช้งานอยู่ (เร็ว, ปกติ, สูงสุด)',
-      'preset_ultrafast_desc': 'เร็วที่สุด, ประสิทธิภาพการบีบอัดและคุณภาพต่ำที่สุด',
+      'preset_default_desc':
+          'ทำตามพรีเซ็ตหน้าจอที่ใช้งานอยู่ (เร็ว, ปกติ, สูงสุด)',
+      'preset_ultrafast_desc':
+          'เร็วที่สุด, ประสิทธิภาพการบีบอัดและคุณภาพต่ำที่สุด',
       'preset_superfast_desc': 'เร็วมาก, คุณภาพต่ำ, ใช้ CPU น้อยที่สุด',
-      'preset_veryfast_desc': 'เร็ว, ประหยัดพลังงานแบตเตอรี่ (ค่าเริ่มต้นโหมดเร็ว)',
+      'preset_veryfast_desc':
+          'เร็ว, ประหยัดพลังงานแบตเตอรี่ (ค่าเริ่มต้นโหมดเร็ว)',
       'preset_faster_desc': 'ค่อนข้างเร็ว, คุณภาพสมดุลสำหรับการใช้งานทั่วไป (ค่าเริ่มต้นโหมดปกติ)',
-      'preset_fast_custom_desc': 'ความเร็วปานกลาง, รายละเอียดภาพคมชัด (ค่าเริ่มต้นโหมดสูงสุด)',
-      'preset_medium_desc': 'ปานกลาง, ความสมดุลมาตรฐานของ x264 ระหว่างความเร็วและขนาด',
+      'preset_fast_custom_desc':
+          'ความเร็วปานกลาง, รายละเอียดภาพคมชัด (ค่าเริ่มต้นโหมดสูงสุด)',
+      'preset_medium_desc':
+          'ปานกลาง, ความสมดุลมาตรฐานของ x264 ระหว่างความเร็วและขนาด',
       'preset_slow_custom_desc': 'ช้า, บีบอัดได้แน่นขึ้นและภาพสะอาดตาขึ้น',
-      'preset_slower_desc': 'ช้ามาก, วิเคราะห์มาโครบล็อกเชิงลึกเพื่อความแม่นยำสูง',
-      'preset_veryslow_desc': 'ช้าที่สุด, ประสิทธิภาพการบีบอัดสูงสุดและคุณภาพดีที่สุด',
+      'preset_slower_desc':
+          'ช้ามาก, วิเคราะห์มาโครบล็อกเชิงลึกเพื่อความแม่นยำสูง',
+      'preset_veryslow_desc':
+          'ช้าที่สุด, ประสิทธิภาพการบีบอัดสูงสุดและคุณภาพดีที่สุด',
       'scaler_default_desc': 'ทำตามพรีเซ็ตที่เลือก (Bicubic / Lanczos / Area)',
-      'scaler_fast_bilinear_desc': 'เร็วที่สุด, คุณภาพต่ำที่สุด (ลิเนียร์พื้นฐานบน ARM NEON)',
+      'scaler_fast_bilinear_desc':
+          'เร็วที่สุด, คุณภาพต่ำที่สุด (ลิเนียร์พื้นฐานบน ARM NEON)',
       'scaler_bilinear_desc': 'เร็วมาก, คุณภาพต่ำ (ภาพนุ่ม/เบลอ, ขาดความคมชัด)',
-      'scaler_bicubic_desc': 'ปานกลาง-ช้า, ความสมดุลมาตรฐานระหว่างความเร็วและความคมชัด',
-      'scaler_area_desc': 'ปานกลาง, เฉลี่ยพื้นที่ช่วยป้องกันลายคลื่นมัวเรเมื่อลดขนาด',
-      'scaler_lanczos_desc': 'ช้าที่สุด, ตัวกรอง Sinc 3 ลูป ให้รายละเอียดและความคมชัดสูงที่สุด',
+      'scaler_bicubic_desc':
+          'ปานกลาง-ช้า, ความสมดุลมาตรฐานระหว่างความเร็วและความคมชัด',
+      'scaler_area_desc':
+          'ปานกลาง, เฉลี่ยพื้นที่ช่วยป้องกันลายคลื่นมัวเรเมื่อลดขนาด',
+      'scaler_lanczos_desc':
+          'ช้าที่สุด, ตัวกรอง Sinc 3 ลูป ให้รายละเอียดและความคมชัดสูงที่สุด',
       'scaler_spline_desc': 'ช้า, เส้นโค้งสไปลน์ธรรมชาติ คมชัดไร้เงาขอบกวนตา',
-      'scaler_gauss_desc': 'เร็วปานกลาง, ตัวกรองเกาส์เซียนแบบนุ่มเพื่อลดสัญญาณรบกวน',
+      'scaler_gauss_desc':
+          'เร็วปานกลาง, ตัวกรองเกาส์เซียนแบบนุ่มเพื่อลดสัญญาณรบกวน',
     },
   };
 

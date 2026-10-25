@@ -161,7 +161,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('heavy_process_warning_banner')), findsNothing);
+      expect(
+        find.byKey(const Key('heavy_process_warning_banner')),
+        findsNothing,
+      );
 
       // 2. 4K video (3840x2160, 2 min) -> Banner appears with 4K text
       const vid4K = VideoInfo(
@@ -194,7 +197,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
+      expect(
+        find.byKey(const Key('heavy_process_warning_banner')),
+        findsOneWidget,
+      );
       expect(find.text(l10n.t('heavy_process_banner_4k')), findsOneWidget);
 
       // 3. Long duration video (1080p, 12 min = 720s) -> Banner appears with long duration text
@@ -228,9 +234,17 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
       expect(
-        find.text(l10n.t('heavy_process_banner_long', args: {'duration': vidLong.formattedDuration})),
+        find.byKey(const Key('heavy_process_warning_banner')),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          l10n.t(
+            'heavy_process_banner_long',
+            args: {'duration': vidLong.formattedDuration},
+          ),
+        ),
         findsOneWidget,
       );
 
@@ -265,7 +279,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('heavy_process_warning_banner')), findsOneWidget);
+      expect(
+        find.byKey(const Key('heavy_process_warning_banner')),
+        findsOneWidget,
+      );
       expect(find.text(l10n.t('heavy_process_banner_4k_long')), findsOneWidget);
     },
   );

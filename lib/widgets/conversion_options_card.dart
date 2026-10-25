@@ -48,7 +48,6 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     _customBitrateMbps = (widget.encodingOptions.customBitrateKbps / 1000)
         .round()
         .clamp(1, 35);
-    final appSettings = SettingsService().settings;
     final sourceFps = (widget.sourceVideo.fps > 0
         ? widget.sourceVideo.fps.round()
         : 60);
@@ -202,10 +201,7 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
               decoration: BoxDecoration(
                 color: Colors.amber.withAlpha(22),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.amber.withAlpha(90),
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.amber.withAlpha(90), width: 1),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,14 +220,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
                       is4K && isLongDuration
                           ? l10n.t('heavy_process_banner_4k_long')
                           : is4K
-                              ? l10n.t('heavy_process_banner_4k')
-                              : l10n.t(
-                                  'heavy_process_banner_long',
-                                  args: {
-                                    'duration':
-                                        widget.sourceVideo.formattedDuration,
-                                  },
-                                ),
+                          ? l10n.t('heavy_process_banner_4k')
+                          : l10n.t(
+                              'heavy_process_banner_long',
+                              args: {
+                                'duration':
+                                    widget.sourceVideo.formattedDuration,
+                              },
+                            ),
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.35,
@@ -1032,13 +1028,14 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final durationSecs = widget.sourceVideo.durationSeconds;
 
     if (durationSecs > 0) {
-      final isPortrait =
-          widget.sourceVideo.height > widget.sourceVideo.width;
+      final isPortrait = widget.sourceVideo.height > widget.sourceVideo.width;
       final res = widget.selectedResolution;
-      final targetW = (isPortrait && res != null && !res.label.startsWith('Original'))
+      final targetW =
+          (isPortrait && res != null && !res.label.startsWith('Original'))
           ? res.height
           : (res?.width ?? widget.sourceVideo.width);
-      final targetH = (isPortrait && res != null && !res.label.startsWith('Original'))
+      final targetH =
+          (isPortrait && res != null && !res.label.startsWith('Original'))
           ? res.width
           : (res?.height ?? widget.sourceVideo.height);
 
@@ -1126,7 +1123,8 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
 
   Widget _buildActivePresetIndicator(ThemeData theme, AppLocalizations l10n) {
     final appSettings = SettingsService().settings;
-    final isCustomPreset = appSettings.isAdvancedSettingsEnabled &&
+    final isCustomPreset =
+        appSettings.isAdvancedSettingsEnabled &&
         (appSettings.customPreset != 'default' ||
             appSettings.customScaler != 'default');
 
@@ -1134,16 +1132,16 @@ class _ConversionOptionsCardState extends State<ConversionOptionsCard> {
     final presetLabel = isCustomPreset
         ? l10n.t('preset_custom_title')
         : (preset == SpeedPreset.fast
-            ? l10n.t('preset_fast_title')
-            : (preset == SpeedPreset.max
-                ? l10n.t('preset_slow_title')
-                : l10n.t('preset_normal_title')));
+              ? l10n.t('preset_fast_title')
+              : (preset == SpeedPreset.max
+                    ? l10n.t('preset_slow_title')
+                    : l10n.t('preset_normal_title')));
 
     final presetDesc = preset == SpeedPreset.fast
         ? l10n.t('preset_fast_desc')
         : (preset == SpeedPreset.max
-            ? l10n.t('preset_slow_desc')
-            : l10n.t('preset_normal_desc'));
+              ? l10n.t('preset_slow_desc')
+              : l10n.t('preset_normal_desc'));
 
     final effectivePreset = appSettings.customPreset != 'default'
         ? appSettings.customPreset

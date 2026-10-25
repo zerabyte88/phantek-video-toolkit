@@ -3214,80 +3214,89 @@ void main() {
       expect(restored.customScaler, equals('fast_bilinear'));
     });
 
-    test('SettingsService persists and modifies advanced settings correctly', () async {
-      SharedPreferences.setMockInitialValues({});
-      final service = SettingsService();
-      await service.init();
+    test(
+      'SettingsService persists and modifies advanced settings correctly',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final service = SettingsService();
+        await service.init();
 
-      expect(service.settings.isAdvancedSettingsEnabled, isFalse);
+        expect(service.settings.isAdvancedSettingsEnabled, isFalse);
 
-      await service.setAdvancedSettingsEnabled(true);
-      expect(service.settings.isAdvancedSettingsEnabled, isTrue);
+        await service.setAdvancedSettingsEnabled(true);
+        expect(service.settings.isAdvancedSettingsEnabled, isTrue);
 
-      await service.setCustomPreset('veryfast');
-      expect(service.settings.customPreset, equals('veryfast'));
+        await service.setCustomPreset('veryfast');
+        expect(service.settings.customPreset, equals('veryfast'));
 
-      await service.setCustomScaler('lanczos');
-      expect(service.settings.customScaler, equals('lanczos'));
+        await service.setCustomScaler('lanczos');
+        expect(service.settings.customScaler, equals('lanczos'));
 
-      // Toggling off advanced settings must reset all overrides back to defaults
-      await service.setAdvancedSettingsEnabled(false);
-      expect(service.settings.isAdvancedSettingsEnabled, isFalse);
-      expect(service.settings.customPreset, equals('default'));
-      expect(service.settings.customScaler, equals('default'));
-    });
+        // Toggling off advanced settings must reset all overrides back to defaults
+        await service.setAdvancedSettingsEnabled(false);
+        expect(service.settings.isAdvancedSettingsEnabled, isFalse);
+        expect(service.settings.customPreset, equals('default'));
+        expect(service.settings.customScaler, equals('default'));
+      },
+    );
 
-    test('FFmpegService.buildVideoArguments correctly generates video arguments', () {
-      const video = VideoInfo(
-        filePath: '/source/input.mp4',
-        fileName: 'input.mp4',
-        width: 1920,
-        height: 1080,
-        durationSeconds: 60,
-        bitrate: 5000000,
-        fps: 30,
-        codec: 'h264',
-        fileSizeBytes: 20000000,
-      );
+    test(
+      'FFmpegService.buildVideoArguments correctly generates video arguments',
+      () {
+        const video = VideoInfo(
+          filePath: '/source/input.mp4',
+          fileName: 'input.mp4',
+          width: 1920,
+          height: 1080,
+          durationSeconds: 60,
+          bitrate: 5000000,
+          fps: 30,
+          codec: 'h264',
+          fileSizeBytes: 20000000,
+        );
 
-      const targetResolution =
-          VideoResolution(label: '720p', width: 1280, height: 720);
+        const targetResolution = VideoResolution(
+          label: '720p',
+          width: 1280,
+          height: 720,
+        );
 
-      const encodingOptions = EncodingOptions(
-        codec: VideoCodec.h264,
-        container: VideoContainer.mp4,
-      );
+        const encodingOptions = EncodingOptions(
+          codec: VideoCodec.h264,
+          container: VideoContainer.mp4,
+        );
 
-      // 1. Standard software encoding (advanced disabled)
-      final normalArgs = FFmpegService.buildVideoArguments(
-        sourceVideo: video,
-        targetResolution: targetResolution,
-        encodingOptions: encodingOptions,
-        appSettings: AppSettings(),
-        outputPath: '/output/out.mp4',
-      );
-      expect(normalArgs.contains('libx264'), isTrue);
+        // 1. Standard software encoding (advanced disabled)
+        final normalArgs = FFmpegService.buildVideoArguments(
+          sourceVideo: video,
+          targetResolution: targetResolution,
+          encodingOptions: encodingOptions,
+          appSettings: AppSettings(),
+          outputPath: '/output/out.mp4',
+        );
+        expect(normalArgs.contains('libx264'), isTrue);
 
-      // 2. Custom Preset and Scaler overrides (software)
-      final customSettings = AppSettings(
-        isAdvancedSettingsEnabled: true,
-        customPreset: 'ultrafast',
-        customScaler: 'fast_bilinear',
-      );
-      final customArgs = FFmpegService.buildVideoArguments(
-        sourceVideo: video,
-        targetResolution: targetResolution,
-        encodingOptions: encodingOptions,
-        appSettings: customSettings,
-        outputPath: '/output/out.mp4',
-      );
-      final presetIndex = customArgs.indexOf('-preset');
-      expect(presetIndex, isNot(-1));
-      expect(customArgs[presetIndex + 1], equals('ultrafast'));
+        // 2. Custom Preset and Scaler overrides (software)
+        final customSettings = AppSettings(
+          isAdvancedSettingsEnabled: true,
+          customPreset: 'ultrafast',
+          customScaler: 'fast_bilinear',
+        );
+        final customArgs = FFmpegService.buildVideoArguments(
+          sourceVideo: video,
+          targetResolution: targetResolution,
+          encodingOptions: encodingOptions,
+          appSettings: customSettings,
+          outputPath: '/output/out.mp4',
+        );
+        final presetIndex = customArgs.indexOf('-preset');
+        expect(presetIndex, isNot(-1));
+        expect(customArgs[presetIndex + 1], equals('ultrafast'));
 
-      final vfArg = customArgs.firstWhere((a) => a.contains('scale='));
-      expect(vfArg.contains('flags=fast_bilinear'), isTrue);
-    });
+        final vfArg = customArgs.firstWhere((a) => a.contains('scale='));
+        expect(vfArg.contains('flags=fast_bilinear'), isTrue);
+      },
+    );
 
     test('Cancellation dialog and Advanced Settings keys resolve properly in all 22 supported languages', () {
       const requiredKeys = [
@@ -3333,7 +3342,11 @@ void main() {
         for (final key in requiredKeys) {
           final val = l10n.t(key);
           expect(val.isNotEmpty, isTrue, reason: 'Key $key empty in $code');
-          expect(val, isNot(equals(key)), reason: 'Key $key unlocalized in $code');
+          expect(
+            val,
+            isNot(equals(key)),
+            reason: 'Key $key unlocalized in $code',
+          );
         }
       }
     });
@@ -3370,20 +3383,20 @@ void main() {
         );
 
         Widget buildCard() => MaterialApp(
-              home: Scaffold(
-                body: SingleChildScrollView(
-                  child: ConversionOptionsCard(
-                    sourceVideo: sourceVideo,
-                    resolutions: sourceVideo.availableDownscaleTargets,
-                    selectedResolution: currentRes,
-                    onResolutionChanged: (_) {},
-                    encodingOptions: currentOpts,
-                    onOptionsChanged: (_) {},
-                    l10n: l10n,
-                  ),
-                ),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ConversionOptionsCard(
+                sourceVideo: sourceVideo,
+                resolutions: sourceVideo.availableDownscaleTargets,
+                selectedResolution: currentRes,
+                onResolutionChanged: (_) {},
+                encodingOptions: currentOpts,
+                onOptionsChanged: (_) {},
+                l10n: l10n,
               ),
-            );
+            ),
+          ),
+        );
 
         // 1. Initially advanced settings is disabled -> displays Normal preset
         await tester.pumpWidget(buildCard());
@@ -3436,7 +3449,9 @@ void main() {
         expect(find.text('Custom Preset'), findsNothing);
 
         // 3. Toggle Advanced Settings Switch directly
-        final advSwitchFinder = find.byKey(const Key('advanced_settings_switch'));
+        final advSwitchFinder = find.byKey(
+          const Key('advanced_settings_switch'),
+        );
         expect(advSwitchFinder, findsOneWidget);
         await tester.tap(advSwitchFinder);
         await tester.pump();
@@ -3450,50 +3465,153 @@ void main() {
       },
     );
 
-    test('Default Theme and Language resolution adapts to system environment', () {
-      // 1. Theme resolution
-      expect(SettingsService.resolveInitialTheme(Brightness.dark), equals('oled_pure'));
-      expect(SettingsService.resolveInitialTheme(Brightness.light), equals('light_clean'));
+    test(
+      'Default Theme and Language resolution adapts to system environment',
+      () {
+        // 1. Theme resolution
+        expect(
+          SettingsService.resolveInitialTheme(Brightness.dark),
+          equals('oled_pure'),
+        );
+        expect(
+          SettingsService.resolveInitialTheme(Brightness.light),
+          equals('light_clean'),
+        );
 
-      // 2. Language resolution: supported languages
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('id', 'ID')]), equals('id'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('in', 'ID')]), equals('id'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ms', 'MY')]), equals('ms'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ja', 'JP')]), equals('ja'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('es', 'ES')]), equals('es'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('de', 'DE')]), equals('de'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('fr', 'FR')]), equals('fr'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ko', 'KR')]), equals('ko'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ru', 'RU')]), equals('ru'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('ar', 'SA')]), equals('ar'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('hi', 'IN')]), equals('hi'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('th', 'TH')]), equals('th'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('vi', 'VN')]), equals('vi'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('it', 'IT')]), equals('it'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nl', 'NL')]), equals('nl'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('pt', 'BR')]), equals('pt'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('fi', 'FI')]), equals('fi'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('sv', 'SE')]), equals('sv'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('da', 'DK')]), equals('da'));
+        // 2. Language resolution: supported languages
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('id', 'ID')]),
+          equals('id'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('in', 'ID')]),
+          equals('id'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('ms', 'MY')]),
+          equals('ms'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('ja', 'JP')]),
+          equals('ja'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('es', 'ES')]),
+          equals('es'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('de', 'DE')]),
+          equals('de'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('fr', 'FR')]),
+          equals('fr'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('ko', 'KR')]),
+          equals('ko'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('ru', 'RU')]),
+          equals('ru'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('ar', 'SA')]),
+          equals('ar'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('hi', 'IN')]),
+          equals('hi'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('th', 'TH')]),
+          equals('th'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('vi', 'VN')]),
+          equals('vi'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('it', 'IT')]),
+          equals('it'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('nl', 'NL')]),
+          equals('nl'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('pt', 'BR')]),
+          equals('pt'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('fi', 'FI')]),
+          equals('fi'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('sv', 'SE')]),
+          equals('sv'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('da', 'DK')]),
+          equals('da'),
+        );
 
-      // Chinese regional variants
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')]), equals('zh_CN'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'CN')]), equals('zh_CN'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh')]), equals('zh_CN'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')]), equals('zh_TW'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'TW')]), equals('zh_TW'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'HK')]), equals('zh_TW'));
+        // Chinese regional variants
+        expect(
+          AppLocalizations.resolveSupportedLanguage([
+            const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+          ]),
+          equals('zh_CN'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'CN')]),
+          equals('zh_CN'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('zh')]),
+          equals('zh_CN'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([
+            const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+          ]),
+          equals('zh_TW'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'TW')]),
+          equals('zh_TW'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('zh', 'HK')]),
+          equals('zh_TW'),
+        );
 
-      // Norwegian mapping
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('no', 'NO')]), equals('no'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nb', 'NO')]), equals('no'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('nn', 'NO')]), equals('no'));
+        // Norwegian mapping
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('no', 'NO')]),
+          equals('no'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('nb', 'NO')]),
+          equals('no'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('nn', 'NO')]),
+          equals('no'),
+        );
 
-      // Unsupported language falls back to English ('en')
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('pl', 'PL')]), equals('en'));
-      expect(AppLocalizations.resolveSupportedLanguage([const Locale('tr', 'TR')]), equals('en'));
-      expect(AppLocalizations.resolveSupportedLanguage([]), equals('en'));
-    });
+        // Unsupported language falls back to English ('en')
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('pl', 'PL')]),
+          equals('en'),
+        );
+        expect(
+          AppLocalizations.resolveSupportedLanguage([const Locale('tr', 'TR')]),
+          equals('en'),
+        );
+        expect(AppLocalizations.resolveSupportedLanguage([]), equals('en'));
+      },
+    );
 
     test('SettingsService applies system theme and language on first launch and reset', () async {
       SharedPreferences.setMockInitialValues({});
@@ -3503,16 +3621,23 @@ void main() {
       // First launch must automatically resolve initial theme & language
       expect(service.settings.isFirstLaunch, isFalse);
       expect(
-        service.settings.themeMode == 'oled_pure' || service.settings.themeMode == 'light_clean',
+        service.settings.themeMode == 'oled_pure' ||
+            service.settings.themeMode == 'light_clean',
         isTrue,
       );
-      expect(AppLocalizations.supportedLanguages.any((m) => m['code'] == service.settings.languageCode), isTrue);
+      expect(
+        AppLocalizations.supportedLanguages.any(
+          (m) => m['code'] == service.settings.languageCode,
+        ),
+        isTrue,
+      );
 
       // Mutate and resetToDefaults
       await service.setThemeMode('oled_snowfall');
       await service.resetToDefaults();
       expect(
-        service.settings.themeMode == 'oled_pure' || service.settings.themeMode == 'light_clean',
+        service.settings.themeMode == 'oled_pure' ||
+            service.settings.themeMode == 'light_clean',
         isTrue,
       );
     });
@@ -3582,17 +3707,61 @@ void main() {
     test('4K and long duration heavy processing localization strings resolve across all 22 supported languages', () {
       for (final code in supportedCodes) {
         final l10n = AppLocalizations(code);
-        expect(l10n.t('heavy_process_title'), isNotEmpty, reason: 'heavy_process_title missing in $code');
-        expect(l10n.t('heavy_process_desc'), isNotEmpty, reason: 'heavy_process_desc missing in $code');
-        expect(l10n.t('heavy_process_desc_4k'), isNotEmpty, reason: 'heavy_process_desc_4k missing in $code');
-        expect(l10n.t('heavy_process_desc_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_desc_long missing in $code');
-        expect(l10n.t('heavy_process_desc_4k_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_desc_4k_long missing in $code');
-        expect(l10n.t('heavy_process_banner_4k'), isNotEmpty, reason: 'heavy_process_banner_4k missing in $code');
-        expect(l10n.t('heavy_process_banner_long', args: {'duration': '15m 10s'}), contains('15m 10s'), reason: 'heavy_process_banner_long missing in $code');
-        expect(l10n.t('heavy_process_banner_4k_long'), isNotEmpty, reason: 'heavy_process_banner_4k_long missing in $code');
-        expect(l10n.t('heavy_process_use_normal'), isNotEmpty, reason: 'heavy_process_use_normal missing in $code');
-        expect(l10n.t('heavy_process_continue'), isNotEmpty, reason: 'heavy_process_continue missing in $code');
-        expect(l10n.t('heavy_process_cancel'), isNotEmpty, reason: 'heavy_process_cancel missing in $code');
+        expect(
+          l10n.t('heavy_process_title'),
+          isNotEmpty,
+          reason: 'heavy_process_title missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_desc'),
+          isNotEmpty,
+          reason: 'heavy_process_desc missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_desc_4k'),
+          isNotEmpty,
+          reason: 'heavy_process_desc_4k missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_desc_long', args: {'duration': '15m 10s'}),
+          contains('15m 10s'),
+          reason: 'heavy_process_desc_long missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_desc_4k_long', args: {'duration': '15m 10s'}),
+          contains('15m 10s'),
+          reason: 'heavy_process_desc_4k_long missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_banner_4k'),
+          isNotEmpty,
+          reason: 'heavy_process_banner_4k missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_banner_long', args: {'duration': '15m 10s'}),
+          contains('15m 10s'),
+          reason: 'heavy_process_banner_long missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_banner_4k_long'),
+          isNotEmpty,
+          reason: 'heavy_process_banner_4k_long missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_use_normal'),
+          isNotEmpty,
+          reason: 'heavy_process_use_normal missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_continue'),
+          isNotEmpty,
+          reason: 'heavy_process_continue missing in $code',
+        );
+        expect(
+          l10n.t('heavy_process_cancel'),
+          isNotEmpty,
+          reason: 'heavy_process_cancel missing in $code',
+        );
       }
     });
 
@@ -3637,5 +3806,3 @@ void main() {
     });
   });
 }
-
-

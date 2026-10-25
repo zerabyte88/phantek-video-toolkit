@@ -1807,9 +1807,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             l10n.t('settings_custom_preset_desc'),
                             style: TextStyle(
                               fontSize: 11.5,
-                              color: theme.colorScheme.onSurface.withAlpha(
-                                130,
-                              ),
+                              color: theme.colorScheme.onSurface.withAlpha(130),
                             ),
                           ),
                         ],
@@ -2632,8 +2630,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             icon: Icons.description_outlined,
             label: 'Third-party notices',
-            url:
-                'https://github.com/zerabyte88/phantek-video-toolkit/blob/main/THIRD_PARTY_NOTICES.md',
+            url: 'https://github.com/zerabyte88/phantek-video-toolkit/blob/main/THIRD_PARTY_NOTICES.md',
           ),
           const SizedBox(height: 8),
         ],
@@ -2673,11 +2670,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  size: 16,
-                  color: const Color(0xFF06B6D4),
-                ),
+                Icon(icon, size: 16, color: const Color(0xFF06B6D4)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -2699,8 +2692,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontSize: 10.5,
                           color: const Color(0xFF06B6D4),
                           decoration: TextDecoration.underline,
-                          decorationColor:
-                              const Color(0xFF06B6D4).withAlpha(120),
+                          decorationColor: const Color(0xFF06B6D4)
+                              .withAlpha(120),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

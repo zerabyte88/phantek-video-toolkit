@@ -10,7 +10,6 @@ import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/log.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/statistics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/app_settings.dart';
@@ -120,7 +119,8 @@ class FFmpegService {
 
   /// Get or create the output directory for converted media.
   /// If [customPath] is provided and valid, uses it.
-  /// Otherwise targets `/storage/emulated/0/Music` for audio or `/storage/emulated/0/Movies` for video directly on Android.
+  /// Otherwise targets `/storage/emulated/0/Music` for audio.
+  /// or `/storage/emulated/0/Movies` for video directly on Android.
   static Future<Directory> getOutputDirectory({
     String? customPath,
     bool isAudio = false,

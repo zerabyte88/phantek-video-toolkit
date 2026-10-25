@@ -45,12 +45,10 @@ class SettingsService extends ChangeNotifier {
         _settings = const AppSettings();
       }
 
-      // Auto-detect hardware on first launch
       if (_settings.isFirstLaunch) {
         await _applyFirstLaunchDefaults();
       }
 
-      // Apply wakelock preference
       await _applyWakelock(_settings.keepScreenAwake);
     } catch (e) {
       debugPrint('Error loading settings: $e');
@@ -60,9 +58,7 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
-  /// Resolves the default theme based on device system brightness:
-  /// - [Brightness.dark] -> 'oled_pure' (AMOLED Murni)
-  /// - [Brightness.light] -> 'light_clean' (Terang Bersih)
+  /// Resolves theme from brightness ('oled_pure' or 'light_clean').
   static String resolveInitialTheme([Brightness? brightness]) {
     if (brightness != null) {
       return brightness == Brightness.light ? 'light_clean' : 'oled_pure';
@@ -70,14 +66,15 @@ class SettingsService extends ChangeNotifier {
     try {
       final platformBrightness =
           WidgetsBinding.instance.platformDispatcher.platformBrightness;
-      return platformBrightness == Brightness.light ? 'light_clean' : 'oled_pure';
+      return platformBrightness == Brightness.light
+          ? 'light_clean'
+          : 'oled_pure';
     } catch (_) {
       return 'oled_pure';
     }
   }
 
-  /// Resolves the default language based on device system locales:
-  /// Matches against supported languages or falls back to 'en'.
+  /// Resolves language from system locales with 'en' fallback.
   static String resolveInitialLanguage([List<Locale>? locales]) {
     return AppLocalizations.resolveSupportedLanguage(locales);
   }
@@ -85,7 +82,6 @@ class SettingsService extends ChangeNotifier {
   Future<void> _applyFirstLaunchDefaults() async {
     final tier = DeviceSpecHelper.getDeviceTier();
 
-    // Hardware-based baseline defaults
     String preset = 'medium';
     if (tier == DeviceTier.highEnd) preset = 'medium';
     if (tier == DeviceTier.lowEnd) preset = 'fast';
@@ -179,7 +175,6 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setAdvancedSettingsEnabled(bool enabled) async {
     if (!enabled) {
-      // Revert all advanced overrides back to default when toggled off
       await updateSettings(
         _settings.copyWith(
           isAdvancedSettingsEnabled: false,
@@ -188,9 +183,7 @@ class SettingsService extends ChangeNotifier {
         ),
       );
     } else {
-      await updateSettings(
-        _settings.copyWith(isAdvancedSettingsEnabled: true),
-      );
+      await updateSettings(_settings.copyWith(isAdvancedSettingsEnabled: true));
     }
   }
 
@@ -213,10 +206,7 @@ class SettingsService extends ChangeNotifier {
   Future<void> resetToDefaults() async {
     final currentLang = _settings.languageCode;
     final initialTheme = resolveInitialTheme();
-    _settings = AppSettings(
-      languageCode: currentLang,
-      themeMode: initialTheme,
-    );
+    _settings = AppSettings(languageCode: currentLang, themeMode: initialTheme);
     notifyListeners();
     await _saveSettings();
     await _applyWakelock(_settings.keepScreenAwake);

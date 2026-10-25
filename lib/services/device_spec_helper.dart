@@ -1970,7 +1970,7 @@ class DeviceSpecHelper {
     final combined = '$s $h $b';
 
     // Mid-range & Flagship chips:
-    // 1. MediaTek Helio G70 and above (G70, G80, G81, G85, G88, G90, G91, G95, G96, G98, G99, G100, G200)
+    // 1. MediaTek Helio G70 and above (G70, G80, G81, G85, G88, G90,G91, G95, G96, G98, G99, G100, G200)
     if (combined.contains('g70') ||
         combined.contains('g80') ||
         combined.contains('g81') ||

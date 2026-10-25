@@ -34,7 +34,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _settingsService = SettingsService();
 
-
   // State
   _AppMode _selectedMode = _AppMode.convert;
   VideoInfo? _videoInfo;
@@ -372,7 +371,8 @@ class _HomeScreenState extends State<HomeScreen> {
         : _encodingOptions.copyWith(codec: VideoCodec.h264);
 
     final isSource4K = _videoInfo!.is4K;
-    final isTarget4K = fallbackRes.height >= 2160 ||
+    final isTarget4K =
+        fallbackRes.height >= 2160 ||
         fallbackRes.width >= 3840 ||
         (fallbackRes.width >= 2160 && fallbackRes.height >= 3840);
     final is4K = isSource4K || isTarget4K;
@@ -472,7 +472,6 @@ class _HomeScreenState extends State<HomeScreen> {
       CacheManagerService().clearAllCache();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

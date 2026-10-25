@@ -34,7 +34,6 @@ class AppSettings {
   /// Custom audio output directory.
   final String audioOutputDirectory;
 
-
   /// Card surface opacity (0.50 to 1.00).
   final double cardOpacity;
 

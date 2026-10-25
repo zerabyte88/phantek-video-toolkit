@@ -523,8 +523,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop) return;
           if (_isProcessing) {
-            final shouldPop =
-                await _showCancelConfirmationDialog(context, l10n, theme);
+            final shouldPop = await _showCancelConfirmationDialog(
+              context,
+              l10n,
+              theme,
+            );
             if (shouldPop == true && context.mounted) {
               Navigator.of(context).pop(true);
             }
@@ -539,8 +542,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               icon: const Icon(Icons.arrow_back_rounded),
               onPressed: () async {
                 if (_isProcessing) {
-                  final shouldPop =
-                      await _showCancelConfirmationDialog(context, l10n, theme);
+                  final shouldPop = await _showCancelConfirmationDialog(
+                    context,
+                    l10n,
+                    theme,
+                  );
                   if (shouldPop == true && context.mounted) {
                     Navigator.of(context).pop(true);
                   }
@@ -1461,8 +1467,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          final shouldPop =
-              await _showCancelConfirmationDialog(context, l10n, theme);
+          final shouldPop = await _showCancelConfirmationDialog(
+            context,
+            l10n,
+            theme,
+          );
           if (shouldPop == true && mounted) {
             Navigator.of(context).pop(true);
           }
@@ -1486,9 +1495,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Container(
