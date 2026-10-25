@@ -2826,32 +2826,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  color: const Color(0xFF06B6D4).withAlpha(22),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: const Color(0xFF06B6D4),
-                    width: 1.8,
+                    color: const Color(0xFF06B6D4).withAlpha(60),
+                    width: 1,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF06B6D4).withAlpha(60),
-                      blurRadius: 6,
-                      spreadRadius: 1,
-                    ),
-                  ],
                 ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/icon/developer_avatar.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.person_rounded,
-                      color: Color(0xFF06B6D4),
-                      size: 24,
-                    ),
-                  ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: Color(0xFF06B6D4),
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 12),
