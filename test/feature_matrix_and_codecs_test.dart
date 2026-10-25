@@ -1,11 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 zerabyte88
+
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:video_downscaler/models/app_settings.dart';
-import 'package:video_downscaler/models/encoding_options.dart';
-import 'package:video_downscaler/models/video_info.dart';
-import 'package:video_downscaler/services/ffmpeg_service.dart';
+import 'package:phantek_video_toolkit/models/app_settings.dart';
+import 'package:phantek_video_toolkit/models/encoding_options.dart';
+import 'package:phantek_video_toolkit/models/video_info.dart';
+import 'package:phantek_video_toolkit/services/ffmpeg_service.dart';
 
 void main() {
   group('1. Convert Feature & Video Codec Tests', () {

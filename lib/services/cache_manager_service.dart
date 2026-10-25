@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 zerabyte88
+
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';

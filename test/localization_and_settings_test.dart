@@ -1,22 +1,25 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 zerabyte88
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:video_downscaler/models/app_settings.dart';
-import 'package:video_downscaler/models/encoding_options.dart';
-import 'package:video_downscaler/models/video_info.dart';
-import 'package:video_downscaler/services/cache_manager_service.dart';
-import 'package:video_downscaler/services/device_spec_helper.dart';
-import 'package:video_downscaler/services/ffmpeg_service.dart';
-import 'package:video_downscaler/services/localization_service.dart';
-import 'package:video_downscaler/screens/settings_screen.dart';
+import 'package:phantek_video_toolkit/models/app_settings.dart';
+import 'package:phantek_video_toolkit/models/encoding_options.dart';
+import 'package:phantek_video_toolkit/models/video_info.dart';
+import 'package:phantek_video_toolkit/services/cache_manager_service.dart';
+import 'package:phantek_video_toolkit/services/device_spec_helper.dart';
+import 'package:phantek_video_toolkit/services/ffmpeg_service.dart';
+import 'package:phantek_video_toolkit/services/localization_service.dart';
+import 'package:phantek_video_toolkit/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:video_downscaler/services/settings_service.dart';
-import 'package:video_downscaler/theme/app_theme.dart';
-import 'package:video_downscaler/widgets/animated_flame_title.dart';
-import 'package:video_downscaler/widgets/conversion_options_card.dart';
-import 'package:video_downscaler/widgets/theme_animated_background.dart';
+import 'package:phantek_video_toolkit/services/settings_service.dart';
+import 'package:phantek_video_toolkit/theme/app_theme.dart';
+import 'package:phantek_video_toolkit/widgets/animated_flame_title.dart';
+import 'package:phantek_video_toolkit/widgets/conversion_options_card.dart';
+import 'package:phantek_video_toolkit/widgets/theme_animated_background.dart';
 
 const supportedUiCodes = [
   'id',
@@ -1275,7 +1278,8 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         expect(find.text('Developer: zerabyte88'), findsOneWidget);
-        expect(find.text('GitHub'), findsOneWidget);
+        expect(find.text('Source code'), findsOneWidget);
+        expect(find.text('GitHub'), findsNWidgets(2));
         expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
       },
     );

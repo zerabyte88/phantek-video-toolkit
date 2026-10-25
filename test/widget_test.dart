@@ -1,12 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 zerabyte88
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:video_downscaler/main.dart';
-import 'package:video_downscaler/models/encoding_options.dart';
-import 'package:video_downscaler/models/video_info.dart';
-import 'package:video_downscaler/screens/home_screen.dart';
-import 'package:video_downscaler/services/localization_service.dart';
-import 'package:video_downscaler/widgets/conversion_options_card.dart';
+import 'package:phantek_video_toolkit/main.dart';
+import 'package:phantek_video_toolkit/models/encoding_options.dart';
+import 'package:phantek_video_toolkit/models/video_info.dart';
+import 'package:phantek_video_toolkit/screens/home_screen.dart';
+import 'package:phantek_video_toolkit/services/localization_service.dart';
+import 'package:phantek_video_toolkit/widgets/conversion_options_card.dart';
 
 void main() {
   testWidgets('App renders correctly', (WidgetTester tester) async {

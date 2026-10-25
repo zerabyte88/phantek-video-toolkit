@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 zerabyte88
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -10,7 +13,8 @@ import 'localization_service.dart';
 import 'device_spec_helper.dart';
 
 class SettingsService extends ChangeNotifier {
-  static const _storageKey = 'video_downscaler_app_settings';
+  static const _storageKey = 'phantek_video_toolkit_app_settings';
+  static const _legacyStorageKey = 'video_downscaler_app_settings';
 
   AppSettings _settings = const AppSettings();
   bool _isLoaded = false;
@@ -27,7 +31,8 @@ class SettingsService extends ChangeNotifier {
   Future<void> init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final jsonStr = prefs.getString(_storageKey);
+      final jsonStr =
+          prefs.getString(_storageKey) ?? prefs.getString(_legacyStorageKey);
       if (jsonStr != null) {
         final Map<String, dynamic> data = jsonDecode(jsonStr);
         final rawRamBuffer = data['ramBufferMb'] as int? ?? 512;

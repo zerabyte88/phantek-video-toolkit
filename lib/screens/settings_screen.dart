@@ -1506,7 +1506,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppLocalizations l10n,
   ) {
     final isHwAccelActive =
-        settings.isAdvancedSettingsEnabled && settings.enableHardwareAcceleration;
+        settings.isAdvancedSettingsEnabled &&
+        settings.enableHardwareAcceleration;
 
     return Opacity(
       opacity: isHwAccelActive ? 0.45 : 1.0,
@@ -1536,7 +1537,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (isHwAccelActive) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.outline.withAlpha(25),
                     borderRadius: BorderRadius.circular(4),
@@ -1609,10 +1613,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isHwAccelActive
                   ? l10n.t('hw_accel_preset_disabled_desc')
                   : (settings.cpuPreset == 'fast'
-                      ? l10n.t('preset_fast_desc')
-                      : (settings.cpuPreset == 'slow'
-                            ? l10n.t('preset_slow_desc')
-                            : l10n.t('preset_normal_desc'))),
+                        ? l10n.t('preset_fast_desc')
+                        : (settings.cpuPreset == 'slow'
+                              ? l10n.t('preset_slow_desc')
+                              : l10n.t('preset_normal_desc'))),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.5,
@@ -1773,10 +1777,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: (settings.isAdvancedSettingsEnabled
-                          ? Colors.amber
-                          : theme.colorScheme.primary)
-                      .withAlpha(20),
+                  color:
+                      (settings.isAdvancedSettingsEnabled
+                              ? Colors.amber
+                              : theme.colorScheme.primary)
+                          .withAlpha(20),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -1837,10 +1842,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (settings.enableHardwareAcceleration
-                            ? Colors.green
-                            : theme.colorScheme.primary)
-                        .withAlpha(20),
+                    color:
+                        (settings.enableHardwareAcceleration
+                                ? Colors.green
+                                : theme.colorScheme.primary)
+                            .withAlpha(20),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -1932,7 +1938,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: isCustomPresetDisabled
                   ? null
                   : () =>
-                      _showPresetPickerSheet(context, theme, settings, l10n),
+                        _showPresetPickerSheet(context, theme, settings, l10n),
               child: Opacity(
                 opacity: isCustomPresetDisabled ? 0.45 : 1.0,
                 child: Padding(
@@ -1978,10 +1984,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: theme.colorScheme.outline.withAlpha(25),
+                                      color: theme.colorScheme.outline
+                                          .withAlpha(25),
                                       borderRadius: BorderRadius.circular(4),
                                       border: Border.all(
-                                        color: theme.colorScheme.outline.withAlpha(50),
+                                        color: theme.colorScheme.outline
+                                            .withAlpha(50),
                                         width: 0.8,
                                       ),
                                     ),
@@ -1990,7 +1998,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.onSurface.withAlpha(140),
+                                        color: theme.colorScheme.onSurface
+                                            .withAlpha(140),
                                       ),
                                     ),
                                   ),
@@ -2004,7 +2013,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   : l10n.t('settings_custom_preset_desc'),
                               style: TextStyle(
                                 fontSize: 11.5,
-                                color: theme.colorScheme.onSurface.withAlpha(130),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  130,
+                                ),
                               ),
                             ),
                           ],
@@ -2031,16 +2042,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               isCustomPresetDisabled
                                   ? l10n.t('hw_accel_disabled_badge')
                                   : (settings.customPreset == 'default'
-                                      ? l10n.t('preset_default')
-                                      : settings.customPreset),
+                                        ? l10n.t('preset_default')
+                                        : settings.customPreset),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: isCustomPresetDisabled
                                     ? theme.colorScheme.onSurface.withAlpha(100)
                                     : (settings.customPreset == 'default'
-                                        ? theme.colorScheme.onSurface.withAlpha(180)
-                                        : theme.colorScheme.primary),
+                                          ? theme.colorScheme.onSurface
+                                                .withAlpha(180)
+                                          : theme.colorScheme.primary),
                               ),
                             ),
                             if (!isCustomPresetDisabled) ...[
@@ -2048,7 +2060,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Icon(
                                 Icons.keyboard_arrow_down_rounded,
                                 size: 16,
-                                color: theme.colorScheme.onSurface.withAlpha(150),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  150,
+                                ),
                               ),
                             ],
                           ],
@@ -2272,31 +2286,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'label': 'veryfast',
         'desc': l10n.t('preset_veryfast_desc'),
       },
-      {
-        'id': 'faster',
-        'label': 'faster',
-        'desc': l10n.t('preset_faster_desc'),
-      },
+      {'id': 'faster', 'label': 'faster', 'desc': l10n.t('preset_faster_desc')},
       {
         'id': 'fast',
         'label': 'fast',
         'desc': l10n.t('preset_fast_custom_desc'),
       },
-      {
-        'id': 'medium',
-        'label': 'medium',
-        'desc': l10n.t('preset_medium_desc'),
-      },
+      {'id': 'medium', 'label': 'medium', 'desc': l10n.t('preset_medium_desc')},
       {
         'id': 'slow',
         'label': 'slow',
         'desc': l10n.t('preset_slow_custom_desc'),
       },
-      {
-        'id': 'slower',
-        'label': 'slower',
-        'desc': l10n.t('preset_slower_desc'),
-      },
+      {'id': 'slower', 'label': 'slower', 'desc': l10n.t('preset_slower_desc')},
       {
         'id': 'veryslow',
         'label': 'veryslow',
@@ -2398,8 +2400,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     size: 20,
                                     color: isSelected
                                         ? theme.colorScheme.primary
-                                        : theme.colorScheme.outline
-                                            .withAlpha(100),
+                                        : theme.colorScheme.outline.withAlpha(
+                                            100,
+                                          ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -2470,26 +2473,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'label': 'bilinear',
         'desc': l10n.t('scaler_bilinear_desc'),
       },
-      {
-        'id': 'gauss',
-        'label': 'gauss',
-        'desc': l10n.t('scaler_gauss_desc'),
-      },
-      {
-        'id': 'area',
-        'label': 'area',
-        'desc': l10n.t('scaler_area_desc'),
-      },
+      {'id': 'gauss', 'label': 'gauss', 'desc': l10n.t('scaler_gauss_desc')},
+      {'id': 'area', 'label': 'area', 'desc': l10n.t('scaler_area_desc')},
       {
         'id': 'bicubic',
         'label': 'bicubic',
         'desc': l10n.t('scaler_bicubic_desc'),
       },
-      {
-        'id': 'spline',
-        'label': 'spline',
-        'desc': l10n.t('scaler_spline_desc'),
-      },
+      {'id': 'spline', 'label': 'spline', 'desc': l10n.t('scaler_spline_desc')},
       {
         'id': 'lanczos',
         'label': 'lanczos',
@@ -2591,8 +2582,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     size: 20,
                                     color: isSelected
                                         ? theme.colorScheme.primary
-                                        : theme.colorScheme.outline
-                                            .withAlpha(100),
+                                        : theme.colorScheme.outline.withAlpha(
+                                            100,
+                                          ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -2787,23 +2779,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Detail rows
           _buildDetailRow(theme, l10n.t('app_version'), _appVersion),
-          _buildDetailRow(
-            theme,
-            l10n.t('build_label'),
-            _buildNumber,
-          ),
+          _buildDetailRow(theme, l10n.t('build_label'), _buildNumber),
           _buildDetailRow(
             theme,
             l10n.t('license_label'),
-            'GPLv3',
+            'GPL-3.0-or-later',
             onTap: () {
               showLicensePage(
                 context: context,
                 applicationName: 'Phantek - Video Toolkit',
                 applicationVersion: '$_appVersion ($_buildNumber)',
                 applicationLegalese:
-                    'Copyright © 2026 zerabyte88\nLicensed under GNU General Public License v3.0 (GPLv3)',
+                    'Copyright © 2026 zerabyte88\n'
+                    'Licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).\n\n'
+                    'This program comes with ABSOLUTELY NO WARRANTY. This is free software, '
+                    'and you are welcome to redistribute it under certain conditions.\n\n'
+                    'Source code: https://github.com/zerabyte88/phantek-video-toolkit\n'
+                    'Third-party notices: https://github.com/zerabyte88/phantek-video-toolkit/blob/main/THIRD_PARTY_NOTICES.md',
               );
+            },
+          ),
+          _buildDetailRow(
+            theme,
+            'Source code',
+            'GitHub',
+            onTap: () async {
+              try {
+                await launchUrl(
+                  Uri.parse(
+                    'https://github.com/zerabyte88/phantek-video-toolkit',
+                  ),
+                  mode: LaunchMode.externalApplication,
+                );
+              } catch (_) {}
             },
           ),
 
@@ -2878,7 +2886,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () async {
-                    final uri = Uri.parse('https://github.com/zerabyte88');
+                    final uri = Uri.parse(
+                      'https://github.com/zerabyte88/phantek-video-toolkit',
+                    );
                     try {
                       await launchUrl(
                         uri,

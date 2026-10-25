@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android%20(arm64-v8a)&color=059669&style=flat-square&logo=android&logoColor=white" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Engine&message=Flutter%20%2B%20FFmpeg&color=2563eb&style=flat-square&logo=flutter&logoColor=white" alt="Engine" />
   <img src="https://img.shields.io/static/v1?label=Privacy&message=100%25%20Offline&color=7c3aed&style=flat-square" alt="Privacy" />
-  <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPL-3.0&color=334155&style=flat-square&logo=gnu&logoColor=white" alt="License" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=GPL-3.0-or-later&color=334155&style=flat-square&logo=gnu&logoColor=white" alt="License" /></a>
 
   <p>
     <a href="https://github.com/zerabyte88/phantek-video-toolkit/releases/latest"><b>Download APK</b></a> •
@@ -144,21 +144,10 @@ The compiled APK will be located at:
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See the [LICENSE](LICENSE) file for complete details.
+This project is licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**. See the [LICENSE](LICENSE) file for complete details. A full list of third-party components and their licenses is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ### Third-Party Licenses & Acknowledgments
 
 * **FFmpeg:** This software uses libraries from the [FFmpeg](https://ffmpeg.org) project under the GNU General Public License v3.0 (compiled with `libx264` support). FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
 * **FFmpegKit:** Built using [ffmpeg-kit](https://github.com/arthenica/ffmpeg-kit) / `ffmpeg_kit_flutter_new` under GPLv3.
 * **Flutter & Dependencies:** Third-party Dart/Flutter packages are licensed under their respective open-source licenses (BSD, MIT, Apache 2.0). Complete open-source licenses can be inspected directly in the app under **Settings > About > License**.
-
----
-
-<div align="center">
-  <br/>
-  <a href="https://github.com/zerabyte88">
-    <img src="https://github.com/zerabyte88.png" width="48" height="48" style="border-radius: 50%;" alt="zerabyte88" />
-  </a>
-  <br/>
-  <sub>Developed with ❤️ by <a href="https://github.com/zerabyte88">zerabyte88</a></sub>
-</div>
