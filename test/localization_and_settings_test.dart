@@ -76,6 +76,7 @@ const supportedCodes = [
 void main() {
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMessageHandler(
           'dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle',
@@ -3433,6 +3434,105 @@ void main() {
 
         // State is toggled to true directly
         expect(service.settings.isAdvancedSettingsEnabled, isTrue);
+      },
+    );
+
+    testWidgets(
+      'SettingsScreen greys out fast, normal, and slow presets when advanced custom preset or scaler is active',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final service = SettingsService();
+        await service.setThemeMode('oled_pure');
+        await service.setLanguage('id');
+        await service.setCpuPreset('medium');
+        await service.setAdvancedSettingsEnabled(false);
+        await service.setCustomPreset('default');
+        await service.setCustomScaler('default');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.getTheme('oled_pure'),
+            home: const SettingsScreen(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        final fastChipFinder = find.widgetWithText(ChoiceChip, 'Cepat');
+        final normalChipFinder = find.widgetWithText(ChoiceChip, 'Normal');
+        final slowChipFinder = find.widgetWithText(ChoiceChip, 'Maksimal');
+
+        // Case 1: Advanced disabled -> chips are enabled
+        expect(fastChipFinder, findsOneWidget);
+        expect(normalChipFinder, findsOneWidget);
+        expect(slowChipFinder, findsOneWidget);
+
+        ChoiceChip fastChip = tester.widget<ChoiceChip>(fastChipFinder);
+        ChoiceChip normalChip = tester.widget<ChoiceChip>(normalChipFinder);
+        ChoiceChip slowChip = tester.widget<ChoiceChip>(slowChipFinder);
+
+        expect(fastChip.onSelected, isNotNull);
+        expect(normalChip.onSelected, isNotNull);
+        expect(slowChip.onSelected, isNotNull);
+        expect(normalChip.selected, isTrue);
+
+        // Case 2: Advanced enabled, customPreset != 'default' -> greyed out (disabled)
+        await service.setAdvancedSettingsEnabled(true);
+        await service.setCustomPreset('ultrafast');
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        fastChip = tester.widget<ChoiceChip>(fastChipFinder);
+        normalChip = tester.widget<ChoiceChip>(normalChipFinder);
+        slowChip = tester.widget<ChoiceChip>(slowChipFinder);
+
+        expect(fastChip.onSelected, isNull);
+        expect(normalChip.onSelected, isNull);
+        expect(slowChip.onSelected, isNull);
+        expect(fastChip.selected, isFalse);
+        expect(normalChip.selected, isFalse);
+        expect(slowChip.selected, isFalse);
+
+        // Tapping disabled chip should not change cpuPreset
+        await tester.tap(fastChipFinder, warnIfMissed: false);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(service.settings.cpuPreset, equals('medium'));
+
+        // Case 3: Advanced enabled, customPreset == 'default', customScaler != 'default' -> greyed out (disabled)
+        await service.setCustomPreset('default');
+        await service.setCustomScaler('lanczos');
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        fastChip = tester.widget<ChoiceChip>(fastChipFinder);
+        normalChip = tester.widget<ChoiceChip>(normalChipFinder);
+        slowChip = tester.widget<ChoiceChip>(slowChipFinder);
+
+        expect(fastChip.onSelected, isNull);
+        expect(normalChip.onSelected, isNull);
+        expect(slowChip.onSelected, isNull);
+
+        // Case 4: Advanced enabled, both customPreset and customScaler are 'default' -> enabled again
+        await service.setCustomScaler('default');
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        fastChip = tester.widget<ChoiceChip>(fastChipFinder);
+        normalChip = tester.widget<ChoiceChip>(normalChipFinder);
+        slowChip = tester.widget<ChoiceChip>(slowChipFinder);
+
+        expect(fastChip.onSelected, isNotNull);
+        expect(normalChip.onSelected, isNotNull);
+        expect(slowChip.onSelected, isNotNull);
+        expect(normalChip.selected, isTrue);
+
+        // Cleanup
+        await service.setAdvancedSettingsEnabled(false);
       },
     );
 

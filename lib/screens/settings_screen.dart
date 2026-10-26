@@ -23,8 +23,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsService = SettingsService();
   Map<String, dynamic>? _hardwareInfo;
-  String _appVersion = 'v2.9.4';
-  String _buildNumber = '53';
+  String _appVersion = 'v2.9.5';
+  String _buildNumber = '54';
   double? _dragCardOpacity;
 
   @override
@@ -53,14 +53,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _appVersion = 'v${packageInfo.version}';
           _buildNumber = packageInfo.buildNumber.isNotEmpty
               ? packageInfo.buildNumber
-              : '53';
+              : '54';
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _appVersion = 'v2.9.4';
-          _buildNumber = '53';
+          _appVersion = 'v2.9.5';
+          _buildNumber = '54';
         });
       }
     }
@@ -1437,6 +1437,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AppSettings settings,
     AppLocalizations l10n,
   ) {
+    final isCustomActive = settings.isAdvancedSettingsEnabled &&
+        (settings.customPreset != 'default' ||
+            settings.customScaler != 'default');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1445,7 +1449,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Icon(
               Icons.speed_rounded,
               size: 16,
-              color: theme.colorScheme.primary,
+              color: isCustomActive
+                  ? theme.colorScheme.onSurface.withAlpha(120)
+                  : theme.colorScheme.primary,
             ),
             const SizedBox(width: 8),
             Text(
@@ -1453,9 +1459,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: isCustomActive
+                    ? theme.colorScheme.onSurface.withAlpha(140)
+                    : theme.colorScheme.onSurface,
               ),
             ),
+            if (isCustomActive) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withAlpha(25),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withAlpha(60),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  l10n.t('preset_custom_title'),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 10),
@@ -1469,21 +1502,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 theme: theme,
                 label: l10n.t('preset_fast_title'),
                 selected: settings.cpuPreset == 'fast',
-                enabled: true,
+                enabled: !isCustomActive,
                 onSelected: () => _settingsService.setCpuPreset('fast'),
               ),
               _buildChoiceChip(
                 theme: theme,
                 label: l10n.t('preset_normal_title'),
                 selected: settings.cpuPreset == 'medium',
-                enabled: true,
+                enabled: !isCustomActive,
                 onSelected: () => _settingsService.setCpuPreset('medium'),
               ),
               _buildChoiceChip(
                 theme: theme,
                 label: l10n.t('preset_slow_title'),
                 selected: settings.cpuPreset == 'slow',
-                enabled: true,
+                enabled: !isCustomActive,
                 onSelected: () => _settingsService.setCpuPreset('slow'),
               ),
             ],
@@ -1492,16 +1525,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 8),
         Center(
           child: Text(
-            settings.cpuPreset == 'fast'
-                ? l10n.t('preset_fast_desc')
-                : (settings.cpuPreset == 'slow'
-                      ? l10n.t('preset_slow_desc')
-                      : l10n.t('preset_normal_desc')),
+            isCustomActive
+                ? (settings.customPreset != 'default' &&
+                        settings.customScaler != 'default'
+                    ? 'x264 ${settings.customPreset} • Scaler ${settings.customScaler}'
+                    : (settings.customPreset != 'default'
+                        ? 'x264 ${settings.customPreset} • ${l10n.t('scaler_default')}'
+                        : '${l10n.t('preset_default')} • Scaler ${settings.customScaler}'))
+                : (settings.cpuPreset == 'fast'
+                    ? l10n.t('preset_fast_desc')
+                    : (settings.cpuPreset == 'slow'
+                          ? l10n.t('preset_slow_desc')
+                          : l10n.t('preset_normal_desc'))),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.5,
               height: 1.35,
-              color: theme.colorScheme.onSurface.withAlpha(140),
+              color: isCustomActive
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withAlpha(140),
             ),
           ),
         ),
@@ -2756,23 +2798,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       showCheckmark: false,
       selected: selected && enabled,
       selectedColor: theme.colorScheme.primary,
-      backgroundColor: isDark
-          ? theme.colorScheme.surfaceContainerHighest.withAlpha(40)
-          : theme.colorScheme.surface,
+      backgroundColor: !enabled
+          ? (isDark
+              ? theme.colorScheme.surfaceContainerHighest.withAlpha(20)
+              : theme.colorScheme.surfaceContainerHighest.withAlpha(50))
+          : (isDark
+              ? theme.colorScheme.surfaceContainerHighest.withAlpha(40)
+              : theme.colorScheme.surface),
       side: BorderSide(
         color: !enabled
             ? theme.colorScheme.outline.withAlpha(40)
             : (selected
                   ? theme.colorScheme.primary
                   : theme.colorScheme.outline.withAlpha(60)),
-        width: selected ? 1.4 : 1.0,
+        width: selected && enabled ? 1.4 : 1.0,
       ),
       label: Text(
         label,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 12,
-          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+          fontWeight: selected && enabled ? FontWeight.w600 : FontWeight.w500,
           color: !enabled
               ? theme.colorScheme.onSurface.withAlpha(80)
               : (selected ? Colors.white : theme.colorScheme.onSurface),
